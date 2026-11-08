@@ -23,7 +23,8 @@ enum StrokeRenderer {
         switch stroke.brushType {
         case .SHAPE: ShapeRenderer.draw(c, stroke)
         case .TEXT: TextRenderer.draw(c, stroke, color: ArgbColor.hex(stroke.colorHex))
-        case .IMAGE, .DIAGRAM, .FORMULA: return // ayrı çiziciler (sonraki aşama)
+        case .FORMULA: FormulaRenderer.draw(c, stroke, color: ArgbColor.hex(stroke.colorHex))
+        case .IMAGE, .DIAGRAM: return // ayrı çiziciler (sonraki aşama)
         default:
             let n = stroke.points.count
             if n == 0 { return }

@@ -22,9 +22,22 @@ enum ImageRenderer {
             c.setFillColor(ArgbColor.cgColor(placeholder)); c.addPath(path); c.fillPath()
             return
         }
+        let alpha = Int(min(max(stroke.opacity, 0), 1) * 255)
+        // v43 arka planla uyum (gölge, renk/ışık, kenar): özgün resim değişmeden çizimde uygulanır
+        if let harmony = stroke.harmony {
+            if let t = affine(q, CGFloat(image.width), CGFloat(image.height)) {
+                HarmonyRenderer.draw(c, image, key: stroke.assetId, spec: harmony, transform: t, alpha: alpha)
+            } else {
+                let p = HarmonyRenderer.processed(image, key: stroke.assetId, spec: harmony)
+                c.saveGState(); c.setAlpha(CGFloat(alpha) / 255)
+                draw(c, p.image, quad: q, key: (stroke.assetId ?? "") + "|h" + harmony.cacheKey)
+                c.restoreGState()
+            }
+            return
+        }
         c.saveGState()
         defer { c.restoreGState() }
-        c.setAlpha(CGFloat(Int(min(max(stroke.opacity, 0), 1) * 255)) / 255)
+        c.setAlpha(CGFloat(alpha) / 255)
         c.interpolationQuality = .high
         draw(c, image, quad: q, key: stroke.assetId ?? "")
     }

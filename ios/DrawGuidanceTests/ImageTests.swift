@@ -118,4 +118,25 @@ final class ImageTests: XCTestCase {
         store.deleteForCanvas("c1")
         XCTAssertNil(store.bytes(a))
     }
+
+    func testHarmonyShadowAndColor() {
+        // Ortada koyu gri kare, çevresi saydam
+        let img = Bitmaps.draw(60, 60) { c in
+            c.setFillColor(ArgbColor.cgColor(0xFF80_8080)); c.fill(CGRect(x: 15, y: 10, width: 30, height: 40))
+        }
+        var spec = HarmonySpec()
+        spec.gainR = 1.4; spec.gainB = 0.6
+        let (px, w, h) = HarmonyRenderer.process(img, spec)
+        XCTAssertEqual(w, 60); XCTAssertEqual(h, 60)
+        let mid = px[30 * 60 + 30]
+        XCTAssertGreaterThan(mid >> 16 & 0xFF, mid & 0xFF, "kırmızı kazancı > mavi")
+        XCTAssertEqual(HarmonyRenderer.footY(px.map { UInt8($0 >> 24) }, w, h), 50)
+        CanvasImageCache.put("harmony-img", img)
+        let s = Stroke(id: "h", points: [StrokePoint(0, 0), StrokePoint(120, 0), StrokePoint(120, 120), StrokePoint(0, 120)], colorHex: "#000000",
+                       brushType: .IMAGE, sizePx: 1, opacity: 1, order: 0, assetId: "harmony-img", harmony: spec)
+        let out = pixels(120, 140) { c in StrokeRenderer.drawStroke(c, s) }
+        // Ayağın (y=100) hemen altı gölgeyle kararır
+        XCTAssertLessThan(out[(102 * 120 + 60) * 4], 250, "temas gölgesi")
+        XCTAssertGreaterThan(out[(60 * 120 + 60) * 4], out[(60 * 120 + 60) * 4 + 2], "resim renk uyumlu")
+    }
 }

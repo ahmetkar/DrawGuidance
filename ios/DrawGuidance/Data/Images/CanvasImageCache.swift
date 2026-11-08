@@ -116,7 +116,7 @@ final class CanvasAssetStore {
     @discardableResult
     func saveData(_ canvasLocalId: String, _ bytes: Data, _ mimeType: String, id: String = UUID().uuidString.lowercased(),
                   width: Int = 0, height: Int = 0) -> String {
-        let m = Meta(id: id, canvasLocalId: canvasLocalId, mimeType: mimeType, width: width, height: height, createdAt: CanvasStore.nowMs())
+        let m = Meta(id: id, canvasLocalId: canvasLocalId, mimeType: mimeType, width: width, height: height, createdAt: Int64(Date().timeIntervalSince1970 * 1000))
         try? FileManager.default.createDirectory(at: dir(canvasLocalId), withIntermediateDirectories: true)
         try? bytes.write(to: file(m), options: .atomic)
         if let j = try? JSONEncoder().encode(m) { try? j.write(to: dir(canvasLocalId).appendingPathComponent(id + ".json"), options: .atomic) }

@@ -9,6 +9,10 @@ struct EditorView: View {
     @State private var color: Color = .black
     @State private var width: Double = 4
     @State private var eraser = false
+    /// Şekil aracında seçili şekil ("lib.<kimlik>"); nil: kalem/silgi.
+    @State private var shapeId: String?
+    @State private var shapeStart: P?
+    @State private var pickerOpen = false
     @State private var historyTick = 0
     private let history = EditHistory<[Stroke]>()
 
@@ -43,18 +47,27 @@ struct EditorView: View {
             Divider().frame(height: 24)
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: 12) {
-                    Toggle(isOn: Binding(get: { !eraser }, set: { eraser = !$0 })) {
+                    Toggle(isOn: Binding(get: { !eraser && shapeId == nil }, set: { if $0 { eraser = false; shapeId = nil } })) {
                         Label(LocalizedStringKey("tool.brush"), systemImage: "paintbrush.pointed")
                     }.toggleStyle(.button).accessibilityIdentifier("tool_brush")
-                    Toggle(isOn: $eraser) {
+                    Toggle(isOn: Binding(get: { eraser && shapeId == nil }, set: { eraser = $0; if $0 { shapeId = nil } })) {
                         Label(LocalizedStringKey("tool.eraser"), systemImage: "eraser")
                     }.toggleStyle(.button).accessibilityIdentifier("tool_eraser")
+                    Toggle(isOn: Binding(get: { shapeId != nil }, set: { if $0 { pickerOpen = true } else { shapeId = nil } })) {
+                        Label(LocalizedStringKey("tool.shape"), systemImage: "square.on.circle")
+                    }.toggleStyle(.button).accessibilityIdentifier("tool_shape")
                     ColorPicker(LocalizedStringKey("tool.color"), selection: $color).labelsHidden()
                     Slider(value: $width, in: 1...40).frame(width: 120)
                 }
             }
         }
         .padding(.horizontal, 12).padding(.vertical, 8)
+        .sheet(isPresented: $pickerOpen) {
+            ShapePickerView(kind: canvas.kind) { id in
+                shapeId = id
+                eraser = false
+            }
+        }
     }
 
     /// Kağıt tuval biriminde (ör. 1080×1080) çizilir, ekrana sığdırılır.
@@ -66,7 +79,11 @@ struct EditorView: View {
             ctx.scaleBy(x: scale, y: scale)
             ctx.fill(Path(CGRect(x: 0, y: 0, width: w, height: h)), with: .color(paper))
             for s in Layers.visible(strokes, canvas.layers) + (current.map { [$0] } ?? []) {
-                draw(s, paper: paper, in: &ctx)
+                if s.brushType == .SHAPE {
+                    ctx.withCGContext { ShapeRenderer.draw($0, s) }
+                } else {
+                    draw(s, paper: paper, in: &ctx)
+                }
             }
         }
         .frame(width: w * scale, height: h * scale)
@@ -74,6 +91,14 @@ struct EditorView: View {
         .gesture(
             DragGesture(minimumDistance: 0)
                 .onChanged { v in
+                    if let shapeId {
+                        let p = P(Float(v.location.x / scale), Float(v.location.y / scale))
+                        let start = shapeStart ?? p
+                        shapeStart = start
+                        current = ShapeFactory.build(shapeId, start, p, style: newShapeStyle(), id: current?.id ?? UUID().uuidString.lowercased(),
+                                                     order: strokes.count)
+                        return
+                    }
                     let p = StrokePoint(ContentCodec.quantize(Float(v.location.x / scale)), ContentCodec.quantize(Float(v.location.y / scale)))
                     if current == nil {
                         current = Stroke(id: UUID().uuidString.lowercased(), points: [p], colorHex: color.hexRGB,
@@ -83,7 +108,17 @@ struct EditorView: View {
                         current?.points.append(p)
                     }
                 }
-                .onEnded { _ in
+                .onEnded { v in
+                    if let shapeId {
+                        let end = P(Float(v.location.x / scale), Float(v.location.y / scale))
+                        let start = shapeStart ?? end
+                        let s = hypotf(end.x - start.x, end.y - start.y) < 2 / Float(scale)
+                            ? shapeAt(shapeId, center: start) : current
+                        if let s { commit(strokes + [s]) }
+                        shapeStart = nil
+                        current = nil
+                        return
+                    }
                     if let s = current { commit(strokes + [s]) }
                     current = nil
                 }
@@ -100,6 +135,23 @@ struct EditorView: View {
         for p in s.points.dropFirst() { path.addLine(to: CGPoint(x: CGFloat(p.x), y: CGFloat(p.y))) }
         let c: Color = s.brushType == .ERASER ? paper : (Color(hex: s.colorHex) ?? .black).opacity(Double(s.opacity))
         ctx.stroke(path, with: .color(c), style: StrokeStyle(lineWidth: CGFloat(s.sizePx), lineCap: .round, lineJoin: .round))
+    }
+
+    /// Yeni şekillerin biçimi: kenar rengi seçili renk, kalınlık fırçayı izler (Android `newShapeStyle`).
+    private func newShapeStyle() -> ShapeStyle {
+        ShapeStyle(strokeColorHex: color.hexRGB, strokeWidth: Float(max(1, width / 2)))
+    }
+
+    /// Dokunulan noktaya tuvalin küçük kenarının %22'si boyutunda şekil (Android `addShapeAt`).
+    private func shapeAt(_ id: String, center: P) -> Stroke? {
+        let line = ShapeFactory.fit(id) == .LINE
+        let aspect: Float = ShapeFactory.fit(id) == .SQUARE ? 1 : ShapeFactory.aspect(id)
+        let half = Float(min(canvas.width, canvas.height)) * 0.22
+        let hw = line ? half : (aspect >= 1 ? half : half * aspect)
+        let hh = line ? half : (aspect >= 1 ? half / aspect : half)
+        let start = line ? P(center.x - half, center.y) : P(center.x - hw, center.y - hh)
+        let end = line ? P(center.x + half, center.y) : P(center.x + hw, center.y + hh)
+        return ShapeFactory.build(id, start, end, style: newShapeStyle(), id: UUID().uuidString.lowercased(), order: strokes.count)
     }
 
     private func commit(_ next: [Stroke]) {

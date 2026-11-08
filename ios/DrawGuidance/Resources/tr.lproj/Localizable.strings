@@ -12,3 +12,6 @@
 "tool.brush" = "Fırça";
 "tool.eraser" = "Silgi";
 "tool.color" = "Renk";
+"tool.shape" = "Şekil";
+"shapes.title" = "Şekiller";
+"common.close" = "Kapat";

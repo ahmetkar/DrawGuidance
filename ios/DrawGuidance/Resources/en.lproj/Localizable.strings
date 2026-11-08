@@ -12,3 +12,6 @@
 "tool.brush" = "Brush";
 "tool.eraser" = "Eraser";
 "tool.color" = "Color";
+"tool.shape" = "Shape";
+"shapes.title" = "Shapes";
+"common.close" = "Close";

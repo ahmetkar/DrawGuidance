@@ -1,3 +1,4 @@
+import PhotosUI
 import SwiftUI
 
 /// İlk düzenleyici: serbest çizim, silgi, renk, kalınlık, geri al/yinele (Android `EditHistory` ile).
@@ -23,6 +24,9 @@ struct EditorView: View {
     @State private var historyTick = 0
     // @State: görünüm yeniden kurulsa da (mağaza kaydı üst görünümü yeniler) geçmiş korunur
     @State private var history = EditHistory<[Stroke]>()
+    @State private var photo: PhotosPickerItem?
+    /// Resim kontrolünün sonucu (hata ya da onay gereken uyarılar).
+    @State private var importResult: ImageCheckResult?
 
     init(canvas: CanvasUi) {
         _canvas = State(initialValue: canvas)
@@ -45,6 +49,32 @@ struct EditorView: View {
         .navigationTitle(canvas.name)
         .navigationBarTitleDisplayMode(.inline)
         .onDisappear { store.save(canvas) }
+        .onAppear {
+            let c = canvas
+            DispatchQueue.global(qos: .userInitiated).async { CanvasAssetStore.shared.ensureLoaded(c) }
+        }
+        .onReceive(NotificationCenter.default.publisher(for: CanvasImageCache.changed).receive(on: RunLoop.main)) { _ in historyTick += 1 }
+        .onChange(of: photo) { _, item in
+            guard let item else { return }
+            photo = nil
+            Task {
+                guard let data = try? await item.loadTransferable(type: Data.self) else {
+                    importResult = ImageCheckResult(errors: [.unreadable], warnings: [], image: nil); return
+                }
+                let r = await Task.detached { ImageImportValidator.check(data) }.value
+                if r.accepted && r.warnings.isEmpty { addImage(r.image!) } else { importResult = r }
+            }
+        }
+        .alert(L(importResult?.accepted == true ? "image_warning_title" : "image_rejected_title"), isPresented: Binding(get: { importResult != nil }, set: { if !$0 { importResult = nil } })) {
+            if let r = importResult, r.accepted {
+                Button(L("image_add_anyway")) { if let img = r.image { addImage(img) }; importResult = nil }
+                Button(L("cancel_button"), role: .cancel) { importResult = nil }
+            } else {
+                Button(L("ok_button"), role: .cancel) { importResult = nil }
+            }
+        } message: {
+            Text(((importResult?.errors ?? []) + (importResult?.warnings ?? [])).map(\.message).joined(separator: "\n"))
+        }
     }
 
     // v49: basit modlarda menü tek satır, sığmazsa yatay kayar; geri al/yinele başta sabit.
@@ -70,6 +100,9 @@ struct EditorView: View {
                     Toggle(isOn: Binding(get: { shapeId != nil }, set: { if $0 { pickerOpen = true } else { shapeId = nil } })) {
                         Label(LocalizedStringKey("tool.shape"), systemImage: "square.on.circle")
                     }.toggleStyle(.button).accessibilityIdentifier("tool_shape")
+                    PhotosPicker(selection: $photo, matching: .images) {
+                        Label(L("add_image"), systemImage: "photo")
+                    }.accessibilityIdentifier("tool_image")
                     ColorPicker(LocalizedStringKey("tool.color"), selection: $color).labelsHidden()
                     Slider(value: $width, in: 1...200).frame(width: 120)
                 }
@@ -179,6 +212,21 @@ struct EditorView: View {
         let start = line ? P(center.x - half, center.y) : P(center.x - hw, center.y - hh)
         let end = line ? P(center.x + half, center.y) : P(center.x + hw, center.y + hh)
         return ShapeFactory.build(id, start, end, style: newShapeStyle(), id: UUID().uuidString.lowercased(), order: strokes.count)
+    }
+
+    /// Seçilen resim tuvalin en fazla %60'ını kaplayacak şekilde, oranı korunarak ortaya eklenir (Android `addImage`).
+    private func addImage(_ image: PreparedImage) {
+        let assetId = CanvasAssetStore.shared.save(canvas.localId, image)
+        let cw = Float(canvas.width), ch = Float(canvas.height)
+        let fit = min(1, cw * 0.6 / Float(image.width), ch * 0.6 / Float(image.height))
+        let hw = Float(image.width) * fit / 2, hh = Float(image.height) * fit / 2
+        let cx = cw / 2, cy = ch / 2
+        let q = ContentCodec.quantize
+        let s = Stroke(id: UUID().uuidString.lowercased(),
+                       points: [StrokePoint(q(cx - hw), q(cy - hh)), StrokePoint(q(cx + hw), q(cy - hh)),
+                                StrokePoint(q(cx + hw), q(cy + hh)), StrokePoint(q(cx - hw), q(cy + hh))],
+                       colorHex: "#000000", brushType: .IMAGE, sizePx: 1, opacity: 1, order: strokes.count, assetId: assetId)
+        commit(strokes + [s])
     }
 
     private func commit(_ next: [Stroke]) {

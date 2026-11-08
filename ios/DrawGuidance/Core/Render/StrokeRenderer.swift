@@ -25,7 +25,7 @@ enum StrokeRenderer {
         case .TEXT: TextRenderer.draw(c, stroke, color: ArgbColor.hex(stroke.colorHex))
         case .FORMULA: FormulaRenderer.draw(c, stroke, color: ArgbColor.hex(stroke.colorHex))
         case .DIAGRAM: DiagramRenderer.draw(c, stroke)
-        case .IMAGE: return // ayrı çizici (sonraki aşama)
+        case .IMAGE: ImageRenderer.draw(c, stroke)
         default:
             let n = stroke.points.count
             if n == 0 { return }

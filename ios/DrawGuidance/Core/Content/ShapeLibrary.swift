@@ -20,7 +20,9 @@ final class ShapeLibrary {
 
     func find(_ id: String) -> LibShape? {
         let key = id.hasPrefix(Self.PREFIX) ? String(id.dropFirst(Self.PREFIX.count)) : id
-        return lock.withLock { remoteById[key] ?? bundledById[key] }
+        if let s = lock.withLock({ remoteById[key] ?? bundledById[key] }) { return s }
+        // Çizgi roman karakterleri katalogda yok: kimlikten üretilir (Android ile aynı)
+        return key.hasPrefix(ComicCharacters.ID_PREFIX) ? ComicCharacters.shape(key) : nil
     }
 
     func forAudience(_ audience: Audience) -> [LibCategory] {

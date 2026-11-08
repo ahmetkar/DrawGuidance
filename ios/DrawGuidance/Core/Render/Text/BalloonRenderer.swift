@@ -286,17 +286,6 @@ enum BalloonRenderer {
         p.closeSubpath()
     }
 
-    /// Java `java.util.Random` (pürüzlü balonun biçimi Android ile aynı olsun).
-    struct JavaRandom {
-        private var seed: Int64
-        init(_ s: Int64) { seed = (s ^ 0x5DEECE66D) & ((1 << 48) - 1) }
-        mutating func next(_ bits: Int) -> Int32 {
-            seed = (seed &* 0x5DEECE66D &+ 0xB) & ((1 << 48) - 1)
-            return Int32(truncatingIfNeeded: seed >> (48 - Int64(bits)))
-        }
-        mutating func nextFloat() -> Float { Float(next(24)) / Float(1 << 24) }
-    }
-
     private static func rough(_ p: CGMutablePath, _ w: Float, _ h: Float) {
         let a = w / 2, b = h / 2
         let n = 58

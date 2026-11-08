@@ -71,10 +71,14 @@ enum StrokeRenderer {
         }
     }
 
-    /// Kağıt rengi + çizimler (silgi kâğıdı silmesin diye çizimler ayrı katmanda).
-    static func drawCanvasContent(_ c: CGContext, paper: UInt32, strokes: [Stroke], width: CGFloat, height: CGFloat) {
+    /// Kağıt rengi + arka plan (gradyan, resim, desen) + çizimler (silgi kâğıdı silmesin diye çizimler ayrı katmanda).
+    static func drawCanvasContent(_ c: CGContext, paper: UInt32, strokes: [Stroke], width: CGFloat, height: CGFloat,
+                                  decor: BackgroundSpec? = nil) {
         c.setFillColor(ArgbColor.cgColor(paper | 0xFF00_0000))
         c.fill(CGRect(x: 0, y: 0, width: width, height: height))
+        if let decor, !decor.isEmpty {
+            BackgroundRenderer.drawCanvasBackground(c, decor, 0, 0, Float(width), Float(height), scale: 1, paper: paper, vector: true)
+        }
         c.beginTransparencyLayer(auxiliaryInfo: nil)
         drawStrokeList(c, strokes)
         c.endTransparencyLayer()
@@ -100,12 +104,13 @@ enum StrokeRenderer {
     }
 
     /// Çizimleri [w]×[h] piksel görüntüye ([scale] piksel/tuval birimi) çizer (önbellek ve dışa aktarma için).
-    static func render(_ strokes: [Stroke], canvasWidth: CGFloat, canvasHeight: CGFloat, scale: CGFloat, paper: UInt32? = nil) -> CGImage {
+    static func render(_ strokes: [Stroke], canvasWidth: CGFloat, canvasHeight: CGFloat, scale: CGFloat, paper: UInt32? = nil,
+                       decor: BackgroundSpec? = nil) -> CGImage {
         let w = max(1, Int((canvasWidth * scale).rounded())), h = max(1, Int((canvasHeight * scale).rounded()))
         return Bitmaps.draw(w, h) { c in
             c.scaleBy(x: scale, y: scale)
             if let paper {
-                drawCanvasContent(c, paper: paper, strokes: strokes, width: canvasWidth, height: canvasHeight)
+                drawCanvasContent(c, paper: paper, strokes: strokes, width: canvasWidth, height: canvasHeight, decor: decor)
             } else {
                 drawStrokeList(c, strokes)
             }

@@ -34,6 +34,7 @@ enum TextRenderer {
         guard let box = spec.box else { return [base, base, base, base] }
         if let b = box.balloon { return BalloonRenderer.pads(b, box.width ?? size * 8, size) }
         if let p = box.padding { return [p, p, p, p] }
+        if let c = BackgroundRenderer.boxContent(box) { return c.map { max(base, Float($0) * box.patternScale) } }
         let p = box.hasBackground ? max(base, size * BOX_PADDING) : base
         return [p, p, p, p]
     }
@@ -250,33 +251,9 @@ enum TextRenderer {
         c.restoreGState()
     }
 
-    /// Yazı kutusunun arka planı (Android `BackgroundRenderer.drawBox`; resim ve desen sonraki aşamada).
+    /// Yazı kutusunun arka planı (renk, gradyan, hazır resim, desen, kenar).
     static func drawBox(_ c: CGContext, _ box: TextBox, _ w: Float, _ h: Float, alpha: Float, coverage: Bool) {
-        guard box.hasBackground else { return }
-        let rad = CGFloat(min(max(box.corner, 0), min(w, h) / 2))
-        let rect = CGRect(x: 0, y: 0, width: CGFloat(w), height: CGFloat(h))
-        let path = CGPath(roundedRect: rect, cornerWidth: rad, cornerHeight: rad, transform: nil)
-        if coverage {
-            c.setFillColor(ArgbColor.cgColor(ArgbColor.black)); c.addPath(path); c.fillPath(); return
-        }
-        c.saveGState()
-        c.addPath(path); c.clip()
-        if !Gradients.fill(c, box.fillGradient, l: 0, t: 0, r: w, b: h, alpha: alpha), let fill = box.fillHex {
-            let col = ArgbColor.parse(fill) ?? ArgbColor.white
-            c.setFillColor(ArgbColor.cgColor(ArgbColor.withAlpha(col, Int(Float(ArgbColor.alpha(col)) * alpha))))
-            c.fill(rect)
-        }
-        c.restoreGState()
-        if let border = box.borderHex {
-            let col = ArgbColor.parse(border) ?? 0xFF33_3333
-            let bw = CGFloat(max(1, min(w, h) * 0.012))
-            let inset = bw / 2
-            c.setStrokeColor(ArgbColor.cgColor(ArgbColor.withAlpha(col, Int(Float(ArgbColor.alpha(col)) * alpha))))
-            c.setLineWidth(bw)
-            let r2 = max(0, rad - inset)
-            c.addPath(CGPath(roundedRect: rect.insetBy(dx: inset, dy: inset), cornerWidth: r2, cornerHeight: r2, transform: nil))
-            c.strokePath()
-        }
+        BackgroundRenderer.drawBox(c, box, w, h, alpha: alpha, coverage: coverage)
     }
 
     // MARK: Yol üzerinde yazı

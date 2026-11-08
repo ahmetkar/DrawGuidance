@@ -94,6 +94,7 @@ struct EditorView: View {
         let w = CGFloat(canvas.width), h = CGFloat(canvas.height)
         let scale = max(0.01, min((fit.width - 16) / w, (fit.height - 16) / h))
         let paperArgb = ArgbColor.parse(canvas.pagePaperHex) ?? ArgbColor.white
+        let decor = canvas.pageBackground
         let committed = Layers.visible(strokes, canvas.layers)
         let pixelScale = min(scale * displayScale, 3)
         let version = historyTick
@@ -104,11 +105,17 @@ struct EditorView: View {
             ctx.withCGContext { c in
                 c.setFillColor(ArgbColor.cgColor(paperArgb | 0xFF00_0000))
                 c.fill(CGRect(x: 0, y: 0, width: w, height: h))
+                // v23 arka plan resmi ve deseni (kağıt renginin üstünde, çizimlerin altında)
+                BackgroundRenderer.drawCanvasBackground(c, decor, 0, 0, Float(w), Float(h), scale: 1, paper: paperArgb,
+                                                        vector: false, density: Float(pixelScale))
                 c.beginTransparencyLayer(auxiliaryInfo: nil)
                 let image = cache.image(version: version, pixelScale: pixelScale, width: w, height: h) { committed }
                 Bitmaps.drawUpright(c, image, in: CGRect(x: 0, y: 0, width: w, height: h))
                 if let live { StrokeRenderer.drawStroke(c, live) }
                 c.endTransparencyLayer()
+                // v40 sayfa numarası, üst ve alt bilgi
+                PageDecorRenderer.draw(c, canvas.pageSettings, page: canvas.currentPage, pageCount: canvas.pageCount,
+                                       width: Float(w), height: Float(h), paper: paperArgb, cover: canvas.hasCover)
             }
         }
         .frame(width: w * scale, height: h * scale)

@@ -48,7 +48,8 @@ final class LaunchUITests: XCTestCase {
         let physics = app.descendants(matching: .any)["shape_cat_sci_physics"].firstMatch
         XCTAssertTrue(physics.waitForExistence(timeout: 10))
         // Kategori şeridi yatay kayar: çip görünene kadar sola kaydırılır
-        let chips = app.scrollViews["shape_categories"].firstMatch
+        // Görünen ilk çip üzerinde kaydırılır (şerit kendisi sorgu ile bulunamayabiliyor)
+        let chips = app.buttons.matching(NSPredicate(format: "identifier BEGINSWITH 'shape_cat_'")).firstMatch
         var tries = 0
         let window = app.windows.firstMatch.frame
         while !window.contains(physics.frame) && tries < 12 { chips.swipeLeft(); tries += 1 }

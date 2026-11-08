@@ -147,12 +147,15 @@ enum MeshOps {
                 let p = face[i], q = face[(i + 1) % n]
                 if !((p == e.a && q == e.b) || (p == e.b && q == e.a)) { continue }
                 let local: Float = p == e.a ? tt : 1 - tt
-                faces[f] = (0...n).map { k in k <= i ? face[k] : k == i + 1 ? ni : face[k - 1] }
+                faces[f] = (0...n).map { (k: Int) -> Int in
+                    if k <= i { return face[k] }
+                    return k == i + 1 ? ni : face[k - 1]
+                }
                 if let u = uvs?[f] {
                     let j = (i + 1) % n
                     let nu = u[2 * i] + (u[2 * j] - u[2 * i]) * local
                     let nv = u[2 * i + 1] + (u[2 * j + 1] - u[2 * i + 1]) * local
-                    uvs![f] = (0..<((n + 1) * 2)).map { k in
+                    uvs![f] = (0..<((n + 1) * 2)).map { (k: Int) -> Float in
                         let c = k / 2
                         if c <= i { return u[k] }
                         if c == i + 1 { return k % 2 == 0 ? nu : nv }

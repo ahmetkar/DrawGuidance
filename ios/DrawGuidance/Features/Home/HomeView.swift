@@ -1,11 +1,11 @@
 import SwiftUI
 
 struct HomeView: View {
-    @EnvironmentObject private var library: CanvasLibrary
-    @State private var openDoc: CanvasDocument?
+    @EnvironmentObject private var store: CanvasStore
+    @State private var openDoc: CanvasUi?
 
-    private let advanced: [CanvasKind] = [.art, .notes, .comic]
-    private let simple: [CanvasKind] = [.simpleArt, .simpleNotes, .kids]
+    private let advanced = CanvasKind.Advanced
+    private let simple = CanvasKind.Simple
 
     var body: some View {
         NavigationStack {
@@ -13,21 +13,21 @@ struct HomeView: View {
                 Section(LocalizedStringKey("home.new_advanced")) { kindRow(advanced) }
                 Section(LocalizedStringKey("home.new_simple")) { kindRow(simple) }
                 Section(LocalizedStringKey("home.my_canvases")) {
-                    if library.canvases.isEmpty {
+                    if store.canvases.isEmpty {
                         Text(LocalizedStringKey("home.empty")).foregroundStyle(.secondary)
                     }
-                    ForEach(library.canvases) { doc in
+                    ForEach(store.canvases) { doc in
                         Button { openDoc = doc } label: {
                             Label(doc.name, systemImage: doc.kind.systemImage)
                         }
                         .accessibilityIdentifier("canvas_\(doc.name)")
                     }
-                    .onDelete { idx in idx.map { library.canvases[$0].id }.forEach(library.delete) }
+                    .onDelete { idx in idx.map { store.canvases[$0].id }.forEach(store.delete) }
                 }
             }
             .navigationTitle(LocalizedStringKey("app.name"))
             .navigationDestination(item: $openDoc) { doc in
-                EditorView(document: doc)
+                EditorView(canvas: doc)
             }
         }
     }
@@ -38,9 +38,9 @@ struct HomeView: View {
             HStack(spacing: 12) {
                 ForEach(kinds) { kind in
                     Button {
-                        let n = library.canvases.filter { $0.kind == kind }.count + 1
+                        let n = store.canvases.filter { $0.kind == kind }.count + 1
                         let title = NSLocalizedString(kind.titleKey, comment: "")
-                        openDoc = library.create(kind: kind, name: "\(title) \(n)")
+                        openDoc = store.create(kind: kind, name: "\(title) \(n)")
                     } label: {
                         VStack(spacing: 6) {
                             Image(systemName: kind.systemImage).font(.title2)
@@ -58,6 +58,6 @@ struct HomeView: View {
     }
 }
 
-extension CanvasDocument: Hashable {
-    func hash(into hasher: inout Hasher) { hasher.combine(id) }
+extension CanvasUi: Hashable {
+    func hash(into hasher: inout Hasher) { hasher.combine(localId) }
 }

@@ -39,7 +39,12 @@ targets:
   DrawGuidanceTests:
     type: bundle.unit-test
     platform: iOS
-    sources: [DrawGuidanceTests]
+    sources:
+      - path: DrawGuidanceTests
+        excludes: ["Fixtures", "Fixtures/**"]
+      - path: DrawGuidanceTests/Fixtures
+        type: folder
+        buildPhase: resources
     dependencies:
       - target: DrawGuidance
     settings:

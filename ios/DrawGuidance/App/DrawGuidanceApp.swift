@@ -2,12 +2,12 @@ import SwiftUI
 
 @main
 struct DrawGuidanceApp: App {
-    @StateObject private var library = CanvasLibrary()
+    @StateObject private var store = CanvasStore()
 
     var body: some Scene {
         WindowGroup {
             HomeView()
-                .environmentObject(library)
+                .environmentObject(store)
         }
     }
 }

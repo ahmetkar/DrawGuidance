@@ -108,6 +108,11 @@ struct EditorView: View {
                 // v23 arka plan resmi ve deseni (kağıt renginin üstünde, çizimlerin altında)
                 BackgroundRenderer.drawCanvasBackground(c, decor, 0, 0, Float(w), Float(h), scale: 1, paper: paperArgb,
                                                         vector: false, density: Float(pixelScale))
+                // Kılavuz ve perspektif çizgileri (ekran ölçeğinde çizgi kalınlığı)
+                c.saveGState()
+                c.scaleBy(x: 1 / scale, y: 1 / scale)
+                GuideRenderer.draw(c, canvas.guide.normalized(), paper: CGRect(x: 0, y: 0, width: w * scale, height: h * scale), scale: Float(scale))
+                c.restoreGState()
                 c.beginTransparencyLayer(auxiliaryInfo: nil)
                 let image = cache.image(version: version, pixelScale: pixelScale, width: w, height: h) { committed }
                 Bitmaps.drawUpright(c, image, in: CGRect(x: 0, y: 0, width: w, height: h))

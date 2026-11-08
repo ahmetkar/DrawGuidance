@@ -81,7 +81,7 @@ final class TextRendererTests: XCTestCase {
     }
 
     func testEveryBalloonStyleDraws() {
-        var rnd = BalloonRenderer.JavaRandom(31)
+        var rnd = JavaRandom(31)
         XCTAssertEqual(rnd.nextFloat().bitPattern, 1060847119)
         XCTAssertEqual(rnd.nextFloat().bitPattern, 1056504238)
         for style in BalloonStyle.allCases where style != .FREE {

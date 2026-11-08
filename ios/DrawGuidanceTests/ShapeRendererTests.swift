@@ -53,8 +53,9 @@ final class ShapeRendererTests: XCTestCase {
                 XCTAssertEqual(st.brushType, .SHAPE)
                 XCTAssertEqual(st.shape?.subpaths.reduce(0) { $0 + $1.count }, st.points.count, id)
                 let b = try XCTUnwrap(ShapeFactory.bounds(st))
-                XCTAssertGreaterThanOrEqual(b.left, -60, id)
-                XCTAssertLessThanOrEqual(b.right, 280, id)
+                // Oranı korunan ve çizgi gibi yerleşen şekiller sürüklenen kutudan taşabilir; yalnız sonlu ve boş olmamalı
+                XCTAssertTrue(b.left.isFinite && b.right.isFinite && b.top.isFinite && b.bottom.isFinite, id)
+                XCTAssertGreaterThan(b.width + b.height, 1, id)
                 built += 1
             }
         }
@@ -83,6 +84,28 @@ final class ShapeRendererTests: XCTestCase {
         XCTAssertGreaterThan(edge.b, 120)
         XCTAssertEqual(ShapeRenderer.distanceTo(stroke, P(50, 50)), 0)
         XCTAssertGreaterThan(ShapeRenderer.distanceTo(stroke, P(150, 50)), 50)
+    }
+
+    func testBuiltinShapesBuild() throws {
+        for k in ShapeKind.allCases where !ShapeKind.legacyGraphs.contains(k) {
+            let st = ShapeFactory.build(k.rawValue, P(20, 20), P(320, 220), style: ShapeStyle(), id: "b", order: 0)
+            XCTAssertNotNil(st, k.rawValue)
+            XCTAssertNotEqual(L("shape_" + k.rawValue.lowercased()), "shape_" + k.rawValue.lowercased(), k.rawValue)
+        }
+        // Kare yerleşim: sürüklenen yönde kare kutu
+        let f = ShapeCatalog.frame(.CIRCLE, P(100, 100), P(40, 180))
+        XCTAssertEqual(f, FRect(left: 20, top: 100, right: 100, bottom: 180))
+        // Ok: gövde + uç
+        XCTAssertEqual(ShapeCatalog.paths(.ARROW, P(0, 0), P(100, 0), ink: 4).count, 2)
+        // Kesik çizgi parçalara ayrılır (12 dolu, 8.8 boş)
+        let d = ShapeCatalog.dashes(ShapePath(points: [P(0, 0), P(100, 0)], dashed: true), 4)
+        XCTAssertEqual(d.count, 5)
+        XCTAssertEqual(d[0].points.last?.x ?? 0, 12, accuracy: 0.01)
+        // Gölgeli cisimlerin yüzleri renk tonuyla dolar
+        let cube = ShapeSolids.paths(.SOLID_CUBE, FRect(left: 0, top: 0, right: 100, bottom: 100))
+        XCTAssertEqual(cube.map(\.fillColorHex), ["@shade:0.50", "@shade:0.78", "@shade:0.30"])
+        XCTAssertFalse(ShapePicker.categories(.NOTES).contains { $0.id == "NOTE_GRAPHS" })
+        XCTAssertEqual(ShapePicker.categories(.ART).first?.id, "ART_GENERAL")
     }
 
     // MARK: - yardımcılar

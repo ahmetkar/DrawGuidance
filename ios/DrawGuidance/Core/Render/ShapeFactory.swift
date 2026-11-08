@@ -41,7 +41,16 @@ enum ShapeFactory {
         (id.hasPrefix(LIB_PREFIX) ? String(id.dropFirst(LIB_PREFIX.count)) : id).hasPrefix(GENERAL_PREFIX)
     }
 
+    static func builtin(_ id: String) -> ShapeKind? { ShapeKind(rawValue: id) }
+
+    /// Kimlikten yeniden kurulabilir mi.
+    static func canBuild(_ id: String) -> Bool {
+        if let k = builtin(id) { return !ShapeKind.legacyGraphs.contains(k) }
+        return isLibrary(id) && ShapeLibrary.shared.find(id) != nil
+    }
+
     static func fit(_ id: String) -> ShapeFit {
+        if let k = builtin(id) { return k.fit }
         guard let lib = ShapeLibrary.shared.find(id) else { return .BOX }
         switch lib.fit {
         case .LINE: return .LINE
@@ -51,6 +60,7 @@ enum ShapeFactory {
     }
 
     static func aspect(_ id: String) -> Float {
+        if let k = builtin(id) { return k.fit == .SQUARE ? 1 : 1.3 }
         guard let a = ShapeLibrary.shared.find(id)?.aspect else { return 1 }
         return min(max(a, 0.2), 6)
     }
@@ -60,6 +70,7 @@ enum ShapeFactory {
 
     /// Sürüklenen iki noktadan şeklin kutusu.
     static func frame(_ id: String, _ start: P, _ end: P) -> FRect {
+        if let k = builtin(id) { return ShapeCatalog.frame(k, start, end) }
         if !keepsAspect(id) && fit(id) != .SQUARE {
             return FRect(left: min(start.x, end.x), top: min(start.y, end.y), right: max(start.x, end.x), bottom: max(start.y, end.y))
         }
@@ -73,7 +84,8 @@ enum ShapeFactory {
     }
 
     /// Kütüphane şeklinin parçaları (tuval koordinatlarında).
-    static func paths(_ id: String, _ start: P, _ end: P) -> [ShapePath] {
+    static func paths(_ id: String, _ start: P, _ end: P, ink: Float = 4) -> [ShapePath] {
+        if let k = builtin(id) { return ShapeCatalog.paths(k, start, end, ink: ink, expandDashes: false) }
         guard let lib = ShapeLibrary.shared.find(id) else { return [] }
         if lib.fit == .LINE { return lineMapped(start, end, aspect: lib.aspect, paths: lib.paths) }
         return mapped(lib.paths, frame(id, start, end))
@@ -120,7 +132,7 @@ enum ShapeFactory {
     /// Kayıttaki şekil kimliğiyle kurar (şimdilik kütüphane şekilleri).
     static func build(_ kind: String, _ start: P, _ end: P, style: ShapeStyle, graph: GraphSpec? = nil, id: String,
                       order: Int, opacity: Float = 1, params: [String: String]? = nil) -> Stroke? {
-        fromPaths(kind, paths(kind, start, end), style: style, graph: graph, id: id, order: order, opacity: opacity, params: params)
+        fromPaths(kind, paths(kind, start, end, ink: max(1, style.strokeWidth)), style: style, graph: graph, id: id, order: order, opacity: opacity, params: params)
     }
 
     static func fromPaths(_ kind: String, _ paths: [ShapePath], style: ShapeStyle, graph: GraphSpec?, id: String,
@@ -158,6 +170,12 @@ enum ShapeFactory {
                       opacity: opacity, order: order,
                       shape: ShapeSpec(kind: kind, subpaths: subpaths, style: style, graph: graph,
                                        params: (params?.isEmpty == false) ? params : nil))
+    }
+
+    /// Şeklin adı (yerleşikler Android metin kaynaklarından).
+    static func title(_ id: String) -> String {
+        if let k = builtin(id) { return L("shape_" + k.rawValue.lowercased()) }
+        return ShapeLibrary.shared.find(id)?.title ?? id
     }
 
     /// Şeklin noktalarının sınırları.

@@ -14,14 +14,21 @@ enum ShapePicker {
 
     /// Tuval türünün seçici kategorileri (Android `ShapeRegistry.categories` kütüphane bölümü).
     static func categories(_ kind: CanvasKind) -> [PickerCategory] {
+        if kind == .SIMPLE_NOTES { return categories(.NOTES) }
+        // Yerleşik temel şekil kategorileri önce (grafikler ayrı motorla gelecek)
+        let builtins = ShapeCategory.forKind(kind).filter { $0 != .NOTE_GRAPHS }.map {
+            PickerCategory(id: $0.rawValue, title: L($0.titleKey), section: "Temel", items: $0.shapes.map(\.rawValue))
+        }
+        return builtins + libraryCategories(kind)
+    }
+
+    private static func libraryCategories(_ kind: CanvasKind) -> [PickerCategory] {
         let lib = ShapeLibrary.shared
         func cat(_ c: LibCategory, _ fallback: String) -> PickerCategory {
             PickerCategory(id: c.id, title: c.title, section: c.section.isEmpty ? fallback : c.section,
                            items: c.shapes.map { ShapeLibrary.PREFIX + $0.id })
         }
         switch kind {
-        case .SIMPLE_NOTES:
-            return categories(.NOTES)
         case .ART, .SIMPLE_ART:
             // v42 resim tuvallerinde yalnız genel şekiller; basit resimde akış şeması yok
             return lib.categories
@@ -99,7 +106,7 @@ struct ShapePickerView: View {
                                     if let img = ShapePicker.thumbnail(id) {
                                         Image(uiImage: img).resizable().scaledToFit().frame(width: 56, height: 56)
                                     }
-                                    Text(ShapeLibrary.shared.find(id)?.title ?? id)
+                                    Text(ShapeFactory.title(id))
                                         .font(.caption2).lineLimit(2).multilineTextAlignment(.center)
                                 }
                                 .frame(maxWidth: .infinity, minHeight: 88)
@@ -126,8 +133,9 @@ struct ShapePickerView: View {
         if q.isEmpty { return current?.items ?? [] }
         var seen = Set<String>()
         return cats.flatMap(\.items).filter { id in
-            guard seen.insert(id).inserted, let s = ShapeLibrary.shared.find(id) else { return false }
-            let text = ([s.title] + s.tags).joined(separator: " ").lowercased(with: Locale(identifier: "tr"))
+            guard seen.insert(id).inserted else { return false }
+            let tags = ShapeLibrary.shared.find(id)?.tags ?? []
+            let text = ([ShapeFactory.title(id)] + tags).joined(separator: " ").lowercased(with: Locale(identifier: "tr"))
             return text.contains(q)
         }
     }

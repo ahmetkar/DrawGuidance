@@ -41,10 +41,10 @@ final class LaunchUITests: XCTestCase {
         XCTAssertTrue(newNotes.waitForExistence(timeout: 10))
         newNotes.tap()
 
-        let tool = app.buttons["tool_shape"]
+        let tool = app.descendants(matching: .any)["tool_shape"].firstMatch
         XCTAssertTrue(tool.waitForExistence(timeout: 10))
         tool.tap()
-        let first = app.buttons.matching(NSPredicate(format: "identifier BEGINSWITH 'shape_lib.'")).firstMatch
+        let first = app.descendants(matching: .any).matching(NSPredicate(format: "identifier BEGINSWITH 'shape_lib.'")).firstMatch
         XCTAssertTrue(first.waitForExistence(timeout: 10))
         first.tap()
 

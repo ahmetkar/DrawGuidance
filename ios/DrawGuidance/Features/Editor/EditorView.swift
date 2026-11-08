@@ -14,7 +14,8 @@ struct EditorView: View {
     @State private var shapeStart: P?
     @State private var pickerOpen = false
     @State private var historyTick = 0
-    private let history = EditHistory<[Stroke]>()
+    // @State: görünüm yeniden kurulsa da (mağaza kaydı üst görünümü yeniler) geçmiş korunur
+    @State private var history = EditHistory<[Stroke]>()
 
     init(canvas: CanvasUi) {
         _canvas = State(initialValue: canvas)

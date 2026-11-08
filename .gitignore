@@ -29,3 +29,4 @@ backend/docker/.env
 backend/.gradle/
 backend/build/
 backend/docker/secrets/
+android/local.properties

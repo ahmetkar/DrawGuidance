@@ -213,7 +213,8 @@ final class FormulaTests: XCTestCase {
                 XCTAssertTrue(matches(idRe, t.id) && t.id.hasPrefix(c.id + "."), t.id)
                 XCTAssertFalse(t.source.contains("@"), t.id)
                 let l = Formula.layout(t.source, size, m)
-                XCTAssertTrue(l.width > size && l.ascent > 0 && l.descent > 0, t.id)
+                // Android (Java2D) ölçüsünde > 1 em; Times New Roman daha dar olduğundan "aⁿ" ~0.85 em
+                XCTAssertTrue(l.width > 0.6 * size && l.ascent > 0 && l.descent > 0, "\(t.id) \(l.width)")
                 XCTAssertGreaterThan(l.ops.count, 1, t.id)
                 let slots = Formula.slots(t.source)
                 XCTAssertFalse(slots.isEmpty, t.id)

@@ -25,12 +25,16 @@ extension Double {
     @inline(__always) func toFloat() -> Float { Float(self) }
     @inline(__always) func toDouble() -> Double { self }
     @inline(__always) func coerceIn(_ lo: Double, _ hi: Double) -> Double { Swift.min(Swift.max(self, lo), hi) }
+    @inline(__always) func coerceAtLeast(_ lo: Double) -> Double { Swift.max(self, lo) }
+    @inline(__always) func coerceAtMost(_ hi: Double) -> Double { Swift.min(self, hi) }
 }
 
 extension Int {
     @inline(__always) func toFloat() -> Float { Float(self) }
     @inline(__always) func toDouble() -> Double { Double(self) }
     @inline(__always) func coerceIn(_ lo: Int, _ hi: Int) -> Int { Swift.min(Swift.max(self, lo), hi) }
+    @inline(__always) func coerceAtLeast(_ lo: Int) -> Int { Swift.max(self, lo) }
+    @inline(__always) func coerceAtMost(_ hi: Int) -> Int { Swift.min(self, hi) }
 }
 
 extension Array where Element == Float {

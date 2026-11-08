@@ -37,8 +37,8 @@ final class ShapeRendererTests: XCTestCase {
     }
 
     func testLibraryShapeBuildsAndRenders() throws {
-        let cat = try XCTUnwrap(ShapePicker.categories(.ART).first)
-        XCTAssertTrue(cat.id.hasPrefix("gen_"))
+        let cat = try XCTUnwrap(ShapePicker.categories(.ART).first { $0.id.hasPrefix("gen_") })
+        XCTAssertEqual(ShapePicker.categories(.ART).filter { !$0.id.hasPrefix("gen_") }.map(\.id), ["ART_GENERAL"])
         XCTAssertFalse(ShapePicker.categories(.SIMPLE_ART).contains { $0.id == ShapePicker.FLOWCHART })
         XCTAssertTrue(ShapePicker.categories(.NOTES).contains { $0.id == "sci_physics" })
         XCTAssertTrue(ShapePicker.categories(.KIDS).allSatisfy { $0.id.hasPrefix("kids_") })

@@ -44,6 +44,10 @@ final class LaunchUITests: XCTestCase {
         let tool = app.descendants(matching: .any)["tool_shape"].firstMatch
         XCTAssertTrue(tool.waitForExistence(timeout: 10))
         tool.tap()
+        // Fen kategorisine geçilip ilk hazır şekil seçilir
+        let physics = app.descendants(matching: .any)["shape_cat_sci_physics"].firstMatch
+        XCTAssertTrue(physics.waitForExistence(timeout: 10))
+        physics.tap()
         let first = app.descendants(matching: .any).matching(NSPredicate(format: "identifier BEGINSWITH 'shape_lib.'")).firstMatch
         XCTAssertTrue(first.waitForExistence(timeout: 10))
         first.tap()
@@ -60,5 +64,29 @@ final class LaunchUITests: XCTestCase {
         shot.name = "shape-inserted"
         shot.lifetime = .keepAlways
         add(shot)
+    }
+
+    func testPickBrushAndDraw() throws {
+        let app = XCUIApplication()
+        app.launchArguments += ["-AppleLanguages", "(tr)"]
+        app.launch()
+        let newArt = app.buttons["new_ART"]
+        XCTAssertTrue(newArt.waitForExistence(timeout: 10))
+        newArt.tap()
+
+        let menu = app.descendants(matching: .any)["brush_menu"].firstMatch
+        XCTAssertTrue(menu.waitForExistence(timeout: 10))
+        menu.tap()
+        let marker = app.descendants(matching: .any)["brush_MARKER"].firstMatch
+        XCTAssertTrue(marker.waitForExistence(timeout: 10))
+        marker.tap()
+
+        let canvas = app.descendants(matching: .any)["drawing_canvas"].firstMatch
+        XCTAssertTrue(canvas.waitForExistence(timeout: 10))
+        canvas.coordinate(withNormalizedOffset: CGVector(dx: 0.2, dy: 0.4))
+            .press(forDuration: 0.1, thenDragTo: canvas.coordinate(withNormalizedOffset: CGVector(dx: 0.8, dy: 0.5)))
+        let undo = app.buttons["undo"]
+        expectation(for: NSPredicate(format: "isEnabled == true"), evaluatedWith: undo)
+        waitForExpectations(timeout: 5)
     }
 }

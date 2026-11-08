@@ -7,7 +7,14 @@ struct EditorView: View {
     @State private var canvas: CanvasUi
     @State private var current: Stroke?
     @State private var color: Color = .black
-    @State private var width: Double = 4
+    @State private var width: Double
+    @State private var brush: BrushType
+    @State private var flow: Double = 1
+    @State private var opacity: Double = 1
+    @State private var brushPickerOpen = false
+    /// Kaydedilmiş çizimlerin görüntüsü (her karede fırça motoru yeniden çalışmasın).
+    @State private var cache = RenderCache()
+    @Environment(\.displayScale) private var displayScale
     @State private var eraser = false
     /// Şekil aracında seçili şekil ("lib.<kimlik>"); nil: kalem/silgi.
     @State private var shapeId: String?
@@ -19,6 +26,9 @@ struct EditorView: View {
 
     init(canvas: CanvasUi) {
         _canvas = State(initialValue: canvas)
+        let b = defaultBrush(canvas.kind)
+        _brush = State(initialValue: b)
+        _width = State(initialValue: Double(b.defaultSize))
     }
 
     private var strokes: [Stroke] { canvas.strokes }
@@ -51,6 +61,9 @@ struct EditorView: View {
                     Toggle(isOn: Binding(get: { !eraser && shapeId == nil }, set: { if $0 { eraser = false; shapeId = nil } })) {
                         Label(LocalizedStringKey("tool.brush"), systemImage: "paintbrush.pointed")
                     }.toggleStyle(.button).accessibilityIdentifier("tool_brush")
+                    Button { brushPickerOpen = true } label: {
+                        Label(L(brush.titleKey), systemImage: "slider.horizontal.3")
+                    }.accessibilityIdentifier("brush_menu")
                     Toggle(isOn: Binding(get: { eraser && shapeId == nil }, set: { eraser = $0; if $0 { shapeId = nil } })) {
                         Label(LocalizedStringKey("tool.eraser"), systemImage: "eraser")
                     }.toggleStyle(.button).accessibilityIdentifier("tool_eraser")
@@ -58,11 +71,16 @@ struct EditorView: View {
                         Label(LocalizedStringKey("tool.shape"), systemImage: "square.on.circle")
                     }.toggleStyle(.button).accessibilityIdentifier("tool_shape")
                     ColorPicker(LocalizedStringKey("tool.color"), selection: $color).labelsHidden()
-                    Slider(value: $width, in: 1...40).frame(width: 120)
+                    Slider(value: $width, in: 1...200).frame(width: 120)
                 }
             }
         }
         .padding(.horizontal, 12).padding(.vertical, 8)
+        .sheet(isPresented: $brushPickerOpen) {
+            BrushPickerView(kind: canvas.kind, brush: $brush, size: $width, flow: $flow, opacity: $opacity,
+                            color: ArgbColor.hex(color.hexRGB))
+                .onDisappear { eraser = false; shapeId = nil }
+        }
         .sheet(isPresented: $pickerOpen) {
             ShapePickerView(kind: canvas.kind) { id in
                 shapeId = id
@@ -75,16 +93,22 @@ struct EditorView: View {
     private func drawingSurface(fit: CGSize) -> some View {
         let w = CGFloat(canvas.width), h = CGFloat(canvas.height)
         let scale = max(0.01, min((fit.width - 16) / w, (fit.height - 16) / h))
-        let paper = Color(hex: canvas.pagePaperHex) ?? .white
+        let paperArgb = ArgbColor.parse(canvas.pagePaperHex) ?? ArgbColor.white
+        let committed = Layers.visible(strokes, canvas.layers)
+        let pixelScale = min(scale * displayScale, 3)
+        let version = historyTick
+        let cache = self.cache
+        let live = current
         return Canvas { ctx, _ in
             ctx.scaleBy(x: scale, y: scale)
-            ctx.fill(Path(CGRect(x: 0, y: 0, width: w, height: h)), with: .color(paper))
-            for s in Layers.visible(strokes, canvas.layers) + (current.map { [$0] } ?? []) {
-                if s.brushType == .SHAPE {
-                    ctx.withCGContext { ShapeRenderer.draw($0, s) }
-                } else {
-                    draw(s, paper: paper, in: &ctx)
-                }
+            ctx.withCGContext { c in
+                c.setFillColor(ArgbColor.cgColor(paperArgb | 0xFF00_0000))
+                c.fill(CGRect(x: 0, y: 0, width: w, height: h))
+                c.beginTransparencyLayer(auxiliaryInfo: nil)
+                let image = cache.image(version: version, pixelScale: pixelScale, width: w, height: h) { committed }
+                Bitmaps.drawUpright(c, image, in: CGRect(x: 0, y: 0, width: w, height: h))
+                if let live { StrokeRenderer.drawStroke(c, live) }
+                c.endTransparencyLayer()
             }
         }
         .frame(width: w * scale, height: h * scale)
@@ -103,8 +127,8 @@ struct EditorView: View {
                     let p = StrokePoint(ContentCodec.quantize(Float(v.location.x / scale)), ContentCodec.quantize(Float(v.location.y / scale)))
                     if current == nil {
                         current = Stroke(id: UUID().uuidString.lowercased(), points: [p], colorHex: color.hexRGB,
-                                         brushType: eraser ? .ERASER : .PENCIL, sizePx: Float(width / scale),
-                                         opacity: 1, order: strokes.count)
+                                         brushType: eraser ? .ERASER : brush, sizePx: Float(width),
+                                         opacity: Float(opacity), order: strokes.count, flow: Float(flow))
                     } else {
                         current?.points.append(p)
                     }
@@ -126,16 +150,6 @@ struct EditorView: View {
         )
         .accessibilityIdentifier("drawing_canvas")
         .frame(maxWidth: .infinity, maxHeight: .infinity)
-    }
-
-    private func draw(_ s: Stroke, paper: Color, in ctx: inout GraphicsContext) {
-        guard let first = s.points.first else { return }
-        var path = Path()
-        path.move(to: CGPoint(x: CGFloat(first.x), y: CGFloat(first.y)))
-        if s.points.count == 1 { path.addLine(to: CGPoint(x: CGFloat(first.x) + 0.1, y: CGFloat(first.y))) }
-        for p in s.points.dropFirst() { path.addLine(to: CGPoint(x: CGFloat(p.x), y: CGFloat(p.y))) }
-        let c: Color = s.brushType == .ERASER ? paper : (Color(hex: s.colorHex) ?? .black).opacity(Double(s.opacity))
-        ctx.stroke(path, with: .color(c), style: StrokeStyle(lineWidth: CGFloat(s.sizePx), lineCap: .round, lineJoin: .round))
     }
 
     /// Yeni şekillerin biçimi: kenar rengi seçili renk, kalınlık fırçayı izler (Android `newShapeStyle`).
@@ -171,6 +185,20 @@ struct EditorView: View {
         canvas.pages[i] = s
         historyTick += 1
         store.save(canvas)
+    }
+}
+
+/// Kaydedilmiş çizimlerin önbellek görüntüsü: sürüm (geçmiş sayacı) ve çözünürlük değişince yeniden çizilir.
+final class RenderCache {
+    private var key: (Int, CGFloat, CGFloat, CGFloat)?
+    private var cached: CGImage?
+
+    func image(version: Int, pixelScale: CGFloat, width: CGFloat, height: CGFloat, _ strokes: () -> [Stroke]) -> CGImage {
+        if let cached, let k = key, k == (version, pixelScale, width, height) { return cached }
+        let img = StrokeRenderer.render(strokes(), canvasWidth: width, canvasHeight: height, scale: pixelScale)
+        cached = img
+        key = (version, pixelScale, width, height)
+        return img
     }
 }
 

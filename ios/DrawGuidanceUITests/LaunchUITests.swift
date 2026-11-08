@@ -50,7 +50,8 @@ final class LaunchUITests: XCTestCase {
         // Kategori şeridi yatay kayar: çip görünene kadar sola kaydırılır
         let chips = app.scrollViews["shape_categories"].firstMatch
         var tries = 0
-        while !physics.isHittable && tries < 12 { chips.swipeLeft(); tries += 1 }
+        let window = app.windows.firstMatch.frame
+        while !window.contains(physics.frame) && tries < 12 { chips.swipeLeft(); tries += 1 }
         physics.tap()
         let first = app.descendants(matching: .any).matching(NSPredicate(format: "identifier BEGINSWITH 'shape_lib.'")).firstMatch
         XCTAssertTrue(first.waitForExistence(timeout: 10))

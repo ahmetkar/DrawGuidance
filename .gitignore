@@ -1,0 +1,20 @@
+# Xcode / SwiftPM
+ios/*.xcodeproj
+ios/build/
+DerivedData/
+*.xcuserstate
+xcuserdata/
+.build/
+*.ipa
+*.dSYM.zip
+# Secrets (never commit)
+*.jks
+*.p12
+*.mobileprovision
+keystore.properties
+release.properties
+sunucu.env
+GoogleService-Info.plist
+google-services.json
+*service-account*.json
+.env

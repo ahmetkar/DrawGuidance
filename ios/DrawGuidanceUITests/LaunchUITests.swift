@@ -52,9 +52,12 @@ final class LaunchUITests: XCTestCase {
         let window = app.windows.firstMatch.frame
         while !window.contains(physics.frame) && tries < 12 { 
             // Şerit hizasında, pencere koordinatıyla sağdan sola sürüklenir
+            // Çip soldaysa sağa, sağdaysa sola; kısa sürüklemeyle (taşmasın)
             let origin = app.windows.firstMatch.coordinate(withNormalizedOffset: .zero)
-            origin.withOffset(CGVector(dx: window.width * 0.85, dy: physics.frame.midY))
-                .press(forDuration: 0.05, thenDragTo: origin.withOffset(CGVector(dx: window.width * 0.15, dy: physics.frame.midY)))
+            let left = physics.frame.minX < window.minX
+            let from = left ? 0.3 : 0.7, to = left ? 0.7 : 0.3
+            origin.withOffset(CGVector(dx: window.width * from, dy: physics.frame.midY))
+                .press(forDuration: 0.05, thenDragTo: origin.withOffset(CGVector(dx: window.width * to, dy: physics.frame.midY)))
             tries += 1
         }
         physics.tap()

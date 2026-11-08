@@ -95,6 +95,7 @@ struct ShapePickerView: View {
                         }
                     }.padding(.horizontal, 12).padding(.vertical, 8)
                 }
+                .accessibilityIdentifier("shape_categories")
                 ScrollView {
                     LazyVGrid(columns: [GridItem(.adaptive(minimum: 72), spacing: 10)], spacing: 10) {
                         ForEach(items, id: \.self) { id in

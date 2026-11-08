@@ -47,6 +47,10 @@ final class LaunchUITests: XCTestCase {
         // Fen kategorisine geçilip ilk hazır şekil seçilir
         let physics = app.descendants(matching: .any)["shape_cat_sci_physics"].firstMatch
         XCTAssertTrue(physics.waitForExistence(timeout: 10))
+        // Kategori şeridi yatay kayar: çip görünene kadar sola kaydırılır
+        let chips = app.scrollViews["shape_categories"].firstMatch
+        var tries = 0
+        while !physics.isHittable && tries < 12 { chips.swipeLeft(); tries += 1 }
         physics.tap()
         let first = app.descendants(matching: .any).matching(NSPredicate(format: "identifier BEGINSWITH 'shape_lib.'")).firstMatch
         XCTAssertTrue(first.waitForExistence(timeout: 10))

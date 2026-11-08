@@ -18,7 +18,17 @@ final class ContentCodecTests: XCTestCase {
         let doc = try ContentCodec.decodeDocument(fixture("plain.bin"))
         XCTAssertEqual(doc.layers, [Layer.Default, Layer(id: "l2", name: "Üst katman", visible: false, locked: true)])
         XCTAssertEqual(doc.pages.count, 2)
-        XCTAssertEqual(doc.pages.flatMap { $0 }, try strokesFromJson("plain.json"))
+        // Basınç/eğim/yön kayıtta 1/255 adımla saklanır (Android'de de öyle): beklenen değerler aynı adıma yuvarlanır.
+        let expected = try strokesFromJson("plain.json").map { s -> Stroke in
+            guard s.points.contains(where: { $0.hasDynamics }) else { return s }
+            var s = s
+            s.points = s.points.map {
+                StrokePoint($0.x, $0.y, pressure: ContentCodec.quantizeUnit($0.pressure), tilt: ContentCodec.quantizeUnit($0.tilt),
+                            orient: ContentCodec.quantizeUnit($0.orient))
+            }
+            return s
+        }
+        XCTAssertEqual(doc.pages.flatMap { $0 }, expected)
         let t = doc.pages[0][3].text!
         XCTAssertEqual(t.content, "Merhaba ğüşİ 😀\n• madde")
         XCTAssertEqual(t.font, .CAVEAT)

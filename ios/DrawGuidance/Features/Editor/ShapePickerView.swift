@@ -1,7 +1,7 @@
 import SwiftUI
 import UIKit
 
-/// Seçicideki bir kategori (Android `ShapeRegistry.PickerCategory`; şimdilik kütüphane kategorileri).
+/// Seçicideki bir kategori (Android `ShapeRegistry.PickerCategory`).
 struct PickerCategory: Identifiable {
     let id: String
     let title: String
@@ -15,11 +15,16 @@ enum ShapePicker {
     /// Tuval türünün seçici kategorileri (Android `ShapeRegistry.categories` kütüphane bölümü).
     static func categories(_ kind: CanvasKind) -> [PickerCategory] {
         if kind == .SIMPLE_NOTES { return categories(.NOTES) }
-        // Yerleşik temel şekil kategorileri önce (grafikler ayrı motorla gelecek)
+        // Yerleşik temel şekil kategorileri önce; not tuvalinde grafikler ve eğriler
         let builtins = ShapeCategory.forKind(kind).filter { $0 != .NOTE_GRAPHS }.map {
             PickerCategory(id: $0.rawValue, title: L($0.titleKey), section: "Temel", items: $0.shapes.map(\.rawValue))
         }
-        return builtins + libraryCategories(kind)
+        var graphs: [PickerCategory] = []
+        if kind == .NOTES {
+            graphs.append(PickerCategory(id: "graphs", title: "Grafikler", section: "Grafik", items: GraphShapes.graphItems))
+            graphs.append(PickerCategory(id: "curves", title: "Grafik eğrileri", section: "Grafik", items: GraphShapes.curveItems))
+        }
+        return builtins + graphs + libraryCategories(kind)
     }
 
     private static func libraryCategories(_ kind: CanvasKind) -> [PickerCategory] {

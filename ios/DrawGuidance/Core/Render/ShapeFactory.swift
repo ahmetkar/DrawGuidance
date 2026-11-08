@@ -46,11 +46,13 @@ enum ShapeFactory {
     /// Kimlikten yeniden kurulabilir mi.
     static func canBuild(_ id: String) -> Bool {
         if let k = builtin(id) { return !ShapeKind.legacyGraphs.contains(k) }
+        if GraphShapes.isModernGraph(id) { return true }
         return isLibrary(id) && ShapeLibrary.shared.find(id) != nil
     }
 
     static func fit(_ id: String) -> ShapeFit {
         if let k = builtin(id) { return k.fit }
+        if GraphShapes.isModernGraph(id) { return GraphShapes.fit(id) }
         guard let lib = ShapeLibrary.shared.find(id) else { return .BOX }
         switch lib.fit {
         case .LINE: return .LINE
@@ -61,6 +63,7 @@ enum ShapeFactory {
 
     static func aspect(_ id: String) -> Float {
         if let k = builtin(id) { return k.fit == .SQUARE ? 1 : 1.3 }
+        if GraphShapes.isModernGraph(id) { return GraphShapes.aspect(id) }
         guard let a = ShapeLibrary.shared.find(id)?.aspect else { return 1 }
         return min(max(a, 0.2), 6)
     }
@@ -84,8 +87,9 @@ enum ShapeFactory {
     }
 
     /// Kütüphane şeklinin parçaları (tuval koordinatlarında).
-    static func paths(_ id: String, _ start: P, _ end: P, ink: Float = 4) -> [ShapePath] {
+    static func paths(_ id: String, _ start: P, _ end: P, ink: Float = 4, graph: GraphSpec? = nil) -> [ShapePath] {
         if let k = builtin(id) { return ShapeCatalog.paths(k, start, end, ink: ink, expandDashes: false) }
+        if GraphShapes.isModernGraph(id) { return GraphShapes.paths(id, start, end, graph: graph) }
         guard let lib = ShapeLibrary.shared.find(id) else { return [] }
         if lib.fit == .LINE { return lineMapped(start, end, aspect: lib.aspect, paths: lib.paths) }
         return mapped(lib.paths, frame(id, start, end))
@@ -129,10 +133,12 @@ enum ShapeFactory {
         )
     }
 
-    /// Kayıttaki şekil kimliğiyle kurar (şimdilik kütüphane şekilleri).
+    /// Kayıttaki (yerleşik, grafik ya da kütüphane) şekil kimliğiyle kurar.
     static func build(_ kind: String, _ start: P, _ end: P, style: ShapeStyle, graph: GraphSpec? = nil, id: String,
                       order: Int, opacity: Float = 1, params: [String: String]? = nil) -> Stroke? {
-        fromPaths(kind, paths(kind, start, end, ink: max(1, style.strokeWidth)), style: style, graph: graph, id: id, order: order, opacity: opacity, params: params)
+        let graphSpec = GraphShapes.isGraph(kind) ? (graph ?? GraphShapes.defaultGraph(kind)) : graph
+        return fromPaths(kind, paths(kind, start, end, ink: max(1, style.strokeWidth), graph: graphSpec), style: style, graph: graphSpec, id: id,
+                         order: order, opacity: opacity, params: params)
     }
 
     static func fromPaths(_ kind: String, _ paths: [ShapePath], style: ShapeStyle, graph: GraphSpec?, id: String,
@@ -175,6 +181,7 @@ enum ShapeFactory {
     /// Şeklin adı (yerleşikler Android metin kaynaklarından).
     static func title(_ id: String) -> String {
         if let k = builtin(id) { return L("shape_" + k.rawValue.lowercased()) }
+        if let t = GraphShapes.title(id) { return t }
         return ShapeLibrary.shared.find(id)?.title ?? id
     }
 

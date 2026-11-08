@@ -552,4 +552,25 @@ final class GraphTests: XCTestCase {
         XCTAssertEqual([8, 40], javaHashOrder([8, 40]).filter { $0 == 8 || $0 == 40 })
         XCTAssertEqual([16, 0], javaHashOrder([16, 0]))
     }
+
+    // MARK: şekil olarak grafik
+
+    func testGraphShapesBuildStrokes() {
+        let style = ShapeStyle(strokeColorHex: "#222222", strokeWidth: 3)
+        for id in GraphShapes.graphItems + GraphShapes.curveItems {
+            XCTAssertTrue(ShapeFactory.canBuild(id), id)
+            XCTAssertNotEqual(id, ShapeFactory.title(id))
+            let s = ShapeFactory.build(id, P(100, 100), P(500, 400), style: style, id: "g", order: 0)
+            XCTAssertNotNil(s, id)
+            XCTAssertNotNil(s?.shape?.graph, id)
+            XCTAssertTrue(s?.shape?.subpaths.contains { $0.label != nil } ?? false, "\(id) yazı yok")
+        }
+        let g = GraphShapes.defaultGraph("curve.sinus")
+        XCTAssertEqual("sinus", g.preset)
+        XCTAssertEqual("FUNCTION", g.kind)
+        let p = GraphShapes.params("curve.sinus", g)
+        XCTAssertEqual(p, GraphShapes.params("curve.sinus", GraphShapes.spec(p, g)))
+        XCTAssertEqual("x^2 - 2", GraphShapes.defaultGraph("graph.FUNCTION").formula)
+        XCTAssertEqual(.LINE, ShapeFactory.fit("graph.NUMBER_LINE"))
+    }
 }

@@ -84,10 +84,10 @@ enum MeshTopo {
         var faces = mesh.faces + [[]]
         faces[f] = k1.map { face[$0] }
         faces[mesh.faceCount] = k2.map { face[$0] }
-        let uvs: [[Float]]? = mesh.uvs.map { u in
-            (0..<faces.count).map { i in
-                if i == f { return (0..<(k1.count * 2)).map { j in u[f][2 * k1[j / 2] + j % 2] } }
-                if i == mesh.faceCount { return (0..<(k2.count * 2)).map { j in u[f][2 * k2[j / 2] + j % 2] } }
+        let uvs: [[Float]]? = mesh.uvs.map { (u: [[Float]]) -> [[Float]] in
+            (0..<faces.count).map { (i: Int) -> [Float] in
+                if i == f { return (0..<(k1.count * 2)).map { (j: Int) -> Float in u[f][2 * k1[j / 2] + j % 2] } }
+                if i == mesh.faceCount { return (0..<(k2.count * 2)).map { (j: Int) -> Float in u[f][2 * k2[j / 2] + j % 2] } }
                 return u[i]
             }
         }

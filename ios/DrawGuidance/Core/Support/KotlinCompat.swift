@@ -40,3 +40,19 @@ extension Int {
 extension Array where Element == Float {
     @inline(__always) func toFloatArray() -> [Float] { self }
 }
+
+/// Java `HashMap`/`HashSet` dolaşma sırası, verilen `hashCode` ile (kova sırası, kova içinde ekleme sırası).
+/// [initialCapacity] Java'daki başlangıç sığası (varsayılan 16; tablo 0,75 doluluğu aşınca ikiye katlanır).
+func javaHashOrder<T>(_ keysInInsertionOrder: [T], initialCapacity: Int = 16, hash: (T) -> Int32) -> [T] {
+    var cap = 1
+    while cap < Swift.max(initialCapacity, 1) { cap *= 2 }
+    while Double(keysInInsertionOrder.count) > Double(cap) * 0.75 { cap *= 2 }
+    let buckets = keysInInsertionOrder.map { k -> Int in
+        let h = hash(k)
+        return Int(h ^ Int32(bitPattern: UInt32(bitPattern: h) >> 16)) & (cap - 1)
+    }
+    return keysInInsertionOrder.indices.sorted { buckets[$0] != buckets[$1] ? buckets[$0] < buckets[$1] : $0 < $1 }.map { keysInInsertionOrder[$0] }
+}
+
+/// Java `Long.hashCode()`.
+@inline(__always) func javaLongHash(_ v: Int64) -> Int32 { Int32(truncatingIfNeeded: v ^ Int64(bitPattern: UInt64(bitPattern: v) >> 32)) }

@@ -319,7 +319,7 @@ enum BrushShapes {
             let rings = subdiv >= 3 ? 12 : 9
             var ringStart = [Int](repeating: 0, count: rings)
             for k in 1..<rings {
-                let u = Float(sin(Double(Float(rings - k) / Float(rings) * Float.pi / 2)))
+                let u = Float(sin(Double(Float(rings - k) / Float(rings) * PI_F / 2)))
                 ringStart[k] = px.count
                 for i in 0..<m { px.append(cx + (xs[i] - cx) * u); py.append(cy + (ys[i] - cy) * u); boundary.append(false) }
             }

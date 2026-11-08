@@ -204,3 +204,11 @@ struct Box3: Equatable {
              V3(Swift.max(max.x, o.max.x), Swift.max(max.y, o.max.y), Swift.max(max.z, o.max.z)))
     }
 }
+
+/// Kotlin `PI.toFloat()` (en yakına yuvarlanmış; Swift'in `Float.pi` değeri sıfıra doğru yuvarlanır).
+let PI_F = Float(Double.pi)
+
+/// Kotlin `kotlin.math.sin/cos(Float)`: çift duyarlıkta hesaplanıp yuvarlanır.
+@inline(__always) func ktSinF(_ x: Float) -> Float { Float(sin(Double(x))) }
+@inline(__always) func ktCosF(_ x: Float) -> Float { Float(cos(Double(x))) }
+@inline(__always) func floorModI(_ a: Int, _ b: Int) -> Int { let r = a % b; return r != 0 && (r < 0) != (b < 0) ? r + b : r }

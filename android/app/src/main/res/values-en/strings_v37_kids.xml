@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="kids_mascot_name">Painty</string>
+    <string name="kids_mascot_open">Call Painty</string>
+    <string name="kids_mascot_cd">Painty, your drawing buddy</string>
+    <string name="kids_mascot_next">OK</string>
+    <string name="kids_mascot_end">End</string>
+    <string name="kids_mascot_close">Close</string>
+    <string name="kids_mascot_apply">Apply</string>
+    <string name="kids_mascot_hello">Hi, I\'m Painty! I\'m always here while you draw. Tap me and I\'ll give you a tip.</string>
+
+    <string name="kids_tip_1">Pick the paint bucket, pick a color and tap a shape: the spot you tap gets painted!</string>
+    <string name="kids_tip_2">Hold your finger on a shape for 2 seconds and the whole shape gets painted at once.</string>
+    <string name="kids_tip_3">Oops? The back arrow at the top undoes your last step.</string>
+    <string name="kids_tip_4">Add a house or balloons from the ready pictures and paint them any way you like.</string>
+    <string name="kids_tip_5">Have you tried changing the paper color? It can be blue like the sky!</string>
+
+    <string name="kids_praise_1">That looks great! You draw so well.</string>
+    <string name="kids_praise_2">Super! Keep going, you\'re doing great!</string>
+    <string name="kids_praise_3">I love it! What\'s next?</string>
+
+    <string name="kids_say_shape_1">That\'s a %1$s! Want me to make it nice and neat?</string>
+    <string name="kids_say_shape_2">Wow, you drew a %1$s! Shall I straighten its lines?</string>
+    <string name="kids_say_shape_3">What a lovely %1$s! Shall we make its edges neat?</string>
+    <string name="kids_say_template_1">That looks like a %1$s! Shall I swap it for a ready picture?</string>
+    <string name="kids_say_template_2">Ooh, it\'s like a %1$s! I can turn it into a picture that\'s easy to paint!</string>
+    <string name="kids_say_template_3">Hmm… I think you wanted to draw a %1$s. Shall I put a ready one here?</string>
+    <string name="kids_say_all_1">You drew %1$d shapes! Shall I fix them all at once?</string>
+    <string name="kids_say_all_2">I can neaten the lines of %1$d shapes in one go. Shall we?</string>
+    <string name="kids_say_text_1">I think you wrote “%1$s”! Shall I turn it into nice text?</string>
+    <string name="kids_say_text_2">I could read “%1$s”! Shall I write it in neat letters?</string>
+    <string name="kids_say_part_1">I can finish this %1$s drawing by adding %2$d parts. Shall I add them?</string>
+    <string name="kids_say_part_2">Want to finish your drawing like a %1$s? I\'ll add %2$d parts!</string>
+
+    <string name="tut_kids">Let\'s draw with Painty</string>
+    <string name="tut_kids_text">Painty shows you the tools and makes a picture with you step by step.</string>
+    <string name="tut_kids_1">Hello!</string>
+    <string name="tut_kids_1_text">I\'m Painty! I\'ll show you the drawing tools and we\'ll make a big picture together. Ready?</string>
+    <string name="tut_kids_2">Brush</string>
+    <string name="tut_kids_2_text">With the brush you draw anything you like. Look, I\'m drawing a bright sun in the sky!</string>
+    <string name="tut_kids_3">Ready pictures</string>
+    <string name="tut_kids_3_text">The shape button adds ready pictures. I\'m putting in a house and colorful balloons.</string>
+    <string name="tut_kids_4">Paint bucket</string>
+    <string name="tut_kids_4_text">Pick the bucket, pick a color and tap inside a shape: the spot you tap gets painted. A red roof and a yellow wall!</string>
+    <string name="tut_kids_5">Paint it all</string>
+    <string name="tut_kids_5_text">Hold your finger on a shape for 2 seconds: when the ring fills up, the whole shape is painted. All the balloons are pink!</string>
+    <string name="tut_kids_6">Eraser</string>
+    <string name="tut_kids_6_text">The eraser wipes away lines you don\'t want. I\'m erasing this scribble.</string>
+    <string name="tut_kids_7">Undo</string>
+    <string name="tut_kids_7_text">Something went wrong? The back arrow undoes your last step, the forward arrow does it again.</string>
+    <string name="tut_kids_8">Paper color</string>
+    <string name="tut_kids_8_text">You can change the paper color too. I\'m making it sky blue!</string>
+    <string name="tut_kids_9">All done!</string>
+    <string name="tut_kids_9_text">Finally, some green grass! Our picture is ready. Now it\'s your turn, make the most beautiful picture!</string>
+
+    <string name="kids_home_say">If you like, start making the most fun drawings</string>
+    <string name="kids_home_title">Kids mode</string>
+    <string name="kids_home_start">Let\'s start</string>
+    <string name="kids_home_dismiss">Not now</string>
+    <string name="kids_canvas_name">My picture</string>
+</resources>

@@ -1,0 +1,84 @@
+# DrawGuidance yerel ağ sunucusu (v42): hazır derlenmiş sunucu (drawguidance-server.jar) + MongoDB.
+# Kaynak koddan derleme gerekmez; yalnız Docker Desktop gerekir. Başlatmak için Yerel-Sunucuyu-Baslat.bat.
+#   docker compose up -d        → MongoDB (tek üyeli kopya kümesi rs0) ve API (http://<bu bilgisayarın IP'si>:4747)
+#   docker compose down         → durdurur (veriler "drawguidance-yerel_mongo-data" biriminde kalır)
+name: drawguidance-yerel
+
+services:
+  # Kopya kümesi üyeleri arası anahtar (bir kez üretilir)
+  keygen:
+    image: mongo:7.0
+    entrypoint: ["bash", "-c", "[ -s /keys/mongo-keyfile ] || head -c 756 /dev/urandom | base64 -w0 > /keys/mongo-keyfile; chmod 400 /keys/mongo-keyfile; chown 999:999 /keys/mongo-keyfile"]
+    volumes:
+      - mongo-keys:/keys
+
+  mongo:
+    image: mongo:7.0
+    hostname: mongo1
+    command: ["bash", "/scripts/rs-entry.sh"]
+    restart: unless-stopped
+    depends_on:
+      keygen:
+        condition: service_completed_successfully
+    environment:
+      RS_NAME: rs0
+      RS_INIT: "1"
+      RS_MEMBERS: mongo1:27017
+      CREATE_USERS: "1"
+      MONGO_CACHE_GB: ${MONGO_CACHE_GB:-1}
+      MONGO_ROOT_USER: ${MONGO_ROOT_USER}
+      MONGO_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD}
+      MONGO_APP_DB: ${MONGO_APP_DB}
+      MONGO_APP_USER: ${MONGO_APP_USER}
+      MONGO_APP_PASSWORD: ${MONGO_APP_PASSWORD}
+    # Veritabanı yalnız bu bilgisayardan (127.0.0.1) erişilebilir; telefon yalnız API'ye bağlanır
+    ports:
+      - "127.0.0.1:${MONGO_PORT:-27017}:27017"
+    volumes:
+      - mongo-data:/data/db
+      - mongo-keys:/keys:ro
+      - ./mongo:/scripts:ro
+    healthcheck:
+      test: ["CMD-SHELL", "test -f /tmp/ready && mongosh --quiet --eval 'db.adminCommand({ping: 1}).ok' | grep -q 1"]
+      interval: 5s
+      timeout: 5s
+      retries: 60
+      start_period: 10s
+
+  api:
+    image: eclipse-temurin:21-jre
+    restart: unless-stopped
+    depends_on:
+      mongo:
+        condition: service_healthy
+    working_dir: /app
+    command: ["java", "-XX:MaxRAMPercentage=60", "-jar", "/app/drawguidance-server.jar"]
+    environment:
+      SPRING_PROFILES_ACTIVE: default
+      MONGODB_URI: mongodb://${MONGO_APP_USER}:${MONGO_APP_PASSWORD}@mongo1:27017/${MONGO_APP_DB}?replicaSet=rs0&authSource=${MONGO_APP_DB}
+      MONGO_WRITE_CONCERN: majority
+      FIREBASE_PROJECT_ID: ${FIREBASE_PROJECT_ID:-drawguidance}
+      IP_HASH_SALT: ${IP_HASH_SALT}
+      WEB_ALLOWED_ORIGINS: ${WEB_ALLOWED_ORIGINS:-http://localhost:3000}
+      WEB_BEHIND_PROXY: "false"
+      # v43 içerik dağıtımı (Firebase yok: cihazlar gelen kutusunu yoklar)
+      DEVICE_DATA_KEY: ${DEVICE_DATA_KEY}
+      GCS_BUCKET: ${GCS_BUCKET:-dgpackets}
+      GCS_SERVICE_ACCOUNT_JSON: /run/dg-secrets/gcs.json
+    ports:
+      - "${API_PORT:-4747}:4747"
+    volumes:
+      - ./drawguidance-server.jar:/app/drawguidance-server.jar:ro
+      # v43 hizmet hesabı (betik sirlar\gcs.json'u hazırlar) ve CLI'nin okuyacağı dosyalar (Yonetim.bat)
+      - ./sirlar:/run/dg-secrets:ro
+      - ./yonetim:/data/yonetim:ro
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS -o /dev/null http://127.0.0.1:4747/api/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 30
+      start_period: 40s
+
+volumes:
+  mongo-keys:
+  mongo-data:

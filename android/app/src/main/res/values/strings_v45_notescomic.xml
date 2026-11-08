@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- v45 çizgi roman kapağı ve not alma panelleri -->
+    <string name="v45_cover">Kapak</string>
+    <string name="v45_cover_add">Kapak ekle</string>
+    <string name="v45_help_cover">Çizgi romanın kapak sayfası: sayfa numarası, üst bilgi ve alt bilgi almaz; numaralar sonraki sayfada 1\'den başlar.</string>
+    <string name="v45_help_cover_add">Çizgi romanın başına başlık, yazar ve resim alanı olan bir kapak sayfası ekler. Var olan sayfaların numaraları değişmez.</string>
+    <string name="v45_panels_add">Panel ekle</string>
+    <string name="v45_help_panels_add">Çizim alanını çerçeveli bölümlere ayırır: sütunlar, satırlar, ızgara, Cornell ve benzeri yerleşimler. Her bölüm ayrı seçilir, taşınır ve silinir.</string>
+    <string name="v45_panels_title">Panel yerleşimi seç</string>
+    <string name="v45_panels_hint">Seçilen yerleşim sayfaya ince çerçeveli alanlar olarak eklenir; alanlar yazıların ve çizimlerin altında kalır.</string>
+    <string name="v45_panel_two_cols">İki sütun</string>
+    <string name="v45_panel_three_cols">Üç sütun</string>
+    <string name="v45_panel_two_rows">İki satır</string>
+    <string name="v45_panel_three_rows">Üç satır</string>
+    <string name="v45_panel_grid_2x2">2 × 2 ızgara</string>
+    <string name="v45_panel_grid_2x3">2 × 3 ızgara</string>
+    <string name="v45_panel_main_side">Büyük alan ve yan sütun</string>
+    <string name="v45_panel_side_main">Yan sütun ve büyük alan</string>
+    <string name="v45_panel_cornell">Cornell not düzeni</string>
+    <string name="v45_panel_header_two_cols">Başlık ve iki sütun</string>
+    <string name="v45_panel_square_2x2">2 × 2 kare</string>
+    <string name="v45_panel_square_3x3">3 × 3 kare</string>
+    <string name="v45_panel_square_notes">Kare alan ve not alanı</string>
+    <string name="v45_panel_count">%1$d alan</string>
+</resources>

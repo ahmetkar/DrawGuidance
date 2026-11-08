@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- v45 çocuk menüsü: kısa adlar, boya fırçası, fırça boyu, açıklamalar ve ipuçları -->
+    <string name="v45_kids_undo">Отменить</string>
+    <string name="v45_kids_redo">Вернуть</string>
+    <string name="v45_kids_pen">Карандаш</string>
+    <string name="v45_kids_eraser">Ластик</string>
+    <string name="v45_kids_paint_brush">Кисть</string>
+    <string name="v45_kids_bucket">Ведёрко</string>
+    <string name="v45_kids_parts">Детали</string>
+    <string name="v45_kids_colors">Цвета</string>
+    <string name="v45_kids_shapes">Фигуры</string>
+    <string name="v45_kids_challenge">Задание</string>
+    <string name="v45_kids_background">Бумага</string>
+    <string name="v45_kids_image">Картинка</string>
+    <string name="v45_kids_text">Буквы</string>
+    <string name="v45_kids_model3d">3D</string>
+    <string name="v45_kids_select">Выбрать</string>
+    <string name="v45_kids_eyedropper">Взять цвет</string>
+    <string name="v45_kids_ruler">Линейка</string>
+    <string name="v45_kids_template">Трафарет</string>
+    <string name="v45_kids_expand">Больше</string>
+    <string name="v45_kids_brush_size">Размер кисти</string>
+    <string name="v45_kids_size_thin">Тонкая</string>
+    <string name="v45_kids_size_medium">Средняя</string>
+    <string name="v45_kids_size_thick">Толстая</string>
+    <string name="v45_help_kids_pen">Рисуй карандашом на бумаге всё, что хочешь. Цвет и толщину выбирай в «Цвета».</string>
+    <string name="v45_help_kids_paint_brush">Кисть: раскрашивай фигуру пальцем. Краска не выходит за линии, а на пустой бумаге красит там, где ты проводишь.</string>
+    <string name="v45_help_kids_bucket">Ведёрко: коснись внутри фигуры, и это место окрасится в выбранный цвет. Подержи 2 секунды — окрасится вся фигура.</string>
+    <string name="v45_help_kids_parts">Здесь видны детали рисунка (линии, фигуры, буквы); их можно спрятать или удалить.</string>
+    <string name="v45_help_kids_colors">Выбери цвет, толщину и вид карандаша.</string>
+    <string name="v45_help_kids_shapes">Готовые картинки и фигуры: выбери одну и коснись бумаги, чтобы поставить.</string>
+    <string name="v45_help_kids_background">Меняет цвет бумаги.</string>
+    <string name="v45_help_kids_brush_size">Толщина кисти: тонкая, средняя или толстая.</string>
+    <string name="v45_challenge_tip_pen">Выбери наверху «Карандаш» и медленно веди пальцем по пунктиру.</string>
+    <string name="v45_challenge_tip_paint_brush">Можно раскрашивать и кистью: выбери «Кисть», выбери цвет и закрась пальцем область. Краска не выйдет за линии!</string>
+    <string name="v45_tut_kids_pen">Карандаш</string>
+    <string name="v45_tut_kids_pen_text">Карандашом можно рисовать что угодно. Смотри, я рисую на небе яркое солнце!</string>
+</resources>

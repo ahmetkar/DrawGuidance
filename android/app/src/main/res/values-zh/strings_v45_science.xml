@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- v45 bilim: formüllü fen şekilleri, grafik formülü, molekül görünümleri -->
+<resources>
+    <string name="v45_tool_params">数值</string>
+    <string name="v45_mode_hint_params">修改数值或公式；拖动图形上的控制点</string>
+    <string name="v45_vector_edit">编辑矢量</string>
+    <string name="v45_param_formula">公式</string>
+    <string name="v45_param_formula_hint">赋值 (v = 20; θ = 45°)、导出量 (R = 50) 或曲线 (y = 2x² − 3)；分子请输入化学式 (CH3COOH、C6H12O6)</string>
+    <string name="v45_param_less">减小 %1$s</string>
+    <string name="v45_param_more">增大 %1$s</string>
+    <string name="v45_param_out_of_range">%1$s 的值超出允许范围</string>
+    <string name="v45_param_no_match">输入的公式不适用于此图形</string>
+    <string name="v45_math_empty">公式为空</string>
+    <string name="v45_math_unexpected">意外的“%1$s”（第 %2$d 个字符）</string>
+    <string name="v45_math_parenthesis">括号不匹配（第 %1$d 个字符）</string>
+    <string name="v45_math_missing">缺少运算数（第 %1$d 个字符）</string>
+    <string name="v45_math_unknown">未知名称：%1$s</string>
+    <string name="v45_math_arguments">%1$s 的参数个数不正确</string>
+    <string name="v45_math_div_zero">除以零：结果无定义</string>
+    <string name="v45_math_domain">%1$s 在此值处无定义</string>
+    <string name="v45_math_relation">此处不能使用关系式</string>
+    <string name="v45_math_overflow">结果太大</string>
+    <string name="v45_chem_empty">公式为空</string>
+    <string name="v45_chem_unknown_element">未知元素：%1$s</string>
+    <string name="v45_chem_valence">%1$s 原子不符合化合价规则</string>
+    <string name="v45_chem_hydrogen">氢原子数与此结构不符</string>
+    <string name="v45_chem_too_large">分子太大无法绘制（重原子最多 %1$s 个）</string>
+    <string name="v45_chem_ionic">无法识别此离子化合物（%1$s）</string>
+    <string name="v45_chem_parenthesis">括号不匹配</string>
+    <string name="v45_chem_ring">环编号未闭合（%1$s）</string>
+    <string name="v45_chem_syntax">无法读取公式</string>
+    <string name="v45_mol_structural">结构式</string>
+    <string name="v45_mol_condensed">结构简式</string>
+    <string name="v45_mol_skeletal">键线式</string>
+    <string name="v45_mol_3d">3D 模型</string>
+    <string name="v45_graph_formula">公式</string>
+    <string name="v45_graph_degrees">角度制</string>
+    <string name="v45_graph_hint_curve">y = f(x)；多条曲线用 ; 分隔 (y = x²; y = 2x + 1)</string>
+    <string name="v45_graph_hint_surface">曲面 z = f(x, y)（例如 x² − y²）</string>
+    <string name="v45_graph_hint_set">点或解集 (x = 3、x &gt; 2、−1 ≤ x &lt; 3)</string>
+    <string name="v45_graph_hint_sampled">数值按 f(1)、f(2)、… 计算（例如 2x + 1）</string>
+    <string name="v45_formula_not_computed">无法计算：%1$s</string>
+</resources>

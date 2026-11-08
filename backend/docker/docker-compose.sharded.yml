@@ -1,0 +1,107 @@
+# DrawGuidance (v33): parçalı MongoDB kümesi (yapılandırma sunucusu + iki parça + mongos) ve API.
+#   docker compose -f docker-compose.sharded.yml up -d
+# Her parça bir kopya kümesidir (üretimde 3 üyeye çıkarılır). users koleksiyonu firebaseUid (benzersiz) anahtarıyla
+# parçalanır; küçük katalog koleksiyonları parçalanmaz.
+name: drawguidance-sharded
+
+x-mongo: &mongo
+  image: mongo:7.0
+  command: ["bash", "/scripts/rs-entry.sh"]
+  restart: unless-stopped
+  depends_on:
+    keygen:
+      condition: service_completed_successfully
+  healthcheck:
+    test: ["CMD-SHELL", "test -f /tmp/ready && mongosh --quiet --eval 'db.adminCommand({ping: 1}).ok' | grep -q 1"]
+    interval: 5s
+    timeout: 5s
+    retries: 60
+    start_period: 10s
+
+x-users: &users
+  CREATE_USERS: "1"
+  MONGO_CACHE_GB: ${MONGO_CACHE_GB:-1}
+  MONGO_ROOT_USER: ${MONGO_ROOT_USER}
+  MONGO_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD}
+
+services:
+  keygen:
+    image: mongo:7.0
+    entrypoint: ["bash", "-c", "[ -s /keys/mongo-keyfile ] || head -c 756 /dev/urandom | base64 -w0 > /keys/mongo-keyfile; chmod 400 /keys/mongo-keyfile; chown 999:999 /keys/mongo-keyfile"]
+    volumes: [mongo-keys:/keys]
+
+  cfg1:
+    <<: *mongo
+    hostname: cfg1
+    environment: { <<: *users, RS_NAME: cfgrs, RS_INIT: "1", RS_MEMBERS: "cfg1:27017", CONFIGSVR: "1" }
+    volumes: [cfg1-data:/data/db, mongo-keys:/keys:ro, ./mongo:/scripts:ro]
+
+  sh1a:
+    <<: *mongo
+    hostname: sh1a
+    environment: { <<: *users, RS_NAME: sh1, RS_INIT: "1", RS_MEMBERS: "sh1a:27017", SHARDSVR: "1" }
+    volumes: [sh1a-data:/data/db, mongo-keys:/keys:ro, ./mongo:/scripts:ro]
+
+  sh2a:
+    <<: *mongo
+    hostname: sh2a
+    environment: { <<: *users, RS_NAME: sh2, RS_INIT: "1", RS_MEMBERS: "sh2a:27017", SHARDSVR: "1" }
+    volumes: [sh2a-data:/data/db, mongo-keys:/keys:ro, ./mongo:/scripts:ro]
+
+  mongos:
+    image: mongo:7.0
+    hostname: mongos
+    command: ["bash", "/scripts/mongos-entry.sh"]
+    restart: unless-stopped
+    depends_on:
+      cfg1: { condition: service_healthy }
+      sh1a: { condition: service_healthy }
+      sh2a: { condition: service_healthy }
+    environment:
+      CONFIG_DB: cfgrs/cfg1:27017
+      SHARDS: "sh1/sh1a:27017;sh2/sh2a:27017"
+      MONGO_ROOT_USER: ${MONGO_ROOT_USER}
+      MONGO_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD}
+      MONGO_APP_DB: ${MONGO_APP_DB}
+      MONGO_APP_USER: ${MONGO_APP_USER}
+      MONGO_APP_PASSWORD: ${MONGO_APP_PASSWORD}
+    ports:
+      - "${MONGO_PORT:-27017}:27017"
+    volumes: [mongo-keys:/keys:ro, ./mongo:/scripts:ro]
+    healthcheck:
+      test: ["CMD-SHELL", "test -f /tmp/ready"]
+      interval: 5s
+      timeout: 5s
+      retries: 60
+      start_period: 10s
+
+  api:
+    build:
+      context: ..
+      target: ${API_BUILD_TARGET:-runtime}
+    image: drawguidance-server:33
+    restart: unless-stopped
+    depends_on:
+      mongos: { condition: service_healthy }
+    environment:
+      # v40 imajın öntanımlı profili "prod"; yerel geliştirmede öntanımlı profil (üretim: swarm/stack.yml)
+      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE:-default}
+      MONGODB_URI: mongodb://${MONGO_APP_USER}:${MONGO_APP_PASSWORD}@mongos:27017/${MONGO_APP_DB}?authSource=${MONGO_APP_DB}
+      MONGO_SHARDING: "true"
+      MONGO_WRITE_CONCERN: ${MONGO_WRITE_CONCERN:-majority}
+      FIREBASE_PROJECT_ID: ${FIREBASE_PROJECT_ID:-drawguidance}
+      # v40 web sitesi (CORS, form sınırı, IP özeti tuzu) ve Slack bildirimleri; değerler .env dosyasından
+      WEB_ALLOWED_ORIGINS: ${WEB_ALLOWED_ORIGINS:-https://drawguidance.ahmetkar.com,http://localhost:3000}
+      WEB_ALLOWED_ORIGIN_PATTERNS: ${WEB_ALLOWED_ORIGIN_PATTERNS:-}
+      WEB_BEHIND_PROXY: ${WEB_BEHIND_PROXY:-false}
+      WEB_PROXY_HOPS: ${WEB_PROXY_HOPS:-1}
+      IP_HASH_SALT: ${IP_HASH_SALT:-}
+      SLACK_WEBHOOK_URL: ${SLACK_WEBHOOK_URL:-}
+    ports:
+      - "${API_PORT:-4747}:4747"
+
+volumes:
+  mongo-keys:
+  cfg1-data:
+  sh1a-data:
+  sh2a-data:

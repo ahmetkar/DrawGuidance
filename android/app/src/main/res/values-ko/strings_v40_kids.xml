@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- v40 çocuk modu: 50 seviyelik çizim görevi, Premium seviyeler ve maskotun görev önerisi -->
+<resources>
+    <string name="v40_challenge_state_premium">프리미엄</string>
+    <string name="v40_challenge_premium_note">레벨 %1$d–%2$d는 프리미엄으로 열려요</string>
+    <string name="v40_challenge_suggest_new">안녕! 나랑 그리기 미션 해 볼래? 레벨마다 그림을 그리고 별을 모으자!</string>
+    <string name="v40_challenge_suggest_resume">다시 왔구나! 그리기 미션을 레벨 %1$d부터 이어서 할까?</string>
+    <string name="v40_challenge_suggest_premium">무료 레벨을 모두 통과했어! 다음 레벨은 프리미엄으로 열려요.</string>
+    <string name="v40_challenge_suggest_start">시작</string>
+    <string name="v40_challenge_suggest_cancel">취소</string>
+    <string name="v40_challenge_suggest_cd">보야즉이 그리기 미션을 추천해요</string>
+    <string name="v40_challenge_body_resume">잘하고 있어! %1$d / %2$d 레벨 통과.</string>
+    <string name="v40_challenge_body_premium">멋져! 무료 레벨 %1$d개를 모두 통과했어. 남은 %2$d개 레벨은 프리미엄으로 열려요.</string>
+    <string name="v40_challenge_body_all_done">최고야! %1$d개 레벨을 모두 통과했어. 레벨을 다시 해서 별을 더 모아 봐.</string>
+    <string name="v40_challenge_go_premium">프리미엄 보기</string>
+    <string name="v40_challenge_replay">다시 하기 (%1$d)</string>
+</resources>

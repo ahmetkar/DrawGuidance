@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- v20 çizim önerileri -->
+    <string name="suggestions_setting">Çizim önerileri</string>
+    <string name="suggestions_setting_hint">Çizip durunca düzeltme önerir</string>
+    <string name="suggestions_turn_off">Önerileri kapat</string>
+    <string name="suggestions_off_event">Çizim önerileri kapatıldı (⋮ menüsünden açılabilir)</string>
+
+    <!-- v20 üç parmakla geri al / yinele -->
+    <string name="swipe_undone">Geri alındı</string>
+    <string name="swipe_redone">Yinelendi</string>
+    <string name="swipe_nothing_to_undo">Geri alınacak adım yok</string>
+    <string name="swipe_nothing_to_redo">Yinelenecek adım yok</string>
+
+    <!-- v20 fırça ayarları -->
+    <string name="brush_size_edit">Fırça boyutunu yaz</string>
+    <string name="brush_size_range">%1$d–%2$d px</string>
+    <string name="brush_spacing_label">Aralık</string>
+    <string name="brush_spacing_hint">Fırça damgaları arasındaki mesafe (fırça kalınlığına göre)</string>
+    <string name="brush_default">Varsayılan</string>
+    <string name="brush_speed_label">Çizim hızı</string>
+    <string name="brush_speed_hint">Mürekkebin kaleme yetişme hızı: düşükte çizgi parmağı gecikerek ve yumuşakça izler</string>
+    <string name="brush_speed_instant">Anında</string>
+    <string name="brush_stabilizer_label">Sabitleme</string>
+    <string name="brush_stabilizer_hint">Titrek, zikzaklı çizgileri düzeltir (bu fırça için)</string>
+    <string name="brush_stabilizer_strength">Sabitleme gücü</string>
+    <string name="brush_tilt_title">Kalem eğimi</string>
+    <string name="brush_tilt_hint">Eğim bildiren tablet kalemlerinde (Ayarlar → Tablet kalemi → Eğimle gölgeleme açık)</string>
+    <string name="brush_tilt_width">Eğimle kalınlaşma</string>
+    <string name="brush_tilt_light">Eğimle açılma</string>
+    <string name="brush_tilt_threshold">Eğim eşiği</string>
+    <string name="brush_tilt_threshold_hint">Kalem bu açıdan fazla yatınca etki başlar</string>
+    <string name="brush_nib_follow">Uç kalemin yönüne dönsün</string>
+    <string name="brush_nib_follow_hint">Yassı uç, kalemi yatırdığın yöne göre döner (yön bildiren kalemlerde)</string>
+    <string name="brush_3d_title">3B ayarları</string>
+    <string name="brush_3d_light">Işık yönü</string>
+    <string name="brush_3d_relief">Kabartma</string>
+    <string name="brush_3d_gloss">Parlaklık</string>
+    <string name="brush_3d_material">Malzeme</string>
+    <string name="brush_3d_matte">Mat</string>
+    <string name="brush_3d_plastic">Plastik</string>
+    <string name="brush_3d_metal">Metal</string>
+    <string name="brush_3d_glass">Cam</string>
+    <string name="brush_3d_shadow">Zemin gölgesi</string>
+    <string name="brush_3d_shadow_soft">Gölge yumuşaklığı</string>
+    <string name="brush_3d_light_cd">Işık yönü %1$d°</string>
+    <string name="brush_tuning_reset">Bu fırçanın ayarlarını sıfırla</string>
+    <string name="degree_value">%1$d°</string>
+</resources>

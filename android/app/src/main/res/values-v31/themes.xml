@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- v30 Android 12+ sistem açılış ekranı: yeni simge (uyarlanabilir); v31 zemin karşılama ekranının nöromorfik rengi -->
+    <style name="Theme.DrawGuidance" parent="android:Theme.Material.Light.NoActionBar">
+        <item name="android:windowBackground">@color/brand_splash</item>
+        <item name="android:windowSplashScreenBackground">@color/brand_splash</item>
+    </style>
+</resources>

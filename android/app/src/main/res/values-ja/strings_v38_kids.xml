@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="kids_challenge">おえかきミッション</string>
+    <string name="help_kids_challenge">レベルごとのおえかきミッション。「スタート」をおして、かみのてんせんのうえをなぞるか、おてほんのいろでぬって、おわったら「できた」をおしてね。てんすうがたりたら、つぎのレベルがひらくよ。「すすみぐあい」でぜんぶのレベルがみられるよ。</string>
+    <string name="challenge_menu_idle">レベルごとのおえかきミッション！おてほんのえをかいて、てんすうとほしをあつめよう。</string>
+    <string name="challenge_menu_running">いまはレベル %1$d：%2$s だよ。</string>
+    <string name="challenge_start">スタート</string>
+    <string name="challenge_stop">モードをおわる</string>
+    <string name="challenge_progress">すすみぐあい</string>
+    <string name="challenge_level_of">レベル %1$d / %2$d</string>
+    <string name="challenge_finish">できた</string>
+
+    <string name="challenge_kind_trace">なぞる</string>
+    <string name="challenge_kind_paint">ぬる</string>
+    <string name="challenge_kind_build">おいてぬる</string>
+    <string name="challenge_intro_trace">レベル %1$d：%2$s！ふででてんせんのうえをなぞってね。おわったらうえの「できた」をおしてね。</string>
+    <string name="challenge_intro_paint">レベル %1$d：%2$s！ペンキバケツで、いろのてんとおなじいろにぬってね。おわったら「できた」をおしてね。</string>
+    <string name="challenge_intro_build">レベル %1$d：%2$s！「図形を追加」でえをみつけて、てんせんのうえにおいて、てんのいろにぬってね。</string>
+
+    <string name="challenge_tip_brush">うえのふでをえらんで、ゆびでてんせんのうえをゆっくりなぞってね。</string>
+    <string name="challenge_tip_eraser">せんがはみでた？けしゴムをえらんで、よぶんなところをけしてね。</string>
+    <string name="challenge_tip_undo">まちがえた？うえのもどるやじるしで、さいごのそうさをもどせるよ。</string>
+    <string name="challenge_tip_paint">ペンキバケツをえらんで、てんのいろをえらんで、そのばしょをタップしてね。</string>
+    <string name="challenge_tip_hold">バケツでかたちのうえを 2 びょうおしたままにすると、かたちぜんぶがいっぺんにぬれるよ。</string>
+    <string name="challenge_tip_shape">「図形を追加」をおして、「%1$s」のえをえらんで、かみをタップしておいてね。</string>
+    <string name="challenge_tip_move">おいたえをゆびでドラッグして、てんせんのうえにうごかしてね。</string>
+    <string name="challenge_tip_finish">じゅんびができたら、うえのみどりの「できた」をおしてね。てんすうをおしえるよ！</string>
+    <string name="challenge_live_close">すごい、もうすこしでぴったりだよ！よければ「できた」をおしてね。</string>
+    <string name="challenge_tip_next">ヒント</string>
+    <string name="challenge_mascot_cd">ぬりぬり、タップでヒント</string>
+
+    <string name="challenge_passed_title">クリア！</string>
+    <string name="challenge_failed_title">あとすこし！</string>
+    <string name="challenge_passed_say">よくできたね！つぎのレベルがまってるよ。</string>
+    <string name="challenge_passed_say_3">すごい！ほしを 3 つぜんぶあつめたね！</string>
+    <string name="challenge_failed_say">このレベルをクリアするには %1$d てんいるよ。もういちどやってみよう、こんどはもっとうまくいくよ！</string>
+    <string name="challenge_all_done">さいごのレベルもクリア！きみはほんもののがかだね！</string>
+    <string name="challenge_score">てんすう</string>
+    <string name="challenge_best">ベスト：%1$d</string>
+    <string name="challenge_stars_cd">ほし %1$d こ</string>
+    <string name="challenge_next">つぎのレベル</string>
+    <string name="challenge_retry">もういちど</string>
+    <string name="challenge_exit">モードをでる</string>
+
+    <string name="challenge_progress_summary">%1$d / %2$d レベルクリア · ほし %3$d こ</string>
+    <string name="challenge_state_passed">クリア</string>
+    <string name="challenge_state_open">あそべる</string>
+    <string name="challenge_state_locked">ロック中</string>
+    <string name="challenge_play">あそぶ</string>
+    <string name="challenge_locked_say">このレベルはまだロックされているよ。さきにレベル %1$d をクリアしてね！</string>
+</resources>

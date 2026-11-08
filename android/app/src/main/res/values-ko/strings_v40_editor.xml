@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- v40 çizim ekranı: arka planı taşıma/boyutlandırma -->
+<resources>
+    <string name="bg_transform">이동 / 크기 조정</string>
+    <string name="bg_transform_hint">배경을 끌어 옮기고, 두 손가락이나 모서리로 크기를 조정하세요</string>
+    <string name="bg_transform_reset">초기화</string>
+</resources>

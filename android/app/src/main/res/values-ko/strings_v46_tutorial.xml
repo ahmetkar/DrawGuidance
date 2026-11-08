@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- v46 eğitimlerin yenilikler grupları -->
+    <string name="v46_tut_art">새 기능 (v46)</string>
+    <string name="v46_tut_art_text">두 부분으로 나뉜 상단 메뉴, 빈 곳을 탭하면 열리는 추가 메뉴, 선택한 요소 모서리의 선택 메뉴.</string>
+    <string name="v46_tut_split">두 줄 상단 메뉴</string>
+    <string name="v46_tut_split_text">도구가 두 부분으로 나뉩니다. 세로 화면에서는 위아래로, 가로 화면에서는 나란히 놓입니다. 모드(그리기, 추가, 선택…)를 바꾸면 두 부분 모두 그 모드의 도구를 보여 줍니다.</string>
+    <string name="v46_tut_addmenu">빈 곳을 탭해 추가</string>
+    <string name="v46_tut_addmenu_text">추가 모드에서 빈 곳을 탭하면 그 자리에 세로 추가 메뉴가 열립니다(도형, 글자, 수식, 다이어그램…). 고른 항목은 탭한 곳에 추가됩니다.</string>
+    <string name="v46_tut_selmenu">선택 메뉴</string>
+    <string name="v46_tut_selmenu_text">요소를 선택하면 모서리에 반투명 메뉴가 나타납니다: 이동, 크기 조절, 복사, 삭제, 편집.</string>
+    <string name="v46_tut_scale">크기 조절과 복사</string>
+    <string name="v46_tut_scale_text">크기 조절로 선택을 키우거나 줄이고, 복사로 옆에 복사본을 둡니다. 여기서는 해가 작아지고 새가 늘어납니다.</string>
+    <string name="v46_tut_edit">편집</string>
+    <string name="v46_tut_edit_text">편집을 누르면 요소 종류에 맞는 작업이 열립니다(도형 편집, 색과 채우기, 앞으로·뒤로, 숨기기). 과학 도형의 값도 여기 있습니다.</string>
+    <string name="v46_tut_notes">새 기능 (v46)</string>
+    <string name="v46_tut_notes_text">패널 추가로 만드는 코넬 페이지, 값을 쓰면 다시 그려지는 물리·원소 도형.</string>
+    <string name="v46_tut_panels">패널 추가</string>
+    <string name="v46_tut_panels_text">페이지를 테두리 있는 영역으로 나눕니다: 열, 격자, 정사각형 또는 코넬 배치(핵심 질문, 노트, 요약). 각 영역은 별도 요소입니다.</string>
+    <string name="v46_tut_titles">제목과 질문</string>
+    <string name="v46_tut_titles_text">노트 영역에 제목을, 왼쪽 열에 스스로에게 할 질문을 씁니다. 복습할 때는 노트를 가리고 질문만 봅니다.</string>
+    <string name="v46_tut_param">수식으로 그리는 도형</string>
+    <string name="v46_tut_param_text">자유물체도, 도르래, 지레, 원소 도형은 수식과 함께 옵니다. 힘, 화살표 길이, 결과가 값에서 계산됩니다.</string>
+    <string name="v46_tut_values">값을 쓰면 도형이 바뀝니다</string>
+    <string name="v46_tut_values_text">도형의 수식 칸에 새 값(예: F = 40, α = 30°)을 쓰면 도형이 다시 그려지고 모서리의 수식과 결과도 바뀝니다.</string>
+    <string name="v46_tut_element">원소 도형</string>
+    <string name="v46_tut_element_text">주기율표 칸과 보어 원자 모형은 입력한 원소로 그려집니다: 기호(Na), 이름, 원자 번호(11). 여기서는 나트륨이 염소로 바뀝니다.</string>
+    <string name="v46_tut_formula">수식과 요약</string>
+    <string name="v46_tut_formula_text">다이어그램 아래에 수식을 넣고 아래 띠에 요약을 씁니다. 복습할 페이지가 준비됐습니다.</string>
+    <string name="v46_tut_comic">새 기능 (v46)</string>
+    <string name="v46_tut_comic_text">실제 칸 배치, 준비된 장소와 캐릭터, 말풍선, 효과, 표지와 템플릿.</string>
+    <string name="v46_tut_tpl">칸 배치</string>
+    <string name="v46_tut_tpl_text">템플릿에서 배치를 고르세요. 칸은 함께 커지고 작아지며, 간격을 조절할 수 있고, 안의 그림은 칸과 함께 움직입니다.</string>
+    <string name="v46_tut_places">장소 배경</string>
+    <string name="v46_tut_places_text">준비된 장소를 칸에 놓으면 그림이 칸 비율에 맞게 잘리고 칸 테두리 뒤에 놓입니다.</string>
+    <string name="v46_tut_chars">캐릭터</string>
+    <string name="v46_tut_chars_text">캐릭터에서 표정, 포즈, 액션을 고르고 칸 안에서 크기와 위치를 정하세요. 프리미엄 캐릭터에는 자물쇠가 표시됩니다.</string>
+    <string name="v46_tut_balloons">말풍선</string>
+    <string name="v46_tut_balloons_text">해설 상자가 장면을 열고, 말·외침·생각·속삭임 말풍선이 캐릭터의 목소리가 됩니다. 꼬리를 말하는 사람에게 향하세요.</string>
+    <string name="v46_tut_fx">속도선과 효과음</string>
+    <string name="v46_tut_fx_text">속도선은 움직임을, 효과음 글자는 소리를 나타냅니다. 선을 캐릭터 뒤에 두면 장면이 더 잘 읽힙니다.</string>
+    <string name="v46_tut_cover">표지와 템플릿</string>
+    <string name="v46_tut_cover_text">새 만화는 표지 페이지로 시작합니다. 캔버스를 만들 때 템플릿에서 예시(액션, 만화, 웹툰, 4컷, 대화)를 골라 이어서 그릴 수 있습니다.</string>
+    <string name="v46_tut_simple">새 기능 (v46)</string>
+    <string name="v46_tut_simple_art_text">두 줄 메뉴, 상단 메뉴의 사각형 선택과 스포이트.</string>
+    <string name="v46_tut_simple_notes_text">패널 추가, 값을 쓰면 다시 그려지는 과학 도형.</string>
+    <string name="v46_tut_s_shape">도형</string>
+    <string name="v46_tut_s_shape_text">도형을 고르고 끌어 보세요: 집, 해, 별… 채운 도형으로 그림의 바탕을 빠르게 만듭니다.</string>
+    <string name="v46_tut_s_select">사각형 선택</string>
+    <string name="v46_tut_s_select_text">상단 메뉴의 사각형 선택으로 영역을 그리면 안의 모든 것이 선택됩니다. 그다음 옮기거나 크기를 바꾸세요.</string>
+    <string name="v46_tut_s_eyedrop">스포이트</string>
+    <string name="v46_tut_s_eyedrop_text">스포이트로 그림의 색을 탭하면 붓이 그 색이 됩니다.</string>
+    <string name="v46_tut_kids_brush">색칠 붓</string>
+    <string name="v46_tut_kids_brush_text">색칠 붓으로 손가락을 움직여 봐! 도형 안에서 시작하면 색이 밖으로 나가지 않아.</string>
+</resources>

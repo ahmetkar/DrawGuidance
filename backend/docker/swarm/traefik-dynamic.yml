@@ -1,0 +1,54 @@
+# DrawGuidance v40 Traefik dinamik ayarları (Swarm config olarak /etc/traefik/dynamic.yml): TLS seçenekleri ve
+# ara katmanlar. Yönlendirici ve servis tanımları stack.yml'deki api etiketlerinde.
+tls:
+  options:
+    # Yalnız TLS 1.2+ ve ileri gizlilikli AEAD şifreleri; SNI'sız / tanımsız alan adıyla bağlantı reddedilir
+    default:
+      minVersion: VersionTLS12
+      sniStrict: true
+      cipherSuites:
+        - TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384
+        - TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        - TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305
+        - TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305
+        - TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256
+        - TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+      curvePreferences:
+        - X25519
+        - CurveP256
+        - CurveP384
+
+http:
+  middlewares:
+    # HSTS (1 yıl, alt alan adları; "preload" listesine girmek ayrı bir karardır) ve tarayıcı güvenlik başlıkları
+    security-headers:
+      headers:
+        stsSeconds: 31536000
+        stsIncludeSubdomains: true
+        forceSTSHeader: true
+        contentTypeNosniff: true
+        frameDeny: true
+        referrerPolicy: no-referrer
+        customResponseHeaders:
+          Server: ""
+          X-Powered-By: ""
+
+    # IP başına genel istek sınırı (bütün kopyaların önünde; sunucudaki uç/kullanıcı sınırlarına ek). Ortalama
+    # saniyede 20, anlık 60 istek. Kaynak: bağlantının adresi (Traefik kapıları "host" kipinde yayımlar)
+    api-ratelimit:
+      rateLimit:
+        average: 20
+        period: 1s
+        burst: 60
+        sourceCriterion:
+          ipStrategy:
+            depth: 0
+
+    # IP başına aynı anda en çok 40 istek (yavaş istemcilerle bağlantı tüketmeye karşı)
+    api-inflight:
+      inFlightReq:
+        amount: 40
+        # Öntanımlı ölçüt alan adıdır (bütün istemciler tek kova olurdu): bağlantının adresi (depth 0 = RemoteAddr)
+        sourceCriterion:
+          ipStrategy:
+            depth: 0

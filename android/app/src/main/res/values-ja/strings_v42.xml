@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- v42 metinleri -->
+<resources>
+    <string name="v42_stats_drawings">イラスト</string>
+    <string name="v42_stats_notes">ノート</string>
+    <string name="v42_stats_comics">コミック</string>
+    <string name="v42_save_title">保存</string>
+    <string name="v42_save_hint">形式を選んでください。設定は選んだ形式に合わせて変わります。</string>
+    <string name="v42_save_tab_image">画像ファイル</string>
+    <string name="v42_save_tab_pdf">PDF</string>
+    <string name="v42_save_tab_cbz">CBZ</string>
+    <string name="v42_err_copy">コピー</string>
+    <string name="v42_err_share">共有 / メール</string>
+    <string name="v42_err_copied">レポートをコピーしました。メールやメッセージで送ってください。</string>
+    <string name="v42_err_share_hint">ログインできない場合やサーバーに接続できない場合は、レポートをコピーまたは共有して送ってください。</string>
+    <string name="v42_server_title">サーバー（一時的）</string>
+    <string name="v42_server_hint">アプリの接続先：リモートサーバー、またはローカルネットワーク内のパソコンで動くサーバー。</string>
+    <string name="v42_server_remote">リモート</string>
+    <string name="v42_server_local">ローカルネットワーク</string>
+    <string name="v42_server_current">現在：%1$s</string>
+    <string name="v42_server_local_hint">スマホとパソコンは同じWi-Fiに接続してください。パソコンでYerel-Sunucuyu-Baslat.batを実行し、表示されたアドレスを入力するか「ネットワークを検索」を押します。通信は暗号化されないので自宅のネットワークだけで使ってください。</string>
+    <string name="v42_server_local_invalid">ローカルネットワークのアドレスのみ入力できます（例：192.168.1.20:4747）。</string>
+    <string name="v42_server_use">このサーバーを使う</string>
+    <string name="v42_add_objects">アイテム</string>
+    <string name="v42_obj_title">アイテムを追加</string>
+    <string name="v42_obj_hint">テーマパックとカテゴリ別のアイテム。タップでページに追加。移動・回転・拡大縮小できます。</string>
+    <string name="v42_fx_images_hint">爆発・エネルギー・煙・きらめきの描画済み画像（テーマパック・カテゴリ別）。</string>
+    <string name="v42_text_on_path">パス上のテキスト</string>
+    <string name="v42_text_on_path_need">パス上のテキスト（先にペンツールでパスを描いてください）</string>
+    <string name="v42_text_path_pick">テキストを沿わせるパスをタップ</string>
+    <string name="v42_text_path_missed">そこにパスはありません。強調表示されたパスをタップしてください</string>
+    <string name="v42_text_path_below">テキストをパスの下へ</string>
+    <string name="v42_text_path_above">テキストをパスの上へ</string>
+    <string name="v42_text_path_reverse">テキストの向きを反転</string>
+    <string name="v42_text_path_detach">テキストをパスから解除</string>
+    <string name="v42_saved_tab_default">既定のフォルダ</string>
+    <string name="v42_saved_tab_other">その他の場所</string>
+    <string name="v42_saved_empty_other">「場所を選択」や「名前を付けて保存」で別のフォルダに保存したファイルがここに表示されます。</string>
+    <string name="v42_saved_open">開く</string>
+    <string name="v42_saved_no_viewer">このファイルを開けるアプリがありません。共有から別のアプリに送れます。</string>
+    <string name="v42_saved_document">%1$s文書 · %2$s</string>
+    <string name="v42_help_add_objects">武器、ランタン、書類、財宝、食べ物などのアイテム。テーマパックとカテゴリで選び、画像としてページに追加します。</string>
+</resources>

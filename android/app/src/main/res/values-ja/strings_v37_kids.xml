@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="kids_mascot_name">ぬりぬり</string>
+    <string name="kids_mascot_open">ぬりぬりをよぶ</string>
+    <string name="kids_mascot_cd">ぬりぬり、おえかきのともだち</string>
+    <string name="kids_mascot_next">OK</string>
+    <string name="kids_mascot_end">おわる</string>
+    <string name="kids_mascot_close">とじる</string>
+    <string name="kids_mascot_apply">つかう</string>
+    <string name="kids_mascot_hello">こんにちは、ぼくはぬりぬり！おえかきのあいだ、ずっといっしょだよ。さわるとヒントをおしえるね。</string>
+
+    <string name="kids_tip_1">ペンキバケツをえらんで、いろをえらんで、かたちをタッチ：タッチしたところがぬれるよ！</string>
+    <string name="kids_tip_2">かたちのうえでゆびを 2 びょうおしたままにすると、かたちぜんぶがいっぺんにぬれるよ。</string>
+    <string name="kids_tip_3">まちがえた？うえのもどるやじるしで、さいごのそうさをもどせるよ。</string>
+    <string name="kids_tip_4">できあいのえから、いえやふうせんをいれて、すきなようにぬってね。</string>
+    <string name="kids_tip_5">かみのいろをかえてみた？そらみたいにあおくもできるよ！</string>
+
+    <string name="kids_praise_1">すごくいいね！とってもじょうずだよ。</string>
+    <string name="kids_praise_2">さいこう！そのちょうし！</string>
+    <string name="kids_praise_3">だいすき！つぎはなにをかく？</string>
+
+    <string name="kids_say_shape_1">これは%1$sだね！きれいにととのえようか？</string>
+    <string name="kids_say_shape_2">わあ、%1$sをかいたんだね！せんをまっすぐにしようか？</string>
+    <string name="kids_say_shape_3">すてきな%1$s！ふちをきれいにしようか？</string>
+    <string name="kids_say_template_1">%1$sみたいだね！できあいのえにかえようか？</string>
+    <string name="kids_say_template_2">あっ、%1$sみたい！ぬりやすいえにかえられるよ！</string>
+    <string name="kids_say_template_3">うーん…%1$sをかきたかったのかな？できあいのをおこうか？</string>
+    <string name="kids_say_all_1">かたちを %1$d こかいたね！ぜんぶいっぺんにととのえようか？</string>
+    <string name="kids_say_all_2">%1$d このかたちのせんを、いっきにきれいにできるよ。やってみる？</string>
+    <string name="kids_say_text_1">「%1$s」ってかいたのかな！きれいなもじにしようか？</string>
+    <string name="kids_say_text_2">「%1$s」ってよめたよ！きれいなもじでかこうか？</string>
+    <string name="kids_say_part_1">この%1$sのえに %2$d このパーツをたしてかんせいできるよ。たそうか？</string>
+    <string name="kids_say_part_2">%1$sみたいにしあげてみる？パーツを %2$d こたすよ！</string>
+
+    <string name="tut_kids">ぬりぬりとおえかきしよう</string>
+    <string name="tut_kids_text">ぬりぬりがどうぐをしょうかいして、いっしょにえをかくよ。</string>
+    <string name="tut_kids_1">こんにちは！</string>
+    <string name="tut_kids_1_text">ぼくはぬりぬり！おえかきのどうぐをみせるから、いっしょにおおきなえをかこう。じゅんびはいい？</string>
+    <string name="tut_kids_2">ふで</string>
+    <string name="tut_kids_2_text">ふででなんでもかけるよ。みて、そらにかがやくおひさまをかくよ！</string>
+    <string name="tut_kids_3">できあいのえ</string>
+    <string name="tut_kids_3_text">かたちボタンでできあいのえをいれられるよ。いえとカラフルなふうせんをおくね。</string>
+    <string name="tut_kids_4">ペンキバケツ</string>
+    <string name="tut_kids_4_text">バケツといろをえらんで、かたちのなかをタッチ：タッチしたところがぬれるよ。やねはあか、かべはきいろ！</string>
+    <string name="tut_kids_5">ぜんぶぬる</string>
+    <string name="tut_kids_5_text">かたちのうえでゆびを 2 びょうおしてね：わっかがいっぱいになると、かたちぜんぶがぬれるよ。ふうせんはぜんぶピンク！</string>
+    <string name="tut_kids_6">けしゴム</string>
+    <string name="tut_kids_6_text">けしゴムでいらないせんをけせるよ。このらくがきをけすね。</string>
+    <string name="tut_kids_7">もどす</string>
+    <string name="tut_kids_7_text">まちがえた？もどるやじるしでさいごのそうさをもどして、すすむやじるしでやりなおせるよ。</string>
+    <string name="tut_kids_8">かみのいろ</string>
+    <string name="tut_kids_8_text">かみのいろもかえられるよ。そらいろにするね！</string>
+    <string name="tut_kids_9">できた！</string>
+    <string name="tut_kids_9_text">さいごにみどりのくさ！えができあがったよ。こんどはきみのばん、いちばんすてきなえをかいてね！</string>
+
+    <string name="kids_home_say">よかったら、いちばんたのしいおえかきをはじめよう</string>
+    <string name="kids_home_title">こどもモード</string>
+    <string name="kids_home_start">はじめよう</string>
+    <string name="kids_home_dismiss">あとで</string>
+    <string name="kids_canvas_name">わたしのえ</string>
+</resources>

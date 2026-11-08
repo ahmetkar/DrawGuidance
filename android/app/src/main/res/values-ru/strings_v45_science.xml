@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- v45 bilim: formüllü fen şekilleri, grafik formülü, molekül görünümleri -->
+<resources>
+    <string name="v45_tool_params">Значения</string>
+    <string name="v45_mode_hint_params">Измените значения или формулу; перетаскивайте маркеры на фигуре</string>
+    <string name="v45_vector_edit">Редактировать вектор</string>
+    <string name="v45_param_formula">Формула</string>
+    <string name="v45_param_formula_hint">Присваивание (v = 20; θ = 45°), производная величина (R = 50) или кривая (y = 2x² − 3); для молекул — формула (CH3COOH, C6H12O6)</string>
+    <string name="v45_param_less">Уменьшить %1$s</string>
+    <string name="v45_param_more">Увеличить %1$s</string>
+    <string name="v45_param_out_of_range">Значение %1$s вне допустимого диапазона</string>
+    <string name="v45_param_no_match">Формула не подходит к этой фигуре</string>
+    <string name="v45_math_empty">Формула пуста</string>
+    <string name="v45_math_unexpected">Неожиданный символ «%1$s» (символ %2$d)</string>
+    <string name="v45_math_parenthesis">Непарная скобка (символ %1$d)</string>
+    <string name="v45_math_missing">Не хватает операнда (символ %1$d)</string>
+    <string name="v45_math_unknown">Неизвестное имя: %1$s</string>
+    <string name="v45_math_arguments">Неверное число аргументов у %1$s</string>
+    <string name="v45_math_div_zero">Деление на ноль: результат не определён</string>
+    <string name="v45_math_domain">%1$s не определена при этом значении</string>
+    <string name="v45_math_relation">Здесь нельзя использовать отношение</string>
+    <string name="v45_math_overflow">Результат слишком велик</string>
+    <string name="v45_chem_empty">Формула пуста</string>
+    <string name="v45_chem_unknown_element">Неизвестный элемент: %1$s</string>
+    <string name="v45_chem_valence">Атом %1$s нарушает правила валентности</string>
+    <string name="v45_chem_hydrogen">Число атомов водорода не подходит к этой структуре</string>
+    <string name="v45_chem_too_large">Молекула слишком велика для рисунка (не более %1$s тяжёлых атомов)</string>
+    <string name="v45_chem_ionic">Это ионное соединение не распознано (%1$s)</string>
+    <string name="v45_chem_parenthesis">Скобки не согласованы</string>
+    <string name="v45_chem_ring">Номер цикла не закрыт (%1$s)</string>
+    <string name="v45_chem_syntax">Не удалось прочитать формулу</string>
+    <string name="v45_mol_structural">Структурная</string>
+    <string name="v45_mol_condensed">Сокращённая</string>
+    <string name="v45_mol_skeletal">Скелетная</string>
+    <string name="v45_mol_3d">3D-модель</string>
+    <string name="v45_graph_formula">Формула</string>
+    <string name="v45_graph_degrees">Градусы</string>
+    <string name="v45_graph_hint_curve">y = f(x); несколько кривых разделяйте ; (y = x²; y = 2x + 1)</string>
+    <string name="v45_graph_hint_surface">Поверхность z = f(x, y) (напр. x² − y²)</string>
+    <string name="v45_graph_hint_set">Точка или множество решений (x = 3, x &gt; 2, −1 ≤ x &lt; 3)</string>
+    <string name="v45_graph_hint_sampled">Значения вычисляются как f(1), f(2), … (напр. 2x + 1)</string>
+    <string name="v45_formula_not_computed">Не удалось вычислить: %1$s</string>
+</resources>

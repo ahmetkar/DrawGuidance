@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="kids_mascot_name">칠칠이</string>
+    <string name="kids_mascot_open">칠칠이 부르기</string>
+    <string name="kids_mascot_cd">칠칠이, 그림 친구</string>
+    <string name="kids_mascot_next">확인</string>
+    <string name="kids_mascot_end">끝내기</string>
+    <string name="kids_mascot_close">닫기</string>
+    <string name="kids_mascot_apply">적용</string>
+    <string name="kids_mascot_hello">안녕, 나는 칠칠이야! 그림 그리는 동안 늘 옆에 있을게. 나를 누르면 팁을 알려 줄게.</string>
+
+    <string name="kids_tip_1">페인트 통을 고르고, 색을 고르고, 모양을 눌러 봐: 누른 곳이 칠해져!</string>
+    <string name="kids_tip_2">모양 위에 손가락을 2초 동안 대고 있으면 모양 전체가 한꺼번에 칠해져.</string>
+    <string name="kids_tip_3">틀렸어? 위쪽 뒤로 화살표로 마지막 작업을 되돌릴 수 있어.</string>
+    <string name="kids_tip_4">준비된 그림에서 집이나 풍선을 넣고 마음대로 칠해 봐.</string>
+    <string name="kids_tip_5">종이 색을 바꿔 봤어? 하늘처럼 파랗게 할 수도 있어!</string>
+
+    <string name="kids_praise_1">정말 멋져! 그림을 아주 잘 그리네.</string>
+    <string name="kids_praise_2">최고야! 계속해 봐!</string>
+    <string name="kids_praise_3">너무 좋아! 다음엔 뭘 그릴까?</string>
+
+    <string name="kids_say_shape_1">이건 %1$s이야! 반듯하고 깔끔하게 만들어 줄까?</string>
+    <string name="kids_say_shape_2">와, %1$s 그렸구나! 선을 곧게 펴 줄까?</string>
+    <string name="kids_say_shape_3">멋진 %1$s! 가장자리를 반듯하게 할까?</string>
+    <string name="kids_say_template_1">%1$s처럼 보여! 준비된 그림으로 바꿔 줄까?</string>
+    <string name="kids_say_template_2">앗, %1$s 같아! 칠하기 쉬운 그림으로 바꿀 수 있어!</string>
+    <string name="kids_say_template_3">음… %1$s 그리고 싶었구나? 준비된 걸 놓아 줄까?</string>
+    <string name="kids_say_all_1">모양을 %1$d개나 그렸네! 한꺼번에 다듬어 줄까?</string>
+    <string name="kids_say_all_2">모양 %1$d개의 선을 한 번에 깔끔하게 할 수 있어. 해 볼까?</string>
+    <string name="kids_say_text_1">“%1$s”라고 쓴 것 같아! 예쁜 글자로 바꿔 줄까?</string>
+    <string name="kids_say_text_2">“%1$s”라고 읽었어! 반듯한 글씨로 써 줄까?</string>
+    <string name="kids_say_part_1">이 %1$s 그림에 %2$d개 부분을 더해서 완성할 수 있어. 더할까?</string>
+    <string name="kids_say_part_2">그림을 %1$s처럼 완성해 볼래? %2$d개 부분을 더해 줄게!</string>
+
+    <string name="tut_kids">칠칠이와 그림 그리기</string>
+    <string name="tut_kids_text">칠칠이가 도구를 소개하고 함께 한 단계씩 그림을 그려요.</string>
+    <string name="tut_kids_1">안녕!</string>
+    <string name="tut_kids_1_text">나는 칠칠이야! 그리기 도구를 보여 주고, 같이 커다란 그림을 그릴 거야. 준비됐어?</string>
+    <string name="tut_kids_2">붓</string>
+    <string name="tut_kids_2_text">붓으로 뭐든지 그릴 수 있어. 봐, 하늘에 반짝이는 해를 그리고 있어!</string>
+    <string name="tut_kids_3">준비된 그림</string>
+    <string name="tut_kids_3_text">모양 버튼으로 준비된 그림을 넣을 수 있어. 집이랑 알록달록 풍선을 놓을게.</string>
+    <string name="tut_kids_4">페인트 통</string>
+    <string name="tut_kids_4_text">통을 고르고 색을 고른 다음 모양 안을 눌러 봐: 누른 곳이 칠해져. 빨간 지붕, 노란 벽!</string>
+    <string name="tut_kids_5">전부 칠하기</string>
+    <string name="tut_kids_5_text">모양 위에 손가락을 2초 동안 대고 있어 봐: 고리가 다 차면 모양 전체가 칠해져. 풍선이 모두 분홍색!</string>
+    <string name="tut_kids_6">지우개</string>
+    <string name="tut_kids_6_text">지우개로 필요 없는 선을 지울 수 있어. 이 낙서를 지울게.</string>
+    <string name="tut_kids_7">되돌리기</string>
+    <string name="tut_kids_7_text">뭔가 잘못됐어? 뒤로 화살표는 마지막 작업을 되돌리고, 앞으로 화살표는 다시 해.</string>
+    <string name="tut_kids_8">종이 색</string>
+    <string name="tut_kids_8_text">종이 색도 바꿀 수 있어. 하늘색으로 할게!</string>
+    <string name="tut_kids_9">완성!</string>
+    <string name="tut_kids_9_text">마지막으로 초록 잔디! 우리 그림이 완성됐어. 이제 네 차례야, 가장 멋진 그림을 그려 봐!</string>
+
+    <string name="kids_home_say">원한다면 가장 재미있는 그림을 그리기 시작해 봐</string>
+    <string name="kids_home_title">어린이 모드</string>
+    <string name="kids_home_start">시작하자</string>
+    <string name="kids_home_dismiss">나중에</string>
+    <string name="kids_canvas_name">나의 그림</string>
+</resources>

@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="kids_mascot_name">Красюша</string>
+    <string name="kids_mascot_open">Позвать Красюшу</string>
+    <string name="kids_mascot_cd">Красюша, твой друг по рисованию</string>
+    <string name="kids_mascot_next">Хорошо</string>
+    <string name="kids_mascot_end">Завершить</string>
+    <string name="kids_mascot_close">Закрыть</string>
+    <string name="kids_mascot_apply">Применить</string>
+    <string name="kids_mascot_hello">Привет, я Красюша! Я всегда рядом, пока ты рисуешь. Нажми на меня, и я дам подсказку.</string>
+
+    <string name="kids_tip_1">Выбери ведёрко с краской, выбери цвет и нажми на фигуру: место, куда ты нажал, раскрасится!</string>
+    <string name="kids_tip_2">Подержи палец на фигуре 2 секунды, и вся фигура раскрасится сразу.</string>
+    <string name="kids_tip_3">Ошибся? Стрелка «назад» вверху отменяет последний шаг.</string>
+    <string name="kids_tip_4">Добавь домик или шарики из готовых картинок и раскрась их как хочешь.</string>
+    <string name="kids_tip_5">А ты пробовал поменять цвет бумаги? Она может быть голубой, как небо!</string>
+
+    <string name="kids_praise_1">Здорово получилось! Ты так красиво рисуешь.</string>
+    <string name="kids_praise_2">Супер! Продолжай, у тебя отлично выходит!</string>
+    <string name="kids_praise_3">Мне очень нравится! Что дальше?</string>
+
+    <string name="kids_say_shape_1">Это фигура «%1$s»! Хочешь, я сделаю её ровной и аккуратной?</string>
+    <string name="kids_say_shape_2">Ого, ты нарисовал фигуру «%1$s»! Выпрямить линии?</string>
+    <string name="kids_say_shape_3">Красивая фигура «%1$s»! Сделаем края ровными?</string>
+    <string name="kids_say_template_1">Похоже на «%1$s»! Заменить на готовую картинку?</string>
+    <string name="kids_say_template_2">Ой, это как «%1$s»! Могу превратить в картинку, которую легко раскрасить!</string>
+    <string name="kids_say_template_3">Хм… кажется, ты хотел нарисовать «%1$s». Поставить готовую?</string>
+    <string name="kids_say_all_1">Ты нарисовал фигур: %1$d! Исправить все сразу?</string>
+    <string name="kids_say_all_2">Я могу выровнять линии у фигур (%1$d) за один раз. Сделаем?</string>
+    <string name="kids_say_text_1">Кажется, ты написал «%1$s»! Превратить в красивый текст?</string>
+    <string name="kids_say_text_2">Я прочитал «%1$s»! Написать ровными буквами?</string>
+    <string name="kids_say_part_1">Я могу дорисовать «%1$s», добавив частей: %2$d. Добавить?</string>
+    <string name="kids_say_part_2">Хочешь закончить рисунок как «%1$s»? Я добавлю частей: %2$d!</string>
+
+    <string name="tut_kids">Рисуем с Красюшей</string>
+    <string name="tut_kids_text">Красюша покажет инструменты и шаг за шагом нарисует с тобой картинку.</string>
+    <string name="tut_kids_1">Привет!</string>
+    <string name="tut_kids_1_text">Я Красюша! Я покажу тебе инструменты, и мы вместе нарисуем большую картинку. Готов?</string>
+    <string name="tut_kids_2">Кисть</string>
+    <string name="tut_kids_2_text">Кистью можно рисовать что угодно. Смотри, я рисую на небе яркое солнце!</string>
+    <string name="tut_kids_3">Готовые картинки</string>
+    <string name="tut_kids_3_text">Кнопка фигур добавляет готовые картинки. Я ставлю домик и разноцветные шарики.</string>
+    <string name="tut_kids_4">Ведёрко с краской</string>
+    <string name="tut_kids_4_text">Выбери ведёрко, выбери цвет и нажми внутри фигуры: место раскрасится. Красная крыша и жёлтая стена!</string>
+    <string name="tut_kids_5">Раскрасить всё</string>
+    <string name="tut_kids_5_text">Подержи палец на фигуре 2 секунды: когда кольцо заполнится, раскрасится вся фигура. Все шарики розовые!</string>
+    <string name="tut_kids_6">Ластик</string>
+    <string name="tut_kids_6_text">Ластик стирает ненужные линии. Я стираю эти каракули.</string>
+    <string name="tut_kids_7">Отменить</string>
+    <string name="tut_kids_7_text">Что-то не так? Стрелка «назад» отменяет последний шаг, стрелка «вперёд» повторяет его.</string>
+    <string name="tut_kids_8">Цвет бумаги</string>
+    <string name="tut_kids_8_text">Цвет бумаги тоже можно менять. Делаю небесно-голубой!</string>
+    <string name="tut_kids_9">Готово!</string>
+    <string name="tut_kids_9_text">И напоследок зелёная травка! Наша картинка готова. Теперь твоя очередь, нарисуй самую красивую картинку!</string>
+
+    <string name="kids_home_say">Если хочешь, начни рисовать самые весёлые рисунки</string>
+    <string name="kids_home_title">Детский режим</string>
+    <string name="kids_home_start">Начнём</string>
+    <string name="kids_home_dismiss">Не сейчас</string>
+    <string name="kids_canvas_name">Мой рисунок</string>
+</resources>

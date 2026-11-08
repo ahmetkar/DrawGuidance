@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- v41 çizgi roman: mekân arka planı ekle (panele sığar ya da bütün sayfa) -->
+<resources>
+    <string name="v41_add_location">Фон локации</string>
+    <string name="v41_loc_title">Добавить фон локации</string>
+    <string name="v41_loc_hint">Выберите стиль и категорию, нажмите на фон, затем перетащите его на панель или растяните на всю страницу.</string>
+    <string name="v41_loc_place_hint">Нажмите на панель или перетащите на неё: фон впишется в панель. Отпустите вне панелей — фон займёт всю страницу.</string>
+    <string name="v41_loc_whole_page">Вся страница</string>
+    <string name="v41_help_add_location">Добавляет готовый фон локации: выберите сцену манги или комикса, отпустите на панели (впишется в неё) или растяните на всю страницу.</string>
+</resources>

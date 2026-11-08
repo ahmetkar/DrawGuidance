@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- v40 Android 11 ve öncesi otomatik yedekleme kuralları; data_extraction_rules.xml ile aynı tutulur. -->
+<full-backup-content>
+    <exclude domain="sharedpref" path="com.google.firebase.auth.api.Store.W0RFRkFVTFRd+MTo3MjI4NTYyNjM2MzQ6YW5kcm9pZDowMWZkZTdkY2U3NzE0MzliMzExMjBi.xml" />
+    <exclude domain="sharedpref" path="server_config.xml" />
+    <exclude domain="sharedpref" path="sync_permit.xml" />
+    <exclude domain="sharedpref" path="inbox.xml" />
+    <exclude domain="sharedpref" path="developer_settings.xml" />
+    <exclude domain="sharedpref" path="error_reports.xml" />
+    <exclude domain="file" path="diagnostics/" />
+    <exclude domain="file" path="catalog/" />
+</full-backup-content>

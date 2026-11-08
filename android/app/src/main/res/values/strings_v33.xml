@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- v33 şekil düzenleme: nokta paneli -->
+    <string name="tool_node_move">Taşı / seç</string>
+
+    <!-- v33 sayfa sınırı -->
+    <string name="page_limit_reached">Sayfa sınırına ulaşıldı (%1$d)</string>
+    <string name="page_limit_hint">En çok %1$d sayfa</string>
+
+    <!-- v33 başlıkta anlık arama -->
+    <string name="search_canvases_hint">Tuvallerde ara</string>
+    <string name="search_in_folder_hint">Bu klasörde ara</string>
+    <string name="search_models_hint">3B şekillerde ara</string>
+    <string name="search_clear">Aramayı temizle</string>
+    <string name="search_no_result">“%1$s” ile eşleşen sonuç yok</string>
+
+    <!-- v33 araç yardımı: dokununca ad, 2 sn basılı tutunca açıklama (çizim alanının köşesindeki kutu) -->
+    <string name="tool_help_box_cd">Araç açıklaması</string>
+    <string name="tool_help_fallback">%1$s: dokunarak kullanılır. Basılı tutunca bu kutuda ne işe yaradığı görünür.</string>
+    <string name="tool_help_hint">Basılı tut: ne işe yarar?</string>
+    <string name="move_step_name">Adım</string>
+
+    <!-- Çiz satırı -->
+    <string name="help_undo">Son yapılan işlemi geri alır.</string>
+    <string name="help_redo">Geri alınan işlemi yeniden yapar.</string>
+    <string name="help_brush_select">Çizim fırçasına geçer; fırçadayken dokununca fırça seçici açılır (kalem, marker, sulu boya…).</string>
+    <string name="help_brush_eraser">Silgiye geçer: çizgilerin üstünden geçerek siler. Yeniden dokununca son fırçaya dönülür.</string>
+    <string name="help_add_pen">Kalem aracı: dokunarak köşeli, sürükleyerek eğri noktalar koyup düzenlenebilir bir yol çizersiniz.</string>
+    <string name="help_fill_color">Seçim yoksa kağıdın rengini, dolgusu olan bir eleman seçiliyse onun dolgu rengini değiştirir.</string>
+    <string name="help_add_background">Kağıdın arka planını seçer: düz renk, desen ya da resim.</string>
+    <string name="help_tab_elements">Elemanlar panelini açar: tuvaldeki elemanları listeler, seçer, gizler ve gruplarsınız.</string>
+    <string name="help_brush_settings_toggle">Özellikler alanını açar: seçili aracın ayarları (fırçanın boyutu, saydamlığı ve rengi ya da yazının biçimi).</string>
+    <string name="help_tab_layers">Katmanlar panelini açar: katman ekler, gizler, kilitler ve etkin katmanı seçersiniz.</string>
+
+    <!-- Seç ve Taşı -->
+    <string name="help_duplicate_selection">Seçili elemanların bir kopyasını hemen yanına ekler.</string>
+    <string name="help_hide_elements">Seçili elemanları gizler; gizlenenler Elemanlar panelinden yeniden gösterilir.</string>
+    <string name="help_delete_selection">Seçili elemanları siler (şekil düzenlerken seçili noktayı ya da çizgiyi siler).</string>
+    <string name="help_move_nudge_left">Seçimi sola kaydırır (adım çipindeki kadar: 1 ya da 10 piksel).</string>
+    <string name="help_move_nudge_up">Seçimi yukarı kaydırır (adım çipindeki kadar: 1 ya da 10 piksel).</string>
+    <string name="help_move_nudge_down">Seçimi aşağı kaydırır (adım çipindeki kadar: 1 ya da 10 piksel).</string>
+    <string name="help_move_nudge_right">Seçimi sağa kaydırır (adım çipindeki kadar: 1 ya da 10 piksel).</string>
+    <string name="help_move_center">Seçimi sayfanın tam ortasına taşır.</string>
+    <string name="help_move_position_title">Seçimin konumu; dokununca tam konumu sayıyla girersiniz.</string>
+    <string name="help_move_step_name">Ok düğmelerinin kaydırma adımı; dokununca 1 ile 10 piksel arasında değişir.</string>
+    <string name="help_canvas_size_title">Kağıdın boyutu; dokununca genişlik ve yüksekliği sayıyla girersiniz.</string>
+    <string name="help_pen_mode_toggle">Kalem kullanırken parmağın çizip çizmeyeceğini seçer (kapalıyken parmak kaydırır).</string>
+
+    <!-- Ekle -->
+    <string name="help_add_shape">Şekil ekler: seçicide şekli seçip tuvalde sürükleyerek yerleştirin.</string>
+    <string name="help_add_formula">Hazır formül ekler; katsayılarını formülün üstünde düzenlersiniz.</string>
+    <string name="help_add_text">Yazı ekler: tuvale dokunun ve yazın.</string>
+    <string name="help_add_diagram">Diyagram ekler (akış, döngü, zaman çizelgesi…); adımları sonra düzenlenir.</string>
+    <string name="help_add_balloon">Konuşma ya da düşünce balonu ekler; kuyruğunu tuvalde sürükleyerek yönlendirirsiniz.</string>
+    <string name="help_add_sfx">“BAM!”, “VUUŞ” gibi efekt yazısı ekler.</string>
+    <string name="help_add_comic_lines">Hız ya da odak çizgileri ekler (hareket ve vurgu için).</string>
+    <string name="help_add_guide">Kılavuz çizgileri ekler: ızgara, noktalar, cetvel çizgileri.</string>
+    <string name="help_add_model3d">3B şekillerinden birini resim olarak tuvale ekler.</string>
+    <string name="help_add_perspective">Perspektif kılavuzu ekler: ufuk çizgisi ve kaçış noktaları.</string>
+    <string name="help_add_image">Cihazdan (not alma ve çizgi romanda kayıtlı resimlerden de) resim ekler.</string>
+
+    <!-- Düzenle -->
+    <string name="help_vector_edit_open">Seçili elemanı noktalarıyla düzenlemeye açar (şekil, çizim ya da yol).</string>
+    <string name="help_mode_rotate">Seçili elemanı döndürür: tuvalde sürükleyin ya da ±15° düğmelerini kullanın.</string>
+    <string name="help_mode_scale">Seçili elemanı büyütür ya da küçültür: sürükleyin ya da ±%10 düğmelerini kullanın.</string>
+    <string name="help_crop">Kırpar: tutamaçlarla alanı belirleyip Kırp ile uygulayın (seçim yoksa kağıt, varsa eleman).</string>
+
+    <!-- Şekil düzenleme -->
+    <string name="help_tool_nodes">Şeklin noktalarını gösterir: sürükleyerek taşırsınız. Alttaki panelde nokta ekleme ve çizgi çizme de var.</string>
+    <string name="help_tool_node_move">Noktaya dokunarak seçer, sürükleyerek taşırsınız; birden çok nokta seçilebilir.</string>
+    <string name="help_tool_add_node">Çizginin üstüne dokununca oraya nokta ekler; boş yere dokunmak yeni nokta koyar.</string>
+    <string name="help_tool_connect">İki noktaya sırayla dokunarak aralarına çizgi çizer; çizmeye son noktadan devam edilir.</string>
+    <string name="help_tool_lines">Şeklin çizgilerini seçer: eğimini, kavisini değiştirir ya da düzleştirirsiniz.</string>
+    <string name="help_tool_region_fill">Şeklin kapalı bir alanına dokununca o alanı seçili renkle boyar.</string>
+    <string name="help_tool_graph">Grafiğin ayarları: desen, nokta sayısı, sayılar ve ızgara.</string>
+    <string name="help_part_style">Seçili parçaların (seçim yoksa tüm şeklin) çizgi rengini, kalınlığını ve dolgusunu değiştirir.</string>
+    <string name="help_vector_cut">Seçili noktalardan şekli keser; parçalar ayrı ayrı düzenlenir.</string>
+    <string name="help_region_fill_clear">Dokunulan alanın boyasını kaldırır.</string>
+    <string name="help_region_fill_custom">Alan boyası için listede olmayan bir renk seçer.</string>
+    <string name="help_edge_turn_less">Seçili çizginin eğimini 15° azaltır.</string>
+    <string name="help_edge_turn_more">Seçili çizginin eğimini 15° artırır.</string>
+    <string name="help_edge_horizontal">Seçili çizgiyi yatay yapar.</string>
+    <string name="help_edge_vertical">Seçili çizgiyi dikey yapar.</string>
+    <string name="help_edge_straighten">Kavisli çizgiyi düz çizgiye çevirir.</string>
+    <string name="help_graph_pattern_less">Grafikteki desen ya da öğe sayısını azaltır.</string>
+    <string name="help_graph_pattern_more">Grafikteki desen ya da öğe sayısını artırır.</string>
+    <string name="help_graph_points_less">Eksendeki nokta (işaret) sayısını azaltır.</string>
+    <string name="help_graph_points_more">Eksendeki nokta (işaret) sayısını artırır.</string>
+    <string name="help_graph_numbers">Eksen sayılarını gösterir ya da gizler.</string>
+    <string name="help_graph_grid">Grafiğin ızgarasını gösterir ya da gizler.</string>
+    <string name="help_graph_fill_under">Fonksiyon eğrisinin altını boyar.</string>
+    <string name="help_graph_key_points">Kökleri, tepe ve kesişme noktalarını işaretler.</string>
+
+    <!-- Resim düzenleme -->
+    <string name="help_image_vectorize">Resmi düzenlenebilir çizgilere çevirir (kenar bulma ayarlarıyla).</string>
+    <string name="help_image_filter">Resme çizgi roman filtreleri uygular (mürekkep, ton, posterize…).</string>
+    <string name="help_bg_remove">Resmin arka planını kaldırır; önizlemeye dokunarak bölge ekler ya da geri getirirsiniz.</string>
+    <string name="help_image_effects">Resme hazır görünümler ve parlaklık, karşıtlık gibi ayarlar uygular.</string>
+
+    <!-- Diyagram düzenleme -->
+    <string name="help_diagram_theme">Diyagramın renk temasını değiştirir.</string>
+    <string name="help_diagram_add_step">Diyagrama yeni adım ekler.</string>
+    <string name="help_diagram_add_arrow">İki adım arasına ok ekler: önce başlangıç, sonra hedef adıma dokunun.</string>
+    <string name="help_diagram_link_cancel">Ok eklemeyi bırakır.</string>
+    <string name="help_diagram_edit">Seçili diyagramı düzenlemeye açar: adımlar, oklar ve yazılar.</string>
+
+    <!-- Genişlet -->
+    <string name="help_expand_left">Kağıdı soldan %10 genişletir.</string>
+    <string name="help_expand_top">Kağıdı üstten %10 genişletir.</string>
+    <string name="help_expand_bottom">Kağıdı alttan %10 genişletir.</string>
+    <string name="help_expand_right">Kağıdı sağdan %10 genişletir.</string>
+    <string name="help_zoom_fit">Kağıdı ekrana sığdırır (yakınlaştırmayı sıfırlar).</string>
+
+    <!-- Mod seçici -->
+    <string name="help_mode_draw">Çiz: fırçayla çizim yapılır; üst menüde fırça, silgi, boya ve paneller.</string>
+    <string name="help_mode_select">Seç: elemanlara dokunarak ya da çerçeve çizerek seçersiniz; seçimle kopyala, gizle, sil.</string>
+    <string name="help_mode_add">Ekle: şekil, yazı, resim, 3B şekil (ve tuval türüne göre formül, diyagram, balon…) eklenir.</string>
+    <string name="help_mode_edit_pick">Düzenle: dokunduğunuz elemanın düzenleyicisi açılır; döndür, ölçekle, kırp.</string>
+    <string name="help_mode_move">Taşı: seçimi sürükleyerek ya da ok düğmeleriyle taşırsınız.</string>
+    <string name="help_mode_expand">Genişlet: kağıdı kenarlarından büyütür ya da boyutunu girersiniz.</string>
+
+    <!-- Mod çubuğu -->
+    <string name="help_move_done">İşlemi bitirir ve önceki moda döner.</string>
+    <string name="help_clear_selection">Seçimi kaldırır.</string>
+    <string name="help_crop_reset">Kırpma alanını baştaki haline getirir.</string>
+    <string name="help_change_shape">Eklenecek şekli değiştirir (şekil seçici açılır).</string>
+    <string name="help_text_settings">Yazı tipi, boyutu, rengi ve hizalaması gibi yazı ayarlarını açar.</string>
+    <string name="help_edit_text">Seçili yazının metnini düzenler.</string>
+    <string name="help_shape_edit_open">Seçili şekli noktaları, çizgileri ve alanlarıyla düzenler.</string>
+    <string name="help_balloon_edit_title">Konuşma balonunun biçimini, kişi sayısını ve renklerini değiştirir.</string>
+    <string name="help_lines_density_action">Hız ya da odak çizgilerinin sıklığını değiştirir.</string>
+    <string name="help_image_edit_open">Seçili resmi düzenlemeye açar: kırp, vektörleştir, arka planı kaldır, efektler.</string>
+    <string name="help_formula_edit">Seçili formülün katsayılarını formülün üstünde düzenler.</string>
+    <string name="help_ink_color">Seçili çizimin rengini değiştirir.</string>
+    <string name="help_ink_thinner">Seçili çizimin çizgisini inceltir.</string>
+    <string name="help_ink_thicker">Seçili çizimin çizgisini kalınlaştırır.</string>
+    <string name="help_ink_smooth">Seçili çizimdeki titremeleri yumuşatır.</string>
+    <string name="help_ink_correct">Seçili çizimi düzgün bir şekle ya da yazıya çevirme önerisi getirir.</string>
+    <string name="help_ink_correct_multi">Seçili çizimlerin hepsi için düzeltme önerisi getirir; tek dokunuşla hepsi düzelir.</string>
+    <string name="help_formula_change">Başka bir hazır formül seçer.</string>
+    <string name="help_pen_undo">Kalem yolunun son noktasını siler.</string>
+    <string name="help_pen_finish">Kalem yolunu bitirip tuvale ekler.</string>
+    <string name="help_rotate_minus">Seçimi 15° sola döndürür.</string>
+    <string name="help_rotate_plus">Seçimi 15° sağa döndürür.</string>
+    <string name="help_rotate_90">Seçimi 90° döndürür.</string>
+    <string name="help_scale_minus">Seçimi %10 küçültür.</string>
+    <string name="help_scale_plus">Seçimi %10 büyütür.</string>
+    <string name="help_guide_remove">Kılavuz ya da perspektif çizgilerini kaldırır.</string>
+
+    <!-- Sayfa şeridi ve başlık -->
+    <string name="help_page_add">Açık sayfanın arkasına yeni sayfa ekler (çizgi romanda en çok 1000, not almada 200 sayfa).</string>
+    <string name="help_page_duplicate">Seçilen sayfayı içeriğiyle çoğaltır.</string>
+    <string name="help_page_delete">Seçilen sayfayı siler (son sayfa silinemez).</string>
+    <string name="help_save_now">Tuvali şimdi kaydeder (otomatik kayıt kapalıyken).</string>
+    <string name="help_editor_more">Diğer seçenekler: PDF, otomatik kayıt, öneriler, yapay zekâ, eğitim.</string>
+    <string name="help_save_as_image">Tuvali resim olarak kaydeder (biçim, boyut ve sayfa seçilir).</string>
+    <string name="help_back">Tuvalden çıkıp önceki sayfaya döner.</string>
+</resources>

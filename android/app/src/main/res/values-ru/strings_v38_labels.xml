@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="label_more">Ещё</string>
+    <string name="label_save_image">Сохранить</string>
+</resources>

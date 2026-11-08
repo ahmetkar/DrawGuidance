@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- v29: yeni balon biçimleri ve boyutu, çizgi türleri ve sıklık, yazı biçimi paneli, tuvale özgü ayarlar,
+     şeffaf editoryal tema, moda özgü tahmin, modlar arası aktarma -->
+<resources>
+    <!-- Balonlar -->
+    <string name="balloon_double">Çift çizgi</string>
+    <string name="balloon_icicle">Buz saçaklı</string>
+    <string name="balloon_drip">Damlayan</string>
+    <string name="balloon_scallop">Fistolu</string>
+    <string name="balloon_flash">Flaş</string>
+    <string name="balloon_heart">Kalp</string>
+    <string name="balloon_cut">Köşesi kesik</string>
+    <string name="balloon_rough">Pürüzlü</string>
+    <string name="balloon_size">Balon boyutu</string>
+    <string name="balloon_size_hint">Balonu seçince köşelerdeki tutamaklarla da boyutlandırabilirsiniz. Yükseklik otomatikse balon yazıya göre uzar.</string>
+
+    <!-- Çizgiler -->
+    <string name="lines_speed_diag">Çapraz hız</string>
+    <string name="lines_motion_curve">Hareket izi</string>
+    <string name="lines_focus_rough">Ürkütücü odak</string>
+    <string name="lines_flash">Flaş</string>
+    <string name="lines_radiate">Neşeli ışınlar</string>
+    <string name="lines_drip">Kasvet (dikey)</string>
+    <string name="lines_waver">Titreme</string>
+    <string name="lines_blush">Kızarma</string>
+    <string name="lines_swirl">Girdap</string>
+    <string name="lines_rings">Şok halkaları</string>
+    <string name="lines_selected_density">Seçili çizgilerin sıklığı</string>
+    <string name="lines_new_density">Yeni çizgilerin sıklığı</string>
+    <string name="lines_density_action">Çizgi sıklığı</string>
+
+    <!-- Yazı biçimi -->
+    <string name="text_format_title">Yazı biçimi</string>
+    <string name="text_tab_font">Yazı</string>
+    <string name="text_tab_color">Renk</string>
+    <string name="text_tab_effects">Efekt</string>
+    <string name="text_tab_box">Kutu ve yer</string>
+    <string name="text_tab_place">Yer</string>
+    <string name="text_place_title">Sayfadaki yeri</string>
+    <string name="text_format_more">Yazı biçimi</string>
+    <string name="text_color_from_pen">Yeni yazılar kalemin rengini alır (Fırça panelindeki renk).</string>
+
+    <!-- Modlar arası aktarma -->
+    <string name="transfer_title_canvas">Not / çizgi romana aktar</string>
+    <string name="transfer_hint_canvas">Çizim, seçtiğiniz tuvalin açık sayfasının ortasına eklenir; bu tuval değişmez.</string>
+    <string name="transfer_title_3d">Tuvale / çizgi romana aktar</string>
+    <string name="transfer_hint_3d">3B şekil şu anki açısıyla, seçtiğiniz tuvalin açık sayfasının ortasına eklenir.</string>
+    <string name="transfer_how">Nasıl aktarılsın</string>
+    <string name="transfer_vector">Vektör</string>
+    <string name="transfer_image">Resim</string>
+    <string name="transfer_vector_hint">Çizgiler ve elemanlar kopyalanır; hedefte tek tek düzenlenebilir.</string>
+    <string name="transfer_image_hint">Tek bir resim (saydam zeminli) olarak eklenir.</string>
+    <string name="transfer_what">Ne aktarılsın</string>
+    <string name="transfer_selection">Seçili %1$d eleman</string>
+    <string name="transfer_page">Tüm sayfa</string>
+    <string name="transfer_where">Nereye</string>
+    <string name="transfer_working">Aktarılıyor…</string>
+    <string name="transfer_new">Yeni %1$s tuvali</string>
+    <string name="transfer_no_targets">Bu türde kayıtlı tuval yok; yeni bir tuval oluşturabilirsiniz.</string>
+    <string name="transfer_page_of">sayfa %1$d/%2$d</string>
+    <string name="transfer_done">«%1$s» tuvaline aktarıldı</string>
+    <string name="transfer_failed">Aktarılamadı</string>
+    <string name="transfer_empty">Aktarılacak çizim yok</string>
+
+    <!-- Resim ekleme kaynağı -->
+    <string name="image_source_title">Resim ekle</string>
+    <string name="image_source_device">Cihazdan seç (galeri, dosyalar)</string>
+    <string name="image_source_saved">Kayıtlı resimlerimden seç</string>
+    <string name="image_source_saved_empty">Henüz kayıtlı resminiz yok. Bir tuvali resim olarak kaydedince burada görünür.</string>
+
+    <!-- Moda özel yapay zekâ -->
+</resources>

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- v41 arka plan penceresinde Uygula; arka planı eleman gibi seçme -->
+<resources>
+    <string name="v41_bg_apply">Применить</string>
+    <string name="v41_bg_hint">Выберите и нажмите «Применить»: старый фон будет удалён</string>
+    <string name="v41_bg_pending">Изменения ещё не применены</string>
+    <string name="v41_bg_selected">Фон выбран</string>
+    <string name="v41_bg_selected_hint">Измените фон, его непрозрачность или удалите его</string>
+    <string name="v41_bg_opacity">Непрозрачность</string>
+    <string name="v41_bg_change">Изменить</string>
+    <string name="v41_bg_remove">Удалить</string>
+    <string name="v41_bg_element">Фон</string>
+    <string name="v41_bg_element_none">Нет фона</string>
+</resources>

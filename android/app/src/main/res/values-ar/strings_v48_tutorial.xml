@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="v48_tut_title">قوائم جديدة</string>
+    <string name="v48_tut_summary">تعرّف على القوائم التي تغيّرت في الإصدار الأخير.</string>
+    <string name="v48_tut_modes_t">أربعة أوضاع</string>
+    <string name="v48_tut_modes_b">قائمة الأوضاع الآن: تحديد، رسم، إضافة، تحرير. التدوير والتحجيم والقص ضمن تحرير.</string>
+    <string name="v48_tut_props_t">الخصائص</string>
+    <string name="v48_tut_props_b">\"إعدادات الفرشاة\" سابقًا أصبحت \"الخصائص\": تعرض إعدادات الأداة المحددة. تُملأ عند اختيار الفرشاة أو الممحاة أو القلم أو النص.</string>
+    <string name="v48_tut_move_t">نقل وتوسيع</string>
+    <string name="v48_tut_move_b">النقل والتوسيع زرّان منفصلان ضمن تحرير. النقل يعمل عند تحديد عنصر، والتوسيع عند تحديد اللوحة.</string>
+    <string name="v48_tut_three_t">ثلاث قوائم</string>
+    <string name="v48_tut_three_b">في الوضع البسيط على الشاشة العمودية ثلاث قوائم: إضافة، رسم، تحديد وتحرير. كل قائمة صف واحد؛ إن لم تتّسع تُمرَّر أفقيًا.</string>
+    <string name="v48_tut_kids_t">ترتيب جديد</string>
+    <string name="v48_tut_kids_b">أُعيد ترتيب الأدوات: القلم والممحاة والتلوين والأشكال والمهمة والقالب والنص في البداية.</string>
+    <string name="v48_tut_kids2_t">المهمة</string>
+    <string name="v48_tut_kids2_b">مهام الرسم بين الأدوات الأولى. أُزيلت إضافة الأشكال ثلاثية الأبعاد من وضع الأطفال.</string>
+</resources>

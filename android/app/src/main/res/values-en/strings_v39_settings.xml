@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="sync_merged_title">Sync</string>
+    <string name="sync_auto_title">Automatic sync</string>
+    <string name="sync_auto_on">On: syncs with the server once a day</string>
+    <string name="sync_auto_off">Off: syncs only with \"Sync now\"</string>
+    <string name="sync_last">Last sync: %1$s</string>
+</resources>

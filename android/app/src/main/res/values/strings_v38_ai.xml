@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- v38 yapay zekâ önerileri: yazı, şekil ve çizgi önerisi ayrı (tek çizgiye öneri yok; tek düğmeyle düzeltme) -->
+    <string name="shape_suggest_title">Şekil önerisi:</string>
+    <string name="line_suggest_title">Çizgi önerisi:</string>
+    <string name="line_fix_all">Çizgileri düzelt (%1$d)</string>
+    <string name="line_fix_cd">Düzeltmeyi uygula: %1$d çizgi birden</string>
+    <string name="line_suggest_turn_off">Çizgi önerilerini kapat</string>
+    <string name="line_suggest_setting">Çizgi önerisi</string>
+    <string name="line_suggest_setting_hint">Birden çok çizgiyi birlikte düzeltir (doğru, çember, köşeler)</string>
+    <string name="kids_say_line_1">Tam %1$d çizgi çizmişsin! Hepsini dümdüz ve tertemiz yapayım mı?</string>
+    <string name="kids_say_line_2">%1$d çizginin uçlarını birleştirip düzgünleştirebilirim. Yapalım mı?</string>
+    <string name="tut_hint_lines">Çizgi önerisi: dokununca dikkate alınan bütün çizgiler birden düzelir (tek geri alma adımı).</string>
+    <string name="tut_art_ai_text_v38">Çizgi düzeltme (2+ çizgi), şablon tanıma (birbirine yakın 4+ eleman) ve yapay zekâ ayarları.</string>
+    <string name="tut_art_ai2_v38">Çizgi düzeltme</string>
+    <string name="tut_art_ai2_text_v38">Birden çok çizgi çizip kalemi kaldır: her çizgi düzgün haline döner, birbirine yakın uçlar birleşir. Tek çizgiye öneri yapılmaz. Ay\'ı iki yayla çiziyoruz.</string>
+    <string name="tut_art_ai3_text_v38">Birbirine yakın 4 ve daha çok çizgiyle çizdiğin nesne şekil veritabanında ve modun sinir ağında aranır: ev, ağaç, yüz… Bir ev çiziyoruz.</string>
+    <string name="tut_lines_v38">Çizgileri düzelt</string>
+    <string name="tut_art_ai4_text_v38">Bir arada çizilen çizgilerin hepsi tek düğmeyle düzelir. Çam ağaçları çiziyoruz.</string>
+    <string name="tut_ai_select_text_v38">Seç modunda iki ya da daha çok çizgi seçince öneri düğmeye basmadan gelir: yazı, şekil ve çizgi önerisi ayrı balonlarda. Seçim çubuğundaki Çoklu düzeltme öner de aynı öneriyi açar.</string>
+    <string name="tut_ai_more_text_v38">⋮ menüsünden bu tuval için yapay zekâyı açıp kapatırsın; yazı, şekil ve çizgi önerileri ayrı ayrı açılır. Öneriler cihazında çalışır ve kabul ettikçe sana uyar.</string>
+    <string name="tut_notes_ai_text_v38">El yazısını yazıya çevirme (2+ eleman) ve çizgileri birlikte düzeltme.</string>
+    <string name="tut_notes_ai2_text_v38">Kutunun dört kenarını ayrı çizgilerle çiz: kenarlar düzelir ve köşeler birleşir. Bir kutu çiziyoruz.</string>
+    <string name="tut_notes_ai3_text_v38">Birbirine değen üç halka çiziyoruz: üçü de tek düğmeyle düzgün çembere döner.</string>
+    <string name="tut_comic_ai_text_v38">Çizgi romana özel tanıma (konuşma balonu, yüz ifadeleri) ve çizgileri birlikte düzeltme.</string>
+    <string name="tut_comic_ai3_text_v38">Baloncuklar çiziyoruz: hepsi tek düğmeyle düzgün çembere döner.</string>
+</resources>

@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- v45 çocuk menüsü: kısa adlar, boya fırçası, fırça boyu, açıklamalar ve ipuçları -->
+    <string name="v45_kids_undo">تراجع</string>
+    <string name="v45_kids_redo">إعادة</string>
+    <string name="v45_kids_pen">قلم</string>
+    <string name="v45_kids_eraser">ممحاة</string>
+    <string name="v45_kids_paint_brush">فرشاة</string>
+    <string name="v45_kids_bucket">دلو</string>
+    <string name="v45_kids_parts">القطع</string>
+    <string name="v45_kids_colors">ألوان</string>
+    <string name="v45_kids_shapes">أشكال</string>
+    <string name="v45_kids_challenge">مهمة</string>
+    <string name="v45_kids_background">الورقة</string>
+    <string name="v45_kids_image">صورة</string>
+    <string name="v45_kids_text">كتابة</string>
+    <string name="v45_kids_model3d">ثلاثي الأبعاد</string>
+    <string name="v45_kids_select">تحديد</string>
+    <string name="v45_kids_eyedropper">خذ لونًا</string>
+    <string name="v45_kids_ruler">مسطرة</string>
+    <string name="v45_kids_template">قالب</string>
+    <string name="v45_kids_expand">تكبير</string>
+    <string name="v45_kids_brush_size">حجم الفرشاة</string>
+    <string name="v45_kids_size_thin">رفيعة</string>
+    <string name="v45_kids_size_medium">متوسطة</string>
+    <string name="v45_kids_size_thick">سميكة</string>
+    <string name="v45_help_kids_pen">ارسم بالقلم ما تشاء على الورقة. اختر لونه وسُمكه من «ألوان».</string>
+    <string name="v45_help_kids_paint_brush">فرشاة التلوين: لوّن داخل الشكل بإصبعك. اللون لا يخرج عن الخطوط، وعلى الورقة الفارغة يلوّن أينما مررت.</string>
+    <string name="v45_help_kids_bucket">دلو الألوان: المس داخل الشكل فيتلوّن ذلك المكان باللون الذي اخترته. اضغط ثانيتين ليتلوّن الشكل كله.</string>
+    <string name="v45_help_kids_parts">ترى قطع رسمتك (الخطوط والأشكال والكتابة)، ويمكنك إخفاؤها أو حذفها.</string>
+    <string name="v45_help_kids_colors">تختار لون القلم وسُمكه ونوعه.</string>
+    <string name="v45_help_kids_shapes">صور وأشكال جاهزة: اختر واحدة والمس الورقة لتضعها.</string>
+    <string name="v45_help_kids_background">يغيّر لون الورقة.</string>
+    <string name="v45_help_kids_brush_size">سُمك فرشاة التلوين: رفيعة أو متوسطة أو سميكة.</string>
+    <string name="v45_challenge_tip_pen">اختر «قلم» في الأعلى ومرّر إصبعك ببطء فوق الخط المتقطع.</string>
+    <string name="v45_challenge_tip_paint_brush">يمكنك التلوين بالفرشاة أيضًا: اختر «فرشاة» ثم اللون ولوّن داخل المكان بإصبعك. اللون لا يخرج عن الخطوط!</string>
+    <string name="v45_tut_kids_pen">القلم</string>
+    <string name="v45_tut_kids_pen_text">بالقلم ترسم ما تشاء. انظر، أرسم شمسًا ساطعة في السماء!</string>
+</resources>

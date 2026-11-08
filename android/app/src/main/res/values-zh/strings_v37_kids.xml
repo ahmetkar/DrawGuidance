@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="kids_mascot_name">小画刷</string>
+    <string name="kids_mascot_open">召唤小画刷</string>
+    <string name="kids_mascot_cd">小画刷，你的画画好朋友</string>
+    <string name="kids_mascot_next">好的</string>
+    <string name="kids_mascot_end">结束</string>
+    <string name="kids_mascot_close">关闭</string>
+    <string name="kids_mascot_apply">应用</string>
+    <string name="kids_mascot_hello">你好，我是小画刷！你画画时我一直陪着你。点点我，我会告诉你小窍门。</string>
+
+    <string name="kids_tip_1">选油漆桶，选一种颜色，再点一下图形：点到的地方就会涂上颜色！</string>
+    <string name="kids_tip_2">手指在图形上按住 2 秒，整个图形会一下子涂满颜色。</string>
+    <string name="kids_tip_3">画错了？上面的后退箭头可以撤销上一步。</string>
+    <string name="kids_tip_4">从现成图画里加一座房子或一些气球，然后随便涂颜色吧。</string>
+    <string name="kids_tip_5">试过换纸的颜色吗？可以像天空一样蓝哦！</string>
+
+    <string name="kids_praise_1">太棒了！你画得真好。</string>
+    <string name="kids_praise_2">超级棒！继续加油！</string>
+    <string name="kids_praise_3">我好喜欢！接下来画什么？</string>
+
+    <string name="kids_say_shape_1">这是一个%1$s！要我把它变得整整齐齐吗？</string>
+    <string name="kids_say_shape_2">哇，你画了一个%1$s！要我把线条弄直吗？</string>
+    <string name="kids_say_shape_3">好漂亮的%1$s！我们把边整理一下好吗？</string>
+    <string name="kids_say_template_1">这看起来像%1$s！要换成现成的图画吗？</string>
+    <string name="kids_say_template_2">哇，好像是%1$s！我可以把它变成好涂色的图画！</string>
+    <string name="kids_say_template_3">嗯……你是想画%1$s吧？要我放一个现成的吗？</string>
+    <string name="kids_say_all_1">你画了 %1$d 个图形！要我一次全部整理好吗？</string>
+    <string name="kids_say_all_2">我可以一下子把 %1$d 个图形的线条变整齐。要试试吗？</string>
+    <string name="kids_say_text_1">我想你写的是“%1$s”！要变成漂亮的文字吗？</string>
+    <string name="kids_say_text_2">我认出了“%1$s”！要用工整的字写出来吗？</string>
+    <string name="kids_say_part_1">我可以给这幅%1$s加上 %2$d 个部分来完成它。要加吗？</string>
+    <string name="kids_say_part_2">想把你的画完成成%1$s吗？我来加 %2$d 个部分！</string>
+
+    <string name="tut_kids">和小画刷一起画画</string>
+    <string name="tut_kids_text">小画刷会介绍工具，并和你一步一步画一幅画。</string>
+    <string name="tut_kids_1">你好！</string>
+    <string name="tut_kids_1_text">我是小画刷！我来给你介绍画画工具，我们一起画一幅大大的画。准备好了吗？</string>
+    <string name="tut_kids_2">画笔</string>
+    <string name="tut_kids_2_text">用画笔可以随便画。看，我在天上画一个亮亮的太阳！</string>
+    <string name="tut_kids_3">现成图画</string>
+    <string name="tut_kids_3_text">用形状按钮可以添加现成的图画。我放一座房子和彩色气球。</string>
+    <string name="tut_kids_4">油漆桶</string>
+    <string name="tut_kids_4_text">选油漆桶，选颜色，点一下图形里面：点到的地方就涂上颜色。红屋顶、黄墙壁！</string>
+    <string name="tut_kids_5">全部涂色</string>
+    <string name="tut_kids_5_text">手指在图形上按住 2 秒：圆环转满后，整个图形就涂好了。气球全都变成粉色！</string>
+    <string name="tut_kids_6">橡皮擦</string>
+    <string name="tut_kids_6_text">橡皮擦可以擦掉不想要的线。我来擦掉这些乱涂的线。</string>
+    <string name="tut_kids_7">撤销</string>
+    <string name="tut_kids_7_text">画错了？后退箭头撤销上一步，前进箭头再做一次。</string>
+    <string name="tut_kids_8">纸的颜色</string>
+    <string name="tut_kids_8_text">纸的颜色也可以换。我把它变成天蓝色！</string>
+    <string name="tut_kids_9">完成啦！</string>
+    <string name="tut_kids_9_text">最后加上绿绿的草地！我们的画完成了。现在轮到你，画出最美的画吧！</string>
+
+    <string name="kids_home_say">愿意的话，就开始画最好玩的画吧</string>
+    <string name="kids_home_title">儿童模式</string>
+    <string name="kids_home_start">开始吧</string>
+    <string name="kids_home_dismiss">以后再说</string>
+    <string name="kids_canvas_name">我的画</string>
+</resources>

@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- v38: yatay ekranda üst menüde düğmelerin altında yazan kısa adlar -->
+    <string name="label_more">Diğer</string>
+    <string name="label_save_image">Resmi kaydet</string>
+</resources>

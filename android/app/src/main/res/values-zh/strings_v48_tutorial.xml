@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="v48_tut_title">新菜单</string>
+    <string name="v48_tut_summary">了解最新版本中改动的菜单。</string>
+    <string name="v48_tut_modes_t">四种模式</string>
+    <string name="v48_tut_modes_b">模式菜单现在是：选择、绘制、添加、编辑。旋转、缩放和裁剪在编辑里。</string>
+    <string name="v48_tut_props_t">属性</string>
+    <string name="v48_tut_props_b">原来的\"画笔设置\"现在叫\"属性\"：显示所选工具的设置。选中画笔、橡皮、钢笔或文字时才会有内容。</string>
+    <string name="v48_tut_move_t">移动和扩展</string>
+    <string name="v48_tut_move_b">移动和扩展是编辑里的两个独立按钮。移动在选中元素时可用，扩展在选中画布时可用。</string>
+    <string name="v48_tut_three_t">三个菜单</string>
+    <string name="v48_tut_three_b">简单模式竖屏下有三个菜单：添加、绘制、选择和编辑。每个菜单为一行；放不下时横向滚动。</string>
+    <string name="v48_tut_kids_t">新顺序</string>
+    <string name="v48_tut_kids_b">工具重新排序：画笔、橡皮、涂色、形状、任务、模板和文字排在最前。</string>
+    <string name="v48_tut_kids2_t">任务</string>
+    <string name="v48_tut_kids2_b">绘画任务在最前面的工具之中。儿童模式已移除添加3D形状。</string>
+</resources>

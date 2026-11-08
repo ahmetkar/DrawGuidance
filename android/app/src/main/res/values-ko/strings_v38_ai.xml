@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- v38 yapay zekâ önerileri: yazı, şekil ve çizgi önerisi ayrı (tek çizgiye öneri yok; tek düğmeyle düzeltme) -->
+    <string name="shape_suggest_title">도형 제안:</string>
+    <string name="line_suggest_title">선 제안:</string>
+    <string name="line_fix_all">선 고치기 (%1$d)</string>
+    <string name="line_fix_cd">수정 적용: 선 %1$d개 한꺼번에</string>
+    <string name="line_suggest_turn_off">선 제안 끄기</string>
+    <string name="line_suggest_setting">선 제안</string>
+    <string name="line_suggest_setting_hint">여러 선을 함께 고칩니다(직선, 원, 모서리)</string>
+    <string name="kids_say_line_1">선을 %1$d개나 그렸네! 모두 곧고 깔끔하게 만들어 줄까?</string>
+    <string name="kids_say_line_2">선 %1$d개의 끝을 이어서 깔끔하게 다듬어 줄 수 있어. 해 볼까?</string>
+    <string name="tut_hint_lines">선 제안: 누르면 고려한 모든 선이 한꺼번에 고쳐집니다(실행 취소 한 번).</string>
+    <string name="tut_art_ai_text_v38">선 고치기(선 2개 이상), 템플릿 인식(서로 가까운 요소 4개 이상), AI 설정.</string>
+    <string name="tut_art_ai2_v38">선 고치기</string>
+    <string name="tut_art_ai2_text_v38">선을 여러 개 그리고 펜을 떼면 각 선이 깔끔해지고 가까운 끝은 서로 이어집니다. 선 하나에는 제안하지 않습니다. 호 두 개로 달을 그립니다.</string>
+    <string name="tut_art_ai3_text_v38">서로 가까운 선 4개 이상으로 그린 물체는 도형 데이터베이스와 모드의 신경망에서 찾습니다: 집, 나무, 얼굴… 집을 그립니다.</string>
+    <string name="tut_lines_v38">선 고치기</string>
+    <string name="tut_art_ai4_text_v38">함께 그린 선은 버튼 하나로 모두 고쳐집니다. 소나무를 그립니다.</string>
+    <string name="tut_ai_select_text_v38">선택 모드에서 선을 두 개 이상 선택하면 버튼을 누르지 않아도 제안이 나옵니다: 글자, 도형, 선 제안이 각각 다른 말풍선에 표시됩니다. 선택 막대의 \'여러 개 수정 제안\'도 같은 제안을 엽니다.</string>
+    <string name="tut_ai_more_text_v38">⋮ 메뉴에서 이 캔버스의 AI를 켜고 끌 수 있으며, 글자·도형·선 제안을 각각 켤 수 있습니다. 제안은 기기에서 실행되고 받아들일수록 사용자에게 맞춰집니다.</string>
+    <string name="tut_notes_ai_text_v38">손글씨를 글자로 바꾸기(요소 2개 이상)와 선 함께 고치기.</string>
+    <string name="tut_notes_ai2_text_v38">상자의 네 변을 각각 다른 선으로 그리세요: 변이 곧아지고 모서리가 이어집니다. 상자를 그립니다.</string>
+    <string name="tut_notes_ai3_text_v38">서로 닿은 고리 세 개를 그립니다: 버튼 하나로 세 개 모두 깔끔한 원이 됩니다.</string>
+    <string name="tut_comic_ai_text_v38">만화 전용 인식(말풍선, 표정)과 선 함께 고치기.</string>
+    <string name="tut_comic_ai3_text_v38">거품을 그립니다: 버튼 하나로 모두 깔끔한 원이 됩니다.</string>
+</resources>

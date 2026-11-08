@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- v46 yeni tuval formunda hazır şablonlar -->
+    <string name="v46_template_section">Шаблон</string>
+    <string name="v46_template_blank">Пустой</string>
+    <string name="v46_template_blank_hint">Пустой холст: выберите размер, бумагу и число страниц ниже.</string>
+    <string name="v46_template_selected_hint">%1$s Используются размер, бумага и страницы шаблона; меняйте что угодно и продолжайте.</string>
+</resources>

@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="sync_merged_title">동기화</string>
+    <string name="sync_auto_title">자동 동기화</string>
+    <string name="sync_auto_on">켜짐: 하루에 한 번 서버와 자동으로 동기화합니다</string>
+    <string name="sync_auto_off">꺼짐: \"지금 동기화\"로만 동기화합니다</string>
+    <string name="sync_last">마지막 동기화: %1$s</string>
+</resources>

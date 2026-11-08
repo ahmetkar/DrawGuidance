@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- v46 eğitimlerin yenilikler grupları -->
+    <string name="v46_tut_art">新機能 (v46)</string>
+    <string name="v46_tut_art_text">2段に分かれた上部メニュー、空いた場所をタップして開く追加メニュー、選択した要素の角に出る選択メニュー。</string>
+    <string name="v46_tut_split">2段の上部メニュー</string>
+    <string name="v46_tut_split_text">ツールは2段に分かれます。縦画面では上下、横画面では左右に並びます。モード（描く・追加・選択…）を変えると、両方の段がそのモードのツールになります。</string>
+    <string name="v46_tut_addmenu">空いた場所をタップして追加</string>
+    <string name="v46_tut_addmenu_text">追加モードで空いた場所をタップすると、その位置に縦の追加メニューが開きます（図形、テキスト、数式、ダイアグラム…）。選んだ要素はタップした場所に追加されます。</string>
+    <string name="v46_tut_selmenu">選択メニュー</string>
+    <string name="v46_tut_selmenu_text">要素を選ぶと、角に半透明のメニューが出ます：移動、拡大縮小、コピー、削除、編集。</string>
+    <string name="v46_tut_scale">拡大縮小とコピー</string>
+    <string name="v46_tut_scale_text">拡大縮小で選択を大きく・小さくし、コピーで隣に複製を置きます。ここでは太陽が小さくなり、鳥が増えます。</string>
+    <string name="v46_tut_edit">編集</string>
+    <string name="v46_tut_edit_text">編集では要素の種類に応じた操作が開きます（図形の編集、色と塗り、前面・背面、非表示）。科学図形の値もここです。</string>
+    <string name="v46_tut_notes">新機能 (v46)</string>
+    <string name="v46_tut_notes_text">パネル追加でコーネル式ページ、値を入力すると描き直される物理図形と元素図形。</string>
+    <string name="v46_tut_panels">パネル追加</string>
+    <string name="v46_tut_panels_text">ページを枠付きの領域に分けます：列、グリッド、正方形、コーネル式（キークエスチョン・ノート・まとめ）。各領域は別々の要素です。</string>
+    <string name="v46_tut_titles">タイトルと質問</string>
+    <string name="v46_tut_titles_text">ノート欄にタイトル、左の列に自分への質問を書きます。復習ではノートを隠して質問だけを見ます。</string>
+    <string name="v46_tut_param">数式で描かれる図形</string>
+    <string name="v46_tut_param_text">自由物体図、滑車、てこ、元素の図形は数式付きです。力、矢印の長さ、結果は値から計算されます。</string>
+    <string name="v46_tut_values">値を入力すると図形が変わる</string>
+    <string name="v46_tut_values_text">図形の数式欄に新しい値（例：F = 40、α = 30°）を入力すると図形が描き直され、角の数式と結果も更新されます。</string>
+    <string name="v46_tut_element">元素の図形</string>
+    <string name="v46_tut_element_text">周期表のセルとボーアの原子模型は、入力した元素で描かれます：記号（Na）、名前、原子番号（11）。ここではナトリウムが塩素に変わります。</string>
+    <string name="v46_tut_formula">数式とまとめ</string>
+    <string name="v46_tut_formula_text">図の下に数式を追加し、下の帯にまとめを書きます。復習用のページの完成です。</string>
+    <string name="v46_tut_comic">新機能 (v46)</string>
+    <string name="v46_tut_comic_text">本物のコマ割り、既成の背景とキャラクター、フキダシ、効果、表紙とテンプレート。</string>
+    <string name="v46_tut_tpl">コマ割り</string>
+    <string name="v46_tut_tpl_text">テンプレートからコマ割りを選びます。コマは一緒に伸縮し、間隔を調整でき、中の絵はコマと一緒に動きます。</string>
+    <string name="v46_tut_places">背景（場所）</string>
+    <string name="v46_tut_places_text">既成の背景をコマに置くと、コマの比率に合わせて切り抜かれ、枠線の後ろに入ります。</string>
+    <string name="v46_tut_chars">キャラクター</string>
+    <string name="v46_tut_chars_text">キャラクターから表情・ポーズ・アクションを選び、コマの中で大きさと位置を決めます。プレミアムのキャラクターには鍵が付きます。</string>
+    <string name="v46_tut_balloons">フキダシ</string>
+    <string name="v46_tut_balloons_text">ナレーションが場面を説明し、セリフ・叫び・思考・ささやきのフキダシがキャラクターの声になります。しっぽは話している人に向けます。</string>
+    <string name="v46_tut_fx">スピード線と効果音</string>
+    <string name="v46_tut_fx_text">スピード線は動き、効果音の文字は音を表します。線をキャラクターの後ろに置くと場面が読みやすくなります。</string>
+    <string name="v46_tut_cover">表紙とテンプレート</string>
+    <string name="v46_tut_cover_text">新しいマンガは表紙から始まります。キャンバス作成時に「テンプレート」から見本（アクション、マンガ、縦読み、4コマ、会話）を選び、続きを描けます。</string>
+    <string name="v46_tut_simple">新機能 (v46)</string>
+    <string name="v46_tut_simple_art_text">2段メニュー、上部メニューの矩形選択とスポイト。</string>
+    <string name="v46_tut_simple_notes_text">パネル追加と、値を入力すると描き直される科学図形。</string>
+    <string name="v46_tut_s_shape">図形</string>
+    <string name="v46_tut_s_shape_text">図形を選んでドラッグ：家、太陽、星…塗りつぶした図形で絵の土台がすぐにできます。</string>
+    <string name="v46_tut_s_select">矩形選択</string>
+    <string name="v46_tut_s_select_text">上部メニューの矩形選択で範囲を描くと、中のものがすべて選ばれます。そのあと移動や大きさの変更ができます。</string>
+    <string name="v46_tut_s_eyedrop">スポイト</string>
+    <string name="v46_tut_s_eyedrop_text">スポイトで絵の色をタップすると、ブラシがその色になります。</string>
+    <string name="v46_tut_kids_brush">ぬりふで</string>
+    <string name="v46_tut_kids_brush_text">ぬりふでで指を動かそう！形の中から始めると、色ははみ出さないよ。</string>
+</resources>

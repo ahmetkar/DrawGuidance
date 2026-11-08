@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- v45 bilim: formüllü fen şekilleri, grafik formülü, molekül görünümleri -->
+<resources>
+    <string name="v45_tool_params">Değerler</string>
+    <string name="v45_mode_hint_params">Değerleri ya da formülü değiştirin; şekildeki tutamakları sürükleyin</string>
+    <string name="v45_vector_edit">Vektör düzenle</string>
+    <string name="v45_param_formula">Formül</string>
+    <string name="v45_param_formula_hint">Atama (v = 20; θ = 45°), türetilmiş değer (R = 50) ya da eğri (y = 2x² − 3); moleküllerde formül (CH3COOH, C6H12O6)</string>
+    <string name="v45_param_less">%1$s azalt</string>
+    <string name="v45_param_more">%1$s artır</string>
+    <string name="v45_param_out_of_range">%1$s için değer geçerli aralığın dışında</string>
+    <string name="v45_param_no_match">Yazılan formül bu şekle uymuyor</string>
+    <string name="v45_math_empty">Formül boş</string>
+    <string name="v45_math_unexpected">Beklenmeyen “%1$s” (%2$d. karakter)</string>
+    <string name="v45_math_parenthesis">Parantez eşleşmiyor (%1$d. karakter)</string>
+    <string name="v45_math_missing">İşlem eksik (%1$d. karakter)</string>
+    <string name="v45_math_unknown">Bilinmeyen ad: %1$s</string>
+    <string name="v45_math_arguments">%1$s için bağımsız değişken sayısı yanlış</string>
+    <string name="v45_math_div_zero">Sıfıra bölme: sonuç tanımsız</string>
+    <string name="v45_math_domain">%1$s bu değerde tanımsız</string>
+    <string name="v45_math_relation">Bağıntı burada kullanılamaz</string>
+    <string name="v45_math_overflow">Sonuç çok büyük</string>
+    <string name="v45_chem_empty">Formül boş</string>
+    <string name="v45_chem_unknown_element">Bilinmeyen element: %1$s</string>
+    <string name="v45_chem_valence">%1$s atomu değerlik kuralına uymuyor</string>
+    <string name="v45_chem_hydrogen">Hidrojen sayısı bu yapıyla uyuşmuyor</string>
+    <string name="v45_chem_too_large">Molekül çizim için çok büyük (en çok %1$s ağır atom)</string>
+    <string name="v45_chem_ionic">Bu iyonik bileşik tanınmıyor (%1$s)</string>
+    <string name="v45_chem_parenthesis">Parantezler eşleşmiyor</string>
+    <string name="v45_chem_ring">Halka numarası kapanmadı (%1$s)</string>
+    <string name="v45_chem_syntax">Formül okunamadı</string>
+    <string name="v45_mol_structural">Açık formül</string>
+    <string name="v45_mol_condensed">Yarı açık</string>
+    <string name="v45_mol_skeletal">İskelet</string>
+    <string name="v45_mol_3d">3B model</string>
+    <string name="v45_graph_formula">Formül</string>
+    <string name="v45_graph_degrees">Derece</string>
+    <string name="v45_graph_hint_curve">y = f(x); birden çok eğri için ; ile ayırın (y = x²; y = 2x + 1)</string>
+    <string name="v45_graph_hint_surface">z = f(x, y) yüzeyi (ör. x² − y²)</string>
+    <string name="v45_graph_hint_set">Nokta ya da çözüm kümesi (x = 3, x &gt; 2, −1 ≤ x &lt; 3)</string>
+    <string name="v45_graph_hint_sampled">Değerler f(1), f(2), … olarak hesaplanır (ör. 2x + 1)</string>
+    <string name="v45_formula_not_computed">Hesaplanamadı: %1$s</string>
+</resources>

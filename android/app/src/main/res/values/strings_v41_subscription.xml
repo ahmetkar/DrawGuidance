@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- v41 abonelik sayfası (SaaS düzeni): plan kartları, bölüm başlıkları, sık sorulanlar -->
+<resources>
+    <string name="v41_sub_hero">Sana uygun planı seç</string>
+    <string name="v41_sub_hero_text">Free ile her modu kullan; Premium ile gelişmiş araçları aç ve reklamları kaldır. İstediğin zaman Google Play\'den iptal edebilirsin.</string>
+    <string name="v41_sub_recommended">Önerilen</string>
+    <string name="v41_sub_downgrade">Free\'ye geç (Google Play)</string>
+    <string name="v41_sub_section_yours">Aboneliğin</string>
+    <string name="v41_sub_section_billing">Faturalandırma</string>
+    <string name="v41_sub_billing_text">Ödemeler Google Play üzerinden alınır. Telefon değiştirdiysen ya da uygulamayı yeniden kurduysan satın alımlarını geri yükle.</string>
+    <string name="v41_sub_section_faq">Sık sorulanlar</string>
+    <string name="v41_sub_faq_cancel_q">Nasıl iptal ederim?</string>
+    <string name="v41_sub_faq_cancel_a">Google Play → Ödemeler ve abonelikler → Abonelikler. İptal edersen dönem sonuna kadar Premium sürer.</string>
+    <string name="v41_sub_faq_devices_q">Başka cihazda da geçerli mi?</string>
+    <string name="v41_sub_faq_devices_a">Evet. Aynı Google hesabıyla giriş yaptığın her cihazda Premium açılır.</string>
+    <string name="v41_sub_faq_free_q">Free\'ye dönersem çizimlerim ne olur?</string>
+    <string name="v41_sub_faq_free_a">Hiçbiri silinmez. Yalnız Premium araçlar ve öğeler yeniden kilitlenir; daha önce eklediklerin çizimde kalır.</string>
+    <string name="v41_sub_manage_title">Yönet</string>
+    <string name="v41_sub_f_modes">Bütün modlar: resim, not, çizgi roman, 3B ve çocuk</string>
+    <string name="v41_sub_f_shapes">Şekillerin ve diyagramların hepsi</string>
+    <string name="v41_sub_f_basic_comic">Temel efektler, şablonlar, karakterler ve arka planlar</string>
+    <string name="v41_sub_f_sync">Google ile girişte bulut eşitleme</string>
+    <string name="v41_sub_f_ads">Reklamlı</string>
+    <string name="v41_sub_f_everything_free">Free\'deki her şey</string>
+    <string name="v41_sub_f_bg_removal">Resim arka planını kaldırma ve gelişmiş efektler</string>
+    <string name="v41_sub_f_ai">Gelişmiş yapay zekâ önerileri ve 3B öneriler</string>
+    <string name="v41_sub_f_comic">Bütün çizgi roman karakterleri, arka planları ve şablonları</string>
+    <string name="v41_sub_f_kids">Çocuk çizim görevinin 36–50. seviyeleri</string>
+    <string name="v41_sub_f_no_ads">Reklamsız</string>
+</resources>

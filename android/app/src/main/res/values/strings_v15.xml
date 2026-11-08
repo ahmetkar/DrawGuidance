@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- v15: fırçalar ve elemanlar -->
+    <string name="brush_dot_pen">Nokta İzi</string>
+    <string name="brush_3d">3B Fırça</string>
+    <string name="brush_cat_effects">Nokta ve 3B</string>
+    <string name="element_formula">Formül</string>
+    <!-- v15: diyagram türleri, kutular, temalar -->
+    <string name="diagram_cycle">Döngü</string>
+    <string name="diagram_mind_map">Zihin haritası</string>
+    <string name="diagram_pyramid">Piramit</string>
+    <string name="diagram_venn">Venn şeması</string>
+    <string name="diagram_matrix">Dört bölmeli tablo</string>
+    <string name="diagram_funnel">Huni</string>
+    <string name="diagram_fishbone">Balık kılçığı</string>
+    <string name="diagram_concept_map">Kavram haritası</string>
+    <string name="diagram_tree">Sınıflandırma ağacı</string>
+    <string name="diagram_kwl">Bil-İste-Öğren</string>
+    <string name="diagram_steps">Basamaklar</string>
+    <string name="diagram_hub">Neden-sonuç</string>
+    <string name="box_hexagon">Altıgen</string>
+    <string name="box_parallelogram">Paralelkenar</string>
+    <string name="box_document">Belge</string>
+    <string name="box_cloud">Bulut</string>
+    <string name="box_trapezoid">Yamuk</string>
+    <string name="box_ellipse">Elips</string>
+    <string name="box_triangle">Üçgen</string>
+    <string name="box_chevron">Ok başı</string>
+    <string name="diagram_theme">Tema</string>
+    <!-- v15: modlar -->
+    <string name="mode_formula">Formül</string>
+    <string name="mode_image_edit">Resmi düzenle</string>
+    <string name="mode_pen">Kalem aracı</string>
+    <!-- v15: şekil seçici -->
+    <string name="shape_filled">İçi dolu ekle</string>
+    <string name="shape_fill_color">Dolgu rengi</string>
+    <!-- v15: ekle menüsü -->
+    <string name="add_formula">Formül ekle</string>
+    <string name="add_pen">Kalem aracı (yol)</string>
+    <!-- v15: formül -->
+    <string name="formula_picker_title">Formül ekle</string>
+    <string name="formula_picker_hint">Formülü seçin, tuvale dokunun ya da kutu çizin. Formül yazı olarak eklenir; bilinmeyenler ve katsayılar sonradan değiştirilebilir.</string>
+    <string name="formula_edit_title">Formülü düzenle</string>
+    <string name="formula_edit_hint">Değiştirmek istediğiniz kısma yazın; tuvaldeki formül hemen güncellenir.</string>
+    <string name="formula_source">Formülün tamamı</string>
+    <string name="formula_source_hint">Örnek: \frac{a}{b}, x^{2}, \sqrt{x}, \int_{0}^{1} f(x)\,dx. Düzenlenebilir kısım: @a</string>
+    <string name="formula_source_show">Formülün tamamını düzenle</string>
+    <string name="formula_edit">Formülü düzenle</string>
+    <string name="mode_hint_formula">Formülü eklemek için dokunun ya da kutu çizin.</string>
+    <!-- v15: doku / desen -->
+    <string name="formula_change">Formül seç</string>
+    <!-- v15: şekil düzenleme -->
+    <string name="tool_points">Nokta</string>
+    <string name="tool_graph">Grafik</string>
+    <string name="mode_hint_shape_points">Noktayı sürükleyin; çizgiye dokunarak nokta ekleyin, noktaya çift dokunarak silin.</string>
+    <string name="mode_hint_shape_graph">Sayılara, değerlere ve eksen adlarına dokunarak değiştirin.</string>
+    <string name="part_style">Özellik</string>
+    <string name="part_style_title">Parça özellikleri</string>
+    <string name="part_style_parts">%1$d parçaya uygulanır. Çizgi ve eğri eklerken de bu biçim kullanılır.</string>
+    <string name="part_style_all">Parça seçilmedi: tüm şekle uygulanır.</string>
+    <string name="part_style_stroke">Çizgi rengi</string>
+    <string name="part_style_fill">Dolgu</string>
+    <string name="part_style_line">Çizgi biçimi</string>
+    <string name="part_style_width">Kalınlık %%%1$d</string>
+    <string name="part_style_alpha">Opaklık %%%1$d</string>
+    <string name="line_solid">Düz</string>
+    <string name="line_dashed">Kesik</string>
+    <string name="line_dotted">Noktalı</string>
+    <string name="line_none">Çizgisiz</string>
+    <!-- v15: grafik -->
+    <string name="graph_pattern">Desen: %1$d</string>
+    <string name="graph_items">Öğe: %1$d</string>
+    <string name="graph_points">Nokta: %1$d</string>
+    <string name="graph_pattern_less">Deseni azalt</string>
+    <string name="graph_pattern_more">Deseni artır</string>
+    <string name="graph_points_less">Noktaları azalt</string>
+    <string name="graph_points_more">Noktaları artır</string>
+    <string name="graph_numbers">Sayılar</string>
+    <string name="graph_grid">Izgara</string>
+    <string name="graph_fill_under">Altını boya</string>
+    <string name="graph_key_points">Önemli noktalar</string>
+    <string name="graph_tap_hint">Grafikteki sayılara, değerlere, eksen adlarına ve formüle dokunarak değiştirin.</string>
+    <string name="graph_edit_tick">Eksendeki sayı</string>
+    <string name="graph_edit_value">Değer</string>
+    <string name="graph_edit_label">Etiket</string>
+    <string name="graph_edit_formula">Formül</string>
+    <string name="graph_edit_axis">Eksen adı</string>
+    <string name="graph_edit_tick_hint">Sayı, kesir ya da π gibi yazı girebilirsiniz; boş bırakılırsa varsayılana döner.</string>
+    <!-- v15: resim düzenleme ve kalem aracı -->
+    <string name="image_edit_open">Resmi düzenle</string>
+    <string name="image_crop">Kırp</string>
+    <string name="image_vectorize">Vektörleştir</string>
+    <string name="image_pen">Kalem</string>
+    <string name="mode_hint_image_edit">Resmi kırpın, vektör şekle çevirin ya da üstünden kalemle yol çizin.</string>
+    <string name="vectorize_title">Vektörleştir</string>
+    <string name="vectorize_hint">Resmin kenarları bulunur ve düzenlenebilir çizgilere dönüşür (dolgu yok). Noktalarını Şekli düzenle ile taşıyabilir, çizgilerin kavisini değiştirebilir, alanları Alan boya ile renklendirebilirsiniz.</string>
+    <string name="vectorize_detail">Ayrıntı %%%1$d</string>
+    <string name="vectorize_smooth">Yumuşatma %%%1$d</string>
+    <string name="vectorize_keep">Resmi de koru</string>
+    <string name="vectorize_apply">Vektörleştir</string>
+    <string name="vectorize_running">Vektörleştiriliyor…</string>
+    <string name="mode_hint_pen">Dokunarak köşe, sürükleyerek eğri noktası ekleyin; ilk noktaya dokununca yol kapanır.</string>
+    <string name="pen_finish">Yolu bitir</string>
+    <string name="pen_undo">Son noktayı sil</string>
+    <!-- v15: katmanlar -->
+    <string name="tab_layers">Katmanlar</string>
+    <string name="layers_hint">Yeni elemanlar etkin katmana eklenir. Gizli katman çizilmez; kilitli katmandakiler seçilemez ve silinmez.</string>
+    <string name="layer_add">Yeni katman</string>
+    <string name="layer_count">%1$d eleman</string>
+    <string name="layer_active">etkin</string>
+    <string name="layer_hide">Katmanı gizle</string>
+    <string name="layer_show">Katmanı göster</string>
+    <string name="layer_lock">Katmanı kilitle</string>
+    <string name="layer_unlock">Kilidi aç</string>
+    <string name="layer_menu">%1$s menüsü</string>
+    <string name="layer_rename">Yeniden adlandır</string>
+    <string name="layer_name">Katman adı</string>
+    <string name="layer_up">Yukarı taşı</string>
+    <string name="layer_down">Aşağı taşı</string>
+    <string name="layer_move_selection">Seçileni buraya taşı (%1$d)</string>
+    <string name="layer_delete">Katmanı sil</string>
+    <string name="layer_delete_title">%1$s silinsin mi?</string>
+    <string name="layer_delete_text">Katmandaki %1$d eleman da silinir. Geri al ile geri getirilebilir.</string>
+    <string name="layer_locked_event">Etkin katman gizli ya da kilitli: çizmek için katmanı açın.</string>
+    <string name="delete_button">Sil</string>
+    <!-- v15: el yazısı, kaydetme, stil -->
+    <string name="handwriting_suggest">Çiziminiz şöyle düzeltilebilir:</string>
+    <string name="handwriting_dismiss">Öneriyi kapat</string>
+    <string name="style_line_cd">Son seçilen renk ve yazı ayarları</string>
+    <string name="editor_more">Diğer seçenekler</string>
+    <string name="export_pdf">PDF olarak kaydet</string>
+    <string name="pdf_exporting">PDF hazırlanıyor…</string>
+    <string name="pdf_saved">PDF kaydedildi: %1$s (%2$s)</string>
+    <string name="pdf_failed">PDF kaydedilemedi</string>
+    <string name="autosave">Otomatik kaydet</string>
+    <string name="autosave_hint">Kapalıyken değişiklikler üstteki Kaydet ile kaydedilir.</string>
+    <string name="save_now">Kaydet</string>
+    <string name="save_now_dirty">Kaydet (kaydedilmemiş değişiklik var)</string>
+    <string name="saved_event">Kaydedildi</string>
+    <string name="unsaved_title">Kaydedilmemiş değişiklikler</string>
+    <string name="unsaved_text">Otomatik kayıt kapalı. Çıkmadan önce değişiklikler kaydedilsin mi?</string>
+    <string name="unsaved_discard">Kaydetme</string>
+    <!-- v15: klasörler ve çoklu seçim -->
+    <string name="folders_title">Klasörler</string>
+    <string name="folder_count">%1$d öğe</string>
+    <string name="folder_name">Klasör adı</string>
+    <string name="folder_new">Yeni klasör</string>
+    <string name="folder_rename">Klasörü yeniden adlandır</string>
+    <string name="folder_root">Ana liste</string>
+    <string name="folder_here">burada</string>
+    <string name="folder_up">Klasörden çık</string>
+    <string name="move_to_folder">Klasöre taşı</string>
+    <string name="selected_items">%1$d öğe seçildi</string>
+    <string name="selected_items_subtitle">Seçili öğeler</string>
+    <string name="delete_selected">Seçilenleri sil</string>
+    <string name="delete_selected_title">%1$d öğe silinsin mi?</string>
+    <string name="delete_selected_canvases_text">%1$d tuval ve %2$d klasör (içindeki %3$d tuvalle birlikte) kalıcı olarak silinecek.</string>
+    <string name="delete_selected_images_text">%1$d resim ve %2$d klasör (içindeki %3$d resimle birlikte) kalıcı olarak silinecek.</string>
+    <string name="editor_settings_title">Çizim ekranı</string>
+</resources>

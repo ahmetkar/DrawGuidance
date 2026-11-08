@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- v40 tasarım: tema, Ana sayfa, Tuvallerim özeti, çizim süresi ve tuval boyutları -->
+<resources>
+    <string name="v40_theme_mode_title">テーマ</string>
+    <string name="v40_theme_mode_light">ライト</string>
+    <string name="v40_theme_mode_dark">ダーク</string>
+    <string name="v40_theme_mode_system">システム</string>
+    <string name="v40_theme_high_contrast">ハイコントラスト</string>
+    <string name="v40_theme_high_contrast_hint">文字と枠を強調し、選択枠を太く表示</string>
+    <string name="v40_home_kind_art">自由に描いて塗ろう</string>
+    <string name="v40_home_kind_notes">授業やアイデアに</string>
+    <string name="v40_home_kind_comic">自分の物語を描こう</string>
+    <string name="v40_home_kind_simple_art">かんたんに描き始めよう</string>
+    <string name="v40_home_kind_simple_notes">すばやくシンプルなメモ</string>
+    <string name="v40_home_kind_kids">子ども向けの楽しいぬりえ</string>
+    <string name="v40_home_kind_3d">3D形状をデザイン</string>
+    <string name="v40_home_group_simple">シンプルでかんたん</string>
+    <string name="v40_home_group_advanced">すべてのツールを手元に</string>
+    <string name="v40_home_most_time_title">いちばん時間をかけた作品</string>
+    <string name="v40_home_most_time_cd">%1$s、%2$s</string>
+    <string name="v40_time_lt_minute">1分未満</string>
+    <string name="v40_time_minutes">%1$d分</string>
+    <string name="v40_time_hours_minutes">%1$d時間%2$d分</string>
+    <string name="v40_time_hours">%1$d時間</string>
+    <string name="v40_stats_title">概要</string>
+    <string name="v40_stats_total">合計</string>
+    <string name="v40_stats_week">今週</string>
+    <string name="v40_stats_time">描画時間</string>
+    <string name="v40_stats_cd">%1$s: %2$s</string>
+    <string name="v40_size_square">正方形</string>
+    <string name="v40_size_portrait">縦向き</string>
+    <string name="v40_size_landscape">横向き</string>
+    <string name="v40_size_wallpaper">スマホ壁紙</string>
+    <string name="v40_size_a4_300">A4（300 dpi）</string>
+    <string name="v40_size_a4">A4</string>
+    <string name="v40_size_a5">A5</string>
+    <string name="v40_size_letter">レター</string>
+    <string name="v40_size_a4_landscape">A4 横</string>
+    <string name="v40_size_comic_page">コミックページ</string>
+    <string name="v40_size_us_comic">アメコミ</string>
+    <string name="v40_size_manga_b5">マンガ（B5）</string>
+    <string name="v40_size_webtoon">ウェブトゥーン</string>
+    <string name="v40_size_custom">カスタム</string>
+    <string name="v40_size_width">幅（%1$s）</string>
+    <string name="v40_size_height">高さ（%1$s）</string>
+    <string name="v40_size_dpi">DPI</string>
+    <string name="v40_size_result">%1$d × %2$d px</string>
+    <string name="v40_size_error_min">辺は%1$d px以上にしてください</string>
+    <string name="v40_size_error_max">辺は最大%1$d pxです</string>
+    <string name="v40_size_error_memory">このサイズは端末のメモリに対して大きすぎます</string>
+</resources>

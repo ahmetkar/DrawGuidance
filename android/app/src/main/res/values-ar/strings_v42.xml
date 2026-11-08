@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- v42 metinleri -->
+<resources>
+    <string name="v42_stats_drawings">رسومات</string>
+    <string name="v42_stats_notes">ملاحظات</string>
+    <string name="v42_stats_comics">قصص مصورة</string>
+    <string name="v42_save_title">حفظ</string>
+    <string name="v42_save_hint">اختر التنسيق؛ تتغير الإعدادات حسب التنسيق المختار.</string>
+    <string name="v42_save_tab_image">ملف صورة</string>
+    <string name="v42_save_tab_pdf">PDF</string>
+    <string name="v42_save_tab_cbz">CBZ</string>
+    <string name="v42_err_copy">نسخ</string>
+    <string name="v42_err_share">مشاركة / بريد</string>
+    <string name="v42_err_copied">تم نسخ التقرير. يمكنك إرساله إلينا بالبريد أو برسالة.</string>
+    <string name="v42_err_share_hint">إذا تعذّر تسجيل الدخول أو الوصول إلى الخادم، انسخ التقرير أو شاركه وأرسله إلينا.</string>
+    <string name="v42_server_title">الخادم (مؤقت)</string>
+    <string name="v42_server_hint">الخادم الذي يتصل به التطبيق: الخادم البعيد أو خادم يعمل على حاسوب في شبكتك المحلية.</string>
+    <string name="v42_server_remote">خادم بعيد</string>
+    <string name="v42_server_local">شبكة محلية</string>
+    <string name="v42_server_current">الآن: %1$s</string>
+    <string name="v42_server_local_hint">يجب أن يكون الهاتف والحاسوب على نفس شبكة Wi-Fi. شغّل Yerel-Sunucuyu-Baslat.bat على الحاسوب ثم اكتب العنوان الظاهر أو ابحث في الشبكة. الاتصال غير مشفّر؛ استخدمه في شبكتك فقط.</string>
+    <string name="v42_server_local_invalid">يُسمح بعنوان الشبكة المحلية فقط (مثل 192.168.1.20:4747).</string>
+    <string name="v42_server_use">استخدم هذا الخادم</string>
+    <string name="v42_add_objects">عناصر</string>
+    <string name="v42_obj_title">إضافة عنصر</string>
+    <string name="v42_obj_hint">عناصر جاهزة حسب حزمة الموضوع والفئة. انقر للإضافة إلى الصفحة؛ يمكنك تحريكها وتدويرها وتغيير حجمها.</string>
+    <string name="v42_fx_images_hint">صور جاهزة للانفجارات والطاقة والدخان والبريق حسب حزمة الموضوع والفئة.</string>
+    <string name="v42_text_on_path">نص على مسار</string>
+    <string name="v42_text_on_path_need">نص على مسار (ارسم مسارًا بأداة القلم أولًا)</string>
+    <string name="v42_text_path_pick">انقر المسار الذي سيتبعه النص</string>
+    <string name="v42_text_path_missed">لا يوجد مسار هنا: انقر أحد المسارات المميزة</string>
+    <string name="v42_text_path_below">ضع النص أسفل المسار</string>
+    <string name="v42_text_path_above">ضع النص أعلى المسار</string>
+    <string name="v42_text_path_reverse">اعكس اتجاه النص</string>
+    <string name="v42_text_path_detach">حرر النص من المسار</string>
+    <string name="v42_saved_tab_default">المجلد الافتراضي</string>
+    <string name="v42_saved_tab_other">مواقع أخرى</string>
+    <string name="v42_saved_empty_other">تظهر هنا الملفات التي تحفظها في مجلد آخر عبر «اختيار الموقع» أو «حفظ باسم».</string>
+    <string name="v42_saved_open">فتح</string>
+    <string name="v42_saved_no_viewer">لا يوجد تطبيق يفتح هذا الملف. يمكنك إرساله إلى تطبيق آخر عبر المشاركة.</string>
+    <string name="v42_saved_document">مستند %1$s · %2$s</string>
+    <string name="v42_help_add_objects">عناصر جاهزة: أسلحة، فوانيس، وثائق، كنوز، طعام... اختر حسب حزمة الموضوع والفئة؛ تضاف إلى الصفحة كصورة.</string>
+</resources>

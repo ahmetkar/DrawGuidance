@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- v45 düzenleyici: tablette sürüklenen pencereler, seçim ve ekleme menüleri -->
+<resources>
+    <string name="v45_window_drag">창 끌기</string>
+    <string name="v45_window_reset">위치 초기화</string>
+    <string name="v45_selection_menu">선택 메뉴</string>
+    <string name="v45_selection_edit_menu">편집 옵션</string>
+    <string name="v45_add_menu">추가 메뉴</string>
+</resources>

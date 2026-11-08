@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- v45 çocuk menüsü: kısa adlar, boya fırçası, fırça boyu, açıklamalar ve ipuçları -->
+    <string name="v45_kids_undo">Geri al</string>
+    <string name="v45_kids_redo">İleri al</string>
+    <string name="v45_kids_pen">Kalem</string>
+    <string name="v45_kids_eraser">Silgi</string>
+    <string name="v45_kids_paint_brush">Boya</string>
+    <string name="v45_kids_bucket">Kova</string>
+    <string name="v45_kids_parts">Parçalar</string>
+    <string name="v45_kids_colors">Renkler</string>
+    <string name="v45_kids_shapes">Şekiller</string>
+    <string name="v45_kids_challenge">Görev</string>
+    <string name="v45_kids_background">Zemin</string>
+    <string name="v45_kids_image">Resim</string>
+    <string name="v45_kids_text">Yazı</string>
+    <string name="v45_kids_model3d">3B</string>
+    <string name="v45_kids_select">Seç</string>
+    <string name="v45_kids_eyedropper">Renk al</string>
+    <string name="v45_kids_ruler">Cetvel</string>
+    <string name="v45_kids_template">Kalıp</string>
+    <string name="v45_kids_expand">Büyüt</string>
+    <string name="v45_kids_brush_size">Fırça boyu</string>
+    <string name="v45_kids_size_thin">İnce</string>
+    <string name="v45_kids_size_medium">Orta</string>
+    <string name="v45_kids_size_thick">Kalın</string>
+    <string name="v45_help_kids_pen">Kalemle kâğıda istediğin her şeyi çiz. Rengini ve kalınlığını Renkler\'den seçersin.</string>
+    <string name="v45_help_kids_paint_brush">Boya fırçası: parmağınla bir şeklin içini boya. Boya çizgilerin dışına taşmaz; boş kâğıtta istediğin yeri boyar.</string>
+    <string name="v45_help_kids_bucket">Boya kovası: bir şeklin içine dokun, o yer seçtiğin renge boyanır. 2 saniye basılı tutarsan bütün şekil boyanır.</string>
+    <string name="v45_help_kids_parts">Resmindeki parçaları (çizgiler, şekiller, yazılar) görür; istersen gizler ya da silersin.</string>
+    <string name="v45_help_kids_colors">Kalemin rengini, kalınlığını ve türünü seçersin.</string>
+    <string name="v45_help_kids_shapes">Hazır resimler ve şekiller: birini seç, kâğıda dokunarak koy.</string>
+    <string name="v45_help_kids_background">Kâğıdın rengini değiştirir.</string>
+    <string name="v45_help_kids_brush_size">Boya fırçasının kalınlığı: ince, orta ya da kalın.</string>
+    <string name="v45_challenge_tip_pen">Üstteki Kalem\'i seç ve parmağınla kesikli çizginin üstünden yavaşça geç.</string>
+    <string name="v45_challenge_tip_paint_brush">Boya fırçasıyla da boyayabilirsin: Boya\'yı seç, rengi seç ve parmağınla alanın içini boya. Boya çizgilerin dışına taşmaz!</string>
+    <string name="v45_tut_kids_pen">Kalem</string>
+    <string name="v45_tut_kids_pen_text">Kalemle istediğin gibi çizersin. Bak, gökyüzüne parlak bir güneş çiziyorum!</string>
+</resources>

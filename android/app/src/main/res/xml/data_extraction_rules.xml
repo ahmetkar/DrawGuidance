@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  v40 Android 12+ yedekleme ve cihaz aktarımı kuralları (Android 11 ve öncesi: backup_rules.xml; ikisi aynı tutulur).
+  Yedeğe girmeyenler:
+  - Firebase oturumu (yenileme jetonu): yedekten geri yüklenen oturum başka bir cihazda açılmasın. Dosya adı Firebase
+    uygulama kimliğinden türetilir (BackupRulesTest denetler).
+  - Sunucu adresi ve geliştirici ayarları.
+  - Hata raporu kuyruğu ve çökme kayıtları (cihaza özgü, kişisel veri içerebilir).
+  - Yeniden indirilebilen katalog.
+  Çizimler, veritabanı ve kullanıcı tercihleri yedeklenmeye devam eder.
+-->
+<data-extraction-rules>
+    <cloud-backup>
+        <exclude domain="sharedpref" path="com.google.firebase.auth.api.Store.W0RFRkFVTFRd+MTo3MjI4NTYyNjM2MzQ6YW5kcm9pZDowMWZkZTdkY2U3NzE0MzliMzExMjBi.xml" />
+        <exclude domain="sharedpref" path="server_config.xml" />
+        <exclude domain="sharedpref" path="sync_permit.xml" />
+        <exclude domain="sharedpref" path="inbox.xml" />
+        <exclude domain="sharedpref" path="developer_settings.xml" />
+        <exclude domain="sharedpref" path="error_reports.xml" />
+        <exclude domain="file" path="diagnostics/" />
+        <exclude domain="file" path="catalog/" />
+    </cloud-backup>
+    <device-transfer>
+        <exclude domain="sharedpref" path="com.google.firebase.auth.api.Store.W0RFRkFVTFRd+MTo3MjI4NTYyNjM2MzQ6YW5kcm9pZDowMWZkZTdkY2U3NzE0MzliMzExMjBi.xml" />
+        <exclude domain="sharedpref" path="server_config.xml" />
+        <exclude domain="sharedpref" path="sync_permit.xml" />
+        <exclude domain="sharedpref" path="inbox.xml" />
+        <exclude domain="sharedpref" path="developer_settings.xml" />
+        <exclude domain="sharedpref" path="error_reports.xml" />
+        <exclude domain="file" path="diagnostics/" />
+        <exclude domain="file" path="catalog/" />
+    </device-transfer>
+</data-extraction-rules>

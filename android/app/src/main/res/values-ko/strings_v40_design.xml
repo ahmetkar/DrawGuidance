@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- v40 tasarım: tema, Ana sayfa, Tuvallerim özeti, çizim süresi ve tuval boyutları -->
+<resources>
+    <string name="v40_theme_mode_title">테마</string>
+    <string name="v40_theme_mode_light">라이트</string>
+    <string name="v40_theme_mode_dark">다크</string>
+    <string name="v40_theme_mode_system">시스템</string>
+    <string name="v40_theme_high_contrast">고대비</string>
+    <string name="v40_theme_high_contrast_hint">더 진한 글자와 테두리, 굵은 선택 테두리</string>
+    <string name="v40_home_kind_art">자유롭게 그리고 칠하기</string>
+    <string name="v40_home_kind_notes">수업과 아이디어를 위해</string>
+    <string name="v40_home_kind_comic">나만의 이야기를 들려주세요</string>
+    <string name="v40_home_kind_simple_art">쉽게 그리기 시작</string>
+    <string name="v40_home_kind_simple_notes">빠르고 간단한 메모</string>
+    <string name="v40_home_kind_kids">아이들을 위한 즐거운 색칠</string>
+    <string name="v40_home_kind_3d">3D 도형 디자인</string>
+    <string name="v40_home_group_simple">간단하고 쉽게</string>
+    <string name="v40_home_group_advanced">모든 도구를 손안에</string>
+    <string name="v40_home_most_time_title">가장 오래 머문 그림</string>
+    <string name="v40_home_most_time_cd">%1$s, %2$s 사용</string>
+    <string name="v40_time_lt_minute">1분 미만</string>
+    <string name="v40_time_minutes">%1$d분</string>
+    <string name="v40_time_hours_minutes">%1$d시간 %2$d분</string>
+    <string name="v40_time_hours">%1$d시간</string>
+    <string name="v40_stats_title">요약</string>
+    <string name="v40_stats_total">전체</string>
+    <string name="v40_stats_week">이번 주</string>
+    <string name="v40_stats_time">그리기 시간</string>
+    <string name="v40_stats_cd">%1$s: %2$s</string>
+    <string name="v40_size_square">정사각형</string>
+    <string name="v40_size_portrait">세로</string>
+    <string name="v40_size_landscape">가로</string>
+    <string name="v40_size_wallpaper">휴대폰 배경화면</string>
+    <string name="v40_size_a4_300">A4 (300dpi)</string>
+    <string name="v40_size_a4">A4</string>
+    <string name="v40_size_a5">A5</string>
+    <string name="v40_size_letter">레터</string>
+    <string name="v40_size_a4_landscape">A4 가로</string>
+    <string name="v40_size_comic_page">만화 페이지</string>
+    <string name="v40_size_us_comic">미국 코믹스</string>
+    <string name="v40_size_manga_b5">만화 (B5)</string>
+    <string name="v40_size_webtoon">웹툰</string>
+    <string name="v40_size_custom">사용자 지정</string>
+    <string name="v40_size_width">너비 (%1$s)</string>
+    <string name="v40_size_height">높이 (%1$s)</string>
+    <string name="v40_size_dpi">DPI</string>
+    <string name="v40_size_result">%1$d × %2$d px</string>
+    <string name="v40_size_error_min">변은 최소 %1$d px이어야 합니다</string>
+    <string name="v40_size_error_max">변은 최대 %1$d px입니다</string>
+    <string name="v40_size_error_memory">이 크기는 기기 메모리에 비해 너무 큽니다</string>
+</resources>

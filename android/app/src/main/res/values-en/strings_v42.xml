@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- v42 metinleri -->
+<resources>
+    <string name="v42_stats_drawings">Drawings</string>
+    <string name="v42_stats_notes">Notes</string>
+    <string name="v42_stats_comics">Comics</string>
+    <string name="v42_save_title">Save</string>
+    <string name="v42_save_hint">Pick a format; the settings change with the format you pick.</string>
+    <string name="v42_save_tab_image">Image file</string>
+    <string name="v42_save_tab_pdf">PDF</string>
+    <string name="v42_save_tab_cbz">CBZ</string>
+    <string name="v42_err_copy">Copy</string>
+    <string name="v42_err_share">Share / email</string>
+    <string name="v42_err_copied">Report copied. You can send it to us by email or message.</string>
+    <string name="v42_err_share_hint">If you can\'t sign in or the server can\'t be reached, copy or share the report and send it to us.</string>
+    <string name="v42_server_title">Server (temporary)</string>
+    <string name="v42_server_hint">Which server the app connects to: the remote server or one running on a computer on your local network.</string>
+    <string name="v42_server_remote">Remote server</string>
+    <string name="v42_server_local">Local network</string>
+    <string name="v42_server_current">Now: %1$s</string>
+    <string name="v42_server_local_hint">Your phone and computer must be on the same Wi-Fi. Run Yerel-Sunucuyu-Baslat.bat on the computer, then enter the address it shows or tap Search network. The connection is unencrypted; use it only on your own network.</string>
+    <string name="v42_server_local_invalid">Only a local network address is allowed (e.g. 192.168.1.20:4747).</string>
+    <string name="v42_server_use">Use this server</string>
+    <string name="v42_add_objects">Objects</string>
+    <string name="v42_obj_title">Add object</string>
+    <string name="v42_obj_hint">Ready-made objects by theme pack and category. Tap to add to the page; you can move, rotate and resize it.</string>
+    <string name="v42_fx_images_hint">Hand-drawn explosions, energy, smoke and sparkles by theme pack and category.</string>
+    <string name="v42_text_on_path">Text on path</string>
+    <string name="v42_text_on_path_need">Text on path (draw a path with the pen tool first)</string>
+    <string name="v42_text_path_pick">Tap the path the text should follow</string>
+    <string name="v42_text_path_missed">No path there: tap one of the highlighted paths</string>
+    <string name="v42_text_path_below">Put text below the path</string>
+    <string name="v42_text_path_above">Put text above the path</string>
+    <string name="v42_text_path_reverse">Reverse text direction</string>
+    <string name="v42_text_path_detach">Release text from path</string>
+    <string name="v42_saved_tab_default">Default folder</string>
+    <string name="v42_saved_tab_other">Other locations</string>
+    <string name="v42_saved_empty_other">Files you save to another folder with \"Choose location\" or \"Save as\" are listed here.</string>
+    <string name="v42_saved_open">Open</string>
+    <string name="v42_saved_no_viewer">No app can open this file. You can send it to another app with Share.</string>
+    <string name="v42_saved_document">%1$s document · %2$s</string>
+    <string name="v42_help_add_objects">Ready-made objects: weapons, lanterns, documents, treasure, food... Pick by theme pack and category; added to the page as an image.</string>
+</resources>

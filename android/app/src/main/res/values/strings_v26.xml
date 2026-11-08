@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- v26: 3B düzenleyici tuvaldeki gibi modlara ayrıldı (Seç, Düzenle, Çiz, Boya, Ekle); geri al/ileri al araç
+     satırında; paneller kapatma düğmeli; parça grupları; silgi yalnız çizimlere; son çizimi sil / tümünü temizle. -->
+<resources>
+    <!-- Modlar ve alt araçlar -->
+    <string name="model3d_mode_select">Seç</string>
+    <string name="model3d_mode_edit">Düzenle</string>
+    <string name="model3d_mode_draw">Çiz</string>
+    <string name="model3d_mode_paint">Boya</string>
+    <string name="model3d_mode_add">Ekle</string>
+    <string name="model3d_tool_brush">Fırça</string>
+    <string name="model3d_tool_eraser">Silgi</string>
+    <string name="model3d_hint_add">Cisme ya da hazır şekle dokunun: sahneye eklenir · sahnede parçayı sürükleyerek yerleştirin</string>
+    <string name="model3d_hint_show">Yönergeyi göster</string>
+    <string name="model3d_close_panel">Paneli kapat</string>
+    <string name="model3d_views">Hazır açılar</string>
+
+    <!-- Araç satırı -->
+    <string name="model3d_axis_cycle">Eksen: %1$s</string>
+    <string name="model3d_plane_cycle">Düzlem: %1$s</string>
+    <string name="model3d_brush_kind_chip">Tür: %1$s</string>
+    <string name="model3d_eraser_small">İnce</string>
+    <string name="model3d_eraser_medium">Orta</string>
+    <string name="model3d_eraser_large">Kalın</string>
+    <string name="model3d_delete_last">Son çizimi sil</string>
+    <string name="model3d_clear_all">Tümünü temizle</string>
+    <string name="model3d_clear_all_title">Bütün çizimler silinsin mi?</string>
+    <string name="model3d_clear_all_text">3B çizgiler ve fırçayla çizilen cisimler silinir. Geri al ile geri getirebilirsiniz.</string>
+    <string name="model3d_clear_confirm">Temizle</string>
+    <string name="model3d_all_shapes">Tümü</string>
+
+    <!-- Gruplar -->
+    <string name="model3d_group">Grupla</string>
+    <string name="model3d_ungroup">Grubu çöz</string>
+    <string name="model3d_group_rename">Grubu yeniden adlandır</string>
+    <string name="model3d_group_count">%1$d parça</string>
+    <string name="model3d_group_expand">Grubu aç/kapat</string>
+
+    <!-- Seçim çipi -->
+    <string name="model3d_selected_parts">%1$d parça seçili</string>
+    <string name="model3d_selected_group">%1$s · %2$d parça</string>
+</resources>

@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- v42 metinleri -->
+<resources>
+    <string name="v42_stats_drawings">绘画</string>
+    <string name="v42_stats_notes">笔记</string>
+    <string name="v42_stats_comics">漫画</string>
+    <string name="v42_save_title">保存</string>
+    <string name="v42_save_hint">选择格式；设置会随所选格式变化。</string>
+    <string name="v42_save_tab_image">图片文件</string>
+    <string name="v42_save_tab_pdf">PDF</string>
+    <string name="v42_save_tab_cbz">CBZ</string>
+    <string name="v42_err_copy">复制</string>
+    <string name="v42_err_share">分享 / 邮件</string>
+    <string name="v42_err_copied">报告已复制。可以通过邮件或消息发给我们。</string>
+    <string name="v42_err_share_hint">如果无法登录或无法连接服务器，可以复制或分享报告发给我们。</string>
+    <string name="v42_server_title">服务器（临时）</string>
+    <string name="v42_server_hint">应用连接的服务器：远程服务器，或在本地网络电脑上运行的服务器。</string>
+    <string name="v42_server_remote">远程服务器</string>
+    <string name="v42_server_local">本地网络</string>
+    <string name="v42_server_current">当前：%1$s</string>
+    <string name="v42_server_local_hint">手机和电脑需连接同一 Wi-Fi。在电脑上运行 Yerel-Sunucuyu-Baslat.bat，输入显示的地址或点“在网络中搜索”。连接未加密，请仅在自己的网络中使用。</string>
+    <string name="v42_server_local_invalid">只能填写本地网络地址（例如 192.168.1.20:4747）。</string>
+    <string name="v42_server_use">使用此服务器</string>
+    <string name="v42_add_objects">物品</string>
+    <string name="v42_obj_title">添加物品</string>
+    <string name="v42_obj_hint">按主题包和类别分类的现成物品。点按即可添加到页面，可移动、旋转和缩放。</string>
+    <string name="v42_fx_images_hint">按主题包和类别分类的爆炸、能量、烟雾与闪光图片。</string>
+    <string name="v42_text_on_path">路径文字</string>
+    <string name="v42_text_on_path_need">路径文字（请先用钢笔工具画一条路径）</string>
+    <string name="v42_text_path_pick">点按文字要沿着的路径</string>
+    <string name="v42_text_path_missed">那里没有路径：请点按高亮的路径之一</string>
+    <string name="v42_text_path_below">文字放在路径下方</string>
+    <string name="v42_text_path_above">文字放在路径上方</string>
+    <string name="v42_text_path_reverse">反转文字方向</string>
+    <string name="v42_text_path_detach">从路径释放文字</string>
+    <string name="v42_saved_tab_default">默认文件夹</string>
+    <string name="v42_saved_tab_other">其他位置</string>
+    <string name="v42_saved_empty_other">通过“选择位置”或“另存为”保存到其他文件夹的文件会显示在这里。</string>
+    <string name="v42_saved_open">打开</string>
+    <string name="v42_saved_no_viewer">没有可以打开此文件的应用。你可以通过分享发送到其他应用。</string>
+    <string name="v42_saved_document">%1$s 文档 · %2$s</string>
+    <string name="v42_help_add_objects">现成物品：武器、灯笼、文件、宝藏、食物……按主题包和类别选择，以图片形式添加到页面。</string>
+</resources>

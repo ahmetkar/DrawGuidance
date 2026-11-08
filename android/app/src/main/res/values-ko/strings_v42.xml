@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- v42 metinleri -->
+<resources>
+    <string name="v42_stats_drawings">그림</string>
+    <string name="v42_stats_notes">노트</string>
+    <string name="v42_stats_comics">만화</string>
+    <string name="v42_save_title">저장</string>
+    <string name="v42_save_hint">형식을 고르세요. 설정은 고른 형식에 따라 바뀝니다.</string>
+    <string name="v42_save_tab_image">이미지 파일</string>
+    <string name="v42_save_tab_pdf">PDF</string>
+    <string name="v42_save_tab_cbz">CBZ</string>
+    <string name="v42_err_copy">복사</string>
+    <string name="v42_err_share">공유 / 이메일</string>
+    <string name="v42_err_copied">보고서를 복사했어요. 이메일이나 메시지로 보내 주세요.</string>
+    <string name="v42_err_share_hint">로그인할 수 없거나 서버에 연결되지 않으면 보고서를 복사하거나 공유해 보내 주세요.</string>
+    <string name="v42_server_title">서버 (임시)</string>
+    <string name="v42_server_hint">앱이 연결할 서버: 원격 서버 또는 로컬 네트워크의 컴퓨터에서 실행 중인 서버.</string>
+    <string name="v42_server_remote">원격 서버</string>
+    <string name="v42_server_local">로컬 네트워크</string>
+    <string name="v42_server_current">현재: %1$s</string>
+    <string name="v42_server_local_hint">휴대폰과 컴퓨터가 같은 Wi-Fi에 있어야 해요. 컴퓨터에서 Yerel-Sunucuyu-Baslat.bat을 실행하고 표시된 주소를 입력하거나 네트워크 검색을 누르세요. 연결은 암호화되지 않으니 내 네트워크에서만 쓰세요.</string>
+    <string name="v42_server_local_invalid">로컬 네트워크 주소만 입력할 수 있어요 (예: 192.168.1.20:4747).</string>
+    <string name="v42_server_use">이 서버 사용</string>
+    <string name="v42_add_objects">사물</string>
+    <string name="v42_obj_title">사물 추가</string>
+    <string name="v42_obj_hint">테마 팩과 카테고리별 사물입니다. 탭하면 페이지에 추가되며 이동, 회전, 크기 조절이 가능합니다.</string>
+    <string name="v42_fx_images_hint">테마 팩과 카테고리별로 그려진 폭발, 에너지, 연기, 반짝임 이미지입니다.</string>
+    <string name="v42_text_on_path">패스 위 텍스트</string>
+    <string name="v42_text_on_path_need">패스 위 텍스트 (먼저 펜 도구로 패스를 그리세요)</string>
+    <string name="v42_text_path_pick">텍스트가 따라갈 패스를 탭하세요</string>
+    <string name="v42_text_path_missed">그곳에는 패스가 없습니다. 강조된 패스 중 하나를 탭하세요</string>
+    <string name="v42_text_path_below">텍스트를 패스 아래로</string>
+    <string name="v42_text_path_above">텍스트를 패스 위로</string>
+    <string name="v42_text_path_reverse">텍스트 방향 뒤집기</string>
+    <string name="v42_text_path_detach">텍스트를 패스에서 해제</string>
+    <string name="v42_saved_tab_default">기본 폴더</string>
+    <string name="v42_saved_tab_other">다른 위치</string>
+    <string name="v42_saved_empty_other">\"위치 선택\"이나 \"다른 이름으로 저장\"으로 다른 폴더에 저장한 파일이 여기에 표시돼요.</string>
+    <string name="v42_saved_open">열기</string>
+    <string name="v42_saved_no_viewer">이 파일을 열 수 있는 앱이 없어요. 공유로 다른 앱에 보낼 수 있어요.</string>
+    <string name="v42_saved_document">%1$s 문서 · %2$s</string>
+    <string name="v42_help_add_objects">무기, 랜턴, 서류, 보물, 음식 등 준비된 사물. 테마 팩과 카테고리로 골라 이미지로 페이지에 추가합니다.</string>
+</resources>

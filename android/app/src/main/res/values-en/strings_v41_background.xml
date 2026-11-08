@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- v41 arka plan penceresinde Uygula; arka planı eleman gibi seçme -->
+<resources>
+    <string name="v41_bg_apply">Apply</string>
+    <string name="v41_bg_hint">Pick, then tap Apply: the old background is removed</string>
+    <string name="v41_bg_pending">Changes not applied yet</string>
+    <string name="v41_bg_selected">Background selected</string>
+    <string name="v41_bg_selected_hint">Change the background, adjust its opacity or delete it</string>
+    <string name="v41_bg_opacity">Opacity</string>
+    <string name="v41_bg_change">Change</string>
+    <string name="v41_bg_remove">Delete</string>
+    <string name="v41_bg_element">Background</string>
+    <string name="v41_bg_element_none">No background</string>
+</resources>

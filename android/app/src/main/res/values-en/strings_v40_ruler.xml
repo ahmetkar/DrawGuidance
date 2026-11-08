@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- v40 cetvel ve şekil kalıbı -->
+<resources>
+    <string name="v40_ruler">Ruler</string>
+    <string name="v40_template">Shape template</string>
+    <string name="v40_ruler_finish">Finish</string>
+    <string name="v40_ruler_straight">Straight ruler</string>
+    <string name="v40_ruler_protractor">Protractor</string>
+    <string name="v40_ruler_set45">Set square 45°</string>
+    <string name="v40_ruler_set30">Set square 30°/60°</string>
+    <string name="v40_ruler_compass">Compass</string>
+    <string name="v40_ruler_ellipse">Ellipse template</string>
+    <string name="v40_ruler_french">French curve</string>
+    <string name="v40_ruler_unit">Unit</string>
+    <string name="v40_ruler_scale">Scale</string>
+    <string name="v40_ruler_type">Ruler type</string>
+    <string name="v40_ruler_hint">Draw near an edge and the line follows it. Drag the body to move it, rotate with two fingers.</string>
+    <string name="v40_compass_hint">Wherever you draw, the line follows the circle. Drag the pin to move it, use the handle to change the radius.</string>
+    <string name="v40_template_pick_hint">Tap a shape on the canvas or pick one from the library</string>
+    <string name="v40_template_library">From library</string>
+    <string name="v40_template_lock">Lock</string>
+    <string name="v40_template_unlock">Unlock</string>
+    <string name="v40_template_hint">Draw near the template\'s edges; move and resize it with the handles.</string>
+    <string name="v40_template_none">No shape here</string>
+    <string name="v40_help_ruler">Opens a ruler: lines drawn near its edge follow the edge. Change type, unit and scale with the buttons beside the ruler.</string>
+    <string name="v40_help_template">Opens a shape template: tap a shape or pick one from the library; lines drawn near its edges follow them.</string>
+</resources>

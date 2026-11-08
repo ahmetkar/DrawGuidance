@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- v40 çocuk modu: 50 seviyelik çizim görevi, Premium seviyeler ve maskotun görev önerisi -->
+<resources>
+    <string name="v40_challenge_state_premium">بريميوم</string>
+    <string name="v40_challenge_premium_note">المستويات %1$d–%2$d تُفتح مع بريميوم</string>
+    <string name="v40_challenge_suggest_new">مرحبًا! هل تريد أن تلعب مهمة الرسم معي؟ سنرسم مستوى بعد مستوى ونجمع النجوم!</string>
+    <string name="v40_challenge_suggest_resume">أهلًا بعودتك! هل نكمل مهمة الرسم من المستوى %1$d؟</string>
+    <string name="v40_challenge_suggest_premium">لقد اجتزت كل المستويات المجانية! المستويات التالية تُفتح مع بريميوم.</string>
+    <string name="v40_challenge_suggest_start">ابدأ</string>
+    <string name="v40_challenge_suggest_cancel">إلغاء</string>
+    <string name="v40_challenge_suggest_cd">بوياجيك يقترح مهمة الرسم</string>
+    <string name="v40_challenge_body_resume">أحسنت! اجتزت %1$d / %2$d مستوى.</string>
+    <string name="v40_challenge_body_premium">رائع! اجتزت كل المستويات المجانية وعددها %1$d. المستويات الـ %2$d الباقية تُفتح مع بريميوم.</string>
+    <string name="v40_challenge_body_all_done">ممتاز! اجتزت كل المستويات وعددها %1$d. أعد لعب مستوى لتجمع نجومًا أكثر.</string>
+    <string name="v40_challenge_go_premium">اطّلع على بريميوم</string>
+    <string name="v40_challenge_replay">العب مرة أخرى (%1$d)</string>
+</resources>

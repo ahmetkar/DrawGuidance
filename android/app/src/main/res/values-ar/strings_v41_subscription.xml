@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- v41 abonelik sayfası (SaaS düzeni): plan kartları, bölüm başlıkları, sık sorulanlar -->
+<resources>
+    <string name="v41_sub_hero">اختر الخطة المناسبة لك</string>
+    <string name="v41_sub_hero_text">استخدم كل الأوضاع مع Free، وافتح الأدوات المتقدمة وأزل الإعلانات مع Premium. يمكنك الإلغاء في أي وقت من Google Play.</string>
+    <string name="v41_sub_recommended">موصى به</string>
+    <string name="v41_sub_downgrade">التحويل إلى Free (Google Play)</string>
+    <string name="v41_sub_section_yours">اشتراكك</string>
+    <string name="v41_sub_section_billing">الفوترة</string>
+    <string name="v41_sub_billing_text">تتم المدفوعات عبر Google Play. إذا غيّرت هاتفك أو أعدت تثبيت التطبيق فاستعد مشترياتك.</string>
+    <string name="v41_sub_section_faq">الأسئلة الشائعة</string>
+    <string name="v41_sub_faq_cancel_q">كيف ألغي الاشتراك؟</string>
+    <string name="v41_sub_faq_cancel_a">Google Play ← الدفعات والاشتراكات ← الاشتراكات. إذا ألغيت يستمر Premium حتى نهاية الفترة.</string>
+    <string name="v41_sub_faq_devices_q">هل يعمل على أجهزتي الأخرى؟</string>
+    <string name="v41_sub_faq_devices_a">نعم. يعمل Premium على كل جهاز تسجّل فيه الدخول بحساب Google نفسه.</string>
+    <string name="v41_sub_faq_free_q">ماذا يحدث لرسوماتي إذا عدت إلى Free؟</string>
+    <string name="v41_sub_faq_free_a">لا يُحذف شيء. تُقفل أدوات وعناصر Premium فقط من جديد، ويبقى ما أضفته في رسوماتك.</string>
+    <string name="v41_sub_manage_title">إدارة</string>
+    <string name="v41_sub_f_modes">كل الأوضاع: الرسم والملاحظات والقصص المصورة وثلاثي الأبعاد والأطفال</string>
+    <string name="v41_sub_f_shapes">كل الأشكال والمخططات</string>
+    <string name="v41_sub_f_basic_comic">المؤثرات والقوالب والشخصيات والخلفيات الأساسية</string>
+    <string name="v41_sub_f_sync">مزامنة سحابية عند تسجيل الدخول بـ Google</string>
+    <string name="v41_sub_f_ads">مع إعلانات</string>
+    <string name="v41_sub_f_everything_free">كل ما في Free</string>
+    <string name="v41_sub_f_bg_removal">إزالة خلفية الصورة والمؤثرات المتقدمة</string>
+    <string name="v41_sub_f_ai">اقتراحات الذكاء الاصطناعي المتقدمة واقتراحات ثلاثية الأبعاد</string>
+    <string name="v41_sub_f_comic">كل شخصيات وخلفيات وقوالب القصص المصورة</string>
+    <string name="v41_sub_f_kids">المستويات 36–50 من تحدي الرسم للأطفال</string>
+    <string name="v41_sub_f_no_ads">بدون إعلانات</string>
+</resources>

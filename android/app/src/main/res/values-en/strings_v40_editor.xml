@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- v40 çizim ekranı: arka planı taşıma/boyutlandırma -->
+<resources>
+    <string name="bg_transform">Move / resize</string>
+    <string name="bg_transform_hint">Drag the background; resize with two fingers or the corners</string>
+    <string name="bg_transform_reset">Reset</string>
+</resources>

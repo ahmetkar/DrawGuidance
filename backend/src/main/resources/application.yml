@@ -1,0 +1,182 @@
+# DrawGuidance sunucusu (v33): Spring Boot + MongoDB. Katalog (herkese açık) ve Firebase kimlikli kullanıcı kaydı;
+# v37: ikili katalog biçimi ve hata/çökme raporları. v39: Google Play abonelikleri (planlar, doğrulama, RTDN).
+# v40: üretim ayarları application-prod.yml (SPRING_PROFILES_ACTIVE=prod); sırlar Docker sırrı olarak *_FILE
+# değişkenleriyle verilebilir (ör. SLACK_WEBHOOK_URL_FILE=/run/secrets/slack_webhook; bkz. SecretFilesEnvironment).
+server:
+  port: ${PORT:4747}
+  # Yerel ağdaki telefonların erişebilmesi için tüm arayüzler
+  address: ${HOST:0.0.0.0}
+  # Küçük JSON yanıtları için (katalog gövdeleri önceden gzip'lenir: Tomcat güçlü ETag'li yanıtı sıkıştırmaz)
+  compression:
+    enabled: true
+    mime-types: application/json
+    min-response-size: 2KB
+  tomcat:
+    max-connections: 10000
+    accept-count: 200
+    keep-alive-timeout: 20s
+    # v40 yavaş istemci (slowloris) ve büyük gövde korumaları
+    connection-timeout: 10s
+    max-swallow-size: 1MB
+    max-http-form-post-size: 64KB
+  shutdown: graceful
+  # v40 hata yanıtlarında yığın dökümü, istisna ve ileti yok (gövdeyi ApiErrorAttributes yazar)
+  error:
+    include-stacktrace: never
+    include-exception: false
+    include-message: never
+    include-binding-errors: never
+    whitelabel:
+      enabled: false
+
+spring:
+  application:
+    name: drawguidance-server
+  # Java 21 sanal iş parçacıkları: her istek ayrı iş parçacığında, binlerce eşzamanlı bağlantı az bellekle
+  threads:
+    virtual:
+      enabled: true
+  data:
+    mongodb:
+      uri: ${MONGODB_URI:mongodb://localhost:27017/drawguidance}
+      auto-index-creation: false
+  lifecycle:
+    timeout-per-shutdown-phase: 20s
+
+# v40 yalnız sağlık ucu açık; ayrıntı (veritabanı sürümü, disk) gösterilmez. liveness/readiness kapsayıcı sağlık
+# denetimi içindir (/actuator/health/liveness veritabanına bağlı değildir: veritabanı kesintisinde kopya yeniden başlamaz)
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
+    jmx:
+      exposure:
+        exclude: "*"
+  endpoint:
+    health:
+      show-details: never
+      show-components: never
+      probes:
+        enabled: true
+  info:
+    env:
+      enabled: false
+
+drawguidance:
+  version: 44.2.0
+  mongo:
+    max-pool-size: ${MONGO_MAX_POOL:200}
+    min-pool-size: ${MONGO_MIN_POOL:10}
+    max-connecting: 8
+    compressors: zstd,snappy,zlib
+    read-preference: ${MONGO_READ_PREFERENCE:primaryPreferred}
+    write-concern: ${MONGO_WRITE_CONCERN:majority}
+    timeouts-ms: 5000
+    # v40 parola URI'ye yazılmadan ayrıca verilebilir (Docker sırrı: MONGO_APP_PASSWORD_FILE); boşsa URI'deki kimlik
+    username: ${MONGO_APP_USER:}
+    password: ${MONGO_APP_PASSWORD:}
+    auth-source: ${MONGO_AUTH_SOURCE:}
+    sharding:
+      enabled: ${MONGO_SHARDING:false}
+  # Firebase ID jetonu: iss = https://securetoken.google.com/<project-id>, aud = <project-id>
+  firebase:
+    project-id: ${FIREBASE_PROJECT_ID:drawguidance}
+    jwk-set-uri: ${FIREBASE_JWK_SET_URI:https://www.googleapis.com/service_accounts/v1/jwk/securetoken@system.gserviceaccount.com}
+  # Katalog tohum dosyası (gzip'li JSON); açılışta sürümü veritabanındakinden büyükse eşitlenir
+  catalog:
+    seed-resource: ${CATALOG_SEED_RESOURCE:classpath:catalog/catalog.json.gz}
+  # v37 hata/çökme raporu ucu (POST /api/v1/reports): gövde sınırı ve bellekte istek sınırları (sunucu başına).
+  # Ters vekil (proxy) arkasında IP sınırı için gerçek istemci adresi gerekir: SERVER_FORWARD_HEADERS_STRATEGY=native
+  reports:
+    max-body-bytes: ${REPORTS_MAX_BODY_BYTES:262144}
+    per-install-limit: ${REPORTS_PER_INSTALL_LIMIT:30}
+    per-ip-limit: ${REPORTS_PER_IP_LIMIT:300}
+    window: ${REPORTS_WINDOW:1h}
+  # v39 Google Play abonelikleri. Hizmet hesabı dosyası verilmezse doğrulama 503 billing_not_configured döner
+  # (sahte doğrulama yapılmaz). Ayrıntılar: docs/v39-api.md
+  billing:
+    package-name: ${GOOGLE_PLAY_PACKAGE_NAME:com.karapp.drawguidance}
+    service-account-file: ${GOOGLE_PLAY_SERVICE_ACCOUNT_JSON:}
+    require-account-id: ${BILLING_REQUIRE_ACCOUNT_ID:false}
+    # v44 geçici istisna: bu doğrulanmış e-postalar (virgülle) abonelik dışında Premium'un her şeyine erişir
+    exempt-emails: ${BILLING_EXEMPT_EMAILS:ahmetkar8040@gmail.com}
+    pubsub:
+      # Pub/Sub itme aboneliğinin "Kimlik doğrulamayı etkinleştir" hedef kitlesi; boşsa jeton denetlenmez
+      audience: ${PUBSUB_PUSH_AUDIENCE:}
+      service-account-email: ${PUBSUB_PUSH_SERVICE_ACCOUNT:}
+      # v40 true: doğrulama zorunlu (hedef kitle ve hizmet hesabı boşsa RTDN 503). Üretim profilinde true
+      required: ${PUBSUB_PUSH_REQUIRED:false}
+    premium:
+      product-id: ${PREMIUM_PRODUCT_ID:drawguidance_premium}
+      base-plan-id: ${PREMIUM_BASE_PLAN_ID:premium-monthly}
+      price-micros: 100000000
+      currency: TRY
+      price-display: 100 TL
+      period: P1M
+  # v40 herkese açık web sitesi (Next.js, Vercel): CORS ve form uçları (hesap silme talebi, destek mesajı)
+  web:
+    # /api/v1/** için izinli kökenler, virgülle ayrılmış (üretim sitesi: https://drawguidance.ahmetkar.com)
+    allowed-origins: ${WEB_ALLOWED_ORIGINS:https://drawguidance.ahmetkar.com,http://localhost:3000}
+    # İsteğe bağlı köken kalıpları, virgülle (ör. Vercel önizlemeleri: https://drawguidance-*.vercel.app). Öntanımlı boş
+    allowed-origin-patterns: ${WEB_ALLOWED_ORIGIN_PATTERNS:}
+    # true: sunucu güvenilen bir ters vekilin arkasında; istemci IP'si X-Forwarded-For'un sağdan proxy-hops. değeri.
+    # Vekil yoksa false bırakın (yoksa sahte başlıkla istek sınırı atlatılır)
+    behind-proxy: ${WEB_BEHIND_PROXY:false}
+    proxy-hops: ${WEB_PROXY_HOPS:1}
+    # IP ve uç başına form sınırı (jeton kovası): pencere başına en çok istek
+    form-limit: ${WEB_FORM_LIMIT:5}
+    form-window: ${WEB_FORM_WINDOW:1h}
+    # IP özetinin gizli tuzu (ham IP saklanmaz). Boşsa açılışta rastgele üretilir
+    ip-hash-salt: ${IP_HASH_SALT:}
+  # v40 Slack gelen web kancası (yeni silme talebi / destek mesajı bildirimi). Sırdır: yalnız ortam değişkeninden
+  # verilir, günlüğe yazılmaz. Boşsa bildirim gönderilmez
+  slack:
+    webhook-url: ${SLACK_WEBHOOK_URL:}
+  # v40 kötüye kullanım sınırları (sunucu kopyası başına; bkz. ApiRateLimitInterceptor, RequestBodyLimitFilter)
+  limits:
+    max-body-bytes: ${API_MAX_BODY_BYTES:65536}
+    ip-limit: ${API_IP_LIMIT:600}
+    ip-window: ${API_IP_WINDOW:1m}
+    write-limit: ${API_WRITE_LIMIT:120}
+    write-window: ${API_WRITE_WINDOW:1h}
+    verify-limit: ${API_VERIFY_LIMIT:30}
+    verify-window: ${API_VERIFY_WINDOW:1h}
+  # v40 mod başına geri bildirim (POST /api/v1/feedback): kullanıcı başına sınır
+  feedback:
+    limit: ${FEEDBACK_LIMIT:10}
+    window: ${FEEDBACK_WINDOW:1h}
+  # v40 uygulama sürümü (GET /api/v1/app/version): güncelleme bildirimi ve zorunlu güncelleme. 0: bilinmiyor
+  app:
+    latest-version-code: ${APP_LATEST_VERSION_CODE:0}
+    min-supported-version-code: ${APP_MIN_SUPPORTED_VERSION_CODE:0}
+    message: ${APP_UPDATE_MESSAGE:}
+  # v40 içerik eşitleme izni (GET /api/v1/sync/permit): grup büyüklüğü, dilim uzunluğu ve döngü (144 dilim/gün)
+  sync:
+    group-size: ${SYNC_GROUP_SIZE:1000}
+    slot-length: ${SYNC_SLOT_LENGTH:10m}
+    cycle: ${SYNC_CYCLE:24h}
+
+  # v43 içerik dağıtımı (paketler, bildirimler, duyurular, güncellemeler). Firebase/FCM yok: cihazlar gelen kutusunu
+  # yoklar (arka planda ~15 dk, uygulama açıkken uzun yoklama). GCS hizmet hesabı sırdır; yoksa gs:// adresleri verilemez
+  distribution:
+    workers-enabled: ${DISTRIBUTION_WORKERS:true}
+    worker-interval: ${DISTRIBUTION_INTERVAL:10s}
+    batch-size: ${DISTRIBUTION_BATCH:1000}
+    signed-url-ttl: ${GCS_SIGNED_URL_TTL:24h}
+    gcs-bucket: ${GCS_BUCKET:}
+    gcs-service-account-file: ${GCS_SERVICE_ACCOUNT_JSON:}
+    # base64, 32 bayt (openssl rand -base64 32). Üretimde zorunlu; değişirse kayıtlı cihaz bilgileri okunamaz
+    device-key: ${DEVICE_DATA_KEY:}
+    # Yoklama aralığı önerisi (yoğunlukta uzar), uzun yoklamanın en uzun beklemesi ve kopya başına bekleyen sınırı
+    poll-interval: ${INBOX_POLL_INTERVAL:15m}
+    busy-poll-interval: ${INBOX_BUSY_POLL_INTERVAL:45m}
+    long-poll-max: ${INBOX_LONG_POLL_MAX:25s}
+    max-waiters: ${INBOX_MAX_WAITERS:5000}
+    data-cache-ttl: ${INBOX_DATA_CACHE_TTL:30m}
+    # Açılışta taban paket kayıtları (base-packages/manifest.json; dosyalar kovada olmalı)
+    seed-base-packages: ${SEED_BASE_PACKAGES:true}
+
+logging:
+  level:
+    org.mongodb.driver.cluster: WARN

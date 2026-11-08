@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Paylaşım için: Android 9 ve altında uygulama klasörüne kaydedilen resimler (Pictures/DrawGuidance) -->
+<paths>
+    <external-files-path name="pictures" path="Pictures/" />
+    <files-path name="pictures_internal" path="pictures/" />
+    <!-- v24 3B modellerin GLB paylaşımı (geçici dosya) -->
+    <cache-path name="models3d" path="models3d/" />
+</paths>

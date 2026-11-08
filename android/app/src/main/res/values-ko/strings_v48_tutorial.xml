@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="v48_tut_title">새 메뉴</string>
+    <string name="v48_tut_summary">최신 버전에서 바뀐 메뉴를 알아보세요.</string>
+    <string name="v48_tut_modes_t">네 가지 모드</string>
+    <string name="v48_tut_modes_b">모드 메뉴가 선택, 그리기, 추가, 편집으로 바뀌었습니다. 회전, 크기 조정, 자르기는 편집 안에 있습니다.</string>
+    <string name="v48_tut_props_t">속성</string>
+    <string name="v48_tut_props_b">기존 \"브러시 설정\"이 \"속성\"으로 바뀌었습니다. 선택한 도구의 설정을 보여 줍니다. 브러시, 지우개, 펜, 글자를 선택하면 채워집니다.</string>
+    <string name="v48_tut_move_t">이동과 확장</string>
+    <string name="v48_tut_move_b">이동과 확장이 편집 안의 두 개 버튼으로 나뉘었습니다. 이동은 요소 선택 시, 확장은 캔버스 선택 시 동작합니다.</string>
+    <string name="v48_tut_three_t">세 개의 메뉴</string>
+    <string name="v48_tut_three_b">심플 모드 세로 화면에는 세 개의 메뉴(추가, 그리기, 선택과 편집)가 있습니다. 각 메뉴는 한 줄이며, 넘치면 옆으로 스크롤됩니다.</string>
+    <string name="v48_tut_kids_t">새 순서</string>
+    <string name="v48_tut_kids_b">도구 순서가 바뀌었습니다. 펜, 지우개, 색칠, 도형, 미션, 틀, 글자가 맨 앞에 옵니다.</string>
+    <string name="v48_tut_kids2_t">미션</string>
+    <string name="v48_tut_kids2_b">그리기 미션이 앞쪽 도구 사이에 있습니다. 키즈 모드에서 3D 도형 추가는 삭제되었습니다.</string>
+</resources>

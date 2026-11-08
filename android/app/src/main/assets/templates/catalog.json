@@ -1,0 +1,271 @@
+{
+    "templates": [
+        {
+            "id": "comic_blank_pages",
+            "kind": "COMIC",
+            "names": {
+                "tr": "Çizgi roman sayfaları",
+                "en": "Comic pages",
+                "ar": "صفحات قصة مصورة",
+                "ja": "コミックのページ",
+                "ko": "코믹 페이지",
+                "ru": "Страницы комикса",
+                "zh": "漫画页面"
+            },
+            "hints": {
+                "tr": "4 sayfa, her biri farklı panel düzeninde; konuşma balonları ve anlatı kutuları soldan sağa okuma sırasında.",
+                "en": "4 pages, each with a different panel layout; speech balloons and captions in left-to-right reading order.",
+                "ar": "4 صفحات بتخطيط لوحات مختلف لكل منها؛ فقاعات الكلام ومربعات السرد بترتيب القراءة من اليسار إلى اليمين.",
+                "ja": "4ページ、それぞれ別のコマ割り。フキダシとナレーションは左から右の読み順で配置。",
+                "ko": "4페이지, 페이지마다 다른 칸 배치. 말풍선과 내레이션은 왼쪽에서 오른쪽 읽기 순서로.",
+                "ru": "4 страницы с разной раскладкой панелей; баллоны и подписи по порядку чтения слева направо.",
+                "zh": "4页，每页分格不同；对白气泡和旁白框按从左到右的阅读顺序排列。"
+            },
+            "pages": 4,
+            "width": 1200,
+            "height": 1800
+        },
+        {
+            "id": "comic_blank_manga",
+            "kind": "COMIC",
+            "names": {
+                "tr": "Manga sayfaları",
+                "en": "Manga pages",
+                "ar": "صفحات مانغا",
+                "ja": "マンガのページ",
+                "ko": "만화 페이지",
+                "ru": "Страницы манги",
+                "zh": "日漫页面"
+            },
+            "hints": {
+                "tr": "Sağdan sola okunan 4 sayfa, her biri farklı panel düzeninde; balonlar manga okuma sırasında.",
+                "en": "4 right-to-left pages, each with a different panel layout; balloons in manga reading order.",
+                "ar": "4 صفحات تُقرأ من اليمين إلى اليسار بتخطيطات مختلفة؛ الفقاعات بترتيب قراءة المانغا.",
+                "ja": "右から左に読む4ページ、それぞれ別のコマ割り。フキダシはマンガの読み順で配置。",
+                "ko": "오른쪽에서 왼쪽으로 읽는 4페이지, 페이지마다 다른 칸 배치. 말풍선은 만화 읽기 순서로.",
+                "ru": "4 страницы справа налево с разной раскладкой; баллоны в порядке чтения манги.",
+                "zh": "4页从右向左阅读，每页分格不同；气泡按日漫阅读顺序排列。"
+            },
+            "pages": 4,
+            "width": 1200,
+            "height": 1800
+        },
+        {
+            "id": "comic_blank_webtoon",
+            "kind": "COMIC",
+            "names": {
+                "tr": "Webtoon bölümü",
+                "en": "Webtoon episode",
+                "ar": "حلقة ويبتون",
+                "ja": "縦読み漫画のエピソード",
+                "ko": "웹툰 에피소드",
+                "ru": "Эпизод вебтуна",
+                "zh": "条漫章节"
+            },
+            "hints": {
+                "tr": "Telefon için 4 dikey sayfa, her biri farklı düzende; balonlar panellerde ve aralardaki boşluklarda.",
+                "en": "4 vertical phone pages, each with a different layout; balloons inside panels and in the gaps between them.",
+                "ar": "4 صفحات عمودية للهاتف بتخطيطات مختلفة؛ الفقاعات داخل اللوحات وفي الفراغات بينها.",
+                "ja": "スマホ向け縦4ページ、それぞれ別の構成。フキダシはコマの中とコマ間の余白にも。",
+                "ko": "휴대폰용 세로 4페이지, 페이지마다 다른 구성. 말풍선은 칸 안과 칸 사이 여백에도.",
+                "ru": "4 вертикальные страницы для телефона с разной раскладкой; баллоны в панелях и в промежутках.",
+                "zh": "4页手机竖版，每页布局不同；气泡位于格内和格间空白处。"
+            },
+            "pages": 4,
+            "width": 800,
+            "height": 1280
+        },
+        {
+            "id": "notes_cornell",
+            "kind": "NOTES",
+            "names": {
+                "tr": "Cornell ders notu",
+                "en": "Cornell lecture notes",
+                "ar": "ملاحظات كورنيل",
+                "ja": "コーネル式ノート",
+                "ko": "코넬 노트",
+                "ru": "Конспект Корнелла",
+                "zh": "康奈尔笔记"
+            },
+            "hints": {
+                "tr": "Anahtar sorular, not alanı ve özet; Newton yasaları örneği.",
+                "en": "Key questions, notes and summary; Newton's laws example.",
+                "ar": "أسئلة رئيسية وملاحظات وملخص؛ مثال قوانين نيوتن.",
+                "ja": "キークエスチョン・ノート・まとめ（ニュートンの法則の例）。",
+                "ko": "핵심 질문, 노트, 요약(뉴턴 법칙 예시).",
+                "ru": "Ключевые вопросы, записи и итог; пример — законы Ньютона.",
+                "zh": "关键问题、笔记和总结（牛顿定律示例）。"
+            },
+            "width": 1240,
+            "height": 1754
+        },
+        {
+            "id": "notes_math",
+            "kind": "NOTES",
+            "names": {
+                "tr": "Matematik çalışma kâğıdı",
+                "en": "Math worksheet",
+                "ar": "ورقة عمل رياضيات",
+                "ja": "数学ワークシート",
+                "ko": "수학 학습지",
+                "ru": "Рабочий лист по математике",
+                "zh": "数学练习页"
+            },
+            "hints": {
+                "tr": "Formüller, çözümlü örnek, grafik ve alıştırmalar.",
+                "en": "Formulas, a worked example, a graph and exercises.",
+                "ar": "صيغ ومثال محلول ورسم بياني وتمارين.",
+                "ja": "公式、解答例、グラフ、練習問題。",
+                "ko": "공식, 풀이 예제, 그래프, 연습 문제.",
+                "ru": "Формулы, разобранный пример, график и упражнения.",
+                "zh": "公式、例题、图像和练习。"
+            },
+            "width": 1240,
+            "height": 1754
+        },
+        {
+            "id": "notes_lab",
+            "kind": "NOTES",
+            "names": {
+                "tr": "Deney raporu",
+                "en": "Lab report",
+                "ar": "تقرير تجربة",
+                "ja": "実験レポート",
+                "ko": "실험 보고서",
+                "ru": "Отчёт о лабораторной",
+                "zh": "实验报告"
+            },
+            "hints": {
+                "tr": "Amaç, malzemeler, yöntem, veri grafiği ve sonuç.",
+                "en": "Aim, materials, method, data graph and conclusion.",
+                "ar": "الهدف والمواد والطريقة ورسم البيانات والنتيجة.",
+                "ja": "目的・材料・方法・データのグラフ・結論。",
+                "ko": "목적, 재료, 방법, 데이터 그래프, 결론.",
+                "ru": "Цель, материалы, метод, график данных и вывод.",
+                "zh": "目的、材料、方法、数据图和结论。"
+            },
+            "width": 1240,
+            "height": 1754
+        },
+        {
+            "id": "notes_meeting",
+            "kind": "NOTES",
+            "names": {
+                "tr": "Toplantı notu",
+                "en": "Meeting notes",
+                "ar": "محضر اجتماع",
+                "ja": "議事録",
+                "ko": "회의록",
+                "ru": "Протокол встречи",
+                "zh": "会议记录"
+            },
+            "hints": {
+                "tr": "Gündem, kararlar, takvim ve sorumlu-tarihli yapılacaklar.",
+                "en": "Agenda, decisions, timeline and to-dos with owners and dates.",
+                "ar": "جدول الأعمال والقرارات والجدول الزمني والمهام مع المسؤول والتاريخ.",
+                "ja": "議題、決定事項、スケジュール、担当と期限付きのToDo。",
+                "ko": "안건, 결정 사항, 일정, 담당자와 기한이 있는 할 일.",
+                "ru": "Повестка, решения, сроки и задачи с ответственными и датами.",
+                "zh": "议程、决定、时间线及带负责人和日期的待办。"
+            },
+            "width": 1240,
+            "height": 1754
+        },
+        {
+            "id": "notes_mindmap",
+            "kind": "NOTES",
+            "names": {
+                "tr": "Zihin haritası",
+                "en": "Mind map",
+                "ar": "خريطة ذهنية",
+                "ja": "マインドマップ",
+                "ko": "마인드맵",
+                "ru": "Интеллект-карта",
+                "zh": "思维导图"
+            },
+            "hints": {
+                "tr": "Merkez konu ve dallar, tepkime, çizim ve anahtar kavramlar.",
+                "en": "Central topic with branches, a reaction, a drawing and key terms.",
+                "ar": "موضوع مركزي وفروع ومعادلة ورسم ومفاهيم رئيسية.",
+                "ja": "中心テーマと枝、反応式、図、キーワード。",
+                "ko": "중심 주제와 가지, 반응식, 그림, 핵심 개념.",
+                "ru": "Центральная тема с ветвями, реакция, рисунок и ключевые понятия.",
+                "zh": "中心主题和分支、反应式、插图和关键概念。"
+            },
+            "width": 1240,
+            "height": 1754
+        },
+        {
+            "id": "simple_lesson",
+            "kind": "SIMPLE_NOTES",
+            "names": {
+                "tr": "Ders notu",
+                "en": "Lesson notes",
+                "ar": "ملاحظات الدرس",
+                "ja": "授業ノート",
+                "ko": "수업 노트",
+                "ru": "Конспект урока",
+                "zh": "课堂笔记"
+            },
+            "hints": {
+                "tr": "Başlık, anahtar kavramlar, döngü diyagramı ve özet; su döngüsü örneği.",
+                "en": "Title, key terms, a cycle diagram and summary; water cycle example.",
+                "ar": "عنوان ومفاهيم رئيسية ومخطط دورة وملخص؛ مثال دورة الماء.",
+                "ja": "タイトル、キーワード、サイクル図、まとめ（水の循環の例）。",
+                "ko": "제목, 핵심 개념, 순환 도표, 요약(물의 순환 예시).",
+                "ru": "Заголовок, ключевые понятия, схема цикла и итог; пример — круговорот воды.",
+                "zh": "标题、关键概念、循环图和总结（水循环示例）。"
+            },
+            "width": 1240,
+            "height": 1754
+        },
+        {
+            "id": "simple_todo",
+            "kind": "SIMPLE_NOTES",
+            "names": {
+                "tr": "Yapılacaklar listesi",
+                "en": "To-do list",
+                "ar": "قائمة المهام",
+                "ja": "やることリスト",
+                "ko": "할 일 목록",
+                "ru": "Список дел",
+                "zh": "待办清单"
+            },
+            "hints": {
+                "tr": "Okul, ev ve kişisel işler için işaretlenebilir listeler.",
+                "en": "Checkable lists for school, home and personal tasks.",
+                "ar": "قوائم قابلة للتأشير للمدرسة والمنزل والمهام الشخصية.",
+                "ja": "学校・家・自分のことのチェックリスト。",
+                "ko": "학교, 집, 개인 일을 위한 체크 목록.",
+                "ru": "Списки с отметками: учёба, дом и личные дела.",
+                "zh": "学校、家庭和个人事务的勾选清单。"
+            },
+            "width": 1240,
+            "height": 1754
+        },
+        {
+            "id": "simple_week",
+            "kind": "SIMPLE_NOTES",
+            "names": {
+                "tr": "Haftalık plan",
+                "en": "Weekly plan",
+                "ar": "خطة أسبوعية",
+                "ja": "週間プラン",
+                "ko": "주간 계획",
+                "ru": "План на неделю",
+                "zh": "周计划"
+            },
+            "hints": {
+                "tr": "Yedi gün için kutular ve notlar alanı.",
+                "en": "Boxes for the seven days and a notes area.",
+                "ar": "مربعات لأيام الأسبوع السبعة ومساحة للملاحظات.",
+                "ja": "7日分の枠とメモ欄。",
+                "ko": "7일 칸과 메모 칸.",
+                "ru": "Блоки на семь дней и место для заметок.",
+                "zh": "七天的方框和备注区。"
+            },
+            "width": 1240,
+            "height": 1754
+        }
+    ]
+}

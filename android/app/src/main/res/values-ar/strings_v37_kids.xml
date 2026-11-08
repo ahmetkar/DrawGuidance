@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="kids_mascot_name">لوّون</string>
+    <string name="kids_mascot_open">نادِ لوّون</string>
+    <string name="kids_mascot_cd">لوّون، صديقك في الرسم</string>
+    <string name="kids_mascot_next">حسنًا</string>
+    <string name="kids_mascot_end">إنهاء</string>
+    <string name="kids_mascot_close">إغلاق</string>
+    <string name="kids_mascot_apply">تطبيق</string>
+    <string name="kids_mascot_hello">مرحبًا، أنا لوّون! أنا معك دائمًا وأنت ترسم. المسني وسأعطيك نصيحة.</string>
+
+    <string name="kids_tip_1">اختر دلو الطلاء، ثم لونًا، ثم المس شكلًا: المكان الذي تلمسه يُلوَّن!</string>
+    <string name="kids_tip_2">أبقِ إصبعك على الشكل ثانيتين فيُلوَّن الشكل كله دفعة واحدة.</string>
+    <string name="kids_tip_3">أخطأت؟ سهم الرجوع في الأعلى يتراجع عن آخر خطوة.</string>
+    <string name="kids_tip_4">أضف بيتًا أو بالونات من الرسوم الجاهزة ولوّنها كما تحب.</string>
+    <string name="kids_tip_5">هل جربت تغيير لون الورقة؟ يمكن أن تصبح زرقاء مثل السماء!</string>
+
+    <string name="kids_praise_1">رائع! رسمك جميل جدًا.</string>
+    <string name="kids_praise_2">ممتاز! استمر، أنت تبلي بلاءً حسنًا!</string>
+    <string name="kids_praise_3">أعجبني كثيرًا! ماذا بعد؟</string>
+
+    <string name="kids_say_shape_1">هذا %1$s! هل أجعله مستقيمًا ومرتبًا؟</string>
+    <string name="kids_say_shape_2">واو، رسمت %1$s! هل أقوّم خطوطه؟</string>
+    <string name="kids_say_shape_3">يا له من %1$s جميل! هل نرتّب حوافه؟</string>
+    <string name="kids_say_template_1">يبدو مثل %1$s! هل أستبدله برسم جاهز؟</string>
+    <string name="kids_say_template_2">أوه، كأنه %1$s! يمكنني تحويله إلى رسم سهل التلوين!</string>
+    <string name="kids_say_template_3">همم… أظنك أردت رسم %1$s. هل أضع واحدًا جاهزًا؟</string>
+    <string name="kids_say_all_1">رسمت %1$d من الأشكال! هل أرتّبها كلها مرة واحدة؟</string>
+    <string name="kids_say_all_2">أستطيع ترتيب خطوط %1$d من الأشكال دفعة واحدة. هل نفعل؟</string>
+    <string name="kids_say_text_1">أظنك كتبت «%1$s»! هل أحوّله إلى نص جميل؟</string>
+    <string name="kids_say_text_2">استطعت قراءة «%1$s»! هل أكتبه بحروف مرتبة؟</string>
+    <string name="kids_say_part_1">يمكنني إكمال رسم %1$s بإضافة %2$d من الأجزاء. هل أضيفها؟</string>
+    <string name="kids_say_part_2">هل تريد إكمال رسمك مثل %1$s؟ سأضيف %2$d من الأجزاء!</string>
+
+    <string name="tut_kids">لنرسم مع لوّون</string>
+    <string name="tut_kids_text">لوّون يعرّفك بالأدوات ويرسم معك صورة خطوة بخطوة.</string>
+    <string name="tut_kids_1">مرحبًا!</string>
+    <string name="tut_kids_1_text">أنا لوّون! سأريك أدوات الرسم وسنرسم معًا صورة كبيرة. هل أنت مستعد؟</string>
+    <string name="tut_kids_2">الفرشاة</string>
+    <string name="tut_kids_2_text">بالفرشاة ترسم ما تشاء. انظر، أرسم شمسًا ساطعة في السماء!</string>
+    <string name="tut_kids_3">رسوم جاهزة</string>
+    <string name="tut_kids_3_text">زر الأشكال يضيف رسومًا جاهزة. سأضع بيتًا وبالونات ملونة.</string>
+    <string name="tut_kids_4">دلو الطلاء</string>
+    <string name="tut_kids_4_text">اختر الدلو ثم لونًا والمس داخل الشكل: يُلوَّن المكان الذي تلمسه. سقف أحمر وجدار أصفر!</string>
+    <string name="tut_kids_5">لوّن الكل</string>
+    <string name="tut_kids_5_text">أبقِ إصبعك على الشكل ثانيتين: عندما تمتلئ الحلقة يُلوَّن الشكل كله. كل البالونات وردية!</string>
+    <string name="tut_kids_6">الممحاة</string>
+    <string name="tut_kids_6_text">الممحاة تمسح الخطوط التي لا تريدها. سأمسح هذه الخربشة.</string>
+    <string name="tut_kids_7">تراجع</string>
+    <string name="tut_kids_7_text">حدث خطأ؟ سهم الرجوع يتراجع عن آخر خطوة، وسهم الإعادة يعيدها.</string>
+    <string name="tut_kids_8">لون الورقة</string>
+    <string name="tut_kids_8_text">يمكنك تغيير لون الورقة أيضًا. سأجعله أزرق سماويًا!</string>
+    <string name="tut_kids_9">انتهينا!</string>
+    <string name="tut_kids_9_text">وأخيرًا عشب أخضر! صورتنا جاهزة. الآن دورك، ارسم أجمل صورة!</string>
+
+    <string name="kids_home_say">إن شئت، ابدأ برسم أمتع الرسومات</string>
+    <string name="kids_home_title">وضع الأطفال</string>
+    <string name="kids_home_start">لنبدأ</string>
+    <string name="kids_home_dismiss">ليس الآن</string>
+    <string name="kids_canvas_name">رسمتي</string>
+</resources>

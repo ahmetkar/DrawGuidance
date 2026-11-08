@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="sync_merged_title">同步</string>
+    <string name="sync_auto_title">自动同步</string>
+    <string name="sync_auto_on">开启：每天自动与服务器同步一次</string>
+    <string name="sync_auto_off">关闭：仅通过“立即同步”进行同步</string>
+    <string name="sync_last">上次同步：%1$s</string>
+</resources>

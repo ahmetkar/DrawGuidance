@@ -1,0 +1,46 @@
+# v40 üretim profili (SPRING_PROFILES_ACTIVE=prod): güvenli öntanımlılar. application.yml'nin üstüne yazılır.
+# Docker Swarm yığını: backend/docker/swarm/stack.yml. Sırlar Docker sırrı + *_FILE değişkenleriyle verilir.
+server:
+  # TLS ters vekilde (Traefik) biter. X-Forwarded-For/-Proto yalnız güvenilen vekilden okunur (Tomcat RemoteIpValve):
+  # istemcinin uydurduğu başlık, istek vekilin adresinden gelmiyorsa yok sayılır. TRUSTED_PROXIES = vekilin bağlandığı
+  # adreslerin düzenli ifadesi (yığındaki "edge" ağının alt ağı 10.231.0.0/24)
+  forward-headers-strategy: native
+  tomcat:
+    remoteip:
+      internal-proxies: ${TRUSTED_PROXIES:10\.231\.0\.\d{1,3}}
+      remote-ip-header: x-forwarded-for
+      protocol-header: x-forwarded-proto
+      port-header: x-forwarded-port
+
+spring:
+  data:
+    mongodb:
+      # Zorunlu (öntanımlı yok: unutulursa sunucu açılmaz). Parola URI'de değil, MONGO_APP_PASSWORD_FILE ile
+      uri: ${MONGODB_URI}
+
+drawguidance:
+  web:
+    # İstemci adresini Tomcat (RemoteIpValve) zaten çözer; X-Forwarded-For ikinci kez okunmasın
+    behind-proxy: ${WEB_BEHIND_PROXY:false}
+    # Zorunlu: kopyalar arasında ve yeniden başlatmada aynı IP özeti için (IP_HASH_SALT ya da IP_HASH_SALT_FILE)
+    ip-hash-salt: ${IP_HASH_SALT}
+  billing:
+    # Uygulama her satın almada obfuscatedAccountId (uid özeti) gönderir: kimliksiz satın alma (ör. Play Store'da kod
+    # kullanımı) başka hesaba bağlanamasın diye reddedilir. Kod kampanyası yapılacaksa BILLING_REQUIRE_ACCOUNT_ID=false
+    require-account-id: ${BILLING_REQUIRE_ACCOUNT_ID:true}
+    pubsub:
+      # Pub/Sub OIDC jetonu zorunlu: PUBSUB_PUSH_AUDIENCE ve PUBSUB_PUSH_SERVICE_ACCOUNT ayarlı değilse RTDN 503
+      required: ${PUBSUB_PUSH_REQUIRED:true}
+
+  distribution:
+    # v43 zorunlu: cihaz bilgilerinin şifreleme anahtarı (DEVICE_DATA_KEY ya da DEVICE_DATA_KEY_FILE; base64 32 bayt)
+    device-key: ${DEVICE_DATA_KEY}
+
+logging:
+  level:
+    root: INFO
+    org.springframework.security: WARN
+    org.mongodb.driver: WARN
+    # Tomcat'in istek ayrıntılarını (başlıklar dahil) yazabilecek hata ayıklama günlükleri kapalı
+    org.apache.catalina: WARN
+    org.apache.coyote: WARN

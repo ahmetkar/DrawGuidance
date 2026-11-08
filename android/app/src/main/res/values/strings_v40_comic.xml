@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- v40 çizgi roman hazır karakterleri ve arka planları -->
+<resources>
+    <string name="v40_comic_chars_hint">Stil ve tema seçin, karaktere dokunun; çeşidine dokununca sayfaya eklenir.</string>
+    <string name="v40_comic_style">Stil</string>
+    <string name="v40_comic_theme">Tema</string>
+    <string name="v40_comic_style_manga">Manga</string>
+    <string name="v40_comic_style_comic">Çizgi Roman</string>
+    <string name="v40_comic_group_expressions">İfadeler</string>
+    <string name="v40_comic_group_poses">Pozlar</string>
+    <string name="v40_comic_group_action">Aksiyon</string>
+    <string name="v40_comic_group_daily">Günlük</string>
+    <string name="v40_comic_bg_title">Hazır arka planlar</string>
+</resources>

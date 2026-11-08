@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- v46 yeni tuval formunda hazır şablonlar -->
+    <string name="v46_template_section">템플릿</string>
+    <string name="v46_template_blank">빈 캔버스</string>
+    <string name="v46_template_blank_hint">빈 캔버스: 아래에서 크기, 용지, 페이지 수를 고르세요.</string>
+    <string name="v46_template_selected_hint">%1$s 템플릿의 크기, 용지, 페이지를 사용합니다. 원하는 대로 바꿔 이어서 작업하세요.</string>
+</resources>

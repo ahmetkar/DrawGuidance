@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- v46 eğitimlerin yenilikler grupları -->
+    <string name="v46_tut_art">Yenilikler (v46)</string>
+    <string name="v46_tut_art_text">İki parçalı üst menü, boş yere dokununca ekleme menüsü ve seçili elemanın köşesindeki seçim menüsü.</string>
+    <string name="v46_tut_split">Üst menü iki parça</string>
+    <string name="v46_tut_split_text">Araçlar iki parçada: dikey ekranda alt alta, yatay ekranda yan yana. Mod değişince (Çiz, Ekle, Seç…) iki parça da o modun araçlarını gösterir.</string>
+    <string name="v46_tut_addmenu">Boş yere dokun, ekle</string>
+    <string name="v46_tut_addmenu_text">Ekle modunda kâğıtta boş bir yere dokununca o noktada dikey ekleme menüsü açılır: şekil, yazı, formül, diyagram… Seçilen öğe dokunduğun yere eklenir.</string>
+    <string name="v46_tut_selmenu">Seçim menüsü</string>
+    <string name="v46_tut_selmenu_text">Bir elemanı seçince köşesinde saydam bir menü açılır: Taşı, Ölçekle, Kopyala, Sil ve Düzenle.</string>
+    <string name="v46_tut_scale">Ölçekle ve kopyala</string>
+    <string name="v46_tut_scale_text">Ölçekle ile seçimi büyütüp küçült, Kopyala ile bir kopyasını yanına koy. Burada güneş küçülüyor, kuşlar çoğalıyor.</string>
+    <string name="v46_tut_edit">Düzenle</string>
+    <string name="v46_tut_edit_text">Düzenle, elemanın türüne özel işlemleri açar: şekli düzenle, renk ve dolgu, öne/arkaya al, gizle. Bilim şekillerinde değerler burada.</string>
+    <string name="v46_tut_notes">Yenilikler (v46)</string>
+    <string name="v46_tut_notes_text">Panel ekle ile Cornell sayfası, değerleri yazınca yeniden çizilen fizik ve element şekilleri.</string>
+    <string name="v46_tut_panels">Panel ekle</string>
+    <string name="v46_tut_panels_text">Sayfayı çerçeveli alanlara böl: sütunlar, ızgaralar, kare alanlar ya da Cornell düzeni (anahtar sorular, notlar, özet). Her alan ayrı bir elemandır.</string>
+    <string name="v46_tut_titles">Başlık ve sorular</string>
+    <string name="v46_tut_titles_text">Not alanına başlığı, sol sütuna kendine soracağın soruları yaz. Tekrar ederken notları kapatıp yalnız sorulara bakarsın.</string>
+    <string name="v46_tut_param">Formülle çizilen şekil</string>
+    <string name="v46_tut_param_text">Serbest cisim diyagramı, makaralar, kaldıraç ve element şekilleri formülüyle gelir: kuvvetler, okların boyu ve sonuçlar değerlerden hesaplanır.</string>
+    <string name="v46_tut_values">Değeri yaz, şekil değişsin</string>
+    <string name="v46_tut_values_text">Şeklin formül alanına yeni değer yazınca (ör. F = 40, α = 30°) şekil yeniden çizilir; köşedeki formül ve sonuçlar da güncellenir.</string>
+    <string name="v46_tut_element">Element şekilleri</string>
+    <string name="v46_tut_element_text">Periyodik tablo hücresi ve Bohr atom modeli yazdığın elemente göre çizilir: sembol (Na), ad (sodyum) ya da atom numarası (11). Burada sodyum klora dönüşüyor.</string>
+    <string name="v46_tut_formula">Formül ve özet</string>
+    <string name="v46_tut_formula_text">Hazır formülü diyagramın altına ekle, alttaki şeride konunun özetini yaz. Sayfa tekrar için hazır.</string>
+    <string name="v46_tut_comic">Yenilikler (v46)</string>
+    <string name="v46_tut_comic_text">Gerçek panel şablonu, hazır mekân ve karakterler, balonlar, efektler; kapak ve hazır şablonlar.</string>
+    <string name="v46_tut_tpl">Panel şablonu</string>
+    <string name="v46_tut_tpl_text">Şablonlar\'dan bir düzen seç: paneller birlikte büyüyüp küçülür, aralarındaki boşluk ayarlanır, içindeki çizimler panelle taşınır.</string>
+    <string name="v46_tut_places">Mekân arka planı</string>
+    <string name="v46_tut_places_text">Hazır mekânı bir panele bırak: resim panelin oranına göre kırpılır ve panel çizgisinin arkasına yerleşir.</string>
+    <string name="v46_tut_chars">Karakterler</string>
+    <string name="v46_tut_chars_text">Karakterler\'den ifade, poz ya da aksiyon seç; panelde boyutlandır ve yerleştir. Premium karakterler kilit simgesiyle görünür.</string>
+    <string name="v46_tut_balloons">Balonlar</string>
+    <string name="v46_tut_balloons_text">Anlatı kutusu sahneyi kurar; konuşma, bağırma, düşünce ve fısıltı balonları karakterin sesini verir. Kuyruğu konuşana çevir.</string>
+    <string name="v46_tut_fx">Hız çizgileri ve ses</string>
+    <string name="v46_tut_fx_text">Hız çizgileri hareketi, efekt yazısı sesi anlatır. Çizgiler karakterin arkasında kalınca sahne daha okunaklı olur.</string>
+    <string name="v46_tut_cover">Kapak ve hazır şablonlar</string>
+    <string name="v46_tut_cover_text">Yeni çizgi roman kapak sayfasıyla başlar. Yeni tuval oluştururken Şablon\'dan hazır bir örnek (aksiyon, manga, webtoon, 4 kare, diyalog) seçip ondan devam edebilirsin.</string>
+    <string name="v46_tut_simple">Yenilikler (v46)</string>
+    <string name="v46_tut_simple_art_text">İki parçalı menü, dikdörtgen seçim ve damlalık üst menüde.</string>
+    <string name="v46_tut_simple_notes_text">Panel ekle ve değerleri yazınca yeniden çizilen bilim şekilleri.</string>
+    <string name="v46_tut_s_shape">Şekiller</string>
+    <string name="v46_tut_s_shape_text">Şekil seç ve sürükle: ev, güneş, yıldız… Dolgulu şekiller resmin temelini hızla kurar.</string>
+    <string name="v46_tut_s_select">Dikdörtgen seçim</string>
+    <string name="v46_tut_s_select_text">Üst menüdeki dikdörtgen seçimle bir alanı çiz; içindeki her şey seçilir, sonra taşı ya da boyutlandır.</string>
+    <string name="v46_tut_s_eyedrop">Damlalık</string>
+    <string name="v46_tut_s_eyedrop_text">Damlalıkla resimdeki bir renge dokun; fırça o rengi alır.</string>
+    <string name="v46_tut_kids_brush">Boya fırçası</string>
+    <string name="v46_tut_kids_brush_text">Boya ile parmağını gezdir! Bir şeklin içinde başlarsan boya dışarı taşmaz.</string>
+</resources>

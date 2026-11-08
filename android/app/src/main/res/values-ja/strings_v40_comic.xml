@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- v40 çizgi roman hazır karakterleri ve arka planları -->
+<resources>
+    <string name="v40_comic_chars_hint">スタイルとテーマを選び、キャラクターをタップして、バリエーションをタップするとページに追加されます。</string>
+    <string name="v40_comic_style">スタイル</string>
+    <string name="v40_comic_theme">テーマ</string>
+    <string name="v40_comic_style_manga">マンガ</string>
+    <string name="v40_comic_style_comic">コミック</string>
+    <string name="v40_comic_group_expressions">表情</string>
+    <string name="v40_comic_group_poses">ポーズ</string>
+    <string name="v40_comic_group_action">アクション</string>
+    <string name="v40_comic_group_daily">日常</string>
+    <string name="v40_comic_bg_title">背景素材</string>
+</resources>

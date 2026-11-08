@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="kids_challenge">مهمة الرسم</string>
+    <string name="help_kids_challenge">مهام رسم مستوى بعد مستوى. اضغط ابدأ؛ ارسم فوق الخطوط المتقطعة على الورقة أو لوّن الصورة بألوان المثال، ثم اضغط تم. إذا كانت نقاطك كافية يُفتح المستوى التالي. في التقدّم ترى كل المستويات.</string>
+    <string name="challenge_menu_idle">مهام رسم مستوى بعد مستوى! ارسم الصورة المطلوبة واجمع النقاط واربح النجوم.</string>
+    <string name="challenge_menu_running">أنت الآن في المستوى %1$d: %2$s.</string>
+    <string name="challenge_start">ابدأ</string>
+    <string name="challenge_stop">أوقف الوضع</string>
+    <string name="challenge_progress">التقدّم</string>
+    <string name="challenge_level_of">المستوى %1$d / %2$d</string>
+    <string name="challenge_finish">تم</string>
+
+    <string name="challenge_kind_trace">ارسم</string>
+    <string name="challenge_kind_paint">لوّن</string>
+    <string name="challenge_kind_build">ضع ولوّن</string>
+    <string name="challenge_intro_trace">المستوى %1$d: %2$s! ارسم بالفرشاة فوق الخطوط المتقطعة. عندما تنتهي اضغط تم في الأعلى.</string>
+    <string name="challenge_intro_paint">المستوى %1$d: %2$s! لوّن الصورة بدلو الألوان بألوان النقاط. عندما تنتهي اضغط تم.</string>
+    <string name="challenge_intro_build">المستوى %1$d: %2$s! ابحث عن الصورة في إضافة شكل، وضعها فوق الخط المتقطع، ثم لوّنها بألوان النقاط.</string>
+
+    <string name="challenge_tip_brush">اختر الفرشاة في الأعلى ومرّر إصبعك ببطء فوق الخط المتقطع.</string>
+    <string name="challenge_tip_eraser">خرج خطك عن الحدود؟ اختر الممحاة وامسح الزائد.</string>
+    <string name="challenge_tip_undo">أخطأت؟ سهم الرجوع في الأعلى يتراجع عن آخر خطوة.</string>
+    <string name="challenge_tip_paint">اختر دلو الألوان، ثم لون النقطة، ثم المس ذلك المكان.</string>
+    <string name="challenge_tip_hold">أبقِ الدلو على الشكل ثانيتين فيُلوَّن الشكل كله دفعة واحدة.</string>
+    <string name="challenge_tip_shape">اضغط إضافة شكل، واختر صورة %1$s، ثم المس الورقة لتضعها.</string>
+    <string name="challenge_tip_move">اسحب الصورة بإصبعك إلى فوق الخط المتقطع.</string>
+    <string name="challenge_tip_finish">عندما تكون جاهزًا اضغط زر تم الأخضر في الأعلى وسأخبرك بنقاطك!</string>
+    <string name="challenge_live_close">رائع، اقتربت كثيرًا! اضغط تم عندما تكون جاهزًا.</string>
+    <string name="challenge_tip_next">تلميح</string>
+    <string name="challenge_mascot_cd">لوّون، المسني لتحصل على تلميح</string>
+
+    <string name="challenge_passed_title">اجتزت المستوى!</string>
+    <string name="challenge_failed_title">بقي القليل!</string>
+    <string name="challenge_passed_say">عمل رائع! المستوى التالي ينتظرك.</string>
+    <string name="challenge_passed_say_3">مذهل! جمعت النجوم الثلاث كلها!</string>
+    <string name="challenge_failed_say">تحتاج إلى %1$d نقطة لاجتياز هذا المستوى. حاول مرة أخرى، ستكون أفضل هذه المرة!</string>
+    <string name="challenge_all_done">اجتزت المستوى الأخير أيضًا! أنت رسّام حقيقي!</string>
+    <string name="challenge_score">النقاط</string>
+    <string name="challenge_best">الأفضل: %1$d</string>
+    <string name="challenge_stars_cd">%1$d نجوم</string>
+    <string name="challenge_next">المستوى التالي</string>
+    <string name="challenge_retry">حاول مجددًا</string>
+    <string name="challenge_exit">اخرج من الوضع</string>
+
+    <string name="challenge_progress_summary">اجتزت %1$d / %2$d مستوى · %3$d نجوم</string>
+    <string name="challenge_state_passed">مُجتاز</string>
+    <string name="challenge_state_open">مفتوح</string>
+    <string name="challenge_state_locked">مقفل</string>
+    <string name="challenge_play">العب</string>
+    <string name="challenge_locked_say">هذا المستوى مقفل. اجتز المستوى %1$d أولًا!</string>
+</resources>

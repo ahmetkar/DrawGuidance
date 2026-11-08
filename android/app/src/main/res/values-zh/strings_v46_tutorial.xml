@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- v46 eğitimlerin yenilikler grupları -->
+    <string name="v46_tut_art">新功能 (v46)</string>
+    <string name="v46_tut_art_text">两部分的顶部菜单、点按空白处打开的添加菜单，以及所选元素角上的选择菜单。</string>
+    <string name="v46_tut_split">两部分顶部菜单</string>
+    <string name="v46_tut_split_text">工具分为两部分：竖屏时上下排列，横屏时左右并排。切换模式（绘制、添加、选择…）时，两部分都会显示该模式的工具。</string>
+    <string name="v46_tut_addmenu">点按空白处添加</string>
+    <string name="v46_tut_addmenu_text">在添加模式下点按空白处，会在该位置打开竖向添加菜单：形状、文字、公式、图表…所选项目会添加到点按的位置。</string>
+    <string name="v46_tut_selmenu">选择菜单</string>
+    <string name="v46_tut_selmenu_text">选中元素后，其角上会出现半透明菜单：移动、缩放、复制、删除、编辑。</string>
+    <string name="v46_tut_scale">缩放和复制</string>
+    <string name="v46_tut_scale_text">缩放可放大或缩小所选内容，复制会在旁边放一个副本。这里太阳变小，鸟变多。</string>
+    <string name="v46_tut_edit">编辑</string>
+    <string name="v46_tut_edit_text">编辑会打开该元素类型的操作：编辑形状、颜色和填充、上移或下移、隐藏。科学图形的数值也在这里。</string>
+    <string name="v46_tut_notes">新功能 (v46)</string>
+    <string name="v46_tut_notes_text">用「添加面板」制作康奈尔页面，输入数值即重绘的物理和元素图形。</string>
+    <string name="v46_tut_panels">添加面板</string>
+    <string name="v46_tut_panels_text">把页面分成带框的区域：分栏、网格、方形区域或康奈尔布局（关键问题、笔记、总结）。每个区域都是独立元素。</string>
+    <string name="v46_tut_titles">标题和问题</string>
+    <string name="v46_tut_titles_text">在笔记区写标题，在左栏写要问自己的问题。复习时遮住笔记，只看问题。</string>
+    <string name="v46_tut_param">由公式绘制的图形</string>
+    <string name="v46_tut_param_text">自由体图、滑轮、杠杆和元素图形都带有公式：力、箭头长度和结果都由数值计算。</string>
+    <string name="v46_tut_values">输入数值，图形随之改变</string>
+    <string name="v46_tut_values_text">在图形的公式栏输入新数值（如 F = 40、α = 30°），图形会重新绘制，角上的公式和结果也会更新。</string>
+    <string name="v46_tut_element">元素图形</string>
+    <string name="v46_tut_element_text">元素周期表格子和玻尔原子模型按你输入的元素绘制：符号（Na）、名称或原子序数（11）。这里钠变成了氯。</string>
+    <string name="v46_tut_formula">公式和总结</string>
+    <string name="v46_tut_formula_text">在图下方添加现成公式，在底部条中写下总结。复习用的页面完成了。</string>
+    <string name="v46_tut_comic">新功能 (v46)</string>
+    <string name="v46_tut_comic_text">真实分格模板、现成场景和角色、对话气泡、特效；封面和现成模板。</string>
+    <string name="v46_tut_tpl">分格模板</string>
+    <string name="v46_tut_tpl_text">从模板中选择分格：分格一起缩放，间距可调，格内的画随分格移动。</string>
+    <string name="v46_tut_places">场景背景</string>
+    <string name="v46_tut_places_text">把现成场景放进分格：图片会按分格比例裁剪，并放在格线后面。</string>
+    <string name="v46_tut_chars">角色</string>
+    <string name="v46_tut_chars_text">在角色中选择表情、姿势或动作，然后在分格中调整大小和位置。高级角色带有锁形标记。</string>
+    <string name="v46_tut_balloons">对话气泡</string>
+    <string name="v46_tut_balloons_text">旁白框交代场景；说话、喊叫、思考和耳语气泡让角色发声。把尾巴指向说话的人。</string>
+    <string name="v46_tut_fx">速度线和音效</string>
+    <string name="v46_tut_fx_text">速度线表现动作，音效字表现声音。把线条放在角色后面，画面更易读。</string>
+    <string name="v46_tut_cover">封面和现成模板</string>
+    <string name="v46_tut_cover_text">新漫画从封面页开始。创建画布时，可在「模板」中选择现成示例（动作、漫画、条漫、四格、对话）继续创作。</string>
+    <string name="v46_tut_simple">新功能 (v46)</string>
+    <string name="v46_tut_simple_art_text">两部分菜单、顶部菜单中的矩形选择和吸管。</string>
+    <string name="v46_tut_simple_notes_text">添加面板，以及输入数值即重绘的科学图形。</string>
+    <string name="v46_tut_s_shape">形状</string>
+    <string name="v46_tut_s_shape_text">选择形状并拖动：房子、太阳、星星…带填充的形状能快速搭好画面基础。</string>
+    <string name="v46_tut_s_select">矩形选择</string>
+    <string name="v46_tut_s_select_text">用顶部菜单的矩形选择框出区域，区域内的内容都会被选中，然后可以移动或调整大小。</string>
+    <string name="v46_tut_s_eyedrop">吸管</string>
+    <string name="v46_tut_s_eyedrop_text">用吸管点按画中的颜色，画笔就会使用该颜色。</string>
+    <string name="v46_tut_kids_brush">涂色笔刷</string>
+    <string name="v46_tut_kids_brush_text">用涂色笔刷移动手指吧！在形状里面开始涂，颜色就不会涂出去。</string>
+</resources>

@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- v18 Taşı: konum ve ok düğmeleri -->
+    <string name="move_nudge_left">Sola kaydır</string>
+    <string name="move_nudge_right">Sağa kaydır</string>
+    <string name="move_nudge_up">Yukarı kaydır</string>
+    <string name="move_nudge_down">Aşağı kaydır</string>
+    <string name="move_center">Sayfada ortala</string>
+    <string name="move_step">Adım: %1$d px</string>
+    <string name="move_position_chip">X %1$d · Y %2$d</string>
+    <string name="move_position_none">X — · Y —</string>
+    <string name="move_position_title">Konum</string>
+    <string name="move_position_hint">Seçimin sol üst köşesinin kağıttaki yeri (piksel). Değerleri girip Uygula\'ya bas.</string>
+    <string name="position_x">X (px)</string>
+    <string name="position_y">Y (px)</string>
+
+    <!-- v18 Genişlet: boyut ve kenarlar -->
+    <string name="expand_left">Soldan genişlet</string>
+    <string name="expand_right">Sağdan genişlet</string>
+    <string name="expand_top">Üstten genişlet</string>
+    <string name="expand_bottom">Alttan genişlet</string>
+    <string name="canvas_size_chip">%1$d × %2$d px</string>
+    <string name="canvas_size_title">Kağıt boyutu</string>
+    <string name="canvas_size_width">Genişlik (px)</string>
+    <string name="canvas_size_height">Yükseklik (px)</string>
+    <string name="canvas_size_anchor">Sabit kalan yer</string>
+    <string name="canvas_size_anchor_cell">Sabit yer: sütun %1$d, satır %2$d</string>
+    <string name="canvas_size_hint">64–8192 px. Büyütünce kağıt seçilen yerden dışarı doğru genişler, küçültünce karşı kenarlardan kırpılır.</string>
+
+    <!-- v18 Boşlukları doldur (komut kutusu yerine bağlam menüsünde) -->
+    <string name="fill_gaps">Boşlukları doldur</string>
+
+    <!-- v18 tablet kalemi -->
+    <string name="pen_mode_finger_pans">Kalem modu: parmak kaydırır</string>
+    <string name="pen_mode_finger_draws">Kalem modu: parmak da çizer</string>
+    <string name="pen_mode_toggle">Kalem modu: parmakla çizimi aç/kapat</string>
+    <string name="stylus_title">Tablet kalemi</string>
+    <string name="stylus_status_attached">Kalem destekli giriş bulundu: %1$s</string>
+    <string name="stylus_status_bluetooth">Bluetooth kalem bağlı: %1$s</string>
+    <string name="stylus_status_used">Kalem kullanılıyor</string>
+    <string name="stylus_status_none">Kalem bulunamadı. Kalemle ekrana dokununca algılanır; pilsiz (kapasitif) kalemler parmak gibi çalışır.</string>
+    <string name="stylus_finger_pans">Kalemle çizerken parmak kaydırsın</string>
+    <string name="stylus_finger_pans_hint">Kalem kullanılınca parmak ve avuç çizmez; tek parmak kaydırır, iki parmak yakınlaştırır</string>
+    <string name="stylus_pressure">Basınca duyarlı</string>
+    <string name="stylus_pressure_hint">Bastırdıkça çizgi kalınlaşır; kurşun kalem, kömür, pastel ve yumuşak fırçalarda koyulaşır</string>
+    <string name="stylus_tilt">Eğimle gölgeleme</string>
+    <string name="stylus_tilt_hint">Kalem yatırılınca kurşun kalem, kömür ve pastel genişleyip açılır (eğim bildiren kalemlerde)</string>
+    <string name="stylus_side_button">Yan tuş silgi olsun</string>
+    <string name="stylus_side_button_hint">Kalemin yan tuşu basılıyken çizilen yer silinir; kalemin silgi ucu her zaman siler</string>
+    <string name="stylus_prediction">Hareket tahmini</string>
+    <string name="stylus_prediction_hint">Çizgi kalem ucunun gerisinde kalmasın diye birkaç milisaniye sonrası tahmin edilip geçici olarak gösterilir</string>
+    <string name="stylus_low_latency">Düşük gecikmeli çizim</string>
+    <string name="stylus_low_latency_hint">Android 10 ve üstünde kalemle çizilen çizgi ekrana beklemeden çizilir (opak fırçalarda)</string>
+    <string name="stylus_low_latency_unsupported">Bu cihazda desteklenmiyor (Android 10 ve üstü gerekir)</string>
+</resources>

@@ -1,0 +1,76 @@
+# Kullanım Şartları
+
+Sürüm: 2026-10-25 · Yürürlük: 25 Ekim 2026
+
+Bu şartlar, karApp tarafından geliştirilen Çizim Rehberi (DrawGuidance) mobil uygulamasının ("Uygulama") kullanımını düzenler. Uygulamayı kullanarak ya da hesap açarak bu şartları okuduğunuzu ve kabul ettiğinizi beyan edersiniz.
+
+## 1. Hizmetin kapsamı
+- Uygulama; resim, not, çizgi roman, çocuk çizimi ve 3B şekil oluşturma araçları sunan bir çizim uygulamasıdır.
+- Çizim önerileri, şekil tanıma ve el yazısı tanıma cihazınızda çalışan yapay zekâ modelleriyle yapılır.
+- Hazır şekil, nesne, karakter, efekt, mekân arka planı ve şablon kataloğu uygulamayla gelir, tema paketleri halinde sunulur ve sunucudan güncellenebilir.
+- Uygulamanın temel özellikleri hesap açmadan da kullanılabilir. Hesap; profil bilgilerinin, aboneliğin ve eşitlenen içeriğin sunucuda saklanması içindir.
+
+## 2. Hesap
+- Hesap Google hesabınızla açılır. Doğum tarihinizi doğru girmeniz gerekir.
+- 13 yaşından küçükler hesabı yalnız veli ya da vasinin izniyle ve gözetiminde kullanabilir.
+- Hesabınızın güvenliğinden ve hesabınızla yapılan işlemlerden siz sorumlusunuz.
+- Hesabınızı istediğiniz zaman Ayarlar > Hesap ayarları > Hesabı sil adımıyla silebilirsiniz.
+
+## 3. Premium abonelik
+- Uygulama ücretsizdir. Premium; reklamsız kullanım, yeni özellikler ve ek içerik sunan, otomatik yenilenen aylık bir aboneliktir.
+- Satın alma, ödeme, yenileme ve iade Google Play üzerinden ve Google Play koşullarına göre yapılır. Fiyat, satın almadan önce Google Play'de yerel para biriminizle gösterilir.
+- Abonelik siz iptal edene kadar her dönem sonunda yenilenir. İptal ettiğinizde ödenmiş dönemin sonuna kadar Premium sürer. Uygulamayı kaldırmak ya da hesabı silmek aboneliği iptal etmez.
+- Tüketici mevzuatından doğan haklarınız saklıdır.
+
+## 4. Reklamlar
+- Ücretsiz planda Google AdMob reklamları gösterilebilir.
+- 13 yaşından küçük hesaplarda ve çocuk tuvallerinde reklam gösterilmez.
+
+## 5. İçeriğiniz
+- Çizimleriniz, notlarınız, çizgi romanlarınız, 3B şekilleriniz ve resimleriniz öntanımlı olarak yalnızca cihazınızda saklanır; yalnız eşitlemeyi kullandığınızda hesabınızla sunucuya gönderilir.
+- Eşitlenen içerik yalnız size hizmet vermek (hesabınızda saklamak ve cihazlarınıza iletmek) için teknik olarak kopyalanır; başka amaçla kullanılmaz, yayımlanmaz ve hesabınızı silince silinir.
+- Cihazınızın ve kaydettiğiniz dosyaların yedeğini almak sizin sorumluluğunuzdadır.
+
+## 6. Çizgi romanlarınızın dağıtımı ve ticari kullanımı
+- Uygulamayla oluşturduğunuz çizgi romanlar, resimler, notlar ve öteki çalışmalar ("Eserleriniz") sizindir. Eserleriniz üzerindeki manevi ve mali haklar, 5846 sayılı Fikir ve Sanat Eserleri Kanunu (FSEK) çerçevesinde eser sahibi olarak size aittir. karApp bu haklar üzerinde hak, pay ya da ücret talep etmez; haklar karApp'a devredilmez.
+- Eserlerinizi dilediğiniz gibi kullanabilirsiniz: PDF, CBZ, PNG, JPEG ya da başka bir biçimde dijital veya basılı olarak çoğaltabilir; internette, sosyal medyada, dijital çizgi roman ve e-kitap platformlarında yayımlayabilir; satabilir, ücretsiz dağıtabilir; yayınevlerine ve baskı hizmetlerine verebilir; reklam, tanıtım ve ürünlerde ticari amaçla kullanabilirsiniz. Bunun için karApp'tan ayrıca izin almanız, karApp'a ödeme yapmanız ya da karApp'ın adını belirtmeniz gerekmez.
+- Eserlerinizin haklarını (ör. yayın hakkını) yayınevlerine ya da başkalarına devredebilir veya lisanslayabilirsiniz. FSEK m. 52 gereği bu sözleşmeler yazılı yapılmalı ve devredilen haklar tek tek gösterilmelidir; bu sözleşmeler sizinle karşı taraf arasındadır.
+- Hazır içerik lisansı: Eserlerinizde kullandığınız hazır karakterler, nesneler, efektler, mekân arka planları, şekiller, desenler ve şablonlar için karApp size dünya çapında, süresiz, bedelsiz, münhasır olmayan (basit) ve geri alınamaz bir lisans verir. Bu lisans, hazır içeriği Eserinizin parçası olarak işleme (FSEK m. 21), çoğaltma (m. 22), yayma (m. 23), temsil (m. 24) ve umuma iletim (m. 25) haklarını, ticari kullanım dahil kapsar. Eserinizi devrettiğiniz ya da lisansladığınız yayıncı, dağıtıcı ve baskı hizmetleri de Eseriniz içindeki hazır içeriği aynı kapsamda kullanabilir.
+- Bu lisans; Eseriniz oluşturulduktan sonra Uygulamayı kaldırmanız, Premium aboneliğinizin bitmesi, hesabınızı silmeniz ya da hazır içeriğin sonraki bir sürümde katalogdan kaldırılması durumunda da sürer. Premium tema paketlerinin içeriği aboneliğiniz sürerken Eserlerinize eklenebilir; eklendiği Eserdeki lisans abonelik bitince de sürer.
+- Bu bölüm karApp'ın yazılı lisans beyanıdır. Bir yayınevi ya da dağıtıcı için imzalı bir lisans belgesi gerekirse Bölüm 13'teki iletişim adresinden ücretsiz isteyebilirsiniz.
+- Sınırlar: Hazır içerik yalnız sizin yaratıcı katkınızı taşıyan bir Eserin parçası olarak kullanılabilir. Hazır içeriği tek başına ya da başlıca değeri hazır içerik olacak biçimde (ör. çıkartma paketi, clip-art, varlık ya da şablon koleksiyonu, başka uygulamalara yüklenecek bir kitaplık, değiştirilmemiş tek bir karakterin ya da nesnenin basıldığı tişört, kupa gibi ürünler) yeniden dağıtamaz, satamaz ya da alt lisanslayamazsınız.
+- Hazır içeriği marka, logo ya da kurumsal kimlik olarak kullanamaz ve tescil ettiremezsiniz. Hazır içerik münhasır değildir; aynı içerik başka kullanıcıların eserlerinde de yer alabilir. Hazır içerik üzerinde başkalarına karşı münhasır hak iddia edemezsiniz; Eserinizin size ait özgün kısımları üzerindeki haklarınız ise saklıdır.
+- Sizin sorumluluğunuz: Eserlerinize eklediğiniz kendi resimleriniz, fotoğraflar, yazı tipleri, metinler ve başkasına ait karakterler için gereken izinleri almak size aittir. Tanınmış karakterleri, markaları ya da başkalarının eserlerini izinsiz kullanan; gerçek kişileri rızaları olmadan teşhir eden ya da kişisel verilerini hukuka aykırı biçimde açıklayan (6698 sayılı KVKK); hakaret, nefret söylemi, şiddete çağrı ya da çocukların istismarını içeren ya da başka biçimde hukuka aykırı Eserler oluşturamaz ve dağıtamazsınız. Eserlerinizin içeriğinden ve dağıtımından doğan sorumluluk size aittir.
+- Basılı yayın: Eserinizi basılı kitap ya da dergi olarak dağıtacaksanız ISBN/ISSN, bandrol (FSEK m. 81) ve derleme (6279 sayılı Çoğaltılmış Fikir ve Sanat Eserlerini Derleme Kanunu) gibi yükümlülükler yayıncıya ya da size aittir.
+- Renk ve baskı: Uygulamanın CMYK dönüşümü genel amaçlı bir baskı profiline göre yapılan yaklaşık bir dönüşümdür. Baskıdan önce matbaanızın istediği renk profilini, taşma payını ve çözünürlüğü kontrol etmeniz ve prova almanız önerilir.
+- Yapay zekâ yardımı: Çizim önerileri ve tanıma özellikleri, çizimi sizin yönettiğiniz yardımcı araçlardır. Telif koruması Türk hukukunda ve birçok ülkede insanın yaratıcı katkısına (hususiyet) bağlıdır; Eserinizin bir ülkede ne ölçüde korunacağı o ülkenin hukukuna göre belirlenir.
+- Atıf ve tanıtım: Atıf zorunlu değildir; isterseniz "Çizim Rehberi ile hazırlandı" ibaresini kullanabilirsiniz. karApp'ın adını ya da logosunu, Eserinizin karApp tarafından hazırlandığı ya da onaylandığı izlenimini verecek biçimde kullanamazsınız. karApp, Eserlerinizi açık izniniz olmadan tanıtımda kullanmaz.
+
+## 7. Hazır içerik ve lisanslar
+- Uygulamadaki hazır şekiller, nesneler, karakterler, efektler, mekân arka planları ve şablonlar Uygulama için özgün olarak hazırlanmıştır. Tanınmış karakterler, markalar ya da başkasına ait çizimler kullanılmaz.
+- Hazır içeriğin fikrî hakları karApp'a aittir. Kendi Eserlerinizde, kişisel ve ticari çalışmalarınızda Bölüm 6'daki lisansla serbestçe kullanılabilir.
+- Yazı tipleri kendi açık kaynak lisanslarıyla gelir (bkz. uygulama içindeki lisans dosyası).
+
+## 8. Kullanım kuralları
+Aşağıdakileri yapmamayı kabul edersiniz:
+- Uygulamanın kaynak kodunu tersine mühendislikle elde etmeye, sunucuya yetkisiz erişmeye ya da hizmeti aksatmaya çalışmak,
+- Başkasının hesabını kullanmak ya da kimliğe bürünmek,
+- Uygulamayı zararlı yazılım yaymak ya da yasa dışı amaçlarla kullanmak,
+- Hazır içeriği Uygulamadan toplu olarak çıkarıp ayrı bir koleksiyon olarak paylaşmak.
+
+## 9. Sorumluluğun sınırlandırılması
+- Uygulama "olduğu gibi" sunulur. Kesintisiz ve hatasız çalışacağı garanti edilmez.
+- Yasaların izin verdiği ölçüde karApp; cihazınızdaki veri kaybından ya da Uygulamanın kullanımından doğan dolaylı zararlardan sorumlu tutulamaz. Kanundan doğan tüketici haklarınız saklıdır.
+
+## 10. Gizlilik
+- Kişisel verilerinizin nasıl işlendiği KVKK Aydınlatma Metninde ve web sitesindeki gizlilik politikasında açıklanır.
+
+## 11. Değişiklikler ve fesih
+- Bu şartlar güncellenebilir. Önemli değişikliklerde Uygulama içinde bilgilendirilir, gerektiğinde yeniden onayınız istenir. Değişiklikler, önceden oluşturduğunuz Eserler için verilen lisansı daraltmaz.
+- Şartlara aykırı kullanımda hesap askıya alınabilir ya da silinebilir.
+
+## 12. Uygulanacak hukuk
+Bu şartlar Türkiye Cumhuriyeti hukukuna tabidir. Tüketici işlemlerinde Tüketici Hakem Heyetleri ve Tüketici Mahkemeleri yetkilidir.
+
+## 13. İletişim
+Sorularınız ve yazılı lisans belgesi istekleriniz için uygulamanın mağaza sayfasında ve web sitesinde yer alan karApp geliştirici iletişim adresine yazabilirsiniz.

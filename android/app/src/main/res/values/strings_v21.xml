@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- v21 Düzenle modu -->
+    <string name="vector_edit_open">Vektör düzenle</string>
+
+    <!-- v21 yeni fırçalar -->
+    <string name="brush_cat_trail">İzler</string>
+    <string name="brush_cat_living">Canlı Dokuları</string>
+    <string name="brush_cat_material">Malzeme Dokuları</string>
+    <string name="brush_ink_trail">Mürekkep İzi</string>
+    <string name="brush_drip_trail">Döküm İzi</string>
+    <string name="brush_paint_trail">Boya İzi</string>
+    <string name="brush_pattern_carpet">Halı Deseni</string>
+    <string name="brush_pattern_wallpaper">Duvar Kağıdı</string>
+    <string name="brush_pattern_woodpaint">Ahşap Boyası</string>
+    <string name="brush_texture_skin">İnsan Dokusu</string>
+    <string name="brush_texture_fur">Hayvan Dokusu</string>
+    <string name="brush_texture_plant">Bitki Dokusu</string>
+    <string name="brush_texture_wood">Ahşap Dokusu</string>
+    <string name="brush_texture_iron">Demir Dokusu</string>
+    <string name="brush_texture_metal">Metal Dokusu</string>
+
+    <!-- v21 tablet kalemi tanıma -->
+    <string name="stylus_recognized">Kalem tanındı: kalem ayarları kullanılıyor</string>
+    <string name="stylus_not_recognized">Kalem tanınmadı: kalem ayarları gizli</string>
+    <string name="stylus_recognition_title">Kalem tanıma</string>
+    <string name="stylus_recognition_auto">Otomatik</string>
+    <string name="stylus_recognition_always">Her zaman açık</string>
+    <string name="stylus_recognition_off">Kapalı</string>
+    <string name="stylus_recognition_auto_hint">Kalem destekli ekran ya da Bluetooth kalem bulunduğunda ya da kalemle ilk dokunuşta tanınır</string>
+    <string name="stylus_recognition_always_hint">Kalem algılanmasa da kalem ayarları görünür ve kullanılır (algılanmayan kalemler için)</string>
+    <string name="stylus_recognition_off_hint">Kalem parmak gibi çizer: basınç, eğim ve yan tuş kullanılmaz, kalem ayarları gizlenir</string>
+
+    <!-- v21 gölgeli 3B cisimler -->
+    <string name="shape_solid_cube">Küp (3B)</string>
+    <string name="shape_solid_box">Kutu (3B)</string>
+    <string name="shape_solid_cylinder">Silindir (3B)</string>
+    <string name="shape_solid_cone">Koni (3B)</string>
+    <string name="shape_solid_sphere">Küre (3B)</string>
+    <string name="shape_solid_dome">Kubbe (3B)</string>
+    <string name="shape_solid_pyramid">Piramit (3B)</string>
+    <string name="shape_solid_prism">Üçgen prizma (3B)</string>
+    <string name="shape_solid_hex_prism">Altıgen prizma (3B)</string>
+
+    <!-- v21 3B çizim modu -->
+    <string name="draw3d_title">3B çizim</string>
+    <string name="draw3d_toggle">3B çizim modunu aç/kapat</string>
+    <string name="draw3d_chip_off">3B kapalı</string>
+    <string name="draw3d_chip_on">3B: %1$s</string>
+    <string name="draw3d_close">3B çizimi kapat</string>
+    <string name="draw3d_plane_free">Serbest</string>
+    <string name="draw3d_plane_front">Ön yüz</string>
+    <string name="draw3d_plane_side">Yan yüz</string>
+    <string name="draw3d_plane_top">Üst (zemin)</string>
+    <string name="draw3d_depth">Derinlik</string>
+    <string name="draw3d_hint">Çizgi seçilen yüze yatırılır, derinlik kadar kabarır. Daireyi sürükleyerek sahneyi döndür; 3B izler ve cisimler de döner.</string>
+    <string name="draw3d_on_event">3B çizim açık: yüz seç, derinliği ayarla</string>
+    <string name="draw3d_off_event">3B çizim kapatıldı</string>
+    <!-- v21 şekil veritabanı önerileri -->
+    <string name="template_apply_cd">Şablonla değiştir: %1$s</string>
+    <string name="template_solid">%1$s (gölgeli)</string>
+</resources>

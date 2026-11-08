@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- v46 yeni tuval formunda hazır şablonlar -->
+    <string name="v46_template_section">قالب</string>
+    <string name="v46_template_blank">فارغ</string>
+    <string name="v46_template_blank_hint">لوحة فارغة: اختر الحجم والورق وعدد الصفحات أدناه.</string>
+    <string name="v46_template_selected_hint">%1$s يُستخدم حجم القالب وورقه وصفحاته؛ عدّل ما تشاء وتابع.</string>
+</resources>

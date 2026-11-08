@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- v45 çizgi roman kapağı ve not alma panelleri -->
+    <string name="v45_cover">الغلاف</string>
+    <string name="v45_cover_add">إضافة غلاف</string>
+    <string name="v45_help_cover">صفحة غلاف القصة المصورة: لا تحمل رقم صفحة ولا رأسًا ولا تذييلًا؛ يبدأ الترقيم من 1 في الصفحة التالية.</string>
+    <string name="v45_help_cover_add">يضيف في بداية القصة المصورة صفحة غلاف فيها مساحة للعنوان والمؤلف والرسم. لا تتغير أرقام الصفحات الموجودة.</string>
+    <string name="v45_panels_add">إضافة لوحات</string>
+    <string name="v45_help_panels_add">يقسّم مساحة الرسم إلى أقسام ذات إطار: أعمدة وصفوف وشبكات وتخطيط كورنيل وما شابه. يمكن تحديد كل قسم ونقله وحذفه وحده.</string>
+    <string name="v45_panels_title">اختر تخطيط اللوحات</string>
+    <string name="v45_panels_hint">يُضاف التخطيط المختار إلى الصفحة كمساحات بإطار رفيع، وتبقى المساحات أسفل كتابتك ورسوماتك.</string>
+    <string name="v45_panel_two_cols">عمودان</string>
+    <string name="v45_panel_three_cols">ثلاثة أعمدة</string>
+    <string name="v45_panel_two_rows">صفّان</string>
+    <string name="v45_panel_three_rows">ثلاثة صفوف</string>
+    <string name="v45_panel_grid_2x2">شبكة 2 × 2</string>
+    <string name="v45_panel_grid_2x3">شبكة 2 × 3</string>
+    <string name="v45_panel_main_side">مساحة كبيرة مع عمود جانبي</string>
+    <string name="v45_panel_side_main">عمود جانبي مع مساحة كبيرة</string>
+    <string name="v45_panel_cornell">ملاحظات كورنيل</string>
+    <string name="v45_panel_header_two_cols">عنوان مع عمودين</string>
+    <string name="v45_panel_square_2x2">مربعات 2 × 2</string>
+    <string name="v45_panel_square_3x3">مربعات 3 × 3</string>
+    <string name="v45_panel_square_notes">مربع ومساحة للملاحظات</string>
+    <string name="v45_panel_count">%1$d مساحات</string>
+</resources>

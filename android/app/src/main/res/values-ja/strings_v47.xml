@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- v47 Özellikler alanı: seçili aracın ayarı yoksa -->
+    <string name="v47_properties_empty">このツールには設定がありません。ブラシ、消しゴム、ペン、テキストツールを選ぶと、ここに設定が表示されます。</string>
+</resources>

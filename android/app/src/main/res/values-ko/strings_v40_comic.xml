@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- v40 çizgi roman hazır karakterleri ve arka planları -->
+<resources>
+    <string name="v40_comic_chars_hint">스타일과 테마를 고르고 캐릭터를 누른 뒤, 변형을 누르면 페이지에 추가됩니다.</string>
+    <string name="v40_comic_style">스타일</string>
+    <string name="v40_comic_theme">테마</string>
+    <string name="v40_comic_style_manga">만화</string>
+    <string name="v40_comic_style_comic">코믹스</string>
+    <string name="v40_comic_group_expressions">표정</string>
+    <string name="v40_comic_group_poses">포즈</string>
+    <string name="v40_comic_group_action">액션</string>
+    <string name="v40_comic_group_daily">일상</string>
+    <string name="v40_comic_bg_title">기본 배경</string>
+</resources>

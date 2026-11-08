@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- v47 Özellikler alanı: seçili aracın ayarı yoksa -->
+    <string name="v47_properties_empty">لا توجد إعدادات لهذه الأداة. تظهر الإعدادات هنا عند اختيار الفرشاة أو الممحاة أو القلم أو أداة النص.</string>
+</resources>

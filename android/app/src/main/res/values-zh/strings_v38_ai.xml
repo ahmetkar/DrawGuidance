@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- v38 yapay zekâ önerileri: yazı, şekil ve çizgi önerisi ayrı (tek çizgiye öneri yok; tek düğmeyle düzeltme) -->
+    <string name="shape_suggest_title">形状建议：</string>
+    <string name="line_suggest_title">线条建议：</string>
+    <string name="line_fix_all">修正线条（%1$d）</string>
+    <string name="line_fix_cd">应用修正：一次修正 %1$d 条线</string>
+    <string name="line_suggest_turn_off">关闭线条建议</string>
+    <string name="line_suggest_setting">线条建议</string>
+    <string name="line_suggest_setting_hint">同时修正多条线（直线、圆、拐角）</string>
+    <string name="kids_say_line_1">你画了 %1$d 条线！要我把它们都变得又直又整齐吗？</string>
+    <string name="kids_say_line_2">我可以把这 %1$d 条线的端点连起来并修整好。要试试吗？</string>
+    <string name="tut_hint_lines">线条建议：点一下，所考虑的所有线条会一次修正（只需撤销一次）。</string>
+    <string name="tut_art_ai_text_v38">线条修正（2 条以上）、模板识别（相互靠近的 4 个以上元素）和 AI 设置。</string>
+    <string name="tut_art_ai2_v38">线条修正</string>
+    <string name="tut_art_ai2_text_v38">画几条线后抬起笔：每条线都会变整齐，相近的端点会连在一起。只画一条线时不会给出建议。我们用两段弧画月亮。</string>
+    <string name="tut_art_ai3_text_v38">用 4 条以上相互靠近的线画出的物体会在形状数据库和该模式的神经网络中搜索：房子、树、脸…… 我们来画一座房子。</string>
+    <string name="tut_lines_v38">修正线条</string>
+    <string name="tut_art_ai4_text_v38">一起画的所有线条用一个按钮即可修正。我们来画松树。</string>
+    <string name="tut_ai_select_text_v38">在选择模式下选中两条或更多线条，无需按按钮即可出现建议：文字、形状和线条建议分别显示在不同的气泡中。选择栏上的“建议批量修正”也会打开同样的建议。</string>
+    <string name="tut_ai_more_text_v38">在 ⋮ 菜单中可为此画布开启或关闭 AI；文字、形状和线条建议可分别开启。建议在你的设备上运行，并会随着你的采纳而适应你。</string>
+    <string name="tut_notes_ai_text_v38">把手写转换为文字（2 个以上元素）以及一起修正线条。</string>
+    <string name="tut_notes_ai2_text_v38">用单独的线条画出方框的四条边：边会变直，拐角会连起来。我们来画一个方框。</string>
+    <string name="tut_notes_ai3_text_v38">我们画三个相互接触的圆环：一个按钮就能把三个都变成整齐的圆。</string>
+    <string name="tut_comic_ai_text_v38">漫画专用识别（对话气泡、面部表情）以及一起修正线条。</string>
+    <string name="tut_comic_ai3_text_v38">我们来画泡泡：一个按钮就能把它们都变成整齐的圆。</string>
+</resources>

@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- v45 çizgi roman kapağı ve not alma panelleri -->
+    <string name="v45_cover">表紙</string>
+    <string name="v45_cover_add">表紙を追加</string>
+    <string name="v45_help_cover">漫画の表紙ページ：ページ番号・ヘッダー・フッターは付きません。番号は次のページから1で始まります。</string>
+    <string name="v45_help_cover_add">漫画の先頭に、タイトル・作者・イラスト用の領域がある表紙ページを追加します。既存ページの番号は変わりません。</string>
+    <string name="v45_panels_add">パネルを追加</string>
+    <string name="v45_help_panels_add">描画領域を枠付きの区画に分けます：列、行、グリッド、コーネル式など。各区画は個別に選択・移動・削除できます。</string>
+    <string name="v45_panels_title">パネルレイアウトを選択</string>
+    <string name="v45_panels_hint">選んだレイアウトは細い枠の領域としてページに追加され、文字や絵の下に置かれます。</string>
+    <string name="v45_panel_two_cols">2列</string>
+    <string name="v45_panel_three_cols">3列</string>
+    <string name="v45_panel_two_rows">2行</string>
+    <string name="v45_panel_three_rows">3行</string>
+    <string name="v45_panel_grid_2x2">2 × 2 グリッド</string>
+    <string name="v45_panel_grid_2x3">2 × 3 グリッド</string>
+    <string name="v45_panel_main_side">大きな領域と横の列</string>
+    <string name="v45_panel_side_main">横の列と大きな領域</string>
+    <string name="v45_panel_cornell">コーネル式ノート</string>
+    <string name="v45_panel_header_two_cols">見出しと2列</string>
+    <string name="v45_panel_square_2x2">2 × 2 の正方形</string>
+    <string name="v45_panel_square_3x3">3 × 3 の正方形</string>
+    <string name="v45_panel_square_notes">正方形とノート欄</string>
+    <string name="v45_panel_count">%1$d 区画</string>
+</resources>

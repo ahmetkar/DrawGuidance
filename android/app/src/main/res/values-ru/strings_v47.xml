@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- v47 Özellikler alanı: seçili aracın ayarı yoksa -->
+    <string name="v47_properties_empty">У этого инструмента нет настроек. Настройки появляются здесь, когда выбраны кисть, ластик, перо или текст.</string>
+</resources>

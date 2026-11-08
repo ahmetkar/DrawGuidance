@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- v45 çocuk menüsü: kısa adlar, boya fırçası, fırça boyu, açıklamalar ve ipuçları -->
+    <string name="v45_kids_undo">되돌리기</string>
+    <string name="v45_kids_redo">다시하기</string>
+    <string name="v45_kids_pen">연필</string>
+    <string name="v45_kids_eraser">지우개</string>
+    <string name="v45_kids_paint_brush">붓</string>
+    <string name="v45_kids_bucket">페인트 통</string>
+    <string name="v45_kids_parts">조각</string>
+    <string name="v45_kids_colors">색깔</string>
+    <string name="v45_kids_shapes">모양</string>
+    <string name="v45_kids_challenge">미션</string>
+    <string name="v45_kids_background">종이</string>
+    <string name="v45_kids_image">사진</string>
+    <string name="v45_kids_text">글자</string>
+    <string name="v45_kids_model3d">3D</string>
+    <string name="v45_kids_select">고르기</string>
+    <string name="v45_kids_eyedropper">색 가져오기</string>
+    <string name="v45_kids_ruler">자</string>
+    <string name="v45_kids_template">모양 틀</string>
+    <string name="v45_kids_expand">넓히기</string>
+    <string name="v45_kids_brush_size">붓 굵기</string>
+    <string name="v45_kids_size_thin">가늘게</string>
+    <string name="v45_kids_size_medium">보통</string>
+    <string name="v45_kids_size_thick">굵게</string>
+    <string name="v45_help_kids_pen">연필로 종이에 무엇이든 그려 봐. 색깔과 굵기는 ‘색깔’에서 골라.</string>
+    <string name="v45_help_kids_paint_brush">붓: 손가락으로 모양 안을 칠해 봐. 색은 선 밖으로 나가지 않아. 빈 종이에서는 손가락이 지나간 곳을 칠해.</string>
+    <string name="v45_help_kids_bucket">페인트 통: 모양 안을 누르면 그곳이 고른 색으로 칠해져. 2초 동안 누르고 있으면 모양 전체가 칠해져.</string>
+    <string name="v45_help_kids_parts">그림의 조각(선, 모양, 글자)을 보고, 숨기거나 지울 수 있어.</string>
+    <string name="v45_help_kids_colors">연필의 색깔, 굵기, 종류를 골라.</string>
+    <string name="v45_help_kids_shapes">준비된 그림과 모양: 하나 골라서 종이를 눌러 놓아.</string>
+    <string name="v45_help_kids_background">종이 색깔을 바꿔.</string>
+    <string name="v45_help_kids_brush_size">붓의 굵기: 가늘게, 보통, 굵게.</string>
+    <string name="v45_challenge_tip_pen">위에서 ‘연필’을 고르고 손가락으로 점선을 천천히 따라가 봐.</string>
+    <string name="v45_challenge_tip_paint_brush">붓으로도 칠할 수 있어: ‘붓’을 고르고 색깔을 고른 다음 손가락으로 안쪽을 칠해. 색은 선 밖으로 나가지 않아!</string>
+    <string name="v45_tut_kids_pen">연필</string>
+    <string name="v45_tut_kids_pen_text">연필로 뭐든지 그릴 수 있어. 봐, 하늘에 반짝이는 해를 그리고 있어!</string>
+</resources>

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- v41 çizgi roman: mekân arka planı ekle (panele sığar ya da bütün sayfa) -->
+<resources>
+    <string name="v41_add_location">Mekân arka planı</string>
+    <string name="v41_loc_title">Mekân arka planı ekle</string>
+    <string name="v41_loc_hint">Stil ve kategori seçin, arka plana dokunun; sonra bir panele bırakın ya da bütün sayfaya koyun.</string>
+    <string name="v41_loc_place_hint">Bir panele dokunun ya da sürükleyip bırakın: arka plan o panele sığar. Panellerin dışına bırakırsanız bütün sayfayı kaplar.</string>
+    <string name="v41_loc_whole_page">Bütün sayfa</string>
+    <string name="v41_help_add_location">Hazır mekân arka planı ekler: Manga ya da Çizgi roman sahnesi seç, bir panele bırak (panele sığar) ya da bütün sayfaya koy.</string>
+</resources>

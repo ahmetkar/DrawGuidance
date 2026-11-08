@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- v41 arka plan penceresinde Uygula; arka planı eleman gibi seçme -->
+<resources>
+    <string name="v41_bg_apply">Uygula</string>
+    <string name="v41_bg_hint">Seç ve Uygula\'ya dokun: eski arka plan kaldırılır</string>
+    <string name="v41_bg_pending">Seçimler henüz uygulanmadı</string>
+    <string name="v41_bg_selected">Arka plan seçili</string>
+    <string name="v41_bg_selected_hint">Arka planı değiştir, örtücülüğünü ayarla ya da sil</string>
+    <string name="v41_bg_opacity">Örtücülük</string>
+    <string name="v41_bg_change">Değiştir</string>
+    <string name="v41_bg_remove">Sil</string>
+    <string name="v41_bg_element">Arka plan</string>
+    <string name="v41_bg_element_none">Arka plan yok</string>
+</resources>

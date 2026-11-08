@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- v40 çizgi roman hazır karakterleri ve arka planları -->
+<resources>
+    <string name="v40_comic_chars_hint">选择风格和主题，点按角色，再点按某个变体即可添加到页面。</string>
+    <string name="v40_comic_style">风格</string>
+    <string name="v40_comic_theme">主题</string>
+    <string name="v40_comic_style_manga">漫画</string>
+    <string name="v40_comic_style_comic">美式漫画</string>
+    <string name="v40_comic_group_expressions">表情</string>
+    <string name="v40_comic_group_poses">姿势</string>
+    <string name="v40_comic_group_action">动作</string>
+    <string name="v40_comic_group_daily">日常</string>
+    <string name="v40_comic_bg_title">现成背景</string>
+</resources>

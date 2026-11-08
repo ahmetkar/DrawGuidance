@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- v38 yapay zekâ önerileri: yazı, şekil ve çizgi önerisi ayrı (tek çizgiye öneri yok; tek düğmeyle düzeltme) -->
+    <string name="shape_suggest_title">اقتراح شكل:</string>
+    <string name="line_suggest_title">اقتراح خطوط:</string>
+    <string name="line_fix_all">تصحيح الخطوط (%1$d)</string>
+    <string name="line_fix_cd">تطبيق التصحيح: %1$d خطوط دفعة واحدة</string>
+    <string name="line_suggest_turn_off">إيقاف اقتراحات الخطوط</string>
+    <string name="line_suggest_setting">اقتراح الخطوط</string>
+    <string name="line_suggest_setting_hint">يصحح عدة خطوط معًا (مستقيمات، دوائر، زوايا)</string>
+    <string name="kids_say_line_1">رسمت %1$d خطوط! هل أجعلها كلها مستقيمة ومرتبة؟</string>
+    <string name="kids_say_line_2">أستطيع وصل أطراف خطوطك الـ %1$d وترتيبها. هل نفعل؟</string>
+    <string name="tut_hint_lines">اقتراح الخطوط: اضغط عليه فتُصحَّح كل الخطوط المعنية دفعة واحدة (بخطوة تراجع واحدة).</string>
+    <string name="tut_art_ai_text_v38">تصحيح الخطوط (خطان أو أكثر)، والتعرف على القوالب (4 عناصر متقاربة أو أكثر) وإعدادات الذكاء الاصطناعي.</string>
+    <string name="tut_art_ai2_v38">تصحيح الخطوط</string>
+    <string name="tut_art_ai2_text_v38">ارسم عدة خطوط وارفع القلم: يصبح كل خط منتظمًا وتتصل الأطراف المتقاربة. لا يُقترح شيء لخط واحد. نرسم القمر بقوسين.</string>
+    <string name="tut_art_ai3_text_v38">الشيء المرسوم بـ 4 خطوط متقاربة أو أكثر يُبحث عنه في قاعدة بيانات الأشكال وفي الشبكة العصبية للوضع: بيت، شجرة، وجه… نرسم بيتًا.</string>
+    <string name="tut_lines_v38">تصحيح الخطوط</string>
+    <string name="tut_art_ai4_text_v38">كل الخطوط المرسومة معًا تُصحَّح بزر واحد. نرسم أشجار الصنوبر.</string>
+    <string name="tut_ai_select_text_v38">في وضع التحديد، حدد خطين أو أكثر فتظهر الاقتراحات دون ضغط زر: اقتراحات النص والشكل والخطوط في فقاعات منفصلة. زر اقتراح التصحيح المتعدد في شريط التحديد يفتح الاقتراحات نفسها.</string>
+    <string name="tut_ai_more_text_v38">من القائمة ⋮ تشغّل الذكاء الاصطناعي لهذه اللوحة أو توقفه؛ وتُفعَّل اقتراحات النص والشكل والخطوط كلٌّ على حدة. تعمل الاقتراحات على جهازك وتتكيف معك كلما قبلتها.</string>
+    <string name="tut_notes_ai_text_v38">تحويل خط اليد إلى نص (عنصران أو أكثر) وتصحيح الخطوط معًا.</string>
+    <string name="tut_notes_ai2_text_v38">ارسم أضلاع الصندوق الأربعة بخطوط منفصلة: تستقيم الأضلاع وتتصل الزوايا. نرسم صندوقًا.</string>
+    <string name="tut_notes_ai3_text_v38">نرسم ثلاث حلقات متلامسة: زر واحد يحوّل الثلاث إلى دوائر منتظمة.</string>
+    <string name="tut_comic_ai_text_v38">تعرّف خاص بالقصص المصورة (فقاعة الكلام، تعابير الوجه) وتصحيح الخطوط معًا.</string>
+    <string name="tut_comic_ai3_text_v38">نرسم فقاعات: زر واحد يحوّلها كلها إلى دوائر منتظمة.</string>
+</resources>

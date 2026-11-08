@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- v40 çocuk modu: 50 seviyelik çizim görevi, Premium seviyeler ve maskotun görev önerisi -->
+<resources>
+    <string name="v40_challenge_state_premium">Премиум</string>
+    <string name="v40_challenge_premium_note">Уровни %1$d–%2$d открываются с Премиумом</string>
+    <string name="v40_challenge_suggest_new">Привет! Хочешь сыграть со мной в рисовальное задание? Будем рисовать уровень за уровнем и собирать звёзды!</string>
+    <string name="v40_challenge_suggest_resume">С возвращением! Продолжим рисовальное задание с уровня %1$d?</string>
+    <string name="v40_challenge_suggest_premium">Ты прошёл все бесплатные уровни! Следующие уровни открываются с Премиумом.</string>
+    <string name="v40_challenge_suggest_start">Начать</string>
+    <string name="v40_challenge_suggest_cancel">Отмена</string>
+    <string name="v40_challenge_suggest_cd">Бояджик предлагает рисовальное задание</string>
+    <string name="v40_challenge_body_resume">Отлично получается! Пройдено уровней: %1$d / %2$d.</string>
+    <string name="v40_challenge_body_premium">Здорово! Ты прошёл все бесплатные уровни (%1$d). Остальные %2$d открываются с Премиумом.</string>
+    <string name="v40_challenge_body_all_done">Супер! Ты прошёл все уровни (%1$d). Пройди уровень ещё раз, чтобы собрать больше звёзд.</string>
+    <string name="v40_challenge_go_premium">Посмотреть Премиум</string>
+    <string name="v40_challenge_replay">Сыграть снова (%1$d)</string>
+</resources>

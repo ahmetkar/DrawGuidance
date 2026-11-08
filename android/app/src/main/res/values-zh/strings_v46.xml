@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- v46 yeni tuval formunda hazır şablonlar -->
+    <string name="v46_template_section">模板</string>
+    <string name="v46_template_blank">空白</string>
+    <string name="v46_template_blank_hint">空白画布：在下方选择尺寸、纸张和页数。</string>
+    <string name="v46_template_selected_hint">%1$s 使用模板的尺寸、纸张和页面；可随意修改后继续创作。</string>
+</resources>

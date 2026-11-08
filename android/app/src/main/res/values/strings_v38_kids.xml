@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- v38 çocuk modunda çizim görevi: seviyeler, maskotun yönlendirmesi, sonuç ve İlerleme -->
+    <string name="kids_challenge">Çizim Görevi</string>
+    <string name="help_kids_challenge">Seviye seviye çizim görevleri. Başlat\'a dokun; kâğıttaki kesikli çizgilerin üstünden çiz ya da resmi örnekteki renklere boya, bitince Bitti\'ye dokun. Puanın yeterliyse sonraki seviye açılır. İlerleme\'de bütün seviyeleri görürsün.</string>
+    <string name="challenge_menu_idle">Seviye seviye çizim görevleri! Hedef resmi çiz, puan topla, yıldız kazan.</string>
+    <string name="challenge_menu_running">Şu an %1$d. seviyedesin: %2$s.</string>
+    <string name="challenge_start">Başlat</string>
+    <string name="challenge_stop">Modu kapat</string>
+    <string name="challenge_progress">İlerleme</string>
+    <string name="challenge_level_of">Seviye %1$d / %2$d</string>
+    <string name="challenge_finish">Bitti</string>
+
+    <string name="challenge_kind_trace">Çiz</string>
+    <string name="challenge_kind_paint">Boya</string>
+    <string name="challenge_kind_build">Yerleştir ve boya</string>
+    <string name="challenge_intro_trace">%1$d. seviye: %2$s! Kesikli çizgilerin üstünden fırçayla çiz. Bitince yukarıdaki Bitti\'ye dokun.</string>
+    <string name="challenge_intro_paint">%1$d. seviye: %2$s! Boya kovasıyla resmi renkli noktalardaki renklere boya. Bitince Bitti\'ye dokun.</string>
+    <string name="challenge_intro_build">%1$d. seviye: %2$s! Resmi Şekil ekle düğmesinde bul, kesikli çizginin üstüne koy ve noktalardaki renklere boya.</string>
+
+    <string name="challenge_tip_brush">Üstteki fırçayı seç ve parmağınla kesikli çizginin üstünden yavaşça geç.</string>
+    <string name="challenge_tip_eraser">Çizgin taştı mı? Silgiyi seç ve fazlasını sil.</string>
+    <string name="challenge_tip_undo">Yanlış mı oldu? Üstteki geri ok son yaptığını geri alır.</string>
+    <string name="challenge_tip_paint">Boya kovasını seç, noktadaki rengi seç ve o yere dokun.</string>
+    <string name="challenge_tip_hold">Kovayla bir şeklin üstünde 2 saniye basılı tutarsan bütün şekil birden boyanır.</string>
+    <string name="challenge_tip_shape">Şekil ekle düğmesine dokun, %1$s resmini seç ve kâğıda dokunarak koy.</string>
+    <string name="challenge_tip_move">Koyduğun resmi parmağınla sürükleyip kesikli çizginin üstüne taşı.</string>
+    <string name="challenge_tip_finish">Hazır olunca üstteki yeşil Bitti düğmesine dokun, puanını söyleyeyim!</string>
+    <string name="challenge_live_close">Çok güzel, hedefe çok yaklaştın! Hazırsan Bitti\'ye dokun.</string>
+    <string name="challenge_tip_next">İpucu</string>
+    <string name="challenge_mascot_cd">Boyacık, ipucu için dokun</string>
+
+    <string name="challenge_passed_title">Seviye geçildi!</string>
+    <string name="challenge_failed_title">Az kaldı!</string>
+    <string name="challenge_passed_say">Harika iş çıkardın! Sıradaki seviye seni bekliyor.</string>
+    <string name="challenge_passed_say_3">Muhteşem! Üç yıldızın hepsini topladın!</string>
+    <string name="challenge_failed_say">Seviyeyi geçmek için %1$d puan gerekiyor. Bir daha dene, bu sefer daha da iyi olacak!</string>
+    <string name="challenge_all_done">Son seviyeyi de geçtin! Sen gerçek bir ressamsın!</string>
+    <string name="challenge_score">Puan</string>
+    <string name="challenge_best">En iyi: %1$d</string>
+    <string name="challenge_stars_cd">%1$d yıldız</string>
+    <string name="challenge_next">Sonraki seviye</string>
+    <string name="challenge_retry">Tekrar dene</string>
+    <string name="challenge_exit">Moddan çık</string>
+
+    <string name="challenge_progress_summary">%1$d / %2$d seviye geçildi · %3$d yıldız</string>
+    <string name="challenge_state_passed">Geçildi</string>
+    <string name="challenge_state_open">Açık</string>
+    <string name="challenge_state_locked">Kilitli</string>
+    <string name="challenge_play">Oyna</string>
+    <string name="challenge_locked_say">Bu seviye kilitli. Önce %1$d. seviyeyi geç!</string>
+</resources>

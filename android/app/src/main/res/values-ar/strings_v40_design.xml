@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- v40 tasarım: tema, Ana sayfa, Tuvallerim özeti, çizim süresi ve tuval boyutları -->
+<resources>
+    <string name="v40_theme_mode_title">السمة</string>
+    <string name="v40_theme_mode_light">فاتح</string>
+    <string name="v40_theme_mode_dark">داكن</string>
+    <string name="v40_theme_mode_system">النظام</string>
+    <string name="v40_theme_high_contrast">تباين عالٍ</string>
+    <string name="v40_theme_high_contrast_hint">نص وحدود أقوى وإطار تحديد عريض</string>
+    <string name="v40_home_kind_art">ارسم ولوّن بحرية</string>
+    <string name="v40_home_kind_notes">للدروس والأفكار</string>
+    <string name="v40_home_kind_comic">احكِ قصتك</string>
+    <string name="v40_home_kind_simple_art">ابدأ الرسم بسهولة</string>
+    <string name="v40_home_kind_simple_notes">ملاحظات سريعة وبسيطة</string>
+    <string name="v40_home_kind_kids">تلوين ممتع للأطفال</string>
+    <string name="v40_home_kind_3d">صمّم أشكالًا ثلاثية الأبعاد</string>
+    <string name="v40_home_group_simple">بسيط وسهل</string>
+    <string name="v40_home_group_advanced">كل الأدوات بين يديك</string>
+    <string name="v40_home_most_time_title">الأكثر وقتًا</string>
+    <string name="v40_home_most_time_cd">%1$s، قضيت %2$s</string>
+    <string name="v40_time_lt_minute">أقل من دقيقة</string>
+    <string name="v40_time_minutes">%1$d د</string>
+    <string name="v40_time_hours_minutes">%1$d س %2$d د</string>
+    <string name="v40_time_hours">%1$d س</string>
+    <string name="v40_stats_title">ملخص</string>
+    <string name="v40_stats_total">الإجمالي</string>
+    <string name="v40_stats_week">هذا الأسبوع</string>
+    <string name="v40_stats_time">وقت الرسم</string>
+    <string name="v40_stats_cd">%1$s: %2$s</string>
+    <string name="v40_size_square">مربع</string>
+    <string name="v40_size_portrait">عمودي</string>
+    <string name="v40_size_landscape">أفقي</string>
+    <string name="v40_size_wallpaper">خلفية الهاتف</string>
+    <string name="v40_size_a4_300">A4 (300 نقطة/بوصة)</string>
+    <string name="v40_size_a4">A4</string>
+    <string name="v40_size_a5">A5</string>
+    <string name="v40_size_letter">Letter</string>
+    <string name="v40_size_a4_landscape">A4 أفقي</string>
+    <string name="v40_size_comic_page">صفحة قصة مصورة</string>
+    <string name="v40_size_us_comic">قصة مصورة أمريكية</string>
+    <string name="v40_size_manga_b5">مانغا (B5)</string>
+    <string name="v40_size_webtoon">ويبتون</string>
+    <string name="v40_size_custom">مخصص</string>
+    <string name="v40_size_width">العرض (%1$s)</string>
+    <string name="v40_size_height">الارتفاع (%1$s)</string>
+    <string name="v40_size_dpi">DPI</string>
+    <string name="v40_size_result">%1$d × %2$d بكسل</string>
+    <string name="v40_size_error_min">يجب ألا تقل الأضلاع عن %1$d بكسل</string>
+    <string name="v40_size_error_max">لا يمكن أن تزيد الأضلاع عن %1$d بكسل</string>
+    <string name="v40_size_error_memory">هذا الحجم كبير جدًا على ذاكرة الجهاز</string>
+</resources>

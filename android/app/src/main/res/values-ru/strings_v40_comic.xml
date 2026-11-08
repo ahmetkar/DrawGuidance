@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- v40 çizgi roman hazır karakterleri ve arka planları -->
+<resources>
+    <string name="v40_comic_chars_hint">Выберите стиль и тему, нажмите на персонажа, затем на вариант — он добавится на страницу.</string>
+    <string name="v40_comic_style">Стиль</string>
+    <string name="v40_comic_theme">Тема</string>
+    <string name="v40_comic_style_manga">Манга</string>
+    <string name="v40_comic_style_comic">Комикс</string>
+    <string name="v40_comic_group_expressions">Эмоции</string>
+    <string name="v40_comic_group_poses">Позы</string>
+    <string name="v40_comic_group_action">Экшен</string>
+    <string name="v40_comic_group_daily">Повседневное</string>
+    <string name="v40_comic_bg_title">Готовые фоны</string>
+</resources>

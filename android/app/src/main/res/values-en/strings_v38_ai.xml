@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- v38 yapay zekâ önerileri: yazı, şekil ve çizgi önerisi ayrı (tek çizgiye öneri yok; tek düğmeyle düzeltme) -->
+    <string name="shape_suggest_title">Shape suggestion:</string>
+    <string name="line_suggest_title">Line suggestion:</string>
+    <string name="line_fix_all">Fix lines (%1$d)</string>
+    <string name="line_fix_cd">Apply the fix: %1$d lines at once</string>
+    <string name="line_suggest_turn_off">Turn off line suggestions</string>
+    <string name="line_suggest_setting">Line suggestion</string>
+    <string name="line_suggest_setting_hint">Fixes several lines together (straight lines, circles, corners)</string>
+    <string name="kids_say_line_1">You drew %1$d lines! Shall I make them all nice and straight?</string>
+    <string name="kids_say_line_2">I can join the ends of your %1$d lines and tidy them up. Shall we?</string>
+    <string name="tut_hint_lines">Line suggestion: tap it and every line it considered is fixed at once (a single undo step).</string>
+    <string name="tut_art_ai_text_v38">Line fixing (2+ lines), template recognition (4+ elements close together) and AI settings.</string>
+    <string name="tut_art_ai2_v38">Line fixing</string>
+    <string name="tut_art_ai2_text_v38">Draw several lines and lift the pen: each line becomes clean and nearby ends join up. A single line gets no suggestion. We\'re drawing the moon with two arcs.</string>
+    <string name="tut_art_ai3_text_v38">An object drawn with 4 or more lines close together is searched in the shape database and the mode\'s neural network: house, tree, face… We\'re drawing a house.</string>
+    <string name="tut_lines_v38">Fix lines</string>
+    <string name="tut_art_ai4_text_v38">All the lines drawn together are fixed with one button. We\'re drawing pine trees.</string>
+    <string name="tut_ai_select_text_v38">In Select mode, select two or more lines and suggestions appear without pressing a button: text, shape and line suggestions in separate balloons. Suggest multi-fix on the selection bar opens the same suggestions.</string>
+    <string name="tut_ai_more_text_v38">From the ⋮ menu you turn AI on or off for this canvas; text, shape and line suggestions can be turned on separately. Suggestions run on your device and adapt to you as you accept them.</string>
+    <string name="tut_notes_ai_text_v38">Turning handwriting into text (2+ elements) and fixing lines together.</string>
+    <string name="tut_notes_ai2_text_v38">Draw the four sides of a box as separate lines: the sides straighten and the corners join. We\'re drawing a box.</string>
+    <string name="tut_notes_ai3_text_v38">We\'re drawing three touching rings: one button turns all three into clean circles.</string>
+    <string name="tut_comic_ai_text_v38">Comic-specific recognition (speech balloon, facial expressions) and fixing lines together.</string>
+    <string name="tut_comic_ai3_text_v38">We\'re drawing bubbles: one button turns them all into clean circles.</string>
+</resources>

@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- v47 Özellikler alanı: seçili aracın ayarı yoksa -->
+    <string name="v47_properties_empty">此工具没有设置。选择画笔、橡皮擦、钢笔或文字工具时，设置会显示在这里。</string>
+</resources>

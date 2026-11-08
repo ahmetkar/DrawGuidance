@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- v40 cetvel ve şekil kalıbı -->
+<resources>
+    <string name="v40_ruler">Cetvel</string>
+    <string name="v40_template">Şekil kalıbı</string>
+    <string name="v40_ruler_finish">Bitir</string>
+    <string name="v40_ruler_straight">Düz cetvel</string>
+    <string name="v40_ruler_protractor">İletki</string>
+    <string name="v40_ruler_set45">Gönye 45°</string>
+    <string name="v40_ruler_set30">Gönye 30°/60°</string>
+    <string name="v40_ruler_compass">Pergel</string>
+    <string name="v40_ruler_ellipse">Elips şablonu</string>
+    <string name="v40_ruler_french">Pistole</string>
+    <string name="v40_ruler_unit">Birim</string>
+    <string name="v40_ruler_scale">Ölçek</string>
+    <string name="v40_ruler_type">Cetvel türü</string>
+    <string name="v40_ruler_hint">Kenara yakın çizin: çizgi kenarı izler. Gövdeyi sürükleyerek taşıyın, iki parmakla döndürün.</string>
+    <string name="v40_compass_hint">Nereye çizerseniz çizin çizgi çemberi izler. İğneyi sürükleyerek taşıyın, tutamakla yarıçapı değiştirin.</string>
+    <string name="v40_template_pick_hint">Kalıp için tuvaldeki bir şekle dokunun ya da kütüphaneden seçin</string>
+    <string name="v40_template_library">Kütüphaneden</string>
+    <string name="v40_template_lock">Kilitle</string>
+    <string name="v40_template_unlock">Kilidi aç</string>
+    <string name="v40_template_hint">Kalıbın kenarına yakın çizin; tutamaklarla taşıyıp boyutlandırın.</string>
+    <string name="v40_template_none">Burada şekil yok</string>
+    <string name="v40_help_ruler">Cetvel açar: kenarına yakın çizdiğiniz çizgi kenarı izler. Türü, birimi ve ölçeği cetvelin yanındaki düğmelerden değiştirin.</string>
+    <string name="v40_help_template">Şekil kalıbı açar: bir şekle dokunun ya da kütüphaneden seçin; kenarına yakın çizdiğiniz çizgi kalıbı izler.</string>
+</resources>

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- v40 çocuk modu: 50 seviyelik çizim görevi, Premium seviyeler ve maskotun görev önerisi -->
+<resources>
+    <string name="v40_challenge_state_premium">Premium</string>
+    <string name="v40_challenge_premium_note">Levels %1$d–%2$d unlock with Premium</string>
+    <string name="v40_challenge_suggest_new">Hi! Do you want to play a drawing quest with me? We will draw level by level and collect stars!</string>
+    <string name="v40_challenge_suggest_resume">Welcome back! Shall we continue the drawing quest from level %1$d?</string>
+    <string name="v40_challenge_suggest_premium">You passed all the free levels! The next levels unlock with Premium.</string>
+    <string name="v40_challenge_suggest_start">Start</string>
+    <string name="v40_challenge_suggest_cancel">Cancel</string>
+    <string name="v40_challenge_suggest_cd">Boyacık suggests the drawing quest</string>
+    <string name="v40_challenge_body_resume">You are doing great! %1$d / %2$d levels passed.</string>
+    <string name="v40_challenge_body_premium">Great! You passed all %1$d free levels. The other %2$d levels unlock with Premium.</string>
+    <string name="v40_challenge_body_all_done">Super! You passed all %1$d levels. Replay a level to collect even more stars.</string>
+    <string name="v40_challenge_go_premium">See Premium</string>
+    <string name="v40_challenge_replay">Play again (%1$d)</string>
+</resources>

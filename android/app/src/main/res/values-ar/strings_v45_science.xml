@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- v45 bilim: formüllü fen şekilleri, grafik formülü, molekül görünümleri -->
+<resources>
+    <string name="v45_tool_params">القيم</string>
+    <string name="v45_mode_hint_params">غيّر القيم أو الصيغة؛ اسحب المقابض على الشكل</string>
+    <string name="v45_vector_edit">تحرير المتجه</string>
+    <string name="v45_param_formula">الصيغة</string>
+    <string name="v45_param_formula_hint">إسناد (v = 20; θ = 45°)، أو قيمة مشتقة (R = 50)، أو منحنى (y = 2x² − 3)؛ وللجزيئات صيغة (CH3COOH، C6H12O6)</string>
+    <string name="v45_param_less">إنقاص %1$s</string>
+    <string name="v45_param_more">زيادة %1$s</string>
+    <string name="v45_param_out_of_range">قيمة %1$s خارج النطاق المسموح</string>
+    <string name="v45_param_no_match">الصيغة المكتوبة لا تناسب هذا الشكل</string>
+    <string name="v45_math_empty">الصيغة فارغة</string>
+    <string name="v45_math_unexpected">رمز غير متوقع “%1$s” (الحرف %2$d)</string>
+    <string name="v45_math_parenthesis">قوس غير متطابق (الحرف %1$d)</string>
+    <string name="v45_math_missing">معامل ناقص (الحرف %1$d)</string>
+    <string name="v45_math_unknown">اسم غير معروف: %1$s</string>
+    <string name="v45_math_arguments">عدد وسائط %1$s غير صحيح</string>
+    <string name="v45_math_div_zero">قسمة على صفر: النتيجة غير معرّفة</string>
+    <string name="v45_math_domain">%1$s غير معرّفة عند هذه القيمة</string>
+    <string name="v45_math_relation">لا يمكن استخدام علاقة هنا</string>
+    <string name="v45_math_overflow">النتيجة كبيرة جدًا</string>
+    <string name="v45_chem_empty">الصيغة فارغة</string>
+    <string name="v45_chem_unknown_element">عنصر غير معروف: %1$s</string>
+    <string name="v45_chem_valence">ذرة %1$s تخالف قواعد التكافؤ</string>
+    <string name="v45_chem_hydrogen">عدد ذرات الهيدروجين لا يناسب هذه البنية</string>
+    <string name="v45_chem_too_large">الجزيء كبير جدًا للرسم (بحد أقصى %1$s ذرة ثقيلة)</string>
+    <string name="v45_chem_ionic">هذا المركب الأيوني غير معروف (%1$s)</string>
+    <string name="v45_chem_parenthesis">الأقواس غير متطابقة</string>
+    <string name="v45_chem_ring">رقم الحلقة لم يُغلق (%1$s)</string>
+    <string name="v45_chem_syntax">تعذّرت قراءة الصيغة</string>
+    <string name="v45_mol_structural">صيغة بنائية</string>
+    <string name="v45_mol_condensed">صيغة مختصرة</string>
+    <string name="v45_mol_skeletal">هيكلية</string>
+    <string name="v45_mol_3d">نموذج ثلاثي الأبعاد</string>
+    <string name="v45_graph_formula">الصيغة</string>
+    <string name="v45_graph_degrees">درجات</string>
+    <string name="v45_graph_hint_curve">y = f(x)؛ افصل بين عدة منحنيات بـ ; (y = x²; y = 2x + 1)</string>
+    <string name="v45_graph_hint_surface">سطح z = f(x, y) (مثلًا x² − y²)</string>
+    <string name="v45_graph_hint_set">نقطة أو مجموعة حل (x = 3، x &gt; 2، −1 ≤ x &lt; 3)</string>
+    <string name="v45_graph_hint_sampled">تُحسب القيم f(1)، f(2)، … (مثلًا 2x + 1)</string>
+    <string name="v45_formula_not_computed">تعذّر الحساب: %1$s</string>
+</resources>

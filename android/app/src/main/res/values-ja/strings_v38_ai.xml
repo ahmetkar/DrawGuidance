@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- v38 yapay zekâ önerileri: yazı, şekil ve çizgi önerisi ayrı (tek çizgiye öneri yok; tek düğmeyle düzeltme) -->
+    <string name="shape_suggest_title">図形の提案：</string>
+    <string name="line_suggest_title">線の提案：</string>
+    <string name="line_fix_all">線を補正（%1$d）</string>
+    <string name="line_fix_cd">補正を適用：%1$d 本の線をまとめて</string>
+    <string name="line_suggest_turn_off">線の提案をオフにする</string>
+    <string name="line_suggest_setting">線の提案</string>
+    <string name="line_suggest_setting_hint">複数の線をまとめて補正します（直線、円、角）</string>
+    <string name="kids_say_line_1">線を %1$d 本かいたね！ ぜんぶまっすぐきれいにしようか？</string>
+    <string name="kids_say_line_2">%1$d 本の線のはしをつないで、きれいにできるよ。やってみる？</string>
+    <string name="tut_hint_lines">線の提案：タップすると、対象のすべての線が一度に補正されます（元に戻すは1回）。</string>
+    <string name="tut_art_ai_text_v38">線の補正（2本以上）、テンプレート認識（近くにある4つ以上の要素）、AIの設定。</string>
+    <string name="tut_art_ai2_v38">線の補正</string>
+    <string name="tut_art_ai2_text_v38">線を何本かかいてペンを離すと、それぞれの線が整い、近くの端どうしがつながります。1本だけの線には提案は出ません。2つの弧で月をかきます。</string>
+    <string name="tut_art_ai3_text_v38">近くにある4本以上の線でかいたものは、図形データベースとモードのニューラルネットワークで検索されます：家、木、顔… 家をかきます。</string>
+    <string name="tut_lines_v38">線を補正</string>
+    <string name="tut_art_ai4_text_v38">まとめてかいた線はボタン1つですべて補正されます。松の木をかきます。</string>
+    <string name="tut_ai_select_text_v38">選択モードで2本以上の線を選ぶと、ボタンを押さなくても提案が出ます：文字・図形・線の提案は別々の吹き出しに表示されます。選択バーの「まとめて補正を提案」でも同じ提案が開きます。</string>
+    <string name="tut_ai_more_text_v38">⋮ メニューからこのキャンバスのAIをオン・オフできます。文字・図形・線の提案は個別にオンにできます。提案は端末上で動作し、受け入れるほどあなたに合わせて学習します。</string>
+    <string name="tut_notes_ai_text_v38">手書きを文字に変換（2つ以上の要素）、線をまとめて補正。</string>
+    <string name="tut_notes_ai2_text_v38">箱の4辺を別々の線でかくと、辺がまっすぐになり角がつながります。箱をかきます。</string>
+    <string name="tut_notes_ai3_text_v38">触れ合う3つの輪をかきます：ボタン1つで3つともきれいな円になります。</string>
+    <string name="tut_comic_ai_text_v38">マンガ専用の認識（吹き出し、表情）と線のまとめて補正。</string>
+    <string name="tut_comic_ai3_text_v38">泡をかきます：ボタン1つですべてきれいな円になります。</string>
+</resources>

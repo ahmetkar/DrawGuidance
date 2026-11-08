@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- v41 arka plan penceresinde Uygula; arka planı eleman gibi seçme -->
+<resources>
+    <string name="v41_bg_apply">应用</string>
+    <string name="v41_bg_hint">选择后点击“应用”：旧背景会被移除</string>
+    <string name="v41_bg_pending">更改尚未应用</string>
+    <string name="v41_bg_selected">已选中背景</string>
+    <string name="v41_bg_selected_hint">更改背景、调整不透明度或删除</string>
+    <string name="v41_bg_opacity">不透明度</string>
+    <string name="v41_bg_change">更改</string>
+    <string name="v41_bg_remove">删除</string>
+    <string name="v41_bg_element">背景</string>
+    <string name="v41_bg_element_none">无背景</string>
+</resources>

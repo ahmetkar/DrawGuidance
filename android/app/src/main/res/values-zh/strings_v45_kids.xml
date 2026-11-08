@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- v45 çocuk menüsü: kısa adlar, boya fırçası, fırça boyu, açıklamalar ve ipuçları -->
+    <string name="v45_kids_undo">撤销</string>
+    <string name="v45_kids_redo">恢复</string>
+    <string name="v45_kids_pen">铅笔</string>
+    <string name="v45_kids_eraser">橡皮</string>
+    <string name="v45_kids_paint_brush">涂色刷</string>
+    <string name="v45_kids_bucket">颜料桶</string>
+    <string name="v45_kids_parts">部件</string>
+    <string name="v45_kids_colors">颜色</string>
+    <string name="v45_kids_shapes">形状</string>
+    <string name="v45_kids_challenge">任务</string>
+    <string name="v45_kids_background">画纸</string>
+    <string name="v45_kids_image">图片</string>
+    <string name="v45_kids_text">文字</string>
+    <string name="v45_kids_model3d">3D</string>
+    <string name="v45_kids_select">选择</string>
+    <string name="v45_kids_eyedropper">取颜色</string>
+    <string name="v45_kids_ruler">尺子</string>
+    <string name="v45_kids_template">模板</string>
+    <string name="v45_kids_expand">放大</string>
+    <string name="v45_kids_brush_size">刷子粗细</string>
+    <string name="v45_kids_size_thin">细</string>
+    <string name="v45_kids_size_medium">中</string>
+    <string name="v45_kids_size_thick">粗</string>
+    <string name="v45_help_kids_pen">用铅笔在纸上画你想画的。颜色和粗细在“颜色”里选。</string>
+    <string name="v45_help_kids_paint_brush">涂色刷：用手指在形状里面涂色。颜色不会涂到线外面；在空白纸上，手指经过的地方都会涂上。</string>
+    <string name="v45_help_kids_bucket">颜料桶：点一下形状里面，那里就变成你选的颜色。按住 2 秒，整个形状都会涂上。</string>
+    <string name="v45_help_kids_parts">看看画里的部件（线条、形状、文字），还可以隐藏或删除。</string>
+    <string name="v45_help_kids_colors">选择铅笔的颜色、粗细和种类。</string>
+    <string name="v45_help_kids_shapes">现成的图画和形状：选一个，再点一下画纸放上去。</string>
+    <string name="v45_help_kids_background">改变画纸的颜色。</string>
+    <string name="v45_help_kids_brush_size">涂色刷的粗细：细、中、粗。</string>
+    <string name="v45_challenge_tip_pen">选上面的“铅笔”，用手指沿着虚线慢慢画。</string>
+    <string name="v45_challenge_tip_paint_brush">也可以用涂色刷：选“涂色刷”，选颜色，用手指涂满里面。颜色不会涂到线外面！</string>
+    <string name="v45_tut_kids_pen">铅笔</string>
+    <string name="v45_tut_kids_pen_text">用铅笔可以随便画。看，我在天上画一个亮亮的太阳！</string>
+</resources>

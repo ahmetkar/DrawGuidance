@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- v28: editoryal diyagramlar (diagram-design tarzı), yeni diyagram türleri, kutu biçimleri -->
+<resources>
+    <string name="diagram_sequence">Sıra (mesajlar)</string>
+    <string name="diagram_er">Varlık–ilişki</string>
+    <string name="diagram_uml_class">UML sınıf</string>
+    <string name="diagram_db_schema">Veritabanı şeması</string>
+    <string name="diagram_swimlane">Kulvar</string>
+    <string name="diagram_kanban">Kanban</string>
+    <string name="diagram_story_map">Hikâye haritası</string>
+    <string name="diagram_deployment">Dağıtım</string>
+    <string name="diagram_nested">İç içe</string>
+    <string name="diagram_layers">Katman yığını</string>
+    <string name="diagram_loop">Göbekli döngü</string>
+    <string name="diagram_quadrant">Dörtlü konum</string>
+    <string name="diagram_wardley">Wardley haritası</string>
+    <string name="diagram_journey">Kullanıcı yolculuğu</string>
+    <string name="diagram_dependency">Bağımlılık</string>
+    <string name="diagram_it_state">BT mevcut durum</string>
+    <string name="diagram_high_level">Üst düzey yığın</string>
+    <string name="diagram_medallion">Madalyon katmanları</string>
+    <string name="diagram_data_flow">Veri akışı</string>
+    <string name="diagram_dp_integration">Platform entegrasyonu</string>
+    <string name="diagram_arch_delta">Mimari farkı</string>
+    <string name="diagram_bar">Sütun grafiği</string>
+    <string name="diagram_waterfall">Şelale</string>
+    <string name="diagram_line">Çizgi grafiği</string>
+    <string name="diagram_scatter">Serpilme</string>
+    <string name="diagram_radar">Radar</string>
+    <string name="diagram_polar">Kutupsal grafik</string>
+    <string name="diagram_treemap">Ağaç haritası</string>
+    <string name="diagram_heatmap">Isı haritası</string>
+    <string name="diagram_dp_security">Erişim matrisi</string>
+    <string name="diagram_sankey">Sankey akışı</string>
+    <string name="diagram_gantt">Gantt</string>
+    <string name="diagram_exploded">Patlatılmış görünüm</string>
+    <string name="diagram_axonometric">Aksonometrik plan</string>
+    <string name="box_table">Tablo</string>
+    <string name="box_group">Bölge</string>
+    <string name="box_lane">Kulvar</string>
+    <string name="box_column">Sütun</string>
+    <string name="box_card">Kart</string>
+    <string name="box_dot">Nokta</string>
+    <string name="box_label">Yalnız yazı</string>
+    <string name="box_bar">Çubuk</string>
+    <string name="box_cell">Hücre</string>
+    <string name="box_slab">Levha</string>
+    <string name="diagram_focal">Vurgula (odak)</string>
+    <string name="diagram_group_structure">Yapı ve akış</string>
+    <string name="diagram_group_software">Yazılım ve veri</string>
+    <string name="diagram_group_data">Nicel (grafik)</string>
+    <string name="diagram_group_teaching">Ders ve sunum</string>
+    <string name="diagram_data_hint">Değerler adımların yazısındaki sayılardır (ör. \"Ocak 120\", \"Kadro +64\", \"Toplam =\"); yazıyı değiştirince grafik yeniden çizilir.</string>
+</resources>

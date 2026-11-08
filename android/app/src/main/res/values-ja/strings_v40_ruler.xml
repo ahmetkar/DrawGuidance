@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- v40 cetvel ve şekil kalıbı -->
+<resources>
+    <string name="v40_ruler">定規</string>
+    <string name="v40_template">図形テンプレート</string>
+    <string name="v40_ruler_finish">完了</string>
+    <string name="v40_ruler_straight">直定規</string>
+    <string name="v40_ruler_protractor">分度器</string>
+    <string name="v40_ruler_set45">三角定規 45°</string>
+    <string name="v40_ruler_set30">三角定規 30°/60°</string>
+    <string name="v40_ruler_compass">コンパス</string>
+    <string name="v40_ruler_ellipse">楕円テンプレート</string>
+    <string name="v40_ruler_french">雲形定規</string>
+    <string name="v40_ruler_unit">単位</string>
+    <string name="v40_ruler_scale">縮尺</string>
+    <string name="v40_ruler_type">定規の種類</string>
+    <string name="v40_ruler_hint">端の近くに描くと線が端に沿います。本体をドラッグして移動、2本指で回転します。</string>
+    <string name="v40_compass_hint">どこに描いても線は円に沿います。針をドラッグして移動し、ハンドルで半径を変更します。</string>
+    <string name="v40_template_pick_hint">キャンバス上の図形をタップするか、ライブラリから選んでください</string>
+    <string name="v40_template_library">ライブラリから</string>
+    <string name="v40_template_lock">ロック</string>
+    <string name="v40_template_unlock">ロック解除</string>
+    <string name="v40_template_hint">テンプレートの端の近くに描きます。ハンドルで移動・サイズ変更できます。</string>
+    <string name="v40_template_none">ここに図形はありません</string>
+    <string name="v40_help_ruler">定規を開きます。端の近くに描いた線は端に沿います。種類・単位・縮尺は定規の横のボタンで変更します。</string>
+    <string name="v40_help_template">図形テンプレートを開きます。図形をタップするかライブラリから選び、端の近くに描いた線は端に沿います。</string>
+</resources>

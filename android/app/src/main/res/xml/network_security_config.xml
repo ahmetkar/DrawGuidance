@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  v44 yayın derlemesi: yalnız HTTPS (sunucu https://drawapi.ahmetkar.com). Düz HTTP'ye hiçbir adres için izin yok
+  (yerel ağ sunucusu seçeneği kaldırıldı). Sistem sertifika depoları kullanılır, kullanıcı tarafından eklenen CA'lara
+  güvenilmez. Sertifika sabitleme (pinning) yok: Let's Encrypt sertifikaları 90 günde bir ve ara sertifikalar habersiz
+  değişebilir; yanlış bir pin uygulamayı güncellemeye dek sunucudan koparır.
+  Hata ayıklama derlemesinde src/debug/res/xml/network_security_config.xml geçerlidir (emülatördeki sunucu).
+-->
+<network-security-config>
+    <base-config cleartextTrafficPermitted="false">
+        <trust-anchors>
+            <certificates src="system" />
+        </trust-anchors>
+    </base-config>
+</network-security-config>

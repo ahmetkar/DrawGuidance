@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- v42 metinleri -->
+<resources>
+    <string name="v42_stats_drawings">Resim</string>
+    <string name="v42_stats_notes">Not</string>
+    <string name="v42_stats_comics">Çizgi roman</string>
+    <string name="v42_save_title">Kaydet</string>
+    <string name="v42_save_hint">Biçimi seç; ayarlar seçtiğin biçime göre değişir.</string>
+    <string name="v42_save_tab_image">Resim dosyası</string>
+    <string name="v42_save_tab_pdf">PDF</string>
+    <string name="v42_save_tab_cbz">CBZ</string>
+    <string name="v42_err_copy">Kopyala</string>
+    <string name="v42_err_share">Paylaş / e-posta</string>
+    <string name="v42_err_copied">Rapor panoya kopyalandı. Bize e-postayla ya da mesajla gönderebilirsin.</string>
+    <string name="v42_err_share_hint">Giriş yapamıyorsan ya da sunucuya ulaşılamıyorsa raporu kopyalayıp ya da paylaşıp bize gönderebilirsin.</string>
+    <string name="v42_server_title">Sunucu (geçici)</string>
+    <string name="v42_server_hint">Uygulamanın bağlanacağı sunucu: uzak sunucu ya da yerel ağındaki bilgisayarda çalışan sunucu.</string>
+    <string name="v42_server_remote">Uzak sunucu</string>
+    <string name="v42_server_local">Yerel ağ</string>
+    <string name="v42_server_current">Şu an: %1$s</string>
+    <string name="v42_server_local_hint">Telefon ve bilgisayar aynı Wi-Fi\'da olmalı. Bilgisayarda Yerel-Sunucuyu-Baslat.bat\'ı çalıştır, gösterilen adresi yaz ya da Ağda ara. Bağlantı şifresizdir; yalnız kendi ağında kullan.</string>
+    <string name="v42_server_local_invalid">Yalnız yerel ağ adresi yazılabilir (ör. 192.168.1.20:4747).</string>
+    <string name="v42_server_use">Bu sunucuyu kullan</string>
+    <string name="v42_add_objects">Nesneler</string>
+    <string name="v42_obj_title">Nesne ekle</string>
+    <string name="v42_obj_hint">Hazır nesneler tema paketine ve kategoriye göre. Dokununca sayfaya eklenir; taşıyıp döndürebilir, boyutunu değiştirebilirsin.</string>
+    <string name="v42_fx_images_hint">Hazır çizilmiş patlama, enerji, duman ve ışıltı resimleri; tema paketine ve kategoriye göre.</string>
+    <string name="v42_text_on_path">Yol üzerinde yazı</string>
+    <string name="v42_text_on_path_need">Yol üzerinde yazı (önce kalem aracıyla bir yol çiz)</string>
+    <string name="v42_text_path_pick">Yazının yerleşeceği yola dokun</string>
+    <string name="v42_text_path_missed">Orada yol yok: işaretli yollardan birine dokun</string>
+    <string name="v42_text_path_below">Yazıyı yolun altına al</string>
+    <string name="v42_text_path_above">Yazıyı yolun üstüne al</string>
+    <string name="v42_text_path_reverse">Yazının yönünü çevir</string>
+    <string name="v42_text_path_detach">Yazıyı yoldan çıkar</string>
+    <string name="v42_saved_tab_default">Varsayılan klasör</string>
+    <string name="v42_saved_tab_other">Diğer konumlar</string>
+    <string name="v42_saved_empty_other">\"Konum seç\" ya da \"Farklı kaydet\" ile başka bir klasöre kaydettiklerin burada listelenir.</string>
+    <string name="v42_saved_open">Aç</string>
+    <string name="v42_saved_no_viewer">Bu dosyayı açacak bir uygulama yok. Paylaş ile başka bir uygulamaya gönderebilirsin.</string>
+    <string name="v42_saved_document">%1$s belgesi · %2$s</string>
+    <string name="v42_help_add_objects">Hazır nesneler: silah, fener, belge, hazine, yiyecek... Tema paketine ve kategoriye göre seçilir, sayfaya resim olarak eklenir.</string>
+</resources>

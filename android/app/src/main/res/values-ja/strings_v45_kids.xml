@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- v45 çocuk menüsü: kısa adlar, boya fırçası, fırça boyu, açıklamalar ve ipuçları -->
+    <string name="v45_kids_undo">もどす</string>
+    <string name="v45_kids_redo">やりなおす</string>
+    <string name="v45_kids_pen">えんぴつ</string>
+    <string name="v45_kids_eraser">けしゴム</string>
+    <string name="v45_kids_paint_brush">ふで</string>
+    <string name="v45_kids_bucket">バケツ</string>
+    <string name="v45_kids_parts">パーツ</string>
+    <string name="v45_kids_colors">いろ</string>
+    <string name="v45_kids_shapes">かたち</string>
+    <string name="v45_kids_challenge">ミッション</string>
+    <string name="v45_kids_background">かみ</string>
+    <string name="v45_kids_image">しゃしん</string>
+    <string name="v45_kids_text">もじ</string>
+    <string name="v45_kids_model3d">3D</string>
+    <string name="v45_kids_select">えらぶ</string>
+    <string name="v45_kids_eyedropper">いろをとる</string>
+    <string name="v45_kids_ruler">じょうぎ</string>
+    <string name="v45_kids_template">ステンシル</string>
+    <string name="v45_kids_expand">ひろげる</string>
+    <string name="v45_kids_brush_size">ふでのふとさ</string>
+    <string name="v45_kids_size_thin">ほそい</string>
+    <string name="v45_kids_size_medium">ふつう</string>
+    <string name="v45_kids_size_thick">ふとい</string>
+    <string name="v45_help_kids_pen">えんぴつでかみになんでもかけるよ。いろとふとさは「いろ」でえらぶよ。</string>
+    <string name="v45_help_kids_paint_brush">ふで：ゆびでかたちのなかをぬろう。いろはせんのそとにはみださないよ。なにもないかみでは、ゆびがとおったところをぬるよ。</string>
+    <string name="v45_help_kids_bucket">バケツ：かたちのなかをタップすると、そこがえらんだいろになるよ。2びょうおしつづけると、かたちぜんぶがぬれるよ。</string>
+    <string name="v45_help_kids_parts">えのパーツ（せん、かたち、もじ）がみられるよ。かくしたり、けしたりできるよ。</string>
+    <string name="v45_help_kids_colors">えんぴつのいろ、ふとさ、しゅるいをえらぶよ。</string>
+    <string name="v45_help_kids_shapes">できあがったえとかたち：ひとつえらんで、かみをタップしておいてね。</string>
+    <string name="v45_help_kids_background">かみのいろをかえるよ。</string>
+    <string name="v45_help_kids_brush_size">ふでのふとさ：ほそい、ふつう、ふとい。</string>
+    <string name="v45_challenge_tip_pen">うえの「えんぴつ」をえらんで、ゆびでてんせんのうえをゆっくりなぞってね。</string>
+    <string name="v45_challenge_tip_paint_brush">ふででもぬれるよ：「ふで」をえらんで、いろをえらんで、ゆびでなかをぬってね。せんのそとにはみださないよ！</string>
+    <string name="v45_tut_kids_pen">えんぴつ</string>
+    <string name="v45_tut_kids_pen_text">えんぴつでなんでもかけるよ。みて、そらにかがやくおひさまをかくよ！</string>
+</resources>

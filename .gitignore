@@ -18,3 +18,14 @@ GoogleService-Info.plist
 google-services.json
 *service-account*.json
 .env
+
+# --- v49 proje kökü .gitignore ---
+
+# v40 sunucu sırları
+backend/docker/.env
+**/.env
+
+# Derleme çıktıları (sunucu)
+backend/.gradle/
+backend/build/
+backend/docker/secrets/

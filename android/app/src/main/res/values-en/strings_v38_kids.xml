@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="kids_challenge">Drawing Quest</string>
+    <string name="help_kids_challenge">Drawing quests, level by level. Tap Start; draw over the dashed lines on the paper or paint the picture in the example colors, then tap Done. If your score is high enough, the next level opens. Progress shows all the levels.</string>
+    <string name="challenge_menu_idle">Drawing quests, level by level! Draw the target picture, collect points and win stars.</string>
+    <string name="challenge_menu_running">You are on level %1$d: %2$s.</string>
+    <string name="challenge_start">Start</string>
+    <string name="challenge_stop">Turn off</string>
+    <string name="challenge_progress">Progress</string>
+    <string name="challenge_level_of">Level %1$d / %2$d</string>
+    <string name="challenge_finish">Done</string>
+
+    <string name="challenge_kind_trace">Draw</string>
+    <string name="challenge_kind_paint">Paint</string>
+    <string name="challenge_kind_build">Place and paint</string>
+    <string name="challenge_intro_trace">Level %1$d: %2$s! Draw over the dashed lines with the brush. When you finish, tap Done at the top.</string>
+    <string name="challenge_intro_paint">Level %1$d: %2$s! Use the paint bucket to paint the picture in the colors of the dots. When you finish, tap Done.</string>
+    <string name="challenge_intro_build">Level %1$d: %2$s! Find the picture under Add shape, put it on the dashed line and paint it in the colors of the dots.</string>
+
+    <string name="challenge_tip_brush">Pick the brush at the top and slowly trace the dashed line with your finger.</string>
+    <string name="challenge_tip_eraser">Went over the line? Pick the eraser and rub out the extra bit.</string>
+    <string name="challenge_tip_undo">Oops? The back arrow at the top undoes your last step.</string>
+    <string name="challenge_tip_paint">Pick the paint bucket, choose the color of the dot and tap that spot.</string>
+    <string name="challenge_tip_hold">Hold the bucket on a shape for 2 seconds and the whole shape gets painted at once.</string>
+    <string name="challenge_tip_shape">Tap Add shape, pick the %1$s picture and tap the paper to put it down.</string>
+    <string name="challenge_tip_move">Drag the picture with your finger onto the dashed line.</string>
+    <string name="challenge_tip_finish">When you are ready, tap the green Done button at the top and I\'ll tell you your score!</string>
+    <string name="challenge_live_close">Great, you are really close! Tap Done when you are ready.</string>
+    <string name="challenge_tip_next">Tip</string>
+    <string name="challenge_mascot_cd">Painty, tap for a tip</string>
+
+    <string name="challenge_passed_title">Level passed!</string>
+    <string name="challenge_failed_title">Almost there!</string>
+    <string name="challenge_passed_say">Great job! The next level is waiting for you.</string>
+    <string name="challenge_passed_say_3">Amazing! You got all three stars!</string>
+    <string name="challenge_failed_say">You need %1$d points to pass this level. Try again, it will be even better this time!</string>
+    <string name="challenge_all_done">You passed the last level too! You are a real artist!</string>
+    <string name="challenge_score">Score</string>
+    <string name="challenge_best">Best: %1$d</string>
+    <string name="challenge_stars_cd">%1$d stars</string>
+    <string name="challenge_next">Next level</string>
+    <string name="challenge_retry">Try again</string>
+    <string name="challenge_exit">Exit mode</string>
+
+    <string name="challenge_progress_summary">%1$d / %2$d levels passed · %3$d stars</string>
+    <string name="challenge_state_passed">Passed</string>
+    <string name="challenge_state_open">Open</string>
+    <string name="challenge_state_locked">Locked</string>
+    <string name="challenge_play">Play</string>
+    <string name="challenge_locked_say">This level is locked. Pass level %1$d first!</string>
+</resources>

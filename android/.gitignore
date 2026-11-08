@@ -1,0 +1,7 @@
+.gradle/
+build/
+local.properties
+# v39 Play yükleme anahtarı (paylaşılan klasörde yedekli; git'e girmez)
+app/keystore/release.properties
+app/keystore/*.jks
+.kotlin/

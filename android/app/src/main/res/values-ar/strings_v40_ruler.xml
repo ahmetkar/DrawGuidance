@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- v40 cetvel ve şekil kalıbı -->
+<resources>
+    <string name="v40_ruler">المسطرة</string>
+    <string name="v40_template">قالب الشكل</string>
+    <string name="v40_ruler_finish">إنهاء</string>
+    <string name="v40_ruler_straight">مسطرة مستقيمة</string>
+    <string name="v40_ruler_protractor">منقلة</string>
+    <string name="v40_ruler_set45">مثلث 45°</string>
+    <string name="v40_ruler_set30">مثلث 30°/60°</string>
+    <string name="v40_ruler_compass">فرجار</string>
+    <string name="v40_ruler_ellipse">قالب القطع الناقص</string>
+    <string name="v40_ruler_french">مسطرة منحنيات</string>
+    <string name="v40_ruler_unit">الوحدة</string>
+    <string name="v40_ruler_scale">المقياس</string>
+    <string name="v40_ruler_type">نوع المسطرة</string>
+    <string name="v40_ruler_hint">ارسم قرب الحافة وسيتبعها الخط. اسحب الجسم لتحريكه، وأدره بإصبعين.</string>
+    <string name="v40_compass_hint">أينما رسمت يتبع الخط الدائرة. اسحب الإبرة للتحريك واستخدم المقبض لتغيير نصف القطر.</string>
+    <string name="v40_template_pick_hint">المس شكلاً على اللوحة أو اختر واحداً من المكتبة</string>
+    <string name="v40_template_library">من المكتبة</string>
+    <string name="v40_template_lock">قفل</string>
+    <string name="v40_template_unlock">إلغاء القفل</string>
+    <string name="v40_template_hint">ارسم قرب حواف القالب؛ حرّكه وغيّر حجمه بالمقابض.</string>
+    <string name="v40_template_none">لا يوجد شكل هنا</string>
+    <string name="v40_help_ruler">يفتح مسطرة: الخطوط المرسومة قرب حافتها تتبعها. غيّر النوع والوحدة والمقياس من الأزرار بجانب المسطرة.</string>
+    <string name="v40_help_template">يفتح قالب شكل: المس شكلاً أو اختره من المكتبة؛ الخطوط المرسومة قرب حوافه تتبعها.</string>
+</resources>

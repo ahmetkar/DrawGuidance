@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- v40 cetvel ve şekil kalıbı -->
+<resources>
+    <string name="v40_ruler">자</string>
+    <string name="v40_template">도형 템플릿</string>
+    <string name="v40_ruler_finish">완료</string>
+    <string name="v40_ruler_straight">직선 자</string>
+    <string name="v40_ruler_protractor">각도기</string>
+    <string name="v40_ruler_set45">삼각자 45°</string>
+    <string name="v40_ruler_set30">삼각자 30°/60°</string>
+    <string name="v40_ruler_compass">컴퍼스</string>
+    <string name="v40_ruler_ellipse">타원 템플릿</string>
+    <string name="v40_ruler_french">운형자</string>
+    <string name="v40_ruler_unit">단위</string>
+    <string name="v40_ruler_scale">축척</string>
+    <string name="v40_ruler_type">자 종류</string>
+    <string name="v40_ruler_hint">가장자리 근처에 그리면 선이 가장자리를 따라갑니다. 본체를 끌어 이동하고 두 손가락으로 회전하세요.</string>
+    <string name="v40_compass_hint">어디에 그려도 선이 원을 따라갑니다. 바늘을 끌어 이동하고 핸들로 반지름을 바꾸세요.</string>
+    <string name="v40_template_pick_hint">캔버스의 도형을 탭하거나 라이브러리에서 선택하세요</string>
+    <string name="v40_template_library">라이브러리에서</string>
+    <string name="v40_template_lock">잠금</string>
+    <string name="v40_template_unlock">잠금 해제</string>
+    <string name="v40_template_hint">템플릿 가장자리 근처에 그리세요. 핸들로 이동하고 크기를 바꿀 수 있습니다.</string>
+    <string name="v40_template_none">여기에 도형이 없습니다</string>
+    <string name="v40_help_ruler">자를 엽니다. 가장자리 근처에 그린 선은 가장자리를 따라갑니다. 종류, 단위, 축척은 자 옆의 버튼으로 바꿉니다.</string>
+    <string name="v40_help_template">도형 템플릿을 엽니다. 도형을 탭하거나 라이브러리에서 고르면, 가장자리 근처에 그린 선이 따라갑니다.</string>
+</resources>

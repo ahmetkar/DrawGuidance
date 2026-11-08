@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- v41 arka plan penceresinde Uygula; arka planı eleman gibi seçme -->
+<resources>
+    <string name="v41_bg_apply">적용</string>
+    <string name="v41_bg_hint">선택 후 적용을 누르세요: 이전 배경은 지워집니다</string>
+    <string name="v41_bg_pending">변경 사항이 아직 적용되지 않았습니다</string>
+    <string name="v41_bg_selected">배경 선택됨</string>
+    <string name="v41_bg_selected_hint">배경을 바꾸거나 불투명도를 조절하거나 삭제하세요</string>
+    <string name="v41_bg_opacity">불투명도</string>
+    <string name="v41_bg_change">변경</string>
+    <string name="v41_bg_remove">삭제</string>
+    <string name="v41_bg_element">배경</string>
+    <string name="v41_bg_element_none">배경 없음</string>
+</resources>

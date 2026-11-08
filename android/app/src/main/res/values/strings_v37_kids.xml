@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- v37 çocuk modu: maskot Boyacık, öneri kalıpları, ilk giriş eğitimi ve Ana sayfa önerisi -->
+    <string name="kids_mascot_name">Boyacık</string>
+    <string name="kids_mascot_open">Boyacık\'ı çağır</string>
+    <string name="kids_mascot_cd">Boyacık, çizim arkadaşın</string>
+    <string name="kids_mascot_next">Tamam</string>
+    <string name="kids_mascot_end">Sonlandır</string>
+    <string name="kids_mascot_close">Kapat</string>
+    <string name="kids_mascot_apply">Uygula</string>
+    <string name="kids_mascot_hello">Merhaba, ben Boyacık! Çizerken hep yanındayım. Bana dokunursan sana ipucu veririm.</string>
+
+    <string name="kids_tip_1">Boya kovasını seç, bir renk seç ve şekle dokun: dokunduğun yer boyanır!</string>
+    <string name="kids_tip_2">Parmağını bir şeklin üstünde 2 saniye tutarsan bütün şekil birden boyanır.</string>
+    <string name="kids_tip_3">Yanlış mı oldu? Üstteki geri ok son yaptığını geri alır.</string>
+    <string name="kids_tip_4">Hazır resimlerden bir ev ya da balon ekleyip istediğin gibi boyayabilirsin.</string>
+    <string name="kids_tip_5">Kâğıdın rengini değiştirmeyi denedin mi? Gökyüzü gibi mavi olabilir!</string>
+
+    <string name="kids_praise_1">Harika oldu! Çok güzel çiziyorsun.</string>
+    <string name="kids_praise_2">Süper! Devam et, çok iyi gidiyorsun!</string>
+    <string name="kids_praise_3">Bayıldım! Sırada ne var?</string>
+
+    <string name="kids_say_shape_1">Bu bir %1$s! İstersen onu dümdüz ve tertemiz yapayım.</string>
+    <string name="kids_say_shape_2">Vay, %1$s çizmişsin! Çizgilerini düzelteyim mi?</string>
+    <string name="kids_say_shape_3">Ne güzel bir %1$s! Kenarlarını düzgün yapalım mı?</string>
+    <string name="kids_say_template_1">Bu bir %1$s gibi görünüyor! Hazır resmiyle değiştireyim mi?</string>
+    <string name="kids_say_template_2">Aaa, sanki bir %1$s! Onu boyaması kolay bir resme çevireyim mi?</string>
+    <string name="kids_say_template_3">Hmm… galiba %1$s çizmek istedin. Hazır bir tane koyayım mı?</string>
+    <string name="kids_say_all_1">Tam %1$d şekil çizmişsin! Hepsini birden düzelteyim mi?</string>
+    <string name="kids_say_all_2">%1$d şeklin çizgilerini tek seferde düzgünleştirebilirim. Yapalım mı?</string>
+    <string name="kids_say_text_1">Sanırım “%1$s” yazdın! Bunu güzel bir yazıya çevireyim mi?</string>
+    <string name="kids_say_text_2">“%1$s” yazısını okuyabildim! Düzgün harflerle yazayım mı?</string>
+    <string name="kids_say_part_1">Bu %1$s çizimine %2$d parça ekleyerek tamamlayabilirim. Ekleyeyim mi?</string>
+    <string name="kids_say_part_2">Çizimini %1$s gibi tamamlamak ister misin? %2$d parça eklerim!</string>
+
+    <string name="tut_kids">Boyacık ile resim yapalım</string>
+    <string name="tut_kids_text">Boyacık araçları tanıtır ve seninle adım adım bir resim yapar.</string>
+    <string name="tut_kids_1">Merhaba!</string>
+    <string name="tut_kids_1_text">Ben Boyacık! Sana çizim araçlarını göstereceğim ve birlikte kocaman bir resim yapacağız. Hazır mısın?</string>
+    <string name="tut_kids_2">Fırça</string>
+    <string name="tut_kids_2_text">Fırçayla istediğin gibi çizersin. Bak, gökyüzüne parlak bir güneş çiziyorum!</string>
+    <string name="tut_kids_3">Hazır resimler</string>
+    <string name="tut_kids_3_text">Şekil düğmesinden hazır resimler eklersin. Bir ev ve renkli balonlar koyuyorum.</string>
+    <string name="tut_kids_4">Boya kovası</string>
+    <string name="tut_kids_4_text">Kovayı seç, bir renk seç ve şeklin içine dokun: dokunduğun yer boyanır. Çatı kırmızı, duvar sarı olsun!</string>
+    <string name="tut_kids_5">Hepsini boya</string>
+    <string name="tut_kids_5_text">Parmağını bir şeklin üstünde 2 saniye tut: halka dolunca bütün şekil birden boyanır. Balonların hepsi pembe!</string>
+    <string name="tut_kids_6">Silgi</string>
+    <string name="tut_kids_6_text">Silgiyle istemediğin çizgileri silersin. Şu karalamayı siliyorum.</string>
+    <string name="tut_kids_7">Geri al</string>
+    <string name="tut_kids_7_text">Bir şey yanlış mı oldu? Geri ok son yaptığını geri alır, ileri ok yeniden yapar.</string>
+    <string name="tut_kids_8">Kâğıdın rengi</string>
+    <string name="tut_kids_8_text">Kâğıdın rengini de değiştirebilirsin. Gökyüzü mavisi yapıyorum!</string>
+    <string name="tut_kids_9">Bitti!</string>
+    <string name="tut_kids_9_text">Son olarak yemyeşil çimen! İşte resmimiz hazır. Şimdi sıra sende, en güzel resmi sen yap!</string>
+
+    <string name="kids_home_say">İstersen en eğlenceli çizimleri yapmaya başla</string>
+    <string name="kids_home_title">Çocuk modu</string>
+    <string name="kids_home_start">Hadi başla</string>
+    <string name="kids_home_dismiss">Şimdi değil</string>
+    <string name="kids_canvas_name">Benim resmim</string>
+</resources>

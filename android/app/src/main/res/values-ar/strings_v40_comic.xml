@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- v40 çizgi roman hazır karakterleri ve arka planları -->
+<resources>
+    <string name="v40_comic_chars_hint">اختر النمط والموضوع، ثم المس شخصية، ثم المس أحد أشكالها لإضافته إلى الصفحة.</string>
+    <string name="v40_comic_style">النمط</string>
+    <string name="v40_comic_theme">الموضوع</string>
+    <string name="v40_comic_style_manga">مانغا</string>
+    <string name="v40_comic_style_comic">قصص مصورة</string>
+    <string name="v40_comic_group_expressions">التعابير</string>
+    <string name="v40_comic_group_poses">الوضعيات</string>
+    <string name="v40_comic_group_action">حركة</string>
+    <string name="v40_comic_group_daily">يومي</string>
+    <string name="v40_comic_bg_title">خلفيات جاهزة</string>
+</resources>

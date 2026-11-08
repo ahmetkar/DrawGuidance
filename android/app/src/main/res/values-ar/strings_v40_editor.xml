@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- v40 çizim ekranı: arka planı taşıma/boyutlandırma -->
+<resources>
+    <string name="bg_transform">نقل / تغيير الحجم</string>
+    <string name="bg_transform_hint">اسحب الخلفية؛ غيّر حجمها بإصبعين أو من الزوايا</string>
+    <string name="bg_transform_reset">إعادة تعيين</string>
+</resources>

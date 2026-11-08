@@ -1,0 +1,42 @@
+# Privacy Notice (KVKK)
+
+Version: 2026-10-25 · Effective: October 2026
+
+Under Article 10 of the Turkish Personal Data Protection Law No. 6698 ("KVKK"), this notice explains how your personal data is processed when you create an account in the Draw Guidance (DrawGuidance) app.
+
+## 1. Data controller
+The data controller is karApp, the developer of the app. Contact details are on the app's store page.
+
+## 2. Data processed
+When you create an account, only the following is processed:
+- Identity: first name, last name, display name, date of birth.
+- Contact: email address and whether it is verified.
+- Account: Google/Firebase account ID, profile photo link, Google account creation date, record creation and update times.
+- Consent records: when and which version of this notice and the Terms of Use you accepted.
+
+Your drawings, notes, 3D shapes, images and what the AI learns on your device are never sent to the server; they stay on your device.
+
+## 3. Purposes
+- Creating your account, verifying your identity and managing your session,
+- Syncing your profile between devices,
+- Ensuring age-appropriate use (date of birth),
+- Meeting legal obligations and keeping evidence in case of disputes (consent records).
+
+## 4. Legal grounds
+Data is processed under KVKK Articles 5/2-c (performance of a contract), 5/2-ç (legal obligation) and 5/2-f (legitimate interest).
+
+## 5. Collection method
+Data is collected electronically from Google (through Firebase Authentication) when you sign in with Google, and from the information you enter when creating your account or in account settings.
+
+## 6. Transfers
+- Google LLC's Firebase Authentication service is used to verify your identity; it may run on servers abroad. This transfer is made in line with Article 9 of KVKK.
+- Your profile is stored in the app's own server database.
+- Your data is not shared with other third parties, sold, or used for advertising. Lawful requests of authorized public bodies are reserved.
+
+## 7. Retention
+Your data is kept while your account is open. When you delete your account, your server record, your Firebase account and the account data on your device are deleted.
+
+## 8. Your rights (KVKK Article 11)
+You may ask whether your data is processed, request information, learn the purpose of processing and the recipients, request correction or deletion, object to results of automated analysis and claim compensation for unlawful processing.
+
+You can correct your profile in Settings > Account settings and delete your account there. For other requests, apply to the data controller in writing; requests are answered free of charge within 30 days.

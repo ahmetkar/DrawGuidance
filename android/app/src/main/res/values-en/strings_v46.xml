@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- v46 yeni tuval formunda hazır şablonlar -->
+    <string name="v46_template_section">Template</string>
+    <string name="v46_template_blank">Blank</string>
+    <string name="v46_template_blank_hint">Blank canvas: choose the size, paper and page count below.</string>
+    <string name="v46_template_selected_hint">%1$s The template\'s size, paper and pages are used; change anything and carry on.</string>
+</resources>

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- v45 düzenleyici: tablette sürüklenen pencereler, seçim ve ekleme menüleri -->
+<resources>
+    <string name="v45_window_drag">Pencereyi sürükle</string>
+    <string name="v45_window_reset">Konumu sıfırla</string>
+    <string name="v45_selection_menu">Seçim menüsü</string>
+    <string name="v45_selection_edit_menu">Düzenleme seçenekleri</string>
+    <string name="v45_add_menu">Ekleme menüsü</string>
+</resources>

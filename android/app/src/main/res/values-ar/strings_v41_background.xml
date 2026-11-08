@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- v41 arka plan penceresinde Uygula; arka planı eleman gibi seçme -->
+<resources>
+    <string name="v41_bg_apply">تطبيق</string>
+    <string name="v41_bg_hint">اختر ثم اضغط تطبيق: ستتم إزالة الخلفية القديمة</string>
+    <string name="v41_bg_pending">لم يتم تطبيق التغييرات بعد</string>
+    <string name="v41_bg_selected">تم تحديد الخلفية</string>
+    <string name="v41_bg_selected_hint">غيّر الخلفية أو اضبط عتامتها أو احذفها</string>
+    <string name="v41_bg_opacity">العتامة</string>
+    <string name="v41_bg_change">تغيير</string>
+    <string name="v41_bg_remove">حذف</string>
+    <string name="v41_bg_element">الخلفية</string>
+    <string name="v41_bg_element_none">لا توجد خلفية</string>
+</resources>

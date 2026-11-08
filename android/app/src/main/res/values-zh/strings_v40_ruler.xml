@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- v40 cetvel ve şekil kalıbı -->
+<resources>
+    <string name="v40_ruler">直尺</string>
+    <string name="v40_template">形状模板</string>
+    <string name="v40_ruler_finish">完成</string>
+    <string name="v40_ruler_straight">直尺</string>
+    <string name="v40_ruler_protractor">量角器</string>
+    <string name="v40_ruler_set45">三角尺 45°</string>
+    <string name="v40_ruler_set30">三角尺 30°/60°</string>
+    <string name="v40_ruler_compass">圆规</string>
+    <string name="v40_ruler_ellipse">椭圆模板</string>
+    <string name="v40_ruler_french">曲线板</string>
+    <string name="v40_ruler_unit">单位</string>
+    <string name="v40_ruler_scale">比例</string>
+    <string name="v40_ruler_type">直尺类型</string>
+    <string name="v40_ruler_hint">靠近边缘绘制，线条会沿边缘走。拖动尺身移动，双指旋转。</string>
+    <string name="v40_compass_hint">无论在哪里绘制，线条都会沿圆走。拖动针脚移动，用手柄改变半径。</string>
+    <string name="v40_template_pick_hint">点按画布上的形状，或从形状库中选择</string>
+    <string name="v40_template_library">从形状库</string>
+    <string name="v40_template_lock">锁定</string>
+    <string name="v40_template_unlock">解锁</string>
+    <string name="v40_template_hint">靠近模板边缘绘制；用手柄移动和缩放。</string>
+    <string name="v40_template_none">这里没有形状</string>
+    <string name="v40_help_ruler">打开直尺：靠近边缘绘制的线条会沿边缘走。用直尺旁的按钮更改类型、单位和比例。</string>
+    <string name="v40_help_template">打开形状模板：点按形状或从形状库选择；靠近边缘绘制的线条会沿边缘走。</string>
+</resources>

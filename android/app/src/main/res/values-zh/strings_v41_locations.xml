@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- v41 çizgi roman: mekân arka planı ekle (panele sığar ya da bütün sayfa) -->
+<resources>
+    <string name="v41_add_location">场景背景</string>
+    <string name="v41_loc_title">添加场景背景</string>
+    <string name="v41_loc_hint">选择风格和类别，点击背景，然后放到某个分格上或铺满整页。</string>
+    <string name="v41_loc_place_hint">点击或拖到某个分格：背景会适配该分格。放在分格外则铺满整页。</string>
+    <string name="v41_loc_whole_page">整页</string>
+    <string name="v41_help_add_location">添加现成的场景背景：选择漫画（日式）或漫画（美式）场景，放到分格上（适配该分格）或铺满整页。</string>
+</resources>

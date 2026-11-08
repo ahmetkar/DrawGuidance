@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- v45 düzenleyici: tablette sürüklenen pencereler, seçim ve ekleme menüleri -->
+<resources>
+    <string name="v45_window_drag">拖动窗口</string>
+    <string name="v45_window_reset">重置位置</string>
+    <string name="v45_selection_menu">选择菜单</string>
+    <string name="v45_selection_edit_menu">编辑选项</string>
+    <string name="v45_add_menu">添加菜单</string>
+</resources>

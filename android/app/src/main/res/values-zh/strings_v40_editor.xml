@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- v40 çizim ekranı: arka planı taşıma/boyutlandırma -->
+<resources>
+    <string name="bg_transform">移动 / 调整大小</string>
+    <string name="bg_transform_hint">拖动背景；用双指或拖动角落调整大小</string>
+    <string name="bg_transform_reset">重置</string>
+</resources>

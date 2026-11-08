@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- v45 bilim: formüllü fen şekilleri, grafik formülü, molekül görünümleri -->
+<resources>
+    <string name="v45_tool_params">値</string>
+    <string name="v45_mode_hint_params">値または式を変更し、図形のハンドルをドラッグします</string>
+    <string name="v45_vector_edit">ベクター編集</string>
+    <string name="v45_param_formula">式</string>
+    <string name="v45_param_formula_hint">代入 (v = 20; θ = 45°)、導出値 (R = 50)、または曲線 (y = 2x² − 3)。分子は化学式 (CH3COOH、C6H12O6)</string>
+    <string name="v45_param_less">%1$sを減らす</string>
+    <string name="v45_param_more">%1$sを増やす</string>
+    <string name="v45_param_out_of_range">%1$sの値が許容範囲外です</string>
+    <string name="v45_param_no_match">入力した式はこの図形に合いません</string>
+    <string name="v45_math_empty">式が空です</string>
+    <string name="v45_math_unexpected">予期しない「%1$s」(%2$d文字目)</string>
+    <string name="v45_math_parenthesis">括弧が対応していません (%1$d文字目)</string>
+    <string name="v45_math_missing">演算の項が足りません (%1$d文字目)</string>
+    <string name="v45_math_unknown">不明な名前: %1$s</string>
+    <string name="v45_math_arguments">%1$sの引数の数が正しくありません</string>
+    <string name="v45_math_div_zero">ゼロ除算: 結果は定義されません</string>
+    <string name="v45_math_domain">%1$sはこの値で定義されません</string>
+    <string name="v45_math_relation">ここでは関係式を使えません</string>
+    <string name="v45_math_overflow">結果が大きすぎます</string>
+    <string name="v45_chem_empty">式が空です</string>
+    <string name="v45_chem_unknown_element">不明な元素: %1$s</string>
+    <string name="v45_chem_valence">%1$s原子が原子価の規則に合いません</string>
+    <string name="v45_chem_hydrogen">水素の数がこの構造に合いません</string>
+    <string name="v45_chem_too_large">分子が大きすぎて描けません (重原子は最大%1$s個)</string>
+    <string name="v45_chem_ionic">このイオン化合物は認識できません (%1$s)</string>
+    <string name="v45_chem_parenthesis">括弧が対応していません</string>
+    <string name="v45_chem_ring">環番号が閉じていません (%1$s)</string>
+    <string name="v45_chem_syntax">式を読み取れません</string>
+    <string name="v45_mol_structural">構造式</string>
+    <string name="v45_mol_condensed">示性式</string>
+    <string name="v45_mol_skeletal">骨格式</string>
+    <string name="v45_mol_3d">3Dモデル</string>
+    <string name="v45_graph_formula">式</string>
+    <string name="v45_graph_degrees">度</string>
+    <string name="v45_graph_hint_curve">y = f(x)。複数の曲線は ; で区切ります (y = x²; y = 2x + 1)</string>
+    <string name="v45_graph_hint_surface">曲面 z = f(x, y) (例: x² − y²)</string>
+    <string name="v45_graph_hint_set">点または解の集合 (x = 3、x &gt; 2、−1 ≤ x &lt; 3)</string>
+    <string name="v45_graph_hint_sampled">値は f(1)、f(2)、… として計算されます (例: 2x + 1)</string>
+    <string name="v45_formula_not_computed">計算できません: %1$s</string>
+</resources>

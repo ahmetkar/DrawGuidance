@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- v46 yeni tuval formunda hazır şablonlar -->
+    <string name="v46_template_section">テンプレート</string>
+    <string name="v46_template_blank">白紙</string>
+    <string name="v46_template_blank_hint">白紙のキャンバス：下でサイズ・用紙・ページ数を選びます。</string>
+    <string name="v46_template_selected_hint">%1$s テンプレートのサイズ・用紙・ページを使います。自由に変更して続けられます。</string>
+</resources>

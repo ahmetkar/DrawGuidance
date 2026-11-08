@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- v40 tasarım: tema, Ana sayfa, Tuvallerim özeti, çizim süresi ve tuval boyutları -->
+<resources>
+    <string name="v40_theme_mode_title">主题</string>
+    <string name="v40_theme_mode_light">浅色</string>
+    <string name="v40_theme_mode_dark">深色</string>
+    <string name="v40_theme_mode_system">跟随系统</string>
+    <string name="v40_theme_high_contrast">高对比度</string>
+    <string name="v40_theme_high_contrast_hint">更醒目的文字和边框，加粗选中框</string>
+    <string name="v40_home_kind_art">自由绘画和上色</string>
+    <string name="v40_home_kind_notes">适合课堂与灵感</string>
+    <string name="v40_home_kind_comic">讲述你自己的故事</string>
+    <string name="v40_home_kind_simple_art">轻松开始绘画</string>
+    <string name="v40_home_kind_simple_notes">快速简洁的笔记</string>
+    <string name="v40_home_kind_kids">儿童趣味涂色</string>
+    <string name="v40_home_kind_3d">设计 3D 形状</string>
+    <string name="v40_home_group_simple">简单易用</string>
+    <string name="v40_home_group_advanced">所有工具尽在手中</string>
+    <string name="v40_home_most_time_title">投入时间最多的作品</string>
+    <string name="v40_home_most_time_cd">%1$s，已用 %2$s</string>
+    <string name="v40_time_lt_minute">不到 1 分钟</string>
+    <string name="v40_time_minutes">%1$d 分钟</string>
+    <string name="v40_time_hours_minutes">%1$d 小时 %2$d 分钟</string>
+    <string name="v40_time_hours">%1$d 小时</string>
+    <string name="v40_stats_title">概览</string>
+    <string name="v40_stats_total">总数</string>
+    <string name="v40_stats_week">本周</string>
+    <string name="v40_stats_time">绘画时间</string>
+    <string name="v40_stats_cd">%1$s：%2$s</string>
+    <string name="v40_size_square">正方形</string>
+    <string name="v40_size_portrait">竖版</string>
+    <string name="v40_size_landscape">横版</string>
+    <string name="v40_size_wallpaper">手机壁纸</string>
+    <string name="v40_size_a4_300">A4（300 dpi）</string>
+    <string name="v40_size_a4">A4</string>
+    <string name="v40_size_a5">A5</string>
+    <string name="v40_size_letter">Letter</string>
+    <string name="v40_size_a4_landscape">A4 横版</string>
+    <string name="v40_size_comic_page">漫画页</string>
+    <string name="v40_size_us_comic">美漫</string>
+    <string name="v40_size_manga_b5">日漫（B5）</string>
+    <string name="v40_size_webtoon">条漫</string>
+    <string name="v40_size_custom">自定义</string>
+    <string name="v40_size_width">宽度（%1$s）</string>
+    <string name="v40_size_height">高度（%1$s）</string>
+    <string name="v40_size_dpi">DPI</string>
+    <string name="v40_size_result">%1$d × %2$d px</string>
+    <string name="v40_size_error_min">边长至少为 %1$d px</string>
+    <string name="v40_size_error_max">边长最多为 %1$d px</string>
+    <string name="v40_size_error_memory">此尺寸对设备内存来说过大</string>
+</resources>

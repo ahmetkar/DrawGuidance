@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- v32 eğitim modu: öneri penceresi ve adım kutusu -->
+    <string name="tut_menu">Eğitim modu</string>
+    <string name="tut_offer_title_art">Çizim moduna hoş geldin</string>
+    <string name="tut_offer_title_notes">Not alma moduna hoş geldin</string>
+    <string name="tut_offer_title_comic">Çizgi roman moduna hoş geldin</string>
+    <string name="tut_offer_text">Hangi araçları öğrenmek istersin? Seçtiğin grubun her aracı, hemen altında açılan bir kutuyla tanıtılır ve o araçla çizim alanında adım adım profesyonel bir çizim yapılır.</string>
+    <string name="tut_offer_note">Eğitim boş bir sayfada gösterilir; bitince ya da iptal edince tuvalin olduğu gibi kalır. İstediğin zaman ⋮ menüsündeki Eğitim modu ile yeniden açabilirsin.</string>
+    <string name="tut_offer_later">Şimdi değil</string>
+    <string name="tut_offer_start_cd">Eğitimi başlat: %s</string>
+    <string name="tut_steps">%d adım</string>
+    <string name="tut_ai_badge">Yapay zekâ</string>
+    <string name="tut_done_badge">Tamamlandı</string>
+    <string name="tut_step_of">%1$d / %2$d</string>
+    <string name="tut_cancel">Eğitimi iptal et</string>
+    <string name="tut_next">Sonraki adım</string>
+    <string name="tut_finish">Eğitimi bitir</string>
+    <string name="tut_replay">Bu adımı yeniden göster</string>
+    <string name="tut_drawing">Çiziliyor…</string>
+    <string name="tut_finished">Eğitim tamamlandı: %s</string>
+    <string name="tut_settings_reset">Eğitimleri yeniden öner</string>
+    <string name="tut_settings_reset_hint">Çizim, not alma ve çizgi roman modlarına ilk girişteki eğitim önerisi yeniden gösterilir</string>
+    <string name="tut_settings_reset_done">Eğitim önerileri sıfırlandı</string>
+
+    <!-- Yapay zekâ adımlarında öneri balonu vurgulanınca -->
+    <string name="tut_hint_shape">Öneri balonu: dokununca titrek çizgi kusursuz şekle dönüşür. İstersen sen dokun.</string>
+    <string name="tut_hint_template">Şablon önerisi: dokununca çizimin yerine aynı fırçayla düzgün çizgiler gelir.</string>
+    <string name="tut_hint_all">Tümünü düzelt: her çizim kendi düzgün şekline döner (tek geri alma adımı).</string>
+    <string name="tut_hint_text">Yazı önerisi: dokununca el yazın aynı yerde ve renkte düzgün yazıya dönüşür.</string>
+
+    <!-- Ortak yapay zekâ adımları -->
+    <string name="tut_ai_more">Tuvalin yapay zekâsı</string>
+    <string name="tut_ai_more_text">⋮ menüsünden bu tuval için yapay zekâyı açıp kapatırsın; yazı, şekil ve seçim önerileri ayrı ayrı açılır. Öneriler cihazında çalışır ve kabul ettikçe sana uyar.</string>
+    <string name="tut_ai_select">Seçimde öneri</string>
+    <string name="tut_ai_select_text">Seç modunda birkaç eleman seçince öneri düğmeye basmadan gelir; bir iki eleman seçiliyse çizimi tamamlayacak parçalar önerilir. Seçim çubuğundaki Çoklu düzeltme öner de aynı öneriyi açar.</string>
+
+    <!-- Çizim: araçlar -->
+    <string name="tut_art_basics">Çizim araçları</string>
+    <string name="tut_art_basics_text">Fırça, fırça ayarları, boya kutusu, silgi, kalem aracı, geri al ve katmanlarla gün batımı manzarası.</string>
+    <string name="tut_art_b1">Fırça</string>
+    <string name="tut_art_b1_text">Kalem, mürekkep, marker, kömür, pastel, yumuşak fırça ve dokular buradan seçilir. Önce mürekkep kalemiyle dağların ve tepelerin hatlarını çiziyoruz; basınç uçlarda çizgiyi inceltir.</string>
+    <string name="tut_art_b2">Özellikler: fırça ayarları</string>
+    <string name="tut_art_b2_text">Kalınlık, saydamlık, akış ve titreme düzeltme. Geniş ve yarı saydam marker ile dağları ve tepeleri katman katman boyuyoruz.</string>
+    <string name="tut_art_b3">Boya kutusu</string>
+    <string name="tut_art_b3_text">Seçim yokken kâğıdı, bir eleman seçiliyse onun içini boyar; düz renk ya da gradyan. Gökyüzüne gün batımı gradyanı veriyoruz.</string>
+    <string name="tut_art_b4">Silgi</string>
+    <string name="tut_art_b4_text">Yalnız fırçayla çizilenleri siler; şekiller, yazılar ve resimler korunur. Tepelerin arasından kıvrılan bir dere açıyoruz.</string>
+    <string name="tut_art_b5">Kalem aracı</string>
+    <string name="tut_art_b5_text">Dokunarak köşe, sürükleyerek eğri koyarsın; temiz vektör yollar için. Gökyüzüne düzgün eğrilerle kuşlar ekliyoruz.</string>
+    <string name="tut_art_b6">Geri al ve yinele</string>
+    <string name="tut_art_b6_text">Her adım geri alınır ve yinelenir; üç parmakla sola ya da sağa kaydırmak da aynı işi yapar. Son kuşu geri alıp yineliyoruz.</string>
+    <string name="tut_art_b7">Katmanlar ve elemanlar</string>
+    <string name="tut_art_b7_text">Gökyüzünü, dağları ve ayrıntıları ayrı katmanlarda tut: gizle, kilitle, sırala. Elemanlar listesinden her parçayı bulup seçebilirsin.</string>
+
+    <!-- Çizim: şekil, yazı, düzenleme -->
+    <string name="tut_art_add">Şekil, yazı ve düzenleme</string>
+    <string name="tut_art_add_text">Hazır şekiller, yazı, seç, taşı ve düzenle ile vektör manzara.</string>
+    <string name="tut_art_a1">Ekle modu</string>
+    <string name="tut_art_a1_text">Şekiller, yazı, kılavuz ve perspektif çizgileri, 3B şekiller ve resimler bu menüde. Bir öğe seçip tuvale dokunmak ya da sürüklemek yeter.</string>
+    <string name="tut_art_a2">Hazır şekiller</string>
+    <string name="tut_art_a2_text">Yüzlerce vektör şekil: manzara, hayvan, bina, ok, grafik… Sürükleyerek boyutlandırılır; gradyan dolgu ve kenar rengi alır. Güneşi, dağları, bulutları ve çamları ekliyoruz.</string>
+    <string name="tut_art_a3">Yazı</string>
+    <string name="tut_art_a3_text">Tuvale dokun ve yaz: 30\'dan fazla yazı tipi, kalın ve eğik, kenarlık, gölge, yazı kutusu. Manzaraya başlık koyuyoruz.</string>
+    <string name="tut_art_a4">Seç</string>
+    <string name="tut_art_a4_text">Dokunarak bir ya da birden çok eleman seç; kopyala, gizle, sil. Güneşi seçiyoruz.</string>
+    <string name="tut_art_a5">Taşı</string>
+    <string name="tut_art_a5_text">Seçimi sürükle ya da ok düğmeleriyle 1–10 piksel kaydır. Güneşi dağların ardına doğru batırıyoruz.</string>
+    <string name="tut_art_a6">Düzenle</string>
+    <string name="tut_art_a6_text">Döndür, ölçekle, kırp ve vektör noktalarını düzenle. Batan güneşi biraz büyütüyoruz.</string>
+
+    <!-- Çizim: yapay zekâ -->
+    <string name="tut_art_ai">Yapay zekâ önerileri</string>
+    <string name="tut_art_ai_text">Elle çizdiğin şekli düzeltme, şablon tanıma, tümünü düzelt ve yapay zekâ ayarları.</string>
+    <string name="tut_art_ai2">Şekil düzeltme</string>
+    <string name="tut_art_ai2_text">Elle bir çember çizip kalemi kaldır: yapay zekâ onu tanır ve düzgün şeklini önerir. Ay\'ı çiziyoruz.</string>
+    <string name="tut_art_ai3">Şablon tanıma</string>
+    <string name="tut_art_ai3_text">Birkaç çizgiyle çizdiğin nesne şekil veritabanında ve modun sinir ağında aranır: ev, ağaç, yüz… Bir ev çiziyoruz.</string>
+    <string name="tut_art_ai4">Tümünü düzelt</string>
+    <string name="tut_art_ai4_text">Bir arada çizilen 3 ve daha çok eleman için öneri kendiliğinden çıkar; Tümünü düzelt hepsini birden düzeltir. Çam ağaçları çiziyoruz.</string>
+
+    <!-- Not alma -->
+    <string name="tut_notes_write">Yazı ve kalemler</string>
+    <string name="tut_notes_write_text">Başlık yazısı, not kalemleri, fosforlu kalem ve sayfalarla fizik ders notu.</string>
+    <string name="tut_notes_w1">Başlık yazısı</string>
+    <string name="tut_notes_w1_text">Ekle menüsündeki Yazı ile başlık, madde ve paragraf yazılır; yazı tipi, boyut ve renk fırça panelinden. Ders notuna başlık koyuyoruz.</string>
+    <string name="tut_notes_w2">Not kalemleri</string>
+    <string name="tut_notes_w2_text">Kurşun, tükenmez, dolma, jel ve keçeli kalem; basınca duyarlı, tablet kalemini tanır. Tükenmez kalemle not alıyoruz.</string>
+    <string name="tut_notes_w3">Fosforlu kalem</string>
+    <string name="tut_notes_w3_text">Önemli yerleri vurgula: yazının üstünde saydam kalır. Başlığı işaretliyoruz.</string>
+    <string name="tut_notes_w4">Sayfalar ve PDF</string>
+    <string name="tut_notes_w4_text">Alttaki şeritten sayfa ekle, çoğalt, sil ve sayfalar arasında geç. Notlarını ⋮ menüsünden PDF olarak kaydedebilirsin.</string>
+    <string name="tut_notes_formula">Formül, diyagram ve şekil</string>
+    <string name="tut_notes_formula_text">Hazır formüller, akış diyagramı ve oklarla konu özeti.</string>
+    <string name="tut_notes_f1">Ekle menüsü</string>
+    <string name="tut_notes_f1_text">Not alma tuvalinde formül ve diyagram da eklenir; öğeyi seç, tuvale dokun ya da sürükle.</string>
+    <string name="tut_notes_f2">Formül</string>
+    <string name="tut_notes_f2_text">Fizik, matematik ve kimyadan yüzlerce hazır formül; her harf ve sayı ayrı düzenlenir. Newton\'un ikinci yasasını ve hız denklemini ekliyoruz.</string>
+    <string name="tut_notes_f3">Diyagram</string>
+    <string name="tut_notes_f3_text">Akış, süreç, zihin haritası, zaman çizelgesi ve dahası; adımlar tuvalin üstünde düzenlenir. Konuyu editoryal bir akış diyagramıyla özetliyoruz.</string>
+    <string name="tut_notes_f4">Ok ve şekiller</string>
+    <string name="tut_notes_f4_text">Notları oklarla bağla, kutu ve çerçevelerle grupla. Formülden diyagrama bir ok çiziyoruz.</string>
+    <string name="tut_notes_ai">Yapay zekâ ile not</string>
+    <string name="tut_notes_ai_text">El yazısını yazıya çevirme, şekil düzeltme ve tümünü düzelt.</string>
+    <string name="tut_notes_ai1">El yazısını yazıya çevir</string>
+    <string name="tut_notes_ai1_text">Elle yazıp kalemi kaldır: Türkçe sözlük ve dil modeliyle tanınır, dokununca aynı yerde yazıya dönüşür. \"kuvvet\" yazıyoruz.</string>
+    <string name="tut_notes_ai2">Şekil düzeltme</string>
+    <string name="tut_notes_ai2_text">Elle çizdiğin kutu, çember ve üçgen düzgün şekle dönüşür. Bir kutu çiziyoruz.</string>
+    <string name="tut_notes_ai3">Tümünü düzelt</string>
+    <string name="tut_notes_ai3_text">Bir arada çizilen 3 ve daha çok eleman için öneri kendiliğinden gelir. Birbirine değen üç halka çiziyoruz.</string>
+
+    <!-- Çizgi roman -->
+    <string name="tut_comic_panels">Paneller ve çizim</string>
+    <string name="tut_comic_panels_text">Panel düzeni, mürekkep kalemiyle kahraman ve odak çizgileri.</string>
+    <string name="tut_comic_p1">Ekle menüsü</string>
+    <string name="tut_comic_p1_text">Çizgi romanda panel düzeni, konuşma balonu, efekt yazısı ve hız çizgileri bu menüdedir.</string>
+    <string name="tut_comic_p2">Şablonlar</string>
+    <string name="tut_comic_p2_text">Tek dokunuşla hazır sayfa şablonları: iki şerit, dörtlü, manga, webtoon… Büyük bir üst panel ve iki küçük panel seçiyoruz.</string>
+    <string name="tut_comic_p3">Mürekkep kalemi</string>
+    <string name="tut_comic_p3_text">Çizgi roman hatları için mürekkep ve ince uçlu kalem; basınçla incelir. Kahramanımızı çiziyoruz.</string>
+    <string name="tut_comic_p4">Hız ve odak çizgileri</string>
+    <string name="tut_comic_p4_text">Hareket ve vurgu için hız, odak, patlama ve titreme çizgileri; seçili panelin içine yerleşir. Kahramanın çevresine odak çizgileri ekliyoruz.</string>
+    <string name="tut_comic_text">Balon ve efekt yazısı</string>
+    <string name="tut_comic_text_text">Konuşma balonu, efekt yazısı ve anlatı kutusu.</string>
+    <string name="tut_comic_t1">Konuşma balonu</string>
+    <string name="tut_comic_t1_text">Oval, düşünce, bağırma, fısıltı ve anlatı balonları; kuyruğu sürükleyerek konuşana yönelt. Kahramanımız konuşuyor.</string>
+    <string name="tut_comic_t2">Efekt yazısı</string>
+    <string name="tut_comic_t2_text">BAM!, POW!, BOOM! gibi hazır, gradyanlı ve gölgeli yazılar. Bir efekt ekliyoruz.</string>
+    <string name="tut_comic_t3">Anlatı kutusu</string>
+    <string name="tut_comic_t3_text">Sahneyi anlatan sarı kutu; kuyruksuzdur. Hikâyeye giriş yapıyoruz.</string>
+    <string name="tut_comic_ai">Yapay zekâ ile çizgi roman</string>
+    <string name="tut_comic_ai_text">Çizgi romana özel tanıma: konuşma balonu, yüz ifadeleri ve tümünü düzelt.</string>
+    <string name="tut_comic_ai1">Balon tanıma</string>
+    <string name="tut_comic_ai1_text">Elle çizdiğin balonu, patlamayı ve duygu işaretlerini çizgi romana özel sinir ağı tanır. Bir konuşma balonu çiziyoruz.</string>
+    <string name="tut_comic_ai2">Yüz ifadesi</string>
+    <string name="tut_comic_ai2_text">Gülen, şaşkın ve kızgın yüzler şablonla düzelir. Gülen bir yüz çiziyoruz.</string>
+    <string name="tut_comic_ai3">Tümünü düzelt</string>
+    <string name="tut_comic_ai3_text">Bir arada çizilen 3 ve daha çok eleman için öneri kendiliğinden gelir. Baloncuklar çiziyoruz.</string>
+</resources>

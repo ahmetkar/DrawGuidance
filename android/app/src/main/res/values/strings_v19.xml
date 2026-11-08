@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- v19 PDF olarak kaydet penceresi -->
+    <string name="pdf_options_title">PDF olarak kaydet</string>
+    <string name="pdf_pages">Sayfalar</string>
+    <string name="pdf_pages_all">Tüm sayfalar (%1$d)</string>
+    <string name="pdf_pages_current">Bu sayfa (%1$d)</string>
+    <string name="pdf_pages_range">Aralık</string>
+    <string name="pdf_range_from">İlk sayfa</string>
+    <string name="pdf_range_to">Son sayfa</string>
+    <string name="pdf_range_hint">1–%1$d arası</string>
+    <string name="pdf_paper">Kağıt boyutu</string>
+    <string name="pdf_paper_canvas">Tuval oranı</string>
+    <string name="pdf_orientation">Yön</string>
+    <string name="pdf_orientation_auto">Otomatik</string>
+    <string name="pdf_orientation_portrait">Dikey</string>
+    <string name="pdf_orientation_landscape">Yatay</string>
+    <string name="pdf_margin">Kenar boşluğu</string>
+    <string name="pdf_margin_none">Yok</string>
+    <string name="pdf_margin_narrow">Dar</string>
+    <string name="pdf_margin_normal">Normal</string>
+    <string name="pdf_quality">Kalite</string>
+    <string name="pdf_quality_sharp">Keskin (vektör)</string>
+    <string name="pdf_quality_image">Resim</string>
+    <string name="pdf_quality_sharp_hint">Yazı, şekil ve formül her büyütmede keskin kalır, dosya küçük olur. Silgi kullanılan sayfalar resim olarak yazılır.</string>
+    <string name="pdf_quality_image_hint">Tüm sayfalar ekrandaki gibi resim olarak yazılır.</string>
+    <string name="pdf_resolution">Resim çözünürlüğü</string>
+    <string name="pdf_resolution_standard">Standart</string>
+    <string name="pdf_resolution_high">Yüksek</string>
+    <string name="pdf_resolution_max">Çok yüksek</string>
+    <string name="pdf_background">Arka plan rengi</string>
+    <string name="pdf_background_hint">Kapalıyken beyaz kağıt (yazdırmak için)</string>
+    <string name="pdf_guides">Kılavuz çizgileri</string>
+    <string name="pdf_page_numbers">Sayfa numarası</string>
+    <string name="pdf_page_numbers_hint">Sayfanın altına “2 / 5” gibi</string>
+    <string name="pdf_summary">%1$d sayfa · %2$s · %3$d × %4$d nokta</string>
+    <string name="pdf_save">PDF kaydet</string>
+</resources>

@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- v16: şekil düzenleme — vektör noktaları ve çizgiler -->
+    <string name="tool_nodes">Noktalar</string>
+    <string name="tool_add_node">Nokta ekle</string>
+    <string name="tool_connect">Çizgi çiz</string>
+    <string name="tool_lines">Çizgiler</string>
+    <string name="mode_hint_vector_nodes">Noktaya dokun: seç · sürükle: taşı (bağlı çizgiler birlikte gelir) · Kes: seçili noktaları çizgileriyle ayır</string>
+    <string name="mode_hint_vector_add">Çizgiye dokun: oraya nokta eklenir · boş yere dokun: serbest nokta</string>
+    <string name="mode_hint_vector_connect">Bir noktaya dokun (ya da noktadan sürükle), sonra diğerine: arasına çizgi çizilir</string>
+    <string name="mode_hint_vector_connect_next">Sonraki noktaya dokun: çizgi devam eder · başlangıç noktasına yeniden dokun: bitir</string>
+    <string name="mode_hint_vector_lines">Çizgiye dokunarak seç · ortadaki tutamak: kavis · uçtaki tutamak: eğim</string>
+    <string name="vector_cut">Kes</string>
+    <string name="vector_delete">Sil</string>
+    <string name="edge_angle">Eğim %1$d°</string>
+    <string name="edge_turn_less">Eğimi 15° azalt</string>
+    <string name="edge_turn_more">Eğimi 15° artır</string>
+    <string name="edge_horizontal">Yatay</string>
+    <string name="edge_vertical">Dikey</string>
+    <string name="edge_straighten">Düzleştir</string>
+    <string name="edge_handles_hint">Tutamaklar: orta = kavis, uç = eğim</string>
+
+    <!-- v16: formül formülün üstünde düzenlenir -->
+    <string name="formula_next_slot">Sonraki kısım</string>
+    <string name="formula_done">Formülü bitir</string>
+</resources>

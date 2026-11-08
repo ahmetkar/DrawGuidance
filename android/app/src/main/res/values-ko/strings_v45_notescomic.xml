@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- v45 çizgi roman kapağı ve not alma panelleri -->
+    <string name="v45_cover">표지</string>
+    <string name="v45_cover_add">표지 추가</string>
+    <string name="v45_help_cover">만화의 표지 페이지: 페이지 번호, 머리글, 바닥글이 붙지 않으며 번호는 다음 페이지에서 1부터 시작합니다.</string>
+    <string name="v45_help_cover_add">만화 맨 앞에 제목, 작가, 그림 영역이 있는 표지 페이지를 추가합니다. 기존 페이지 번호는 바뀌지 않습니다.</string>
+    <string name="v45_panels_add">패널 추가</string>
+    <string name="v45_help_panels_add">그리기 영역을 테두리가 있는 구역으로 나눕니다: 열, 행, 격자, 코넬 노트 등. 각 구역은 따로 선택, 이동, 삭제할 수 있습니다.</string>
+    <string name="v45_panels_title">패널 배치 선택</string>
+    <string name="v45_panels_hint">선택한 배치는 얇은 테두리 영역으로 페이지에 추가되며, 글과 그림 아래에 놓입니다.</string>
+    <string name="v45_panel_two_cols">2열</string>
+    <string name="v45_panel_three_cols">3열</string>
+    <string name="v45_panel_two_rows">2행</string>
+    <string name="v45_panel_three_rows">3행</string>
+    <string name="v45_panel_grid_2x2">2 × 2 격자</string>
+    <string name="v45_panel_grid_2x3">2 × 3 격자</string>
+    <string name="v45_panel_main_side">큰 영역과 옆 열</string>
+    <string name="v45_panel_side_main">옆 열과 큰 영역</string>
+    <string name="v45_panel_cornell">코넬 노트</string>
+    <string name="v45_panel_header_two_cols">제목과 2열</string>
+    <string name="v45_panel_square_2x2">2 × 2 정사각형</string>
+    <string name="v45_panel_square_3x3">3 × 3 정사각형</string>
+    <string name="v45_panel_square_notes">정사각형과 노트 영역</string>
+    <string name="v45_panel_count">영역 %1$d개</string>
+</resources>

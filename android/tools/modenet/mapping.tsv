@@ -1,0 +1,181 @@
+smiley face	yuz.ifade.gulen
+face	yuz.ifade.notr
+eye	yuz.goz.bebekli
+eyeglasses	yuz.goz.gozluk
+nose	yuz.burun.duz
+mouth	yuz.agiz.dudak
+ear	yuz.kulak.onden
+moustache	yuz.biyik
+beard	yuz.sakal
+goatee	yuz.keci_sakal
+hand	vucut.el
+foot	vucut.ayak_izi
+arm	vucut.kol
+leg	vucut.bacak
+house	yapi.ev.tam
+door	yapi.kapi.duz
+stairs	yapi.basamak
+fence	yapi.cit
+ladder	yapi.merdiven_el
+castle	yapi.kale
+tent	yapi.cadir
+bridge	yapi.kopru
+lighthouse	yapi.deniz_feneri
+skyscraper	yapi.gokdelen
+windmill	yapi.yel_degirmeni
+chair	mobilya.sandalye.yandan
+table	mobilya.masa
+couch	mobilya.kanepe
+bed	mobilya.yatak
+dresser	mobilya.komodin
+floor lamp	mobilya.abajur
+television	mobilya.televizyon
+apple	meyve.elma
+pear	meyve.armut
+banana	meyve.muz
+grapes	meyve.uzum
+strawberry	meyve.cilek
+watermelon	meyve.karpuz
+pineapple	meyve.ananas
+blackberry	meyve.bogurtlen
+carrot	sebze.havuc
+onion	sebze.sogan
+potato	sebze.patates
+peas	sebze.bezelye
+broccoli	sebze.brokoli
+mushroom	sebze.mantar
+fish	hayvan.balik
+bird	hayvan.kus
+cat	hayvan.kedi_yuz
+dog	hayvan.kopek_yuz
+rabbit	hayvan.tavsan_yuz
+bear	hayvan.ayi_yuz
+snail	hayvan.salyangoz
+butterfly	hayvan.kelebek
+snake	hayvan.yilan
+duck	hayvan.ordek
+sea turtle	hayvan.kaplumbaga
+spider	hayvan.orumcek
+bee	hayvan.ari
+mouse	hayvan.fare
+pig	hayvan.domuz_yuz
+lion	hayvan.aslan_yuz
+panda	hayvan.panda_yuz
+owl	hayvan.baykus
+penguin	hayvan.penguen
+frog	hayvan.kurbaga
+octopus	hayvan.ahtapot
+crab	hayvan.yengec
+whale	hayvan.balina
+shark	hayvan.kopekbaligi
+dolphin	hayvan.yunus
+elephant	hayvan.fil
+giraffe	hayvan.zurafa
+sheep	hayvan.koyun
+ant	hayvan.karinca
+bat	hayvan.yarasa
+teddy-bear	hayvan.ayicik
+leaf	bitki.yaprak
+flower	bitki.cicek_basit
+tree	bitki.agac
+palm tree	bitki.palmiye
+cactus	bitki.kaktus
+grass	bitki.cimen
+house plant	bitki.saksi
+sun	doga.gunes
+moon	doga.hilal
+star	doga.yildiz
+cloud	doga.bulut
+rain	doga.yagmur
+lightning	doga.simsek
+snowflake	doga.kar_tanesi
+rainbow	doga.gokkusagi
+mountain	doga.dag
+ocean	doga.dalga
+campfire	doga.ates
+snowman	doga.kardan_adam
+tornado	doga.hortum
+key	nesne.anahtar
+mug	nesne.kupa
+coffee cup	nesne.fincan
+wine bottle	nesne.sise
+light bulb	nesne.ampul
+clock	nesne.saat
+umbrella	nesne.semsiye
+pencil	nesne.kalem
+book	nesne.kitap
+envelope	nesne.zarf
+crown	nesne.tac
+diamond	nesne.elmas
+hat	nesne.sapka
+t-shirt	nesne.tisort
+shoe	nesne.ayakkabi
+soccer ball	esya.futbol_topu
+basketball	esya.basketbol
+wheel	tasit.tekerlek
+car	tasit.araba
+sailboat	tasit.yelkenli
+speedboat	tasit.tekne
+airplane	tasit.ucak
+bicycle	tasit.bisiklet
+train	tasit.tren
+truck	tasit.kamyon
+bus	tasit.otobus
+helicopter	tasit.helikopter
+motorbike	tasit.motosiklet
+submarine	tasit.denizalti
+hot air balloon	tasit.hava_balonu
+traffic light	tasit.trafik_lambasi
+stop sign	tasit.dur_isareti
+tractor	tasit.traktor
+ambulance	tasit.ambulans
+flying saucer	tasit.ufo
+cell phone	esya.telefon
+laptop	esya.laptop
+computer	esya.monitor
+headphones	esya.kulaklik
+camera	esya.kamera
+wristwatch	esya.kol_saati
+alarm clock	esya.calar_saat
+candle	esya.mum
+vase	esya.vazo
+scissors	esya.makas
+paper clip	esya.atac
+purse	esya.canta
+backpack	esya.sirt_cantasi
+broom	esya.supurge
+bucket	esya.kova
+hammer	esya.cekic
+screwdriver	esya.tornavida
+axe	esya.balta
+shovel	esya.kurek
+guitar	esya.gitar
+drums	esya.davul
+microphone	esya.mikrofon
+tennis racquet	esya.raket
+dumbbell	esya.dambil
+skateboard	esya.kaykay
+pants	giyim.pantolon
+sock	giyim.corap
+bowtie	giyim.papyon
+tooth	esya.dis
+bandage	esya.yara_bandi
+mailbox	esya.posta_kutusu
+skull	hayal.kafatasi
+sword	hayal.kilic
+birthday cake	yiyecek.pasta
+ice cream	yiyecek.dondurma
+pizza	yiyecek.pizza
+hamburger	yiyecek.hamburger
+donut	yiyecek.donut
+cookie	yiyecek.kurabiye
+bread	yiyecek.ekmek
+lollipop	yiyecek.lolipop
+wine glass	yiyecek.kadeh
+teapot	yiyecek.caydanlik
+fork	yiyecek.catal
+knife	yiyecek.bicak
+spoon	yiyecek.kasik
+frying pan	yiyecek.tava
+hot dog	yiyecek.sosisli
+hourglass	simge.kum_saati

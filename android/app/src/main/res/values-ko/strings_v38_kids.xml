@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="kids_challenge">그리기 미션</string>
+    <string name="help_kids_challenge">단계별 그리기 미션. 시작을 누르고, 종이의 점선을 따라 그리거나 예시 색깔로 그림을 칠한 다음 완료를 눌러. 점수가 충분하면 다음 단계가 열려. 진행 상황에서 모든 단계를 볼 수 있어.</string>
+    <string name="challenge_menu_idle">단계별 그리기 미션! 목표 그림을 그리고 점수와 별을 모아 봐.</string>
+    <string name="challenge_menu_running">지금은 %1$d단계야: %2$s.</string>
+    <string name="challenge_start">시작</string>
+    <string name="challenge_stop">모드 끄기</string>
+    <string name="challenge_progress">진행 상황</string>
+    <string name="challenge_level_of">%1$d / %2$d단계</string>
+    <string name="challenge_finish">완료</string>
+
+    <string name="challenge_kind_trace">따라 그리기</string>
+    <string name="challenge_kind_paint">칠하기</string>
+    <string name="challenge_kind_build">놓고 칠하기</string>
+    <string name="challenge_intro_trace">%1$d단계: %2$s! 붓으로 점선을 따라 그려 봐. 다 그리면 위의 완료를 눌러.</string>
+    <string name="challenge_intro_paint">%1$d단계: %2$s! 페인트 통으로 색깔 점과 같은 색으로 그림을 칠해 봐. 다 칠하면 완료를 눌러.</string>
+    <string name="challenge_intro_build">%1$d단계: %2$s! 도형 추가에서 그림을 찾아 점선 위에 놓고, 점의 색깔로 칠해 봐.</string>
+
+    <string name="challenge_tip_brush">위에서 붓을 고르고 손가락으로 점선을 천천히 따라가 봐.</string>
+    <string name="challenge_tip_eraser">선이 삐져나왔어? 지우개를 골라서 남는 부분을 지워.</string>
+    <string name="challenge_tip_undo">틀렸어? 위쪽 뒤로 화살표로 마지막 작업을 되돌릴 수 있어.</string>
+    <string name="challenge_tip_paint">페인트 통을 고르고, 점의 색깔을 고른 다음 그 자리를 눌러.</string>
+    <string name="challenge_tip_hold">페인트 통으로 모양 위를 2초 동안 누르고 있으면 모양 전체가 한꺼번에 칠해져.</string>
+    <string name="challenge_tip_shape">도형 추가를 누르고 %1$s 그림을 고른 다음, 종이를 눌러서 놓아.</string>
+    <string name="challenge_tip_move">놓은 그림을 손가락으로 끌어서 점선 위로 옮겨 봐.</string>
+    <string name="challenge_tip_finish">준비되면 위의 초록색 완료 버튼을 눌러. 점수를 알려 줄게!</string>
+    <string name="challenge_live_close">멋져, 거의 다 됐어! 준비되면 완료를 눌러.</string>
+    <string name="challenge_tip_next">힌트</string>
+    <string name="challenge_mascot_cd">칠칠이, 누르면 힌트를 줘</string>
+
+    <string name="challenge_passed_title">단계 통과!</string>
+    <string name="challenge_failed_title">조금만 더!</string>
+    <string name="challenge_passed_say">정말 잘했어! 다음 단계가 기다리고 있어.</string>
+    <string name="challenge_passed_say_3">대단해! 별 세 개를 모두 모았어!</string>
+    <string name="challenge_failed_say">이 단계를 통과하려면 %1$d점이 필요해. 다시 해 보자, 이번엔 더 잘할 수 있어!</string>
+    <string name="challenge_all_done">마지막 단계까지 통과했어! 너는 진짜 화가야!</string>
+    <string name="challenge_score">점수</string>
+    <string name="challenge_best">최고: %1$d</string>
+    <string name="challenge_stars_cd">별 %1$d개</string>
+    <string name="challenge_next">다음 단계</string>
+    <string name="challenge_retry">다시 하기</string>
+    <string name="challenge_exit">모드 나가기</string>
+
+    <string name="challenge_progress_summary">%1$d / %2$d단계 통과 · 별 %3$d개</string>
+    <string name="challenge_state_passed">통과</string>
+    <string name="challenge_state_open">열림</string>
+    <string name="challenge_state_locked">잠김</string>
+    <string name="challenge_play">하기</string>
+    <string name="challenge_locked_say">이 단계는 잠겨 있어. 먼저 %1$d단계를 통과해!</string>
+</resources>

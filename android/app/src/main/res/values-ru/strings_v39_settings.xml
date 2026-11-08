@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="sync_merged_title">Синхронизация</string>
+    <string name="sync_auto_title">Автосинхронизация</string>
+    <string name="sync_auto_on">Вкл.: синхронизация с сервером раз в день</string>
+    <string name="sync_auto_off">Выкл.: только по кнопке «Синхронизировать»</string>
+    <string name="sync_last">Последняя синхронизация: %1$s</string>
+</resources>

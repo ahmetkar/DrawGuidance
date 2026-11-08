@@ -1,0 +1,6 @@
+# Derlenmiş sunucu (teslim paketinde gelir) ve parolalar depoya girmez
+drawguidance-server.jar
+.env
+logs/
+# v43 hizmet hesabı kopyası
+sirlar/

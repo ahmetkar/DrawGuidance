@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- v41 çizgi roman: mekân arka planı ekle (panele sığar ya da bütün sayfa) -->
+<resources>
+    <string name="v41_add_location">خلفية المكان</string>
+    <string name="v41_loc_title">إضافة خلفية مكان</string>
+    <string name="v41_loc_hint">اختر النمط والفئة واضغط على الخلفية، ثم أفلتها على لوحة أو استخدمها للصفحة كلها.</string>
+    <string name="v41_loc_place_hint">اضغط على لوحة أو اسحب إليها: تتناسب الخلفية مع تلك اللوحة. أفلتها خارج اللوحات لتغطي الصفحة كلها.</string>
+    <string name="v41_loc_whole_page">الصفحة كلها</string>
+    <string name="v41_help_add_location">يضيف خلفية مكان جاهزة: اختر مشهد مانغا أو قصة مصورة وأفلته على لوحة (يتناسب معها) أو استخدمه للصفحة كلها.</string>
+</resources>

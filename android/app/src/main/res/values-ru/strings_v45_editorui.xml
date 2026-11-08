@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- v45 düzenleyici: tablette sürüklenen pencereler, seçim ve ekleme menüleri -->
+<resources>
+    <string name="v45_window_drag">Перетащить окно</string>
+    <string name="v45_window_reset">Сбросить положение</string>
+    <string name="v45_selection_menu">Меню выделения</string>
+    <string name="v45_selection_edit_menu">Параметры правки</string>
+    <string name="v45_add_menu">Меню добавления</string>
+</resources>

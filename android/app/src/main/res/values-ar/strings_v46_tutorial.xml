@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- v46 eğitimlerin yenilikler grupları -->
+    <string name="v46_tut_art">الجديد (v46)</string>
+    <string name="v46_tut_art_text">القائمة العلوية ذات الجزأين، وقائمة الإضافة عند لمس مكان فارغ، وقائمة التحديد عند زاوية العنصر المحدد.</string>
+    <string name="v46_tut_split">قائمة علوية من جزأين</string>
+    <string name="v46_tut_split_text">الأدوات في جزأين: فوق بعضهما في الوضع العمودي، وجنبًا إلى جنب في الوضع الأفقي. عند تغيير الوضع (رسم، إضافة، تحديد…) يعرض الجزآن أدوات ذلك الوضع.</string>
+    <string name="v46_tut_addmenu">المس مكانًا فارغًا للإضافة</string>
+    <string name="v46_tut_addmenu_text">في وضع الإضافة، يؤدي لمس مكان فارغ إلى فتح قائمة إضافة عمودية في ذلك الموضع: شكل، نص، صيغة، مخطط… يُضاف العنصر حيث لمست.</string>
+    <string name="v46_tut_selmenu">قائمة التحديد</string>
+    <string name="v46_tut_selmenu_text">عند تحديد عنصر تظهر عند زاويته قائمة شفافة: نقل، تحجيم، نسخ، حذف، تعديل.</string>
+    <string name="v46_tut_scale">التحجيم والنسخ</string>
+    <string name="v46_tut_scale_text">التحجيم يكبّر التحديد أو يصغّره، والنسخ يضع نسخة بجانبه. هنا تصغر الشمس وتتكاثر الطيور.</string>
+    <string name="v46_tut_edit">تعديل</string>
+    <string name="v46_tut_edit_text">يفتح «تعديل» إجراءات نوع العنصر: تعديل الشكل، اللون والتعبئة، تقديم أو إرجاع، إخفاء. تظهر قيم الأشكال العلمية هنا.</string>
+    <string name="v46_tut_notes">الجديد (v46)</string>
+    <string name="v46_tut_notes_text">صفحة كورنيل عبر «إضافة لوحات»، وأشكال فيزيائية وعناصر يُعاد رسمها عند كتابة القيم.</string>
+    <string name="v46_tut_panels">إضافة لوحات</string>
+    <string name="v46_tut_panels_text">قسّم الصفحة إلى مناطق مؤطرة: أعمدة، شبكات، مربعات أو تخطيط كورنيل (أسئلة رئيسية، ملاحظات، ملخص). كل منطقة عنصر مستقل.</string>
+    <string name="v46_tut_titles">العنوان والأسئلة</string>
+    <string name="v46_tut_titles_text">اكتب العنوان في منطقة الملاحظات، والأسئلة التي ستطرحها على نفسك في العمود الأيسر. عند المراجعة غطِّ الملاحظات وانظر إلى الأسئلة فقط.</string>
+    <string name="v46_tut_param">شكل يُرسم من صيغة</string>
+    <string name="v46_tut_param_text">يأتي مخطط الجسم الحر والبكرات والرافعة وأشكال العناصر مع صيغها: تُحسب القوى وأطوال الأسهم والنتائج من القيم.</string>
+    <string name="v46_tut_values">اكتب قيمة فيتغير الشكل</string>
+    <string name="v46_tut_values_text">اكتب قيمة جديدة في حقل صيغة الشكل (مثل F = 40، α = 30°) فيُعاد رسم الشكل وتتحدث الصيغة والنتائج في الزاوية.</string>
+    <string name="v46_tut_element">أشكال العناصر</string>
+    <string name="v46_tut_element_text">تُرسم خلية الجدول الدوري ونموذج بور الذري للعنصر الذي تكتبه: الرمز (Na) أو الاسم أو العدد الذري (11). هنا يتحول الصوديوم إلى كلور.</string>
+    <string name="v46_tut_formula">الصيغة والملخص</string>
+    <string name="v46_tut_formula_text">أضف صيغة جاهزة تحت المخطط واكتب ملخص الموضوع في الشريط السفلي. الصفحة جاهزة للمراجعة.</string>
+    <string name="v46_tut_comic">الجديد (v46)</string>
+    <string name="v46_tut_comic_text">تخطيط لوحات حقيقي، أماكن وشخصيات جاهزة، فقاعات، مؤثرات؛ الغلاف والقوالب الجاهزة.</string>
+    <string name="v46_tut_tpl">تخطيط اللوحات</string>
+    <string name="v46_tut_tpl_text">اختر تخطيطًا من القوالب: تتغير أحجام اللوحات معًا، ويمكن ضبط الفراغ بينها، وتتحرك الرسوم داخلها مع اللوحة.</string>
+    <string name="v46_tut_places">خلفية المكان</string>
+    <string name="v46_tut_places_text">أسقط مكانًا جاهزًا في لوحة: تُقص الصورة حسب نسبة اللوحة وتوضع خلف إطارها.</string>
+    <string name="v46_tut_chars">الشخصيات</string>
+    <string name="v46_tut_chars_text">اختر تعبيرًا أو وضعية أو حركة من الشخصيات، ثم غيّر حجمها وضعها في اللوحة. تظهر الشخصيات المميزة بقفل.</string>
+    <string name="v46_tut_balloons">الفقاعات</string>
+    <string name="v46_tut_balloons_text">مربع السرد يمهّد للمشهد، وفقاعات الكلام والصراخ والتفكير والهمس تمنح الشخصيات صوتًا. وجّه الذيل نحو المتكلم.</string>
+    <string name="v46_tut_fx">خطوط السرعة والصوت</string>
+    <string name="v46_tut_fx_text">خطوط السرعة تُظهر الحركة، والمؤثرات النصية تُظهر الصوت. إبقاء الخطوط خلف الشخصية يجعل المشهد أوضح.</string>
+    <string name="v46_tut_cover">الغلاف والقوالب الجاهزة</string>
+    <string name="v46_tut_cover_text">تبدأ القصة المصورة الجديدة بصفحة غلاف. عند إنشاء لوحة يمكنك اختيار نموذج جاهز من «قالب» (أكشن، مانغا، ويبتون، أربع لوحات، حوار) والمتابعة منه.</string>
+    <string name="v46_tut_simple">الجديد (v46)</string>
+    <string name="v46_tut_simple_art_text">القائمة ذات الجزأين، والتحديد المستطيل وأداة القطارة في القائمة العلوية.</string>
+    <string name="v46_tut_simple_notes_text">إضافة لوحات، وأشكال علمية يُعاد رسمها عند كتابة القيم.</string>
+    <string name="v46_tut_s_shape">الأشكال</string>
+    <string name="v46_tut_s_shape_text">اختر شكلًا واسحب: بيت، شمس، نجمة… الأشكال المعبأة تبني أساس الرسم بسرعة.</string>
+    <string name="v46_tut_s_select">التحديد المستطيل</string>
+    <string name="v46_tut_s_select_text">ارسم منطقة بأداة التحديد المستطيل في القائمة العلوية؛ يُحدد كل ما بداخلها، ثم انقله أو غيّر حجمه.</string>
+    <string name="v46_tut_s_eyedrop">القطارة</string>
+    <string name="v46_tut_s_eyedrop_text">المس لونًا في الصورة بالقطارة فتأخذ الفرشاة ذلك اللون.</string>
+    <string name="v46_tut_kids_brush">فرشاة التلوين</string>
+    <string name="v46_tut_kids_brush_text">حرّك إصبعك بالتلوين! إذا بدأت داخل شكل فلن يخرج اللون منه.</string>
+</resources>

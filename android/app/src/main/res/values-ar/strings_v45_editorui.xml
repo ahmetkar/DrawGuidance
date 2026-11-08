@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- v45 düzenleyici: tablette sürüklenen pencereler, seçim ve ekleme menüleri -->
+<resources>
+    <string name="v45_window_drag">اسحب النافذة</string>
+    <string name="v45_window_reset">إعادة تعيين الموضع</string>
+    <string name="v45_selection_menu">قائمة التحديد</string>
+    <string name="v45_selection_edit_menu">خيارات التحرير</string>
+    <string name="v45_add_menu">قائمة الإضافة</string>
+</resources>

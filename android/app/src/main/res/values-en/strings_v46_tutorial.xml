@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- v46 eğitimlerin yenilikler grupları -->
+    <string name="v46_tut_art">What\'s new (v46)</string>
+    <string name="v46_tut_art_text">The two-part top menu, the add menu on an empty spot and the selection menu at the corner of the selected item.</string>
+    <string name="v46_tut_split">Two-part top menu</string>
+    <string name="v46_tut_split_text">Tools sit in two parts: stacked in portrait, side by side in landscape. When you switch mode (Draw, Add, Select…) both parts show that mode\'s tools.</string>
+    <string name="v46_tut_addmenu">Tap an empty spot to add</string>
+    <string name="v46_tut_addmenu_text">In Add mode, tapping an empty spot opens a vertical add menu right there: shape, text, formula, diagram… The item is added where you tapped.</string>
+    <string name="v46_tut_selmenu">Selection menu</string>
+    <string name="v46_tut_selmenu_text">When you select an item, a translucent menu appears at its corner: Move, Scale, Copy, Delete and Edit.</string>
+    <string name="v46_tut_scale">Scale and copy</string>
+    <string name="v46_tut_scale_text">Scale makes the selection bigger or smaller; Copy places a copy next to it. Here the sun shrinks and the birds multiply.</string>
+    <string name="v46_tut_edit">Edit</string>
+    <string name="v46_tut_edit_text">Edit opens actions for the item\'s type: edit shape, colour and fill, bring forward or send back, hide. Science shapes show their values here.</string>
+    <string name="v46_tut_notes">What\'s new (v46)</string>
+    <string name="v46_tut_notes_text">A Cornell page with Add panels, and physics and element shapes that redraw when you type values.</string>
+    <string name="v46_tut_panels">Add panels</string>
+    <string name="v46_tut_panels_text">Split the page into framed areas: columns, grids, square areas or the Cornell layout (key questions, notes, summary). Each area is its own item.</string>
+    <string name="v46_tut_titles">Title and questions</string>
+    <string name="v46_tut_titles_text">Write the title in the notes area and the questions you\'ll ask yourself in the left column. When reviewing, cover the notes and look only at the questions.</string>
+    <string name="v46_tut_param">Shape drawn from a formula</string>
+    <string name="v46_tut_param_text">Free-body diagram, pulleys, lever and element shapes come with their formulas: forces, arrow lengths and results are calculated from the values.</string>
+    <string name="v46_tut_values">Type a value, the shape changes</string>
+    <string name="v46_tut_values_text">Type a new value in the shape\'s formula field (e.g. F = 40, α = 30°) and the shape is redrawn; the corner formula and results update too.</string>
+    <string name="v46_tut_element">Element shapes</string>
+    <string name="v46_tut_element_text">The periodic table cell and the Bohr atom model are drawn for the element you type: symbol (Na), name (sodium) or atomic number (11). Here sodium turns into chlorine.</string>
+    <string name="v46_tut_formula">Formula and summary</string>
+    <string name="v46_tut_formula_text">Add a ready formula under the diagram and write the topic\'s summary in the bottom strip. The page is ready for review.</string>
+    <string name="v46_tut_comic">What\'s new (v46)</string>
+    <string name="v46_tut_comic_text">A real panel layout, ready locations and characters, balloons, effects; the cover and ready templates.</string>
+    <string name="v46_tut_tpl">Panel layout</string>
+    <string name="v46_tut_tpl_text">Pick a layout from Templates: panels resize together, the gutter is adjustable and drawings inside move with their panel.</string>
+    <string name="v46_tut_places">Location background</string>
+    <string name="v46_tut_places_text">Drop a ready location into a panel: the picture is cropped to the panel\'s shape and sits behind the panel border.</string>
+    <string name="v46_tut_chars">Characters</string>
+    <string name="v46_tut_chars_text">Choose an expression, pose or action from Characters, then size and place it in the panel. Premium characters show a lock.</string>
+    <string name="v46_tut_balloons">Balloons</string>
+    <string name="v46_tut_balloons_text">A caption sets the scene; speech, shout, thought and whisper balloons give the characters a voice. Point the tail at the speaker.</string>
+    <string name="v46_tut_fx">Speed lines and sound</string>
+    <string name="v46_tut_fx_text">Speed lines show motion and sound effects show sound. Keeping the lines behind the character makes the scene easier to read.</string>
+    <string name="v46_tut_cover">Cover and ready templates</string>
+    <string name="v46_tut_cover_text">A new comic starts with a cover page. When creating a canvas, pick a ready sample under Template (action, manga, webtoon, four-panel, dialogue) and carry on from it.</string>
+    <string name="v46_tut_simple">What\'s new (v46)</string>
+    <string name="v46_tut_simple_art_text">The two-part menu, rectangle selection and the eyedropper in the top menu.</string>
+    <string name="v46_tut_simple_notes_text">Add panels, and science shapes that redraw when you type values.</string>
+    <string name="v46_tut_s_shape">Shapes</string>
+    <string name="v46_tut_s_shape_text">Pick a shape and drag: house, sun, star… Filled shapes quickly build the base of the picture.</string>
+    <string name="v46_tut_s_select">Rectangle selection</string>
+    <string name="v46_tut_s_select_text">Draw an area with rectangle selection in the top menu; everything inside is selected, then move or resize it.</string>
+    <string name="v46_tut_s_eyedrop">Eyedropper</string>
+    <string name="v46_tut_s_eyedrop_text">Tap a colour in the picture with the eyedropper; the brush takes that colour.</string>
+    <string name="v46_tut_kids_brush">Paint brush</string>
+    <string name="v46_tut_kids_brush_text">Move your finger with Paint! If you start inside a shape, the paint stays inside.</string>
+</resources>

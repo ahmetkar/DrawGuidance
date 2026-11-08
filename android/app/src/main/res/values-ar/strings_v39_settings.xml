@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="sync_merged_title">المزامنة</string>
+    <string name="sync_auto_title">المزامنة التلقائية</string>
+    <string name="sync_auto_on">مفعّلة: تتم المزامنة مع الخادم مرة يوميًا</string>
+    <string name="sync_auto_off">متوقفة: تتم المزامنة فقط عبر \"مزامنة الآن\"</string>
+    <string name="sync_last">آخر مزامنة: %1$s</string>
+</resources>

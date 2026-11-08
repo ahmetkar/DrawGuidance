@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- v40 tasarım: tema, Ana sayfa, Tuvallerim özeti, çizim süresi ve tuval boyutları -->
+<resources>
+    <string name="v40_theme_mode_title">Тема</string>
+    <string name="v40_theme_mode_light">Светлая</string>
+    <string name="v40_theme_mode_dark">Тёмная</string>
+    <string name="v40_theme_mode_system">Системная</string>
+    <string name="v40_theme_high_contrast">Высокий контраст</string>
+    <string name="v40_theme_high_contrast_hint">Более чёткий текст и рамки, толстая рамка выделения</string>
+    <string name="v40_home_kind_art">Рисуйте и раскрашивайте свободно</string>
+    <string name="v40_home_kind_notes">Для уроков и идей</string>
+    <string name="v40_home_kind_comic">Расскажите свою историю</string>
+    <string name="v40_home_kind_simple_art">Легко начните рисовать</string>
+    <string name="v40_home_kind_simple_notes">Быстрые простые заметки</string>
+    <string name="v40_home_kind_kids">Весёлая раскраска для детей</string>
+    <string name="v40_home_kind_3d">Создавайте 3D-фигуры</string>
+    <string name="v40_home_group_simple">Просто и легко</string>
+    <string name="v40_home_group_advanced">Все инструменты под рукой</string>
+    <string name="v40_home_most_time_title">Больше всего времени</string>
+    <string name="v40_home_most_time_cd">%1$s, потрачено %2$s</string>
+    <string name="v40_time_lt_minute">Меньше 1 мин</string>
+    <string name="v40_time_minutes">%1$d мин</string>
+    <string name="v40_time_hours_minutes">%1$d ч %2$d мин</string>
+    <string name="v40_time_hours">%1$d ч</string>
+    <string name="v40_stats_title">Сводка</string>
+    <string name="v40_stats_total">Всего</string>
+    <string name="v40_stats_week">На этой неделе</string>
+    <string name="v40_stats_time">Время рисования</string>
+    <string name="v40_stats_cd">%1$s: %2$s</string>
+    <string name="v40_size_square">Квадрат</string>
+    <string name="v40_size_portrait">Портрет</string>
+    <string name="v40_size_landscape">Пейзаж</string>
+    <string name="v40_size_wallpaper">Обои телефона</string>
+    <string name="v40_size_a4_300">A4 (300 dpi)</string>
+    <string name="v40_size_a4">A4</string>
+    <string name="v40_size_a5">A5</string>
+    <string name="v40_size_letter">Letter</string>
+    <string name="v40_size_a4_landscape">A4 альбомный</string>
+    <string name="v40_size_comic_page">Страница комикса</string>
+    <string name="v40_size_us_comic">Американский комикс</string>
+    <string name="v40_size_manga_b5">Манга (B5)</string>
+    <string name="v40_size_webtoon">Вебтун</string>
+    <string name="v40_size_custom">Свой</string>
+    <string name="v40_size_width">Ширина (%1$s)</string>
+    <string name="v40_size_height">Высота (%1$s)</string>
+    <string name="v40_size_dpi">DPI</string>
+    <string name="v40_size_result">%1$d × %2$d px</string>
+    <string name="v40_size_error_min">Стороны должны быть не меньше %1$d px</string>
+    <string name="v40_size_error_max">Стороны могут быть не больше %1$d px</string>
+    <string name="v40_size_error_memory">Этот размер слишком велик для памяти устройства</string>
+</resources>

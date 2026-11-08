@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- v40 cetvel ve şekil kalıbı -->
+<resources>
+    <string name="v40_ruler">Линейка</string>
+    <string name="v40_template">Шаблон фигуры</string>
+    <string name="v40_ruler_finish">Готово</string>
+    <string name="v40_ruler_straight">Прямая линейка</string>
+    <string name="v40_ruler_protractor">Транспортир</string>
+    <string name="v40_ruler_set45">Угольник 45°</string>
+    <string name="v40_ruler_set30">Угольник 30°/60°</string>
+    <string name="v40_ruler_compass">Циркуль</string>
+    <string name="v40_ruler_ellipse">Шаблон эллипса</string>
+    <string name="v40_ruler_french">Лекало</string>
+    <string name="v40_ruler_unit">Единица</string>
+    <string name="v40_ruler_scale">Масштаб</string>
+    <string name="v40_ruler_type">Тип линейки</string>
+    <string name="v40_ruler_hint">Рисуйте у края — линия пойдёт вдоль него. Перетащите корпус, чтобы сдвинуть, поворачивайте двумя пальцами.</string>
+    <string name="v40_compass_hint">Где бы вы ни рисовали, линия идёт по окружности. Перетащите иглу, чтобы сдвинуть, маркером меняйте радиус.</string>
+    <string name="v40_template_pick_hint">Коснитесь фигуры на холсте или выберите её в библиотеке</string>
+    <string name="v40_template_library">Из библиотеки</string>
+    <string name="v40_template_lock">Закрепить</string>
+    <string name="v40_template_unlock">Открепить</string>
+    <string name="v40_template_hint">Рисуйте у краёв шаблона; двигайте и масштабируйте его маркерами.</string>
+    <string name="v40_template_none">Здесь нет фигуры</string>
+    <string name="v40_help_ruler">Открывает линейку: линии у края идут вдоль него. Тип, единицы и масштаб меняются кнопками рядом с линейкой.</string>
+    <string name="v40_help_template">Открывает шаблон фигуры: коснитесь фигуры или выберите её в библиотеке; линии у краёв идут вдоль них.</string>
+</resources>

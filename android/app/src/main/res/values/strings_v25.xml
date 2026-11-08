@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- v25: 3B düzenleyicide Nokta aracı (kenara dokunarak nokta ekleme, silme, birleştirme, halkadan kesme), yüzey seçimi,
+     delik, katı cisim işlemleri (birleştir, çıkar, kesişim), parçalama, ayırma, 3B fırça cisimleri, resim olarak dışa
+     aktarma ve tuvalde ayrı "3B şekil ekle" penceresi. -->
+<resources>
+    <!-- Nokta aracı -->
+    <string name="model3d_tool_point">Nokta</string>
+    <string name="model3d_hint_point">Kenara dokunun: nokta ekler · noktaya dokunun: seçer (sırayla) · Birleştir: seçili noktaları kenarla bağlar · Kes: noktaların çevirdiği bölgeyi ayrı parça yapar</string>
+    <string name="model3d_points_selected">%d nokta seçili</string>
+    <string name="model3d_point_delete">Sil</string>
+    <string name="model3d_point_connect">Birleştir</string>
+    <string name="model3d_point_cut">Kes</string>
+
+    <!-- Yüz aracı -->
+    <string name="model3d_face_single">Tek yüz</string>
+    <string name="model3d_face_surface">Yüzey</string>
+    <string name="model3d_hint_face_surface">Yüzeye dokunun: dokunulan yüzün bütün yüzeyi seçilir · seçili yüzü sürükleyerek taşıyın · boşlukta sürükleyin: döndürür · iki parmak: kaydır/yakınlaştır</string>
+    <string name="model3d_hole">Delik aç</string>
+    <string name="model3d_op_hole">Delik genişliği: seçili yüzden parça boydan boya delinir</string>
+    <string name="model3d_detach">Ayrı parça</string>
+
+    <!-- İşlemler paneli -->
+    <string name="model3d_panel_ops">İşlemler</string>
+    <string name="model3d_ops_booleans">Katı cisim işlemleri</string>
+    <string name="model3d_ops_hint">Birleştir, çıkar ve kesişim için en az iki parça seçin (Parçalar panelindeki kutucuklarla). Çıkarmada ilk seçilen parçadan diğerleri çıkarılır.</string>
+    <string name="model3d_union">Birleştir</string>
+    <string name="model3d_subtract">Çıkar</string>
+    <string name="model3d_intersect">Kesişim</string>
+    <string name="model3d_ops_selected">Seçili: %1$s</string>
+    <string name="model3d_ops_none">Parça seçilmedi</string>
+    <string name="model3d_ops_slice">Parçala</string>
+    <string name="model3d_ops_slice_hint">Seçili parça düzlemle ikiye ayrılır, iki taraf da kapatılır. Düzlem sahnede gösterilir.</string>
+    <string name="model3d_slice_view">Ekrana dik</string>
+    <string name="model3d_slice_offset">Düzlemin konumu</string>
+    <string name="model3d_ops_separate">Kopuk parçaları ayır</string>
+    <string name="model3d_ops_separate_hint">Birbirine değmeyen kısımlar (ör. kesilmiş ya da gruplanmış parçalar) ayrı parçalar olur.</string>
+    <string name="model3d_ops_hole">Delik</string>
+    <string name="model3d_ops_hole_hint">Yüz aracında yüz seçiliyse o yüzden, değilse parçanın ortasından ekrana dik delinir.</string>
+    <string name="model3d_hole_size">Delik genişliği</string>
+
+    <!-- 3B fırça -->
+    <string name="model3d_brush_kind">Fırça türü</string>
+    <string name="model3d_brush_line">Çizgi</string>
+    <string name="model3d_brush_tube">Tüp</string>
+    <string name="model3d_brush_ribbon">Şerit</string>
+    <string name="model3d_brush_wall">Duvar</string>
+    <string name="model3d_brush_lathe">Torna</string>
+    <string name="model3d_brush_inflate">Şişir</string>
+    <string name="model3d_brush_line_hint">İnce 3B çizgi (kalem gibi).</string>
+    <string name="model3d_brush_tube_hint">İz boyunca yuvarlak tüp; basınç ve uç incelmesi kalınlığı değiştirir.</string>
+    <string name="model3d_brush_ribbon_hint">İz boyunca kalınlıklı şerit (yassı bant).</string>
+    <string name="model3d_brush_wall_hint">İzden düzleme dik yükselen duvar; kapalı çizerseniz içi dolu prizma olur.</string>
+    <string name="model3d_brush_lathe_hint">Yarım profili eksenden başlayarak çizin: başladığınız noktadan geçen dikey eksen çevresinde döndürülür (vazo, şişe, kadeh…).</string>
+    <string name="model3d_brush_inflate_hint">Kapalı çizdiğiniz şekil yastık gibi şişirilir.</string>
+    <string name="model3d_brush_height">Yükseklik</string>
+    <string name="model3d_brush_bulge">Şişkinlik</string>
+    <string name="model3d_brush_taper">Uç incelmesi</string>
+    <string name="model3d_brush_smoothing">Yumuşatma</string>
+    <string name="model3d_brush_pressure">Kalem basıncı</string>
+    <string name="model3d_brush_material">Malzeme</string>
+    <string name="model3d_brush_opacity">Örtücülük</string>
+
+    <!-- Resim olarak dışa aktarma -->
+    <string name="model3d_export_image">Resim olarak dışa aktar</string>
+    <string name="model3d_image_size">Boyut (en uzun kenar)</string>
+    <string name="model3d_image_limit">Bu cihazda en çok %d px</string>
+    <string name="model3d_image_aspect">Oran</string>
+    <string name="model3d_image_square">Kare</string>
+    <string name="model3d_image_portrait">Dikey 3:4</string>
+    <string name="model3d_image_landscape">Yatay 4:3</string>
+    <string name="model3d_image_wide">Geniş 16:9</string>
+    <string name="model3d_image_background">Arka plan</string>
+    <string name="model3d_image_angle">Açı</string>
+    <string name="model3d_image_fit">Modele sığdır</string>
+    <string name="model3d_image_current">Şu anki görünüm</string>
+    <string name="model3d_image_format">Biçim</string>
+    <string name="model3d_image_smooth">Kenar yumuşatma</string>
+    <string name="model3d_image_smooth_low">Az</string>
+    <string name="model3d_image_smooth_mid">Orta</string>
+    <string name="model3d_image_smooth_high">Çok</string>
+    <string name="model3d_image_save">Kaydedilenlere kaydet</string>
+    <string name="model3d_image_share">Paylaş</string>
+    <string name="model3d_image_saved">Resim kaydedildi (Kaydedilenler)</string>
+    <string name="model3d_image_failed">Resim kaydedilemedi</string>
+    <string name="model3d_image_jpeg_bg">JPEG saydam olamaz: beyaz arka plan kullanılır</string>
+
+    <!-- Tuvalde 3B şekil ekle penceresi -->
+    <string name="model3d_add_title">3B şekil ekle</string>
+    <string name="model3d_add_button">3B şekil ekle</string>
+    <string name="model3d_add_pick_hint">Bir şekle dokunarak seçin, sonra aşağıdaki "3B şekil ekle" düğmesine basın · kalem: 3B düzenleyicide aç</string>
+    <string name="model3d_add_selected">Seçili: %1$s</string>
+    <string name="model3d_add_none">Henüz şekil seçilmedi</string>
+    <string name="model3d_add_ready_hint">Ders ve çizim için hazır şekiller: dokunarak seçin.</string>
+</resources>

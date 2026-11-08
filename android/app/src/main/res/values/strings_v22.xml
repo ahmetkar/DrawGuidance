@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- v22 çoklu seçimde düzeltme -->
+    <string name="ink_correct_multi">Çoklu düzeltme öner</string>
+    <string name="multi_fix">Tümünü düzelt (%1$d)</string>
+    <string name="multi_fix_cd">Düzeltmeyi uygula: tüm seçili çizimler</string>
+    <!-- v22 döndürülebilir 3B sahne -->
+    <string name="draw3d_orbit">Sahneyi döndür (sürükle)</string>
+    <string name="draw3d_view_iso">İzometrik</string>
+    <string name="draw3d_view_front">Önden</string>
+    <string name="draw3d_view_side">Yandan</string>
+    <string name="draw3d_view_top">Üstten</string>
+    <string name="draw3d_persp">Perspektif</string>
+    <string name="draw3d_collapse">3B çubuğunu küçült</string>
+    <string name="draw3d_expand">3B çubuğunu aç</string>
+</resources>

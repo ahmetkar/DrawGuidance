@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- v34 Düzenle satırı: şekil düzenleme araçları doğrudan menüde -->
+    <string name="edit_nodes">Nokta düzenle</string>
+    <string name="edit_lines">Çizgi düzenle</string>
+    <string name="help_edit_nodes">Şeklin noktalarını düzenler. Şekil seçiliyse hemen açılır; değilse bir şekle dokununca o şeklin nokta düzenlemesi açılır.</string>
+    <string name="help_edit_lines">Şeklin çizgilerini (kalınlık, renk, kesik çizgi) düzenler. Şekil seçili değilse bir şekle dokununca açılır.</string>
+    <!-- v34 Resmi düzenle: Vektörleştir'in türleri doğrudan üst menüde -->
+    <string name="vectorize_direct_auto">Otomatik vektörleştir</string>
+    <string name="vectorize_direct_edges">Kenarları vektörleştir</string>
+    <string name="vectorize_direct_lines">Çizgileri vektörleştir</string>
+    <string name="help_vectorize_direct_auto">Resmi düzenlenebilir çizgilere çevirir; resme göre kenar ya da çizgi yöntemini kendisi seçer. Ayrıntı, yumuşatma ve kalınlık alttaki pencerede.</string>
+    <string name="help_vectorize_direct_edges">Resimdeki renk ve parlaklık sınırlarını (kenarları) düzenlenebilir çizgilere çevirir. Ayarlar alttaki pencerede.</string>
+    <string name="help_vectorize_direct_lines">Resimdeki çizimin çizgilerini (orta hatlarını) düzenlenebilir çizgilere çevirir; karakalem ve mürekkep çizimler için. Ayarlar alttaki pencerede.</string>
+    <!-- v34 hesap ayarları -->
+    <string name="account_personal_title">Kişisel bilgiler</string>
+    <string name="account_google_info_hint">Bu bilgiler Google hesabından gelir; değiştirmek için Google hesabını düzenleyip "Google\'dan yenile"ye dokun.</string>
+    <string name="account_photo">Profil fotoğrafı</string>
+    <string name="account_photo_google">Google profil fotoğrafı</string>
+    <string name="account_photo_none">Fotoğraf yok (baş harfler)</string>
+    <string name="account_delete">Hesabı sil</string>
+    <string name="account_delete_short">Hesabın sunucudan, Google girişinden ve bu cihazdan kalıcı olarak silinir.</string>
+    <string name="account_delete_title">Hesabı kalıcı olarak sil</string>
+    <string name="account_delete_text">Bu işlem geri alınamaz. Silmeden önce Google hesabın bir kez daha doğrulanır. Şunlar silinir:</string>
+    <string name="account_delete_item_server">Sunucudaki kullanıcı kaydın</string>
+    <string name="account_delete_item_firebase">Google ile giriş hesabın (Firebase)</string>
+    <string name="account_delete_item_device">Bu cihazdaki hesap bilgilerin</string>
+    <string name="account_delete_item_pending">Hesabınla ilgili bekleyen sunucu işleri</string>
+    <string name="account_delete_keeps">Tuvallerin, 3B şekillerin ve resimlerin cihazda kalır.</string>
+    <string name="account_delete_type">Onaylamak için aşağıdaki metni aynen yaz:</string>
+    <string name="account_delete_phrase">hesabımı silmek istiyorum</string>
+    <string name="account_delete_input_label">Onay metni</string>
+    <string name="account_delete_mismatch">Metin aynı değil</string>
+    <string name="account_delete_confirm">Kalıcı olarak sil</string>
+    <string name="account_deleting">Hesap siliniyor…</string>
+    <string name="account_deleted">Hesabın silindi</string>
+    <string name="account_deleted_title">Hesabın silindi</string>
+    <string name="account_deleted_text">Sunucudaki, Google girişindeki ve bu cihazdaki hesap bilgilerin silindi.</string>
+    <string name="account_delete_partial">Hesabın sunucudan ve cihazdan silindi; Google girişi silinemedi, oturum kapatıldı.</string>
+    <string name="account_delete_server_failed">Sunucuya ulaşılamadı, hesap silinmedi. İnternet bağlantını denetleyip yeniden dene.</string>
+    <string name="account_delete_cancelled">Hesap doğrulanmadı, hesap silinmedi</string>
+    <!-- v34 ana sayfa: giriş önerisi ve profil -->
+    <string name="home_signin_title">Google ile giriş yap</string>
+    <string name="home_signin_text">Premium ayrıcalıklarından faydalanmak için ve sana özel bir deneyim sağlamamız için önce giriş yap.</string>
+    <string name="home_signin_button">Google hesabını seç</string>
+    <string name="home_greeting_named">%1$s, %2$s</string>
+    <!-- v34 basit çizimde daha çok şekil -->
+    <string name="shape_cat_simple_nature">Doğa ve gökyüzü</string>
+    <string name="shape_cat_simple_things">Canlılar ve eşyalar</string>
+    <string name="shape_cat_simple_geometry">Geometri</string>
+    <string name="shape_cat_simple_solids">Cisimler ve ölçme</string>
+    <!-- v34 dil desteği -->
+    <string name="language_title">Dil</string>
+    <string name="language_auto_hint">İlk açılışta sistemin diline ve ülkesine göre seçildi (%1$s). Aşağıdan değiştirebilirsiniz.</string>
+    <string name="language_chosen_hint">Sizin seçtiğiniz dil. Uygulamanın bütün metinleri bu dilde.</string>
+    <string name="language_change_title">Dili değiştir</string>
+    <string name="language_change_text">Uygulama %1$s diline geçmek için yeniden başlatılacak. Çizimleriniz kaydedilir.</string>
+    <string name="language_change_confirm">Yeniden başlat</string>
+</resources>

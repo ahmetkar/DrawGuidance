@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- v40 tasarım: tema, Ana sayfa, Tuvallerim özeti, çizim süresi ve tuval boyutları -->
+<resources>
+    <string name="v40_theme_mode_title">Theme</string>
+    <string name="v40_theme_mode_light">Light</string>
+    <string name="v40_theme_mode_dark">Dark</string>
+    <string name="v40_theme_mode_system">System</string>
+    <string name="v40_theme_high_contrast">High contrast</string>
+    <string name="v40_theme_high_contrast_hint">Stronger text and borders, bold selection frame</string>
+    <string name="v40_home_kind_art">Draw and paint freely</string>
+    <string name="v40_home_kind_notes">For classes and ideas</string>
+    <string name="v40_home_kind_comic">Tell your own story</string>
+    <string name="v40_home_kind_simple_art">Start drawing easily</string>
+    <string name="v40_home_kind_simple_notes">Quick, simple notes</string>
+    <string name="v40_home_kind_kids">Fun coloring for kids</string>
+    <string name="v40_home_kind_3d">Design 3D shapes</string>
+    <string name="v40_home_group_simple">Simple and easy</string>
+    <string name="v40_home_group_advanced">Every tool at hand</string>
+    <string name="v40_home_most_time_title">Where you spent the most time</string>
+    <string name="v40_home_most_time_cd">%1$s, %2$s spent</string>
+    <string name="v40_time_lt_minute">Under 1 min</string>
+    <string name="v40_time_minutes">%1$d min</string>
+    <string name="v40_time_hours_minutes">%1$d h %2$d min</string>
+    <string name="v40_time_hours">%1$d h</string>
+    <string name="v40_stats_title">Summary</string>
+    <string name="v40_stats_total">Total</string>
+    <string name="v40_stats_week">This week</string>
+    <string name="v40_stats_time">Drawing time</string>
+    <string name="v40_stats_cd">%1$s: %2$s</string>
+    <string name="v40_size_square">Square</string>
+    <string name="v40_size_portrait">Portrait</string>
+    <string name="v40_size_landscape">Landscape</string>
+    <string name="v40_size_wallpaper">Phone wallpaper</string>
+    <string name="v40_size_a4_300">A4 (300 dpi)</string>
+    <string name="v40_size_a4">A4</string>
+    <string name="v40_size_a5">A5</string>
+    <string name="v40_size_letter">Letter</string>
+    <string name="v40_size_a4_landscape">A4 landscape</string>
+    <string name="v40_size_comic_page">Comic page</string>
+    <string name="v40_size_us_comic">US comic</string>
+    <string name="v40_size_manga_b5">Manga (B5)</string>
+    <string name="v40_size_webtoon">Webtoon</string>
+    <string name="v40_size_custom">Custom</string>
+    <string name="v40_size_width">Width (%1$s)</string>
+    <string name="v40_size_height">Height (%1$s)</string>
+    <string name="v40_size_dpi">DPI</string>
+    <string name="v40_size_result">%1$d × %2$d px</string>
+    <string name="v40_size_error_min">Sides must be at least %1$d px</string>
+    <string name="v40_size_error_max">Sides can be at most %1$d px</string>
+    <string name="v40_size_error_memory">This size is too large for the device\'s memory</string>
+</resources>

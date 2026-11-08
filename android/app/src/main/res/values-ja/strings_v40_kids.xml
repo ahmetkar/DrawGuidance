@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- v40 çocuk modu: 50 seviyelik çizim görevi, Premium seviyeler ve maskotun görev önerisi -->
+<resources>
+    <string name="v40_challenge_state_premium">プレミアム</string>
+    <string name="v40_challenge_premium_note">レベル%1$d〜%2$dはプレミアムで解放</string>
+    <string name="v40_challenge_suggest_new">こんにちは！いっしょにお絵かきミッションをやってみない？レベルごとにかいて星をあつめよう！</string>
+    <string name="v40_challenge_suggest_resume">おかえり！お絵かきミッションをレベル%1$dからつづけようか？</string>
+    <string name="v40_challenge_suggest_premium">無料のレベルをぜんぶクリアしたよ！つぎのレベルはプレミアムで解放されます。</string>
+    <string name="v40_challenge_suggest_start">スタート</string>
+    <string name="v40_challenge_suggest_cancel">キャンセル</string>
+    <string name="v40_challenge_suggest_cd">ボヤジュクがお絵かきミッションをすすめています</string>
+    <string name="v40_challenge_body_resume">すごいね！%1$d / %2$d レベルクリア。</string>
+    <string name="v40_challenge_body_premium">すごい！無料の%1$dレベルをぜんぶクリアしたよ。のこりの%2$dレベルはプレミアムで解放されます。</string>
+    <string name="v40_challenge_body_all_done">さいこう！%1$dレベルをぜんぶクリアしたよ。もういちど遊んで星をもっとあつめよう。</string>
+    <string name="v40_challenge_go_premium">プレミアムを見る</string>
+    <string name="v40_challenge_replay">もういちど遊ぶ（%1$d）</string>
+</resources>

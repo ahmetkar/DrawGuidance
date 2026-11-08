@@ -1,0 +1,76 @@
+# Terms of Use
+
+Version: 2026-10-25 · Effective: October 25, 2026
+
+These terms govern the use of the Draw Guidance (DrawGuidance) mobile application ("App") developed by karApp. By using the App or creating an account you confirm that you have read and accept these terms.
+
+## 1. The service
+- The App is a drawing app with tools for pictures, notes, comics, kids' drawings and 3D shapes.
+- Drawing suggestions, shape recognition and handwriting recognition run with AI models on your device.
+- The ready-made catalog of shapes, objects, characters, effects, location backgrounds and templates ships with the App, is organized into theme packs and may be updated from the server.
+- The core features work without an account. An account stores your profile, subscription and synced content on the server.
+
+## 2. Account
+- Accounts are created with your Google account. You must enter your correct date of birth.
+- Children under 13 may use an account only with the permission and supervision of a parent or guardian.
+- You are responsible for the security of your account and for actions taken with it.
+- You can delete your account at any time in Settings > Account settings > Delete account.
+
+## 3. Premium subscription
+- The App is free. Premium is an auto-renewing monthly subscription that removes ads and adds new features and extra content.
+- Purchases, payments, renewals and refunds are handled by Google Play under Google Play's terms. The price is shown in your local currency in Google Play before you buy.
+- The subscription renews at the end of each period until you cancel. If you cancel, Premium lasts until the end of the paid period. Uninstalling the App or deleting your account does not cancel the subscription.
+- Your statutory consumer rights are not affected.
+
+## 4. Ads
+- On the Free plan the App may show Google AdMob ads.
+- No ads are shown to accounts under 13 or on kids canvases.
+
+## 5. Your content
+- By default your drawings, notes, comics, 3D shapes and images are stored only on your device; they are sent to the server with your account only when you use sync.
+- Synced content is copied only as technically needed to serve you (storing it in your account and delivering it to your devices). It is not used for anything else, never published, and is deleted when you delete your account.
+- Backing up your device and the files you save is your responsibility.
+
+## 6. Distributing and commercially using your comics
+- The comics, pictures, notes and other works you create with the App ("Your Works") are yours. As the author, you hold the moral and economic rights in Your Works under Turkish Law No. 5846 on Intellectual and Artistic Works (FSEK). karApp claims no right, share or fee in them, and no rights are transferred to karApp.
+- You may use Your Works as you wish: reproduce them digitally or in print as PDF, CBZ, PNG, JPEG or any other format; publish them online, on social media and on digital comic and e-book platforms; sell them or distribute them for free; give them to publishers and print services; and use them commercially in advertising, promotion and products. You do not need separate permission from karApp, to pay karApp, or to credit karApp.
+- You may assign or license the rights in Your Works (for example publishing rights) to publishers or others. Under FSEK art. 52 such contracts must be in writing and list each right separately; they are between you and the other party.
+- Ready-made content license: for the ready-made characters, objects, effects, location backgrounds, shapes, patterns and templates you use in Your Works, karApp grants you a worldwide, perpetual, royalty-free, non-exclusive and irrevocable license. It covers adaptation (FSEK art. 21), reproduction (art. 22), distribution (art. 23), performance (art. 24) and communication to the public (art. 25) of the ready-made content as part of Your Work, including commercial use. Publishers, distributors and print services to whom you assign or license Your Work may use the ready-made content in it to the same extent.
+- This license continues after Your Work is created even if you uninstall the App, your Premium subscription ends, you delete your account, or the ready-made content is removed from the catalog in a later version. Content from Premium theme packs can be added to Your Works while your subscription is active; the license for Works it was added to continues after the subscription ends.
+- This section is karApp's written license statement. If a publisher or distributor needs a signed license document, you can request one free of charge at the contact address in Section 13.
+- Limits: ready-made content may only be used as part of a Work that carries your own creative contribution. You may not redistribute, sell or sublicense the ready-made content on its own or in a form whose main value is the ready-made content (for example sticker packs, clip art, asset or template collections, libraries for other apps, or T-shirts, mugs and similar products showing a single unmodified character or object).
+- You may not use or register ready-made content as a trademark, logo or corporate identity. Ready-made content is non-exclusive and may also appear in other users' works. You may not claim exclusive rights in the ready-made content against others; your rights in the original parts of Your Work remain yours.
+- Your responsibility: obtaining any permissions needed for your own images, photos, fonts, texts and third-party characters you add to Your Works is up to you. You may not create or distribute Works that use well-known characters, brands or others' works without permission; expose real people without their consent or unlawfully disclose their personal data (Law No. 6698, KVKK); contain insults, hate speech, incitement to violence or child abuse; or are otherwise unlawful. You are responsible for the content and distribution of Your Works.
+- Print publishing: if you distribute Your Work as a printed book or magazine, obligations such as ISBN/ISSN, banderole (FSEK art. 81) and legal deposit (Law No. 6279) lie with the publisher or with you.
+- Color and print: the App's CMYK conversion is an approximate conversion based on a general-purpose print profile. Before printing, check the color profile, bleed and resolution your printer requires and order a proof.
+- AI assistance: drawing suggestions and recognition features are assistive tools you control. In Turkish law and in many countries copyright protection depends on human creative contribution; the extent to which Your Work is protected in a country is determined by that country's law.
+- Credit and promotion: credit is not required; if you like, you can write "Made with Draw Guidance". You may not use karApp's name or logo in a way that suggests karApp made or endorsed Your Work. karApp does not use Your Works for promotion without your explicit permission.
+
+## 7. Ready-made content and licenses
+- The ready-made shapes, objects, characters, effects, location backgrounds and templates are original works made for the App. No well-known characters, brands or third-party drawings are used.
+- The intellectual property rights in the ready-made content belong to karApp. You may use it freely in your own Works, for personal and commercial work, under the license in Section 6.
+- Fonts ship under their own open-source licenses (see the license file in the App).
+
+## 8. Acceptable use
+You agree not to:
+- reverse engineer the App, access the server without authorization or disrupt the service,
+- use another person's account or impersonate anyone,
+- use the App to spread malware or for unlawful purposes,
+- extract the ready-made content from the App in bulk and share it as a separate collection.
+
+## 9. Limitation of liability
+- The App is provided "as is" without a guarantee of uninterrupted or error-free operation.
+- To the extent permitted by law, karApp is not liable for data loss on your device or indirect damages arising from the use of the App. Your statutory consumer rights are not affected.
+
+## 10. Privacy
+- How your personal data is processed is explained in the KVKK information notice and in the privacy policy on the website.
+
+## 11. Changes and termination
+- These terms may be updated. You will be informed in the App about important changes and asked to accept them again when needed. Changes do not narrow the license granted for Works you have already created.
+- Accounts used in breach of these terms may be suspended or deleted.
+
+## 12. Governing law
+These terms are governed by the laws of the Republic of Türkiye. For consumer transactions, Consumer Arbitration Committees and Consumer Courts have jurisdiction; mandatory consumer protection rules of your country of residence are not affected.
+
+## 13. Contact
+For questions and requests for a written license document, write to the karApp developer contact address shown on the App's store page and website.

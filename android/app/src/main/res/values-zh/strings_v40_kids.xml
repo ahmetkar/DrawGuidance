@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- v40 çocuk modu: 50 seviyelik çizim görevi, Premium seviyeler ve maskotun görev önerisi -->
+<resources>
+    <string name="v40_challenge_state_premium">高级版</string>
+    <string name="v40_challenge_premium_note">第%1$d–%2$d关需要高级版</string>
+    <string name="v40_challenge_suggest_new">你好！想和我一起玩绘画任务吗？我们一关一关地画，收集星星！</string>
+    <string name="v40_challenge_suggest_resume">欢迎回来！要从第%1$d关继续绘画任务吗？</string>
+    <string name="v40_challenge_suggest_premium">你已通过所有免费关卡！后面的关卡需要高级版。</string>
+    <string name="v40_challenge_suggest_start">开始</string>
+    <string name="v40_challenge_suggest_cancel">取消</string>
+    <string name="v40_challenge_suggest_cd">博亚吉克推荐绘画任务</string>
+    <string name="v40_challenge_body_resume">做得很好！已通过 %1$d / %2$d 关。</string>
+    <string name="v40_challenge_body_premium">太棒了！你已通过全部%1$d个免费关卡。其余%2$d关需要高级版。</string>
+    <string name="v40_challenge_body_all_done">超级棒！你已通过全部%1$d关。重玩一关，收集更多星星吧。</string>
+    <string name="v40_challenge_go_premium">查看高级版</string>
+    <string name="v40_challenge_replay">再玩一次（%1$d）</string>
+</resources>

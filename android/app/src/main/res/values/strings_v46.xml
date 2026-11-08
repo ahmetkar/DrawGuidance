@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- v46 yeni tuval formunda hazır şablonlar -->
+    <string name="v46_template_section">Şablon</string>
+    <string name="v46_template_blank">Boş</string>
+    <string name="v46_template_blank_hint">Boş tuval: boyutu, kâğıdı ve sayfa sayısını aşağıdan seç.</string>
+    <string name="v46_template_selected_hint">%1$s Şablonun boyutu, kâğıdı ve sayfaları kullanılır; istediğin gibi değiştirip devam edebilirsin.</string>
+</resources>

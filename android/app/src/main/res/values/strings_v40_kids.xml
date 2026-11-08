@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- v40 çocuk modu: 50 seviyelik çizim görevi, Premium seviyeler ve maskotun görev önerisi -->
+<resources>
+    <string name="v40_challenge_state_premium">Premium</string>
+    <string name="v40_challenge_premium_note">%1$d–%2$d. seviyeler Premium ile açılır</string>
+    <string name="v40_challenge_suggest_new">Merhaba! Benimle çizim görevi oynamak ister misin? Seviye seviye çizip yıldız toplayacağız!</string>
+    <string name="v40_challenge_suggest_resume">Tekrar hoş geldin! Çizim görevine %1$d. seviyeden devam edelim mi?</string>
+    <string name="v40_challenge_suggest_premium">Bütün ücretsiz seviyeleri geçtin! Sonraki seviyeler Premium ile açılır.</string>
+    <string name="v40_challenge_suggest_start">Başlat</string>
+    <string name="v40_challenge_suggest_cancel">İptal</string>
+    <string name="v40_challenge_suggest_cd">Boyacık çizim görevini öneriyor</string>
+    <string name="v40_challenge_body_resume">Harika gidiyorsun! %1$d / %2$d seviye geçtin.</string>
+    <string name="v40_challenge_body_premium">Harika! %1$d ücretsiz seviyenin hepsini geçtin. Kalan %2$d seviye Premium ile açılır.</string>
+    <string name="v40_challenge_body_all_done">Süpersin! %1$d seviyenin hepsini geçtin. Bir seviyeyi yeniden oynayıp daha çok yıldız toplayabilirsin.</string>
+    <string name="v40_challenge_go_premium">Premium\'a bak</string>
+    <string name="v40_challenge_replay">Tekrar oyna (%1$d)</string>
+</resources>

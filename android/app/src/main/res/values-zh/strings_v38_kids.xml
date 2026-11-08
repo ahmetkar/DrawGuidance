@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="kids_challenge">画画任务</string>
+    <string name="help_kids_challenge">一关一关的画画任务。点“开始”；沿着纸上的虚线画，或者按示例的颜色给图画上色，画完点“完成”。分数够了就会开启下一关。在“进度”里可以看到所有关卡。</string>
+    <string name="challenge_menu_idle">一关一关的画画任务！画出目标图画，赢分数，拿星星。</string>
+    <string name="challenge_menu_running">你现在在第 %1$d 关：%2$s。</string>
+    <string name="challenge_start">开始</string>
+    <string name="challenge_stop">关闭模式</string>
+    <string name="challenge_progress">进度</string>
+    <string name="challenge_level_of">第 %1$d / %2$d 关</string>
+    <string name="challenge_finish">完成</string>
+
+    <string name="challenge_kind_trace">描画</string>
+    <string name="challenge_kind_paint">上色</string>
+    <string name="challenge_kind_build">摆放并上色</string>
+    <string name="challenge_intro_trace">第 %1$d 关：%2$s！用画笔沿着虚线画。画完点上面的“完成”。</string>
+    <string name="challenge_intro_paint">第 %1$d 关：%2$s！用颜料桶按彩色圆点的颜色给图画上色。画完点“完成”。</string>
+    <string name="challenge_intro_build">第 %1$d 关：%2$s！在“添加形状”里找到这幅图，放到虚线上，再按圆点的颜色上色。</string>
+
+    <string name="challenge_tip_brush">选上面的画笔，用手指沿着虚线慢慢画。</string>
+    <string name="challenge_tip_eraser">画出线了？选橡皮擦，把多出来的擦掉。</string>
+    <string name="challenge_tip_undo">画错了？上面的后退箭头可以撤销上一步。</string>
+    <string name="challenge_tip_paint">选颜料桶，选圆点的颜色，再点那个地方。</string>
+    <string name="challenge_tip_hold">用颜料桶在图形上按住 2 秒，整个图形会一下子涂满颜色。</string>
+    <string name="challenge_tip_shape">点“添加形状”，选“%1$s”这幅图，再点一下纸把它放上去。</string>
+    <string name="challenge_tip_move">用手指把图拖到虚线上。</string>
+    <string name="challenge_tip_finish">准备好了就点上面绿色的“完成”，我来告诉你得了多少分！</string>
+    <string name="challenge_live_close">真棒，你已经非常接近了！准备好了就点“完成”。</string>
+    <string name="challenge_tip_next">提示</string>
+    <string name="challenge_mascot_cd">小画刷，点我获得提示</string>
+
+    <string name="challenge_passed_title">过关啦！</string>
+    <string name="challenge_failed_title">差一点点！</string>
+    <string name="challenge_passed_say">干得漂亮！下一关在等你。</string>
+    <string name="challenge_passed_say_3">太厉害了！三颗星全拿到了！</string>
+    <string name="challenge_failed_say">过这一关需要 %1$d 分。再试一次，这次一定会更好！</string>
+    <string name="challenge_all_done">最后一关也过了！你是真正的小画家！</string>
+    <string name="challenge_score">分数</string>
+    <string name="challenge_best">最高：%1$d</string>
+    <string name="challenge_stars_cd">%1$d 颗星</string>
+    <string name="challenge_next">下一关</string>
+    <string name="challenge_retry">再试一次</string>
+    <string name="challenge_exit">退出模式</string>
+
+    <string name="challenge_progress_summary">已过 %1$d / %2$d 关 · %3$d 颗星</string>
+    <string name="challenge_state_passed">已通过</string>
+    <string name="challenge_state_open">可玩</string>
+    <string name="challenge_state_locked">未解锁</string>
+    <string name="challenge_play">开始玩</string>
+    <string name="challenge_locked_say">这一关还没解锁。先过第 %1$d 关吧！</string>
+</resources>

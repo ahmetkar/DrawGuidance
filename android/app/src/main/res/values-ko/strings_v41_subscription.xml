@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- v41 abonelik sayfası (SaaS düzeni): plan kartları, bölüm başlıkları, sık sorulanlar -->
+<resources>
+    <string name="v41_sub_hero">나에게 맞는 요금제를 고르세요</string>
+    <string name="v41_sub_hero_text">Free로 모든 모드를 쓰고, Premium으로 고급 도구를 열고 광고를 없애세요. 언제든 Google Play에서 해지할 수 있습니다.</string>
+    <string name="v41_sub_recommended">추천</string>
+    <string name="v41_sub_downgrade">Free로 전환 (Google Play)</string>
+    <string name="v41_sub_section_yours">내 구독</string>
+    <string name="v41_sub_section_billing">결제</string>
+    <string name="v41_sub_billing_text">결제는 Google Play에서 처리됩니다. 휴대전화를 바꿨거나 앱을 다시 설치했다면 구매를 복원하세요.</string>
+    <string name="v41_sub_section_faq">자주 묻는 질문</string>
+    <string name="v41_sub_faq_cancel_q">어떻게 해지하나요?</string>
+    <string name="v41_sub_faq_cancel_a">Google Play → 결제 및 정기 결제 → 정기 결제. 해지해도 기간이 끝날 때까지 Premium이 유지됩니다.</string>
+    <string name="v41_sub_faq_devices_q">다른 기기에서도 되나요?</string>
+    <string name="v41_sub_faq_devices_a">네. 같은 Google 계정으로 로그인한 모든 기기에서 Premium이 켜집니다.</string>
+    <string name="v41_sub_faq_free_q">Free로 돌아가면 그림은 어떻게 되나요?</string>
+    <string name="v41_sub_faq_free_a">아무것도 지워지지 않습니다. Premium 도구와 항목만 다시 잠기고, 이미 넣은 것은 그림에 남습니다.</string>
+    <string name="v41_sub_manage_title">관리</string>
+    <string name="v41_sub_f_modes">모든 모드: 그림, 노트, 만화, 3D, 어린이</string>
+    <string name="v41_sub_f_shapes">모든 도형과 다이어그램</string>
+    <string name="v41_sub_f_basic_comic">기본 효과, 템플릿, 캐릭터, 배경</string>
+    <string name="v41_sub_f_sync">Google 로그인 시 클라우드 동기화</string>
+    <string name="v41_sub_f_ads">광고 포함</string>
+    <string name="v41_sub_f_everything_free">Free의 모든 기능</string>
+    <string name="v41_sub_f_bg_removal">이미지 배경 제거와 고급 효과</string>
+    <string name="v41_sub_f_ai">고급 AI 추천과 3D 추천</string>
+    <string name="v41_sub_f_comic">모든 만화 캐릭터, 배경, 템플릿</string>
+    <string name="v41_sub_f_kids">어린이 그리기 미션 36~50단계</string>
+    <string name="v41_sub_f_no_ads">광고 없음</string>
+</resources>

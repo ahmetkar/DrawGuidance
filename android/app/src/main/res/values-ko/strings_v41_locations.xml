@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- v41 çizgi roman: mekân arka planı ekle (panele sığar ya da bütün sayfa) -->
+<resources>
+    <string name="v41_add_location">장소 배경</string>
+    <string name="v41_loc_title">장소 배경 추가</string>
+    <string name="v41_loc_hint">스타일과 분류를 고르고 배경을 누른 다음 칸에 놓거나 페이지 전체에 쓰세요.</string>
+    <string name="v41_loc_place_hint">칸을 누르거나 끌어다 놓으면 배경이 그 칸에 맞춰집니다. 칸 밖에 놓으면 페이지 전체를 덮습니다.</string>
+    <string name="v41_loc_whole_page">페이지 전체</string>
+    <string name="v41_help_add_location">준비된 장소 배경을 추가합니다: 만화나 코믹 장면을 골라 칸에 놓거나(칸에 맞춰짐) 페이지 전체에 씁니다.</string>
+</resources>

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Compose kendi Material3 temasını yönetiyor (bkz. ui/theme/Theme.kt);
+         bu, Activity'nin ilk çizim öncesi ihtiyaç duyduğu temel sistem temasıdır.
+         v30: açılışta beyaz parlama olmasın diye pencere zemini karşılama ekranının rengi. -->
+    <style name="Theme.DrawGuidance" parent="android:Theme.Material.Light.NoActionBar">
+        <item name="android:windowBackground">@color/brand_splash</item>
+    </style>
+</resources>

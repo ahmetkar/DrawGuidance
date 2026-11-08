@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- v42 metinleri -->
+<resources>
+    <string name="v42_stats_drawings">Рисунки</string>
+    <string name="v42_stats_notes">Заметки</string>
+    <string name="v42_stats_comics">Комиксы</string>
+    <string name="v42_save_title">Сохранить</string>
+    <string name="v42_save_hint">Выберите формат; настройки зависят от выбранного формата.</string>
+    <string name="v42_save_tab_image">Файл изображения</string>
+    <string name="v42_save_tab_pdf">PDF</string>
+    <string name="v42_save_tab_cbz">CBZ</string>
+    <string name="v42_err_copy">Копировать</string>
+    <string name="v42_err_share">Поделиться / e-mail</string>
+    <string name="v42_err_copied">Отчёт скопирован. Отправьте его нам по почте или в сообщении.</string>
+    <string name="v42_err_share_hint">Если не удаётся войти или сервер недоступен, скопируйте отчёт или поделитесь им и отправьте нам.</string>
+    <string name="v42_server_title">Сервер (временно)</string>
+    <string name="v42_server_hint">К какому серверу подключается приложение: удалённому или запущенному на компьютере в локальной сети.</string>
+    <string name="v42_server_remote">Удалённый</string>
+    <string name="v42_server_local">Локальная сеть</string>
+    <string name="v42_server_current">Сейчас: %1$s</string>
+    <string name="v42_server_local_hint">Телефон и компьютер должны быть в одной сети Wi-Fi. Запустите на компьютере Yerel-Sunucuyu-Baslat.bat и введите показанный адрес или нажмите «Найти в сети». Соединение не шифруется — используйте только в своей сети.</string>
+    <string name="v42_server_local_invalid">Можно указать только адрес локальной сети (например, 192.168.1.20:4747).</string>
+    <string name="v42_server_use">Использовать этот сервер</string>
+    <string name="v42_add_objects">Предметы</string>
+    <string name="v42_obj_title">Добавить предмет</string>
+    <string name="v42_obj_hint">Готовые предметы по тематическим пакетам и категориям. Нажмите, чтобы добавить на страницу; их можно перемещать, вращать и масштабировать.</string>
+    <string name="v42_fx_images_hint">Готовые рисунки взрывов, энергии, дыма и блеска по тематическим пакетам и категориям.</string>
+    <string name="v42_text_on_path">Текст по контуру</string>
+    <string name="v42_text_on_path_need">Текст по контуру (сначала нарисуйте контур пером)</string>
+    <string name="v42_text_path_pick">Коснитесь контура, по которому пойдёт текст</string>
+    <string name="v42_text_path_missed">Там нет контура: коснитесь одного из выделенных</string>
+    <string name="v42_text_path_below">Текст под контуром</string>
+    <string name="v42_text_path_above">Текст над контуром</string>
+    <string name="v42_text_path_reverse">Развернуть направление текста</string>
+    <string name="v42_text_path_detach">Снять текст с контура</string>
+    <string name="v42_saved_tab_default">Папка по умолчанию</string>
+    <string name="v42_saved_tab_other">Другие места</string>
+    <string name="v42_saved_empty_other">Здесь отображаются файлы, сохранённые в другую папку через «Выбрать место» или «Сохранить как».</string>
+    <string name="v42_saved_open">Открыть</string>
+    <string name="v42_saved_no_viewer">Нет приложения для открытия этого файла. Его можно отправить в другое приложение через «Поделиться».</string>
+    <string name="v42_saved_document">Документ %1$s · %2$s</string>
+    <string name="v42_help_add_objects">Готовые предметы: оружие, фонари, документы, сокровища, еда... Выбор по тематическому пакету и категории; добавляются как изображение.</string>
+</resources>

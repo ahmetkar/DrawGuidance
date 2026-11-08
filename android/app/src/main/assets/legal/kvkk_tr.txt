@@ -1,0 +1,49 @@
+# KVKK Aydınlatma Metni
+
+Sürüm: 2026-10-25 · Yürürlük: Ekim 2026
+
+6698 sayılı Kişisel Verilerin Korunması Kanunu ("KVKK") 10. maddesi uyarınca, Çizim Rehberi (DrawGuidance) uygulamasında hesap açtığınızda işlenen kişisel verileriniz hakkında sizi bilgilendiririz.
+
+## 1. Veri sorumlusu
+Veri sorumlusu, uygulamanın geliştiricisi karApp'tır. İletişim bilgileri uygulamanın mağaza sayfasında yer alır.
+
+## 2. İşlenen kişisel veriler
+Hesap açtığınızda yalnızca şu veriler işlenir:
+- Kimlik: ad, soyad, görünen ad, doğum tarihi.
+- İletişim: e-posta adresi ve doğrulanıp doğrulanmadığı.
+- Hesap bilgileri: Google/Firebase hesap kimliği, profil fotoğrafının bağlantısı, Google hesabının açılış tarihi, kayıt ve güncelleme zamanları.
+- Onay kayıtları: bu metnin ve Kullanım Şartları'nın onaylandığı zaman ve sürüm.
+
+Çizimleriniz, notlarınız, 3B şekilleriniz, resimleriniz ve yapay zekânın cihazda öğrendikleri sunucuya gönderilmez; yalnızca cihazınızda kalır.
+
+## 3. İşleme amaçları
+- Hesabınızın oluşturulması, kimliğinizin doğrulanması ve oturumunuzun yönetilmesi,
+- Profil bilgilerinizin cihazlar arasında eşitlenmesi,
+- Yaşa uygun kullanımın sağlanması (doğum tarihi),
+- Hukuki yükümlülüklerin yerine getirilmesi ve olası uyuşmazlıklarda delil olarak kullanılması (onay kayıtları).
+
+## 4. Hukuki sebepler
+Verileriniz KVKK 5/2-c (sözleşmenin kurulması ve ifası), 5/2-ç (hukuki yükümlülük) ve 5/2-f (meşru menfaat) hükümlerine dayanılarak işlenir.
+
+## 5. Toplama yöntemi
+Veriler; Google ile giriş sırasında Google'dan (Firebase Authentication aracılığıyla) ve hesap açarken ya da hesap ayarlarında sizin girdiğiniz bilgilerden elektronik ortamda toplanır.
+
+## 6. Aktarım
+- Kimlik doğrulama için Google LLC'nin Firebase Authentication hizmeti kullanılır; bu hizmet yurt dışındaki sunucularda çalışabilir. Bu aktarım KVKK 9. maddesine uygun olarak yapılır.
+- Profil bilgileriniz uygulamanın kendi sunucusundaki veritabanında saklanır.
+- Verileriniz bunlar dışında üçüncü kişilerle paylaşılmaz, satılmaz ve reklam amacıyla kullanılmaz. Yetkili kamu kurumlarının yasal talepleri saklıdır.
+
+## 7. Saklama süresi
+Verileriniz hesabınız açık kaldığı sürece saklanır. Hesabınızı sildiğinizde sunucudaki kaydınız, Firebase hesabınız ve cihazdaki hesap bilgileriniz silinir. Yasal saklama yükümlülüğü olan kayıtlar yalnız bu süre boyunca tutulur.
+
+## 8. Haklarınız (KVKK madde 11)
+- Kişisel verilerinizin işlenip işlenmediğini öğrenme ve bilgi talep etme,
+- İşlenme amacını ve amaca uygun kullanılıp kullanılmadığını öğrenme,
+- Yurt içinde ya da yurt dışında aktarıldığı üçüncü kişileri bilme,
+- Eksik ya da yanlış işlenmişse düzeltilmesini isteme,
+- KVKK 7. maddedeki şartlar çerçevesinde silinmesini ya da yok edilmesini isteme,
+- Düzeltme ve silme işlemlerinin aktarılan üçüncü kişilere bildirilmesini isteme,
+- Otomatik sistemlerle analiz sonucu aleyhinize bir sonuç çıkmasına itiraz etme,
+- Kanuna aykırı işleme nedeniyle zarara uğramanız hâlinde zararın giderilmesini talep etme.
+
+Profil bilgilerinizi Ayarlar > Hesap ayarları bölümünden düzeltebilir, hesabınızı aynı yerden silebilirsiniz. Diğer talepleriniz için veri sorumlusuna yazılı olarak başvurabilirsiniz; başvurular en geç 30 gün içinde ücretsiz sonuçlandırılır.

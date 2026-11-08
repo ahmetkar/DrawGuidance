@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- v39: ayarlar sadeleştirme, otomatik günlük eşitleme -->
+    <string name="sync_merged_title">Eşitleme</string>
+    <string name="sync_auto_title">Otomatik eşitleme</string>
+    <string name="sync_auto_on">Açık: sunucuyla günde bir kez kendiliğinden eşitlenir</string>
+    <string name="sync_auto_off">Kapalı: yalnız \"Şimdi eşitle\" ile eşitlenir</string>
+    <string name="sync_last">Son eşitleme: %1$s</string>
+</resources>

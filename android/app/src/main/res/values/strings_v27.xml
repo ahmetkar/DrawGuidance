@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- v27: 3B düzenleyicide alt araç seçici araç satırından ayrı ve daha büyük; Düzenle'de nokta/kenar/yüz seçimi
+     işlemlerden ayrı, işlemler hep etkin (seçim yokken ne seçileceği söylenir); Boya'da kapsam (tek yüz, yüzey, parça,
+     tümü); 3B çizim önerisi (cihazda öğrenen). -->
+<resources>
+    <!-- Boya kapsamı -->
+    <string name="model3d_paint_scope_face">Tek yüz</string>
+    <string name="model3d_paint_scope_surface">Yüzey</string>
+    <string name="model3d_paint_scope_part">Parça</string>
+    <string name="model3d_paint_scope_all">Tümü</string>
+    <string name="model3d_hint_paint_face">Tek yüz: dokunduğunuz yüz boyanır · basılı tutunca boyanacak yer vurgulanır · iki parmak: döndür</string>
+    <string name="model3d_hint_paint_surface">Yüzey: dokunduğunuz yüzün bütün yüzeyi (ör. silindirin yanı, kutunun bir yüzü) boyanır</string>
+    <string name="model3d_hint_paint_part">Parça: dokunduğunuz parçanın tamamı boyanır</string>
+    <string name="model3d_hint_paint_all">Tümü: dokununca modeldeki bütün görünür parçalar aynı renge boyanır</string>
+
+    <!-- Düzenle: seçim durumu ve yönlendirme -->
+    <string name="model3d_none_points">Nokta seçilmedi</string>
+    <string name="model3d_none_edges">Kenar seçilmedi</string>
+    <string name="model3d_none_faces">Yüz seçilmedi</string>
+    <string name="model3d_edges_selected">%1$d kenar seçili</string>
+    <string name="model3d_faces_selected">%1$d yüz seçili</string>
+    <string name="model3d_need_points">Önce noktaları seçin: noktaya dokunun (kenara dokunmak nokta ekler)</string>
+    <string name="model3d_need_edges">Önce bir kenar seçin: modelin kenarına dokunun</string>
+    <string name="model3d_need_faces">Önce bir yüz seçin: modelin yüzüne dokunun</string>
+    <string name="model3d_need_part">Önce bir parça seçin: sahnede parçaya dokunun</string>
+    <string name="model3d_need_two_parts">Gruplamak için en az iki parça seçin (Parçalar panelinde kutucuklarla)</string>
+
+    <!-- GLB içe aktarma (tuvalde ve 3B düzenleyicide) -->
+    <string name="glb_import_button">GLB içe aktar</string>
+    <string name="glb_import_file">"%1$s" (%2$s)</string>
+    <string name="glb_import_detail">Ayrıntı düzeyi</string>
+    <string name="glb_import_save_question">İçe aktarılan şekil 3B Şekillerim\'e ayrı şekil olarak kaydedilsin mi?</string>
+    <string name="glb_import_save_yes">Evet, kaydet ve ekle</string>
+    <string name="glb_import_save_no">Hayır, yalnız ekle</string>
+    <string name="glb_import_failed">GLB dosyası okunamadı: %1$s</string>
+
+    <!-- Çizgi roman tuvali -->
+    <string name="canvas_kind_comic">Çizgi roman</string>
+    <string name="canvas_kind_comic_hint">Resim fırçaları · konuşma balonları, paneller, efekt yazıları, sayfalar</string>
+    <string name="canvas_kind_badge_comic">Çizgi roman</string>
+    <string name="font_group_comic">Çizgi roman</string>
+
+    <!-- Gradyan -->
+    <string name="gradient_title">Gradyan</string>
+    <string name="gradient_stops">Renkler</string>
+    <string name="gradient_radial">Dairesel</string>
+    <string name="fill_tab_color">Renk</string>
+    <string name="fill_tab_gradient">Gradyan</string>
+
+    <!-- 3B gradyan -->
+    <string name="model3d_gradient">Gradyan</string>
+    <string name="model3d_gradient_none">Tek renk</string>
+    <string name="model3d_gradient_vertical">Dikey</string>
+    <string name="model3d_gradient_horizontal">Yatay</string>
+    <string name="model3d_gradient_depth">Derinlik</string>
+    <string name="model3d_gradient_second">İkinci renk</string>
+
+    <!-- Çizgi roman: Ekle menüsü ve pencereler -->
+    <string name="add_balloon">Konuşma balonu</string>
+    <string name="add_sfx">Efekt yazısı</string>
+    <string name="add_comic_lines">Hız ve odak çizgileri</string>
+    <string name="balloon_title">Konuşma balonu</string>
+    <string name="balloon_edit_title">Balon</string>
+    <string name="balloon_hint">Biçime dokunun: balon eklenir ve yazısı hemen yazılır. Kuyrukların uçlarını tuvalde sürükleyerek konuşana yöneltin.</string>
+    <string name="balloon_speakers">Kime işaret etsin</string>
+    <string name="balloon_no_tail">Kuyruksuz</string>
+    <string name="balloon_people">%1$d kişi</string>
+    <string name="balloon_fill">Balon rengi</string>
+    <string name="balloon_border">Kenar rengi</string>
+    <string name="balloon_tail_hint">Seç modunda balon seçiliyken kuyruk uçlarındaki noktaları sürükleyin.</string>
+    <string name="balloon_speech">Konuşma</string>
+    <string name="balloon_rounded">Kutu</string>
+    <string name="balloon_thought">Düşünce</string>
+    <string name="balloon_shout">Bağırma</string>
+    <string name="balloon_whisper">Fısıltı</string>
+    <string name="balloon_narration">Anlatı</string>
+    <string name="balloon_electric">Telefon/radyo</string>
+    <string name="balloon_wavy">Titrek</string>
+    <string name="sfx_title">Efekt yazısı</string>
+    <string name="sfx_hint">Ses efekti: kalın kenarlık, gölge ve gradyan dolgulu büyük yazı. Yazısı ve renkleri sonradan değiştirilebilir.</string>
+    <string name="lines_title">Hız ve odak çizgileri</string>
+    <string name="lines_hint">Seçili kare varsa onun içine, yoksa bütün sayfaya eklenir; tek eleman gibi taşınır.</string>
+    <string name="lines_speed_h">Yatay hız</string>
+    <string name="lines_speed_v">Dikey hız</string>
+    <string name="lines_focus">Odak</string>
+    <string name="lines_burst">Patlama</string>
+
+    <!-- Yazı efektleri -->
+    <string name="text_effects">Efektler</string>
+    <string name="text_shadow">Gölge</string>
+    <string name="text_shadow_none">Yok</string>
+    <string name="text_shadow_soft">Yumuşak</string>
+    <string name="text_gradient">Gradyan dolgu</string>
+    <string name="text_caps">BÜYÜK HARF</string>
+    <string name="text_letter_spacing">Harf aralığı</string>
+
+    <!-- Resim filtreleri -->
+    <string name="image_filter">Filtre</string>
+    <string name="image_filter_hint">Resme çizgi roman görünümü verilir; geri al ile özgün resme dönülür.</string>
+    <string name="filter_comic">Çizgi roman</string>
+    <string name="filter_halftone">Ton noktaları</string>
+    <string name="filter_manga">Manga</string>
+    <string name="filter_pop">Pop art</string>
+
+    <!-- Kılavuz -->
+    <string name="guide_clear_all">Mevcut kılavuz çizgilerini temizle</string>
+
+    <!-- Çizim önerisi -->
+    <string name="model3d_suggest_toggle">Öneri</string>
+    <string name="model3d_suggest_toggle_long">Çizimden sonra cisim öner</string>
+    <string name="model3d_suggest_title">Çizim önerisi</string>
+    <string name="model3d_suggest_dismiss">Öneriyi kapat</string>
+    <string name="model3d_section_suggest">Çizim önerisi</string>
+    <string name="model3d_suggest_info">Çizdiğiniz şekil (daire, üçgen, dikdörtgen, sarmal…) cihazda tanınır ve uygun cisimler önerilir; seçtikleriniz öğrenilir, öneriler zamanla size uyar. İnternet gerekmez.</string>
+    <!-- v27 seçimde kendiliğinden öneri: şekil (çok eleman) ve parça (az eleman) -->
+    <string name="selection_suggest_setting">Seçimde otomatik öneri</string>
+    <string name="selection_suggest_setting_hint">Eleman seçince öneri gösterir</string>
+    <string name="selection_suggest_turn_off">Seçim önerilerini kapat</string>
+    <string name="selection_suggest_off_event">Seçimde otomatik öneri kapatıldı (Ayarlar\'dan açılabilir)</string>
+    <string name="part_suggest_title">Parça önerisi</string>
+    <string name="part_suggest_option">%1$s: +%2$d parça</string>
+    <string name="part_suggest_cd">%s ekle</string>
+    <string name="template_vector">Şekil: %s</string>
+    <!-- v28 -->
+    <string name="suggest_move">Öneri kutusunu taşı (sürükle; çift dokun: otomatik yere dön)</string>
+</resources>

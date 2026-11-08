@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- v40 çizim ekranı: arka planı taşıma/boyutlandırma -->
+<resources>
+    <string name="bg_transform">Переместить / размер</string>
+    <string name="bg_transform_hint">Перетащите фон; меняйте размер двумя пальцами или за углы</string>
+    <string name="bg_transform_reset">Сбросить</string>
+</resources>

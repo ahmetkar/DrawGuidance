@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- v17: kenar vektörleştirme -->
+    <string name="vectorize_min_length">Kısa çizgileri at %%%1$d</string>
+    <string name="vectorize_width">Çizgi kalınlığı %1$s</string>
+    <string name="vectorize_colored">Çizgi rengini resimden al</string>
+    <string name="vectorize_mode">Çizgi bulma</string>
+    <string name="vectorize_mode_auto">Otomatik</string>
+    <string name="vectorize_mode_edges">Kenarlar</string>
+    <string name="vectorize_mode_lines">Çizimin çizgileri</string>
+    <string name="vectorize_mode_auto_hint">Resme göre seçilir: fotoğrafta kenarlar, kalem/mürekkep çiziminde çizgilerin ortası.</string>
+    <string name="vectorize_mode_edges_hint">Renk ve ışık değişen yerlerin kenarları (fotoğraf, renkli resim).</string>
+    <string name="vectorize_mode_lines_hint">Koyu çizgilerin ortası tek çizgi olur (karakalem, mürekkep, eskiz).</string>
+    <string name="vectorize_empty">Resimde çizgi bulunamadı; ayrıntıyı artırın.</string>
+    <!-- v17: alan alan boyama -->
+    <string name="tool_region_fill">Alan boya</string>
+    <string name="mode_hint_region_fill">Rengi seçip çizgilerle çevrili bir alana dokunun; boyalı alana dokunmak rengini değiştirir. Temizle ile alanın rengi kalkar.</string>
+    <string name="region_fill_clear">Temizle</string>
+    <string name="region_fill_custom">Başka renk</string>
+    <string name="region_open">Bu alan kapalı değil: çizgilerle çevrili bir yere dokunun.</string>
+    <!-- v17: modlar ve menüler -->
+    <string name="mode_add">Ekle</string>
+    <string name="mode_edit_pick">Düzenle</string>
+    <string name="hint_select_empty">Elemana dokunarak seç · boş yerde kaydır</string>
+    <string name="hint_add">Eklemek istediğin yere dokun</string>
+    <string name="hint_edit_pick">Düzenlemek istediğin elemana dokun</string>
+    <string name="add_here_title">Buraya ekle</string>
+    <string name="context_add_title">Ekle</string>
+    <string name="context_text_title">Yazı</string>
+    <string name="context_shape_title">Şekil</string>
+    <string name="context_ink_title">Çizim</string>
+    <string name="context_formula_title">Formül</string>
+    <string name="context_image_title">Resim</string>
+    <string name="context_diagram_title">Diyagram</string>
+    <string name="context_mixed_title">%1$d eleman seçili</string>
+    <string name="text_color">Yazı rengi</string>
+    <string name="region_fill_open">Alan boya</string>
+    <string name="ink_color">Renk</string>
+    <string name="ink_color_title">Çizimin rengi</string>
+    <string name="ink_thinner">İnce</string>
+    <string name="ink_thicker">Kalın</string>
+    <string name="ink_smooth">Yumuşat</string>
+    <string name="ink_thinner_long">İncelt</string>
+    <string name="ink_thicker_long">Kalınlaştır</string>
+    <string name="ink_correct">Düzeltme öner</string>
+    <string name="formula_edit_slots">Katsayıları düzenle</string>
+    <string name="formula_write">Formülü yaz</string>
+    <string name="group_selection">Grupla</string>
+    <string name="shape_tools_label">Şekil araçları</string>
+    <!-- v17: çizim düzeltme -->
+    <string name="fix_line">Düz çizgi</string>
+    <string name="fix_polyline">Düz kenarlar</string>
+    <string name="fix_circle">Daire</string>
+    <string name="fix_ellipse">Elips</string>
+    <string name="fix_triangle">Üçgen</string>
+    <string name="fix_rectangle">Dikdörtgen</string>
+    <string name="fix_square">Kare</string>
+    <string name="fix_polygon">Çokgen</string>
+    <string name="fix_apply_cd">Düzeltmeyi uygula: %1$s</string>
+    <string name="no_correction">Bu çizim için düzeltme bulunamadı.</string>
+</resources>

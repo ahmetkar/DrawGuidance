@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- v31 koyu temada açılış penceresinin zemini (nöromorfik koyu zemin) -->
+    <color name="brand_splash">#FF272B33</color>
+</resources>

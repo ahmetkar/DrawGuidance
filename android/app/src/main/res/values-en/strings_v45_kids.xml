@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- v45 çocuk menüsü: kısa adlar, boya fırçası, fırça boyu, açıklamalar ve ipuçları -->
+    <string name="v45_kids_undo">Undo</string>
+    <string name="v45_kids_redo">Redo</string>
+    <string name="v45_kids_pen">Pencil</string>
+    <string name="v45_kids_eraser">Eraser</string>
+    <string name="v45_kids_paint_brush">Paint</string>
+    <string name="v45_kids_bucket">Bucket</string>
+    <string name="v45_kids_parts">Pieces</string>
+    <string name="v45_kids_colors">Colors</string>
+    <string name="v45_kids_shapes">Shapes</string>
+    <string name="v45_kids_challenge">Quest</string>
+    <string name="v45_kids_background">Paper</string>
+    <string name="v45_kids_image">Picture</string>
+    <string name="v45_kids_text">Words</string>
+    <string name="v45_kids_model3d">3D</string>
+    <string name="v45_kids_select">Select</string>
+    <string name="v45_kids_eyedropper">Copy color</string>
+    <string name="v45_kids_ruler">Ruler</string>
+    <string name="v45_kids_template">Stencil</string>
+    <string name="v45_kids_expand">Bigger</string>
+    <string name="v45_kids_brush_size">Brush size</string>
+    <string name="v45_kids_size_thin">Thin</string>
+    <string name="v45_kids_size_medium">Medium</string>
+    <string name="v45_kids_size_thick">Thick</string>
+    <string name="v45_help_kids_pen">Draw anything you like on the paper with the pencil. Choose its color and thickness in Colors.</string>
+    <string name="v45_help_kids_paint_brush">Paint brush: paint inside a shape with your finger. The paint stays inside the lines; on empty paper it paints wherever you go.</string>
+    <string name="v45_help_kids_bucket">Paint bucket: tap inside a shape and that spot is filled with your color. Hold for 2 seconds to paint the whole shape.</string>
+    <string name="v45_help_kids_parts">See the pieces of your picture (lines, shapes, words); you can hide or delete them.</string>
+    <string name="v45_help_kids_colors">Choose the pencil\'s color, thickness and type.</string>
+    <string name="v45_help_kids_shapes">Ready pictures and shapes: pick one and tap the paper to place it.</string>
+    <string name="v45_help_kids_background">Changes the color of the paper.</string>
+    <string name="v45_help_kids_brush_size">How thick the paint brush is: thin, medium or thick.</string>
+    <string name="v45_challenge_tip_pen">Pick the Pencil at the top and slowly trace the dashed line with your finger.</string>
+    <string name="v45_challenge_tip_paint_brush">You can also use the paint brush: pick Paint, choose the color and paint inside the area with your finger. The paint stays inside the lines!</string>
+    <string name="v45_tut_kids_pen">Pencil</string>
+    <string name="v45_tut_kids_pen_text">With the pencil you draw anything you like. Look, I\'m drawing a bright sun in the sky!</string>
+</resources>

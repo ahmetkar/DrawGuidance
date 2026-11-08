@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- v40 çizgi roman hazır karakterleri ve arka planları -->
+<resources>
+    <string name="v40_comic_chars_hint">Pick a style and theme, tap a character, then tap a variant to add it to the page.</string>
+    <string name="v40_comic_style">Style</string>
+    <string name="v40_comic_theme">Theme</string>
+    <string name="v40_comic_style_manga">Manga</string>
+    <string name="v40_comic_style_comic">Comic</string>
+    <string name="v40_comic_group_expressions">Expressions</string>
+    <string name="v40_comic_group_poses">Poses</string>
+    <string name="v40_comic_group_action">Action</string>
+    <string name="v40_comic_group_daily">Everyday</string>
+    <string name="v40_comic_bg_title">Ready-made backgrounds</string>
+</resources>

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- v41 çizgi roman: mekân arka planı ekle (panele sığar ya da bütün sayfa) -->
+<resources>
+    <string name="v41_add_location">場所の背景</string>
+    <string name="v41_loc_title">場所の背景を追加</string>
+    <string name="v41_loc_hint">スタイルとカテゴリを選び、背景をタップして、コマに置くかページ全体に使います。</string>
+    <string name="v41_loc_place_hint">コマをタップするかドラッグして置くと、背景がそのコマに収まります。コマの外に置くとページ全体を覆います。</string>
+    <string name="v41_loc_whole_page">ページ全体</string>
+    <string name="v41_help_add_location">既成の場所の背景を追加：マンガかコミックの場面を選び、コマに置く（コマに収まる）かページ全体に使います。</string>
+</resources>

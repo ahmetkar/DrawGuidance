@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- v40 tasarım: tema, Ana sayfa, Tuvallerim özeti, çizim süresi ve tuval boyutları -->
+<resources>
+    <string name="v40_theme_mode_title">Tema</string>
+    <string name="v40_theme_mode_light">Açık</string>
+    <string name="v40_theme_mode_dark">Koyu</string>
+    <string name="v40_theme_mode_system">Sistem</string>
+    <string name="v40_theme_high_contrast">Yüksek karşıtlık</string>
+    <string name="v40_theme_high_contrast_hint">Daha güçlü yazı ve kenarlar, kalın seçim çerçevesi</string>
+    <string name="v40_home_kind_art">Serbestçe çiz ve boya</string>
+    <string name="v40_home_kind_notes">Dersler ve fikirler için</string>
+    <string name="v40_home_kind_comic">Kendi hikâyeni anlat</string>
+    <string name="v40_home_kind_simple_art">Kolayca çizmeye başla</string>
+    <string name="v40_home_kind_simple_notes">Hızlı ve sade notlar</string>
+    <string name="v40_home_kind_kids">Çocuklar için eğlenceli boyama</string>
+    <string name="v40_home_kind_3d">3B şekiller tasarla</string>
+    <string name="v40_home_group_simple">Sade ve kolay</string>
+    <string name="v40_home_group_advanced">Bütün araçlar elinde</string>
+    <string name="v40_home_most_time_title">En çok vakit geçirdiklerin</string>
+    <string name="v40_home_most_time_cd">%1$s, %2$s harcandı</string>
+    <string name="v40_time_lt_minute">1 dk\'dan az</string>
+    <string name="v40_time_minutes">%1$d dk</string>
+    <string name="v40_time_hours_minutes">%1$d sa %2$d dk</string>
+    <string name="v40_time_hours">%1$d sa</string>
+    <string name="v40_stats_title">Özet</string>
+    <string name="v40_stats_total">Toplam</string>
+    <string name="v40_stats_week">Bu hafta</string>
+    <string name="v40_stats_time">Çizim süresi</string>
+    <string name="v40_stats_cd">%1$s: %2$s</string>
+    <string name="v40_size_square">Kare</string>
+    <string name="v40_size_portrait">Portre</string>
+    <string name="v40_size_landscape">Manzara</string>
+    <string name="v40_size_wallpaper">Telefon duvar kâğıdı</string>
+    <string name="v40_size_a4_300">A4 (300 dpi)</string>
+    <string name="v40_size_a4">A4</string>
+    <string name="v40_size_a5">A5</string>
+    <string name="v40_size_letter">Letter</string>
+    <string name="v40_size_a4_landscape">A4 yatay</string>
+    <string name="v40_size_comic_page">Çizgi roman sayfası</string>
+    <string name="v40_size_us_comic">ABD çizgi roman</string>
+    <string name="v40_size_manga_b5">Manga (B5)</string>
+    <string name="v40_size_webtoon">Webtoon</string>
+    <string name="v40_size_custom">Özel</string>
+    <string name="v40_size_width">Genişlik (%1$s)</string>
+    <string name="v40_size_height">Yükseklik (%1$s)</string>
+    <string name="v40_size_dpi">DPI</string>
+    <string name="v40_size_result">%1$d × %2$d px</string>
+    <string name="v40_size_error_min">Kenarlar en az %1$d px olmalı</string>
+    <string name="v40_size_error_max">Kenarlar en çok %1$d px olabilir</string>
+    <string name="v40_size_error_memory">Bu boyut cihazın belleği için çok büyük</string>
+</resources>

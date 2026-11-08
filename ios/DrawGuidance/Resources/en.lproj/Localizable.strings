@@ -1,0 +1,14 @@
+"app.name" = "DrawGuidance";
+"home.new_advanced" = "New (advanced)";
+"home.new_simple" = "New (simple)";
+"home.my_canvases" = "My canvases";
+"home.empty" = "No canvases yet.";
+"kind.art" = "Art";
+"kind.notes" = "Notes";
+"kind.comic" = "Comic";
+"kind.simple_art" = "Simple art";
+"kind.simple_notes" = "Simple notes";
+"kind.kids" = "For kids";
+"tool.brush" = "Brush";
+"tool.eraser" = "Eraser";
+"tool.color" = "Color";

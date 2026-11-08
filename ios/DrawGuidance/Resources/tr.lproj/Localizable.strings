@@ -1,0 +1,14 @@
+"app.name" = "Çizim Rehberi";
+"home.new_advanced" = "Yeni (gelişmiş)";
+"home.new_simple" = "Yeni (basit)";
+"home.my_canvases" = "Tuvallerim";
+"home.empty" = "Henüz tuval yok.";
+"kind.art" = "Resim";
+"kind.notes" = "Not alma";
+"kind.comic" = "Çizgi roman";
+"kind.simple_art" = "Basit resim";
+"kind.simple_notes" = "Basit not";
+"kind.kids" = "Çocuklar için";
+"tool.brush" = "Fırça";
+"tool.eraser" = "Silgi";
+"tool.color" = "Renk";

@@ -1,0 +1,79 @@
+name: iOS
+
+on:
+  push:
+    branches: [main, "ios/**"]
+    paths: ["ios/**", ".github/workflows/ios.yml"]
+  pull_request:
+    paths: ["ios/**", ".github/workflows/ios.yml"]
+  workflow_dispatch:
+
+concurrency:
+  group: ios-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-test:
+    runs-on: macos-15
+    timeout-minutes: 45
+    defaults:
+      run:
+        working-directory: ios
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Xcode sürümü
+        run: xcodebuild -version
+
+      - name: XcodeGen kur ve projeyi üret
+        run: |
+          brew install xcodegen
+          xcodegen generate
+
+      - name: Simülatör seç
+        id: sim
+        run: |
+          ID=$(xcrun simctl list devices available -j | python3 -c '
+          import json,sys
+          d=json.load(sys.stdin)["devices"]
+          c=[(r,x) for r,l in d.items() if "iOS" in r for x in l if x["name"].startswith("iPhone")]
+          c.sort(key=lambda t:t[0]); print(c[-1][1]["udid"])')
+          echo "udid=$ID" >> "$GITHUB_OUTPUT"
+          xcrun simctl list devices | grep "$ID"
+
+      - name: Birim ve arayüz testleri (simülatör)
+        run: |
+          mkdir -p build
+          xcodebuild test -project DrawGuidance.xcodeproj -scheme DrawGuidance \
+            -destination "id=${{ steps.sim.outputs.udid }}" \
+            -resultBundlePath build/TestResults.xcresult \
+            CODE_SIGNING_ALLOWED=NO | tee build/test.log | grep -E "Test Case|error:|\*\* TEST" || true
+          grep -q "\*\* TEST SUCCEEDED \*\*" build/test.log
+
+      - name: Cihaz için Release derleme (imzasız)
+        run: |
+          set -o pipefail
+          xcodebuild build -project DrawGuidance.xcodeproj -scheme DrawGuidance \
+            -configuration Release -sdk iphoneos -destination "generic/platform=iOS" \
+            -derivedDataPath build/dd \
+            CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY="" | tail -20
+
+      - name: .ipa paketle
+        run: |
+          APP=build/dd/Build/Products/Release-iphoneos/DrawGuidance.app
+          test -d "$APP"
+          mkdir -p build/ipa/Payload
+          cp -R "$APP" build/ipa/Payload/
+          (cd build/ipa && zip -qry ../DrawGuidance-v49-ios-unsigned.ipa Payload)
+          ls -la build/*.ipa
+          echo "Sembol kontrolü (ilk 20):"; nm -U "$APP/DrawGuidance" | head -20 || true
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: ios-build
+          path: |
+            ios/build/*.ipa
+            ios/build/test.log
+            ios/build/TestResults.xcresult
+          if-no-files-found: warn

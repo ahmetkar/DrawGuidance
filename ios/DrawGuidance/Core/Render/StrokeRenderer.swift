@@ -22,7 +22,8 @@ enum StrokeRenderer {
     private static func drawUnclipped(_ c: CGContext, _ stroke: Stroke) {
         switch stroke.brushType {
         case .SHAPE: ShapeRenderer.draw(c, stroke)
-        case .IMAGE, .TEXT, .DIAGRAM, .FORMULA: return // ayrı çiziciler (sonraki aşama)
+        case .TEXT: TextRenderer.draw(c, stroke, color: ArgbColor.hex(stroke.colorHex))
+        case .IMAGE, .DIAGRAM, .FORMULA: return // ayrı çiziciler (sonraki aşama)
         default:
             let n = stroke.points.count
             if n == 0 { return }

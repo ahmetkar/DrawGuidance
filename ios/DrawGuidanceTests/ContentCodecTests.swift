@@ -71,7 +71,7 @@ final class ContentCodecTests: XCTestCase {
 
     func testEmptyAndLegacy() throws {
         XCTAssertEqual(try ContentCodec.decode(ContentCodec.EMPTY), [])
-        let legacy = #"[{"id":"x","points":[{"x":1.0,"y":2.0}],"colorHex":"#000000","brushType":"PENCIL","sizePx":3.0,"opacity":1.0,"order":0}]"#
+        let legacy = ##"[{"id":"x","points":[{"x":1.0,"y":2.0}],"colorHex":"#000000","brushType":"PENCIL","sizePx":3.0,"opacity":1.0,"order":0}]"##
         XCTAssertEqual(try ContentCodec.decode(Data(legacy.utf8)).first?.points, [StrokePoint(1, 2)])
     }
 

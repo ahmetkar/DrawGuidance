@@ -1,7 +1,7 @@
 import Foundation
 
-/// Tuvallerin cihazda saklanması (Android Room `canvases` tablosunun ilk karşılığı): her tuval bir klasörde,
-/// üst bilgisi `meta.json`, çizimleri Android ile aynı ikili biçimde `content.bin` (ContentCodec).
+/// Tuvallerin cihazda saklanması (Android `CanvasRepository` + Room `canvases` tablosu karşılığı): her tuval bir
+/// klasörde, üst bilgisi `meta.json`, çizimleri Android ile aynı ikili biçimde `content.bin` (ContentCodec).
 @MainActor
 final class CanvasStore: ObservableObject {
     struct Meta: Codable, Equatable {
@@ -23,16 +23,19 @@ final class CanvasStore: ObservableObject {
     }
 
     @Published private(set) var canvases: [CanvasUi] = []
-    private let root: URL
+    let files: CanvasFiles
+    let saveQueue: CanvasSaveQueue
 
     init(directory: URL? = nil) {
-        root = directory ?? FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask)[0]
-            .appendingPathComponent("canvases", isDirectory: true)
-        try? FileManager.default.createDirectory(at: root, withIntermediateDirectories: true)
+        files = directory.map { CanvasFiles(root: $0) } ?? .shared
+        saveQueue = CanvasSaveQueue(files: files)
         reload()
+        saveQueue.onSaved = { [weak self] id in
+            Task { @MainActor in self?.refresh(id) }
+        }
     }
 
-    static func nowMs() -> Int64 { Int64(Date().timeIntervalSince1970 * 1000) }
+    nonisolated static func nowMs() -> Int64 { Int64(Date().timeIntervalSince1970 * 1000) }
 
     func create(kind: CanvasKind, name: String) -> CanvasUi {
         let size = kind.defaultSize
@@ -43,42 +46,106 @@ final class CanvasStore: ObservableObject {
         return c
     }
 
+    static func meta(_ c: CanvasUi) -> Meta {
+        Meta(localId: c.localId, name: c.name, width: c.width, height: c.height, backgroundColorHex: c.backgroundColorHex,
+             aiEnabled: c.aiEnabled, createdAt: c.createdAt, updatedAt: c.updatedAt, kind: c.kind, currentPage: c.currentPage,
+             guide: c.guide, folderId: c.folderId, background: c.background, pageBackgrounds: c.pageBackgrounds,
+             pageSettings: c.pageSettings)
+    }
+
+    /// Tuvalin tamamını yazar (oluşturma, kopyalama, şablon).
     func save(_ canvas: CanvasUi) {
         var c = canvas
         c.updatedAt = Self.nowMs()
-        let dir = root.appendingPathComponent(c.localId, isDirectory: true)
-        try? FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
         let content = ContentCodec.encodePages(c.pages, layers: c.layers)
         c.sizeBytes = Int64(content.count)
-        let meta = Meta(localId: c.localId, name: c.name, width: c.width, height: c.height, backgroundColorHex: c.backgroundColorHex,
-                        aiEnabled: c.aiEnabled, createdAt: c.createdAt, updatedAt: c.updatedAt, kind: c.kind, currentPage: c.currentPage,
-                        guide: c.guide, folderId: c.folderId, background: c.background, pageBackgrounds: c.pageBackgrounds,
-                        pageSettings: c.pageSettings)
-        try? content.write(to: dir.appendingPathComponent("content.bin"), options: .atomic)
-        if let m = try? JSONEncoder().encode(meta) { try? m.write(to: dir.appendingPathComponent("meta.json"), options: .atomic) }
-        if let i = canvases.firstIndex(where: { $0.localId == c.localId }) { canvases[i] = c } else { canvases.insert(c, at: 0) }
-        canvases.sort { $0.updatedAt > $1.updatedAt }
+        let meta = Self.meta(c)
+        files.queue.sync {
+            files.writeContent(c.localId, content)
+            files.writeMeta(meta)
+        }
+        upsert(c)
+    }
+
+    func getCanvas(_ id: String) -> CanvasUi? {
+        files.queue.sync { files.load(id) }
     }
 
     func delete(_ id: String) {
-        try? FileManager.default.removeItem(at: root.appendingPathComponent(id, isDirectory: true))
+        files.queue.sync { try? FileManager.default.removeItem(at: files.dir(id)) }
         canvases.removeAll { $0.localId == id }
     }
 
     func reload() {
-        let dirs = (try? FileManager.default.contentsOfDirectory(at: root, includingPropertiesForKeys: nil)) ?? []
-        canvases = dirs.compactMap(load).sorted { $0.updatedAt > $1.updatedAt }
+        let ids: [String] = files.queue.sync {
+            ((try? FileManager.default.contentsOfDirectory(at: files.root, includingPropertiesForKeys: nil)) ?? []).map(\.lastPathComponent)
+        }
+        canvases = ids.compactMap { id in files.queue.sync { files.load(id) } }.sorted { $0.updatedAt > $1.updatedAt }
     }
 
-    private func load(_ dir: URL) -> CanvasUi? {
-        guard let m = try? Data(contentsOf: dir.appendingPathComponent("meta.json")),
-              let meta = try? JSONDecoder().decode(Meta.self, from: m) else { return nil }
-        let data = (try? Data(contentsOf: dir.appendingPathComponent("content.bin"))) ?? ContentCodec.EMPTY
-        let doc = (try? ContentCodec.decodeDocument(data)) ?? ContentCodec.Document(pages: [[]], layers: [Layer.Default])
-        return CanvasUi(localId: meta.localId, name: meta.name, width: meta.width, height: meta.height,
-                        backgroundColorHex: meta.backgroundColorHex, aiEnabled: meta.aiEnabled, pages: doc.pages,
-                        createdAt: meta.createdAt, updatedAt: meta.updatedAt, kind: meta.kind, currentPage: meta.currentPage,
-                        guide: meta.guide, layers: doc.layers, folderId: meta.folderId, sizeBytes: Int64(data.count),
-                        background: meta.background, pageBackgrounds: meta.pageBackgrounds, pageSettings: meta.pageSettings)
+    /// Kayıttan sonra listedeki tuvali yeniler.
+    func refresh(_ id: String) {
+        guard let c = files.queue.sync(execute: { files.load(id) }) else { return }
+        upsert(c)
+    }
+
+    private func upsert(_ c: CanvasUi) {
+        if let i = canvases.firstIndex(where: { $0.localId == c.localId }) { canvases[i] = c } else { canvases.insert(c, at: 0) }
+        canvases.sort { $0.updatedAt > $1.updatedAt }
+    }
+
+    // MARK: Android CanvasRepository işlemleri
+
+    func saveGuide(_ id: String, _ guide: GuideSpec) {
+        files.updateMeta(id) { $0.guide = guide }
+        refresh(id)
+    }
+
+    func saveBackground(_ id: String, _ hex: String) {
+        files.updateMeta(id) { $0.backgroundColorHex = hex }
+        refresh(id)
+    }
+
+    func saveBackgroundSpec(_ id: String, _ spec: BackgroundSpec, _ pages: [PageBackground?] = []) {
+        files.updateMeta(id) { $0.background = spec; $0.pageBackgrounds = pages }
+        refresh(id)
+    }
+
+    func savePageSettings(_ id: String, _ settings: PageSettings) {
+        files.updateMeta(id) { $0.pageSettings = settings }
+        refresh(id)
+    }
+
+    func rename(_ id: String, _ name: String) {
+        files.updateMeta(id) { $0.name = name }
+        refresh(id)
+    }
+
+    func setAiEnabled(_ id: String, _ enabled: Bool) {
+        files.updateMeta(id, touch: false) { $0.aiEnabled = enabled }
+        refresh(id)
+    }
+
+    func setFolder(_ id: String, _ folderId: String?) {
+        files.updateMeta(id, touch: false) { $0.folderId = folderId }
+        refresh(id)
+    }
+
+    func updateSettings(_ id: String, name: String, width: Int, height: Int, background: String, kind: CanvasKind? = nil) {
+        files.updateMeta(id) { m in
+            m.name = name; m.width = width; m.height = height; m.backgroundColorHex = background
+            if let kind { m.kind = kind }
+        }
+        refresh(id)
+    }
+
+    func duplicate(_ id: String, name: String) -> CanvasUi? {
+        guard var c = getCanvas(id) else { return nil }
+        let now = Self.nowMs()
+        c.localId = UUID().uuidString.lowercased()
+        c.name = name
+        c.createdAt = now
+        save(c)
+        return canvases.first { $0.localId == c.localId }
     }
 }

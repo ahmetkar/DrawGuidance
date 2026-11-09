@@ -21,13 +21,6 @@ struct ShapePath: Equatable {
 /// Şeklin parmakla yerleştiriliş biçimi (Android `ShapeFit`).
 enum ShapeFit { case BOX, SQUARE, LINE }
 
-/// Bir kutu (Android `Rect`).
-struct FRect: Equatable {
-    var left, top, right, bottom: Float
-    var width: Float { right - left }
-    var height: Float { bottom - top }
-}
-
 /// Katalogdaki şekilleri tek bir vektör elemana ([BrushType.SHAPE]) çevirir (Android `ShapeFactory` ve
 /// `ShapeRegistry`'nin kütüphane bölümü).
 enum ShapeFactory {

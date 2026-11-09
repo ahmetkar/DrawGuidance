@@ -16,8 +16,8 @@ final class ParamShapeController: ObservableObject {
 
     func clearError() { error = nil }
 
-    func model(_ stroke: Stroke?) -> ParamShapeModel? { stroke?.shape.flatMap { ShapeFactory.paramModel($0.kind) } }
-    func model() -> ParamShapeModel? { model(selected()) }
+    func model(_ stroke: Stroke?) -> ParamModel? { stroke?.shape.flatMap { ShapeFactory.paramModel($0.kind) } }
+    func model() -> ParamModel? { model(selected()) }
 
     func raw(_ stroke: Stroke?) -> [String: String] { stroke?.shape?.params ?? [:] }
 

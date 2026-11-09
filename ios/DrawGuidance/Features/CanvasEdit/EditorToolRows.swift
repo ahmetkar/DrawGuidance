@@ -87,7 +87,9 @@ struct ModeToolRow: View {
         case .CROP:
             ToolButton(icon: "checkmark", label: L("apply_button"), id: "crop_apply") { _ = vm.frame.applyCrop(); vm.finishAction() }
             ToolButton(icon: "arrow.counterclockwise", label: "reset", id: "crop_reset") { vm.frame.resetCrop() }
-        case .EXPAND, .SHAPE, .DIAGRAM, .FORMULA, .GUIDE, .PERSPECTIVE, .SHAPE_EDIT, .DIAGRAM_EDIT, .IMAGE_EDIT:
+        case .SHAPE_EDIT:
+            ShapeEditToolRow(vm: vm, shapes: vm.shapes)
+        case .EXPAND, .SHAPE, .DIAGRAM, .FORMULA, .GUIDE, .PERSPECTIVE, .DIAGRAM_EDIT, .IMAGE_EDIT:
             ToolButton(icon: "checkmark", label: L("apply_button"), id: "finish_action") { vm.finishAction() }
         default:
             EmptyView()

@@ -43,6 +43,11 @@ struct LibShape: Identifiable {
     var aspect: Float = 1
     var tags: [String] = []
     let paths: [VPath]
+    /// v45 parametreli şekil: değerleri, formülü ve tutamakları olan çizim (yoksa sabit çizim).
+    var param: ParamModel? = nil
+
+    /// v45: şeklin kayıttaki değerleriyle çizimi (parametresiz şekilde sabit çizim).
+    func paths(_ params: [String: String]?) -> [VPath] { param?.paths(params) ?? paths }
 }
 
 struct LibCategory: Identifiable {

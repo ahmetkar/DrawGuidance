@@ -20,6 +20,8 @@ final class ShapeLibrary {
 
     func find(_ id: String) -> LibShape? {
         let key = id.hasPrefix(Self.PREFIX) ? String(id.dropFirst(Self.PREFIX.count)) : id
+        // v45 parametreli yerleşik şekiller sunucudaki sabit çizimle değişmez (değerleri, formülü, tutamakları var)
+        if let p = ParamShapes.shape(key) { return p }
         if let s = lock.withLock({ remoteById[key] ?? bundledById[key] }) { return s }
         // Çizgi roman karakterleri katalogda yok: kimlikten üretilir (Android ile aynı)
         return key.hasPrefix(ComicCharacters.ID_PREFIX) ? ComicCharacters.shape(key) : nil

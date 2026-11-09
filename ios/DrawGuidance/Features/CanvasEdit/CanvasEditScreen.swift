@@ -34,6 +34,7 @@ struct CanvasEditScreen: View {
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .overlay(alignment: .bottom) { if vm.loaded { TextDraftBar(vm: vm, texts: vm.texts) } }
+            .overlay(alignment: .top) { if vm.loaded { ParamControlsHost(vm: vm, shapes: vm.shapes) } }
         }
         .background(Color(uiColor: CanvasColors.background))
         .navigationBarBackButtonHidden(true)
@@ -174,6 +175,18 @@ private struct EditorTopBar: View {
         .padding(.top, 8)
         .padding(.horizontal, 12)
         .padding(.bottom, 6)
+    }
+}
+
+/// Parametreli şekil düzenlenirken (Değerler aracı) tuvalin üstündeki değer/formül çubuğu.
+private struct ParamControlsHost: View {
+    @ObservedObject var vm: EditorViewModel
+    @ObservedObject var shapes: ShapeController
+
+    var body: some View {
+        if vm.mode == .SHAPE_EDIT && shapes.tool == .PARAMS {
+            ParamControlsBar(vm: vm, store: vm.store, shapes: shapes, params: shapes.paramShapes).padding(.top, 6)
+        }
     }
 }
 

@@ -80,12 +80,13 @@ enum ShapeFactory {
     }
 
     /// Kütüphane şeklinin parçaları (tuval koordinatlarında).
-    static func paths(_ id: String, _ start: P, _ end: P, ink: Float = 4, graph: GraphSpec? = nil) -> [ShapePath] {
+    static func paths(_ id: String, _ start: P, _ end: P, ink: Float = 4, graph: GraphSpec? = nil, params: [String: String]? = nil) -> [ShapePath] {
         if let k = builtin(id) { return ShapeCatalog.paths(k, start, end, ink: ink, expandDashes: false) }
         if GraphShapes.isModernGraph(id) { return GraphShapes.paths(id, start, end, graph: graph) }
         guard let lib = ShapeLibrary.shared.find(id) else { return [] }
-        if lib.fit == .LINE { return lineMapped(start, end, aspect: lib.aspect, paths: lib.paths) }
-        return mapped(lib.paths, frame(id, start, end))
+        let vp = lib.paths(params)
+        if lib.fit == .LINE { return lineMapped(start, end, aspect: lib.aspect, paths: vp) }
+        return mapped(vp, frame(id, start, end))
     }
 
     /// Birim kutudaki parçaları dikdörtgene eşler.
@@ -130,7 +131,7 @@ enum ShapeFactory {
     static func build(_ kind: String, _ start: P, _ end: P, style: ShapeStyle, graph: GraphSpec? = nil, id: String,
                       order: Int, opacity: Float = 1, params: [String: String]? = nil) -> Stroke? {
         let graphSpec = GraphShapes.isGraph(kind) ? (graph ?? GraphShapes.defaultGraph(kind)) : graph
-        return fromPaths(kind, paths(kind, start, end, ink: max(1, style.strokeWidth), graph: graphSpec), style: style, graph: graphSpec, id: id,
+        return fromPaths(kind, paths(kind, start, end, ink: max(1, style.strokeWidth), graph: graphSpec, params: params), style: style, graph: graphSpec, id: id,
                          order: order, opacity: opacity, params: params)
     }
 

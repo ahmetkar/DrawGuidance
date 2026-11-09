@@ -630,6 +630,7 @@ final class EditorCanvasView: UIView {
         }
 
         drawSelectionOverlays(g, vm, c, selected, ap, paper, paperCanvas)
+        if mode == .SHAPE_EDIT && vm.shapes.tool == .PARAMS { drawParamHandles(g, vm.shapes.paramShapes.handles(ap?.editedStroke), viewport, accent) }
         if let f = finger, mode == .DRAW || mode == .PAINT { drawFingerBubble(g, f, vm.brush.settings) }
     }
 
@@ -1011,6 +1012,18 @@ final class EditorCanvasView: UIView {
     }
 
     /// Çizim sırasında parmağın yanında seçili fırçanın rengi.
+    /// v45 parametreli şeklin tutamakları (Android `ParamHandlesLayer`): beyaz dolgu, vurgu halkası ve merkez.
+    private func drawParamHandles(_ g: CGContext, _ handles: [(String, P)], _ viewport: ViewportState, _ accent: UIColor) {
+        for (_, p) in handles {
+            let sp = viewport.toScreen(p)
+            let r: CGFloat = 11
+            let rect = CGRect(x: CGFloat(sp.x) - r, y: CGFloat(sp.y) - r, width: r * 2, height: r * 2)
+            g.setFillColor(UIColor.white.cgColor); g.fillEllipse(in: rect)
+            g.setStrokeColor(accent.cgColor); g.setLineWidth(3); g.strokeEllipse(in: rect)
+            g.setFillColor(accent.cgColor); g.fillEllipse(in: rect.insetBy(dx: r - 4, dy: r - 4))
+        }
+    }
+
     private func drawFingerBubble(_ g: CGContext, _ f: P, _ b: BrushSettings) {
         let size: CGFloat = 34
         let c = CGPoint(x: CGFloat(f.x) + size * 0.45 + size / 2, y: CGFloat(f.y) - size * 1.5 + size / 2)

@@ -102,4 +102,33 @@ final class LaunchUITests: XCTestCase {
         expectation(for: NSPredicate(format: "isEnabled == true"), evaluatedWith: undo)
         waitForExpectations(timeout: 5)
     }
+
+    func testModel3DEditorMoveUndo() throws {
+        let app = XCUIApplication()
+        app.launchArguments += ["-AppleLanguages", "(tr)"]
+        app.launch()
+        let models = app.buttons["home_models3d"]
+        XCTAssertTrue(models.waitForExistence(timeout: 10))
+        models.tap()
+        let new = app.buttons["models3d_new"]
+        XCTAssertTrue(new.waitForExistence(timeout: 10))
+        new.tap()
+        let viewport = app.descendants(matching: .any)["model3d_viewport"].firstMatch
+        XCTAssertTrue(viewport.waitForExistence(timeout: 15))
+        sleep(2)
+        // Küpün üstünden başlayan sürükleme küpü taşır: geri al etkinleşir
+        let start = viewport.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.5))
+        let end = viewport.coordinate(withNormalizedOffset: CGVector(dx: 0.75, dy: 0.5))
+        start.press(forDuration: 0.2, thenDragTo: end)
+        let undo = app.buttons["model3d_undo"]
+        XCTAssertTrue(undo.waitForExistence(timeout: 5))
+        expectation(for: NSPredicate(format: "isEnabled == true"), evaluatedWith: undo)
+        waitForExpectations(timeout: 8)
+        undo.tap()
+        XCTAssertTrue(app.buttons["model3d_redo"].isEnabled)
+        let shot = XCTAttachment(screenshot: app.screenshot())
+        shot.name = "model3d_editor"
+        shot.lifetime = .keepAlways
+        add(shot)
+    }
 }

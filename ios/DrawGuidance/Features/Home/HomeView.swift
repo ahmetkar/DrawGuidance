@@ -2,6 +2,7 @@ import SwiftUI
 
 struct HomeView: View {
     @EnvironmentObject private var store: CanvasStore
+    @EnvironmentObject private var models3d: Model3DRepository
     @State private var openDoc: CanvasUi?
 
     private let advanced = CanvasKind.Advanced
@@ -12,6 +13,14 @@ struct HomeView: View {
             List {
                 Section(LocalizedStringKey("home.new_advanced")) { kindRow(advanced) }
                 Section(LocalizedStringKey("home.new_simple")) { kindRow(simple) }
+                Section {
+                    NavigationLink {
+                        Model3DListView(repository: models3d)
+                    } label: {
+                        Label(L("model3d_my_models"), systemImage: "cube")
+                    }
+                    .accessibilityIdentifier("home_models3d")
+                }
                 Section(LocalizedStringKey("home.my_canvases")) {
                     if store.canvases.isEmpty {
                         Text(LocalizedStringKey("home.empty")).foregroundStyle(.secondary)

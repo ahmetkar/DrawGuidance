@@ -20,7 +20,7 @@ struct EditablePath: Equatable {
 /// Android `ShapeFactory`'nin düzenleme işlevleri: yeniden kurma, kutu, alt yolları açma ve geri kurma.
 extension ShapeFactory {
     /// v45 parametreli şeklin modeli (bilim kütüphanesi); bilim kütüphanesi taşınana kadar nil.
-    static func paramModel(_ id: String) -> AnyObject? { nil }
+    static func paramModel(_ id: String) -> ParamShapeModel? { nil }
 
     /// Grafiğin etiketi/formülü ya da biçimi değişince şekli, bulunduğu kutuda yeniden kurar.
     static func rebuild(_ stroke: Stroke, style: ShapeStyle, graph: GraphSpec?, params: [String: String]?? = nil) -> Stroke? {

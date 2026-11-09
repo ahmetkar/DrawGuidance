@@ -149,3 +149,5 @@ final class CanvasStore: ObservableObject {
         return canvases.first { $0.localId == c.localId }
     }
 }
+
+extension CanvasStore: CanvasPersistence {}

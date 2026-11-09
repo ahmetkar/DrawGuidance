@@ -1,39 +1,6 @@
 import Foundation
 import CoreGraphics
 
-/// Dışa aktarılmış bir dosyanın kaydı (Android `SavedImageEntity`; Kaydedilenler ekranı).
-struct SavedImage: Equatable, Identifiable, Codable {
-    var id: Int64
-    var canvasLocalId: String
-    var title: String
-    /// Dosyanın yolu (varsayılan klasörde göreli; seçilen klasörde güvenlik kapsamlı yer imiyle).
-    var path: String
-    var bookmark: Data? = nil
-    var width: Int
-    var height: Int
-    var createdAt: Int64
-    var location: String
-    var sizeBytes: Int64 = 0
-    var folderId: String? = nil
-    var mime = "image/png"
-    var defaultLocation = true
-
-    var isImage: Bool { mime.hasPrefix("image/") && mime != "image/tiff" }
-
-    var typeLabel: String {
-        if mime == "application/pdf" { return "PDF" }
-        if mime.contains("comicbook") || path.lowercased().hasSuffix(".cbz") { return "CBZ" }
-        switch mime {
-        case "image/jpeg": return "JPEG"
-        case "image/webp": return "WEBP"
-        case "image/tiff": return "TIFF"
-        default: return "PNG"
-        }
-    }
-
-    static let CBZ_MIME = "application/vnd.comicbook+zip"
-}
-
 /// Kaydedilenlerin listesi: Uygulama Desteği'nde tek JSON dosyası (Android Room `saved_images` tablosu).
 @MainActor
 final class SavedImagesStore: ObservableObject {

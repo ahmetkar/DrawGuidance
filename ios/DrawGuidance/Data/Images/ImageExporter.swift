@@ -11,7 +11,7 @@ import Photos
 /// Varsayılan yer: uygulamanın Belgeler › DrawGuidance klasörü (Dosyalar uygulamasında görünür).
 final class ImageExporter {
     static let FOLDER = "DrawGuidance"
-    static var MAX_SIDE: Int { Budget3D.exportMaxSide >= 3072 ? 4096 : Budget3D.exportMaxSide }
+    static var MAX_SIDE: Int { Budget3D.tier == .LOW ? 2048 : 4096 }
 
     var settings: () -> ExportSettings = { ExportSettings.load() }
     let root: URL

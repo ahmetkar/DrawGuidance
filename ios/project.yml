@@ -20,6 +20,10 @@ targets:
     platform: iOS
     sources:
       - path: DrawGuidance
+      # Çizgi roman hazır resimleri (Android ile ortak; klasör yapısı korunur: comic/chars/...)
+      - path: ../android/app/src/main/assets/comic
+        type: folder
+        buildPhase: resources
     dependencies:
       - package: TalsecRuntime
     settings:

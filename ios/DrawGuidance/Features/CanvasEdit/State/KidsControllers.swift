@@ -55,12 +55,12 @@ struct PaintCursor: Equatable {
 /// bulunur (yalnız en son istenen yer hesaplanır).
 @MainActor
 final class KidsPaintController: ObservableObject {
-    private let target: @Sendable (P) -> PaintTarget?
+    private let target: @MainActor (P) -> PaintTarget?
     @Published private(set) var cursor: PaintCursor?
     private var pending: P?
     private var running = false
 
-    init(target: @escaping @Sendable (P) -> PaintTarget?) { self.target = target }
+    init(target: @escaping @MainActor (P) -> PaintTarget?) { self.target = target }
 
     func hover(_ point: P?, hold: Int, color: String? = nil) {
         guard let point else { cursor = nil; return }
@@ -82,8 +82,10 @@ final class KidsPaintController: ObservableObject {
     private func drain() async {
         while let p = pending {
             pending = nil
-            let find = target
-            let t = await Task.detached(priority: .userInitiated) { find(p) }.value
+            // Ana iş parçacığında (şekil denetleyicisi); peş peşe istekler birleşsin diye önce sıra verilir
+            await Task.yield()
+            if pending != nil { continue }
+            let t = target(p)
             if var c = cursor, c.point == p || (t?.region.map { RegionFill.contains($0, c.point) } ?? false) {
                 c.target = t
                 cursor = c

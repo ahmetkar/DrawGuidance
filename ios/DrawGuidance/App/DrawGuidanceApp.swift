@@ -2,8 +2,8 @@ import SwiftUI
 
 @main
 struct DrawGuidanceApp: App {
-    @StateObject private var store = CanvasStore()
-    @StateObject private var models3d = Model3DRepository()
+    @StateObject private var store = EditorDependencies.shared.canvases
+    @StateObject private var models3d = EditorDependencies.shared.models3d!
 
     init() {
         // freeRASP çalışma zamanı koruması (Android TalsecGuard karşılığı)

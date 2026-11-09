@@ -125,24 +125,3 @@ final class ShapeTemplateRepository: TemplateSource, @unchecked Sendable {
         Task.detached(priority: .utility) { [self] in persist() }
     }
 }
-
-/// Bir şablon kaynağını açık tuvalin moduna/türüne bağlar (Android'de düzenleyici görünüm modelinin sarmalayıcısı).
-final class ScopedTemplateSource: TemplateSource {
-    private let base: TemplateSource
-    private let scope: () -> ShapeScope?
-    private let kind: () -> CanvasKind?
-    private let onAccepted: (String, [[P]]) -> Void
-    private let onRejected: ([String], [[P]]) -> Void
-
-    init(_ base: TemplateSource, scope: @escaping () -> ShapeScope?, kind: @escaping () -> CanvasKind?,
-         onAccepted: @escaping (String, [[P]]) -> Void = { _, _ in }, onRejected: @escaping ([String], [[P]]) -> Void = { _, _ in }) {
-        self.base = base; self.scope = scope; self.kind = kind; self.onAccepted = onAccepted; self.onRejected = onRejected
-    }
-
-    var index: ShapeIndex? { base.index }
-    var searchScope: ShapeScope? { scope() }
-    var canvasKind: CanvasKind? { kind() }
-    func accepted(_ key: String, _ drawn: [[P]]) { base.accepted(key, drawn); onAccepted(key, drawn) }
-    func acceptedPart(_ key: String, _ drawn: [[P]]) { base.accepted(key, []); onAccepted(key, drawn) }
-    func rejected(_ keys: [String], _ drawn: [[P]]) { base.rejected(keys, drawn); onRejected(keys, drawn) }
-}

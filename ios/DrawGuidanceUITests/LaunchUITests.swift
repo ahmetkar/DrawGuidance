@@ -131,4 +131,30 @@ final class LaunchUITests: XCTestCase {
         shot.lifetime = .keepAlways
         add(shot)
     }
+
+    func testKidsMascotGreets() throws {
+        let app = XCUIApplication()
+        app.launchArguments += ["-AppleLanguages", "(tr)", "-uiTesting"]
+        app.launch()
+        let kids = app.buttons["new_KIDS"]
+        XCTAssertTrue(kids.waitForExistence(timeout: 10))
+        var tries = 0
+        while !kids.isHittable && tries < 6 { kids.swipeLeft(); tries += 1 }
+        kids.tap()
+        // Maskot kapalıysa köşedeki yüz düğmesi açar ve selam verir; açıksa maskota dokununca ipucu söyler
+        let toggle = app.descendants(matching: .any)["kids_mascot_toggle"].firstMatch
+        let mascot = app.descendants(matching: .any)["kids_mascot"].firstMatch
+        if toggle.waitForExistence(timeout: 8) { toggle.tap() } else {
+            XCTAssertTrue(mascot.waitForExistence(timeout: 5))
+            mascot.tap()
+        }
+        let balloon = app.descendants(matching: .any)["kids_mascot_balloon"].firstMatch
+        XCTAssertTrue(balloon.waitForExistence(timeout: 5))
+        let shot = XCTAttachment(screenshot: app.screenshot())
+        shot.name = "kids_mascot"
+        shot.lifetime = .keepAlways
+        add(shot)
+        app.buttons["mascot_close"].tap()
+        XCTAssertTrue(toggle.waitForExistence(timeout: 5))
+    }
 }

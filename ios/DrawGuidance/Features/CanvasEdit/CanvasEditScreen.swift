@@ -27,7 +27,7 @@ struct CanvasEditScreen: View {
             ZStack {
                 if vm.loaded, vm.store.canvas != nil, let actions {
                     EditorCanvasHost(vm: vm, store: vm.store, pen: vm.pen, shapes: vm.shapes, diagrams: vm.diagrams,
-                                     frame: vm.frame, actions: actions)
+                                     frame: vm.frame, hw: vm.handwriting, actions: actions)
                 } else {
                     ProgressView()
                 }
@@ -35,6 +35,7 @@ struct CanvasEditScreen: View {
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .overlay(alignment: .bottom) { if vm.loaded { TextDraftBar(vm: vm, texts: vm.texts) } }
             .overlay(alignment: .top) { if vm.loaded { ParamControlsHost(vm: vm, shapes: vm.shapes) } }
+            .overlay(alignment: .bottom) { if vm.loaded { SuggestionLayer(vm: vm, hw: vm.handwriting, texts: vm.texts) } }
         }
         .background(Color(uiColor: CanvasColors.background))
         .navigationBarBackButtonHidden(true)
@@ -86,6 +87,7 @@ private struct EditorCanvasHost: View {
     @ObservedObject var shapes: ShapeController
     @ObservedObject var diagrams: DiagramController
     @ObservedObject var frame: FrameController
+    @ObservedObject var hw: HandwritingController
     let actions: CanvasActions
 
     var body: some View {
@@ -104,6 +106,10 @@ private struct EditorCanvasHost: View {
         o.diagramLink = diagrams.link
         o.cropRect = frame.cropRect
         o.cropArea = frame.cropArea
+        // Önerinin düzeltmesi tuvalde kesik çizgiyle (önce şekil, yoksa çizgi önerisi)
+        let shapePreview: [[StrokePoint]] = hw.shape?.preview ?? []
+        let preview: [[StrokePoint]] = shapePreview.isEmpty ? (hw.line?.preview ?? []) : shapePreview
+        o.correction = preview.isEmpty ? nil : preview.map { (part: [StrokePoint]) -> [P] in part.map { P($0.x, $0.y) } }
         return o
     }
 }
@@ -186,6 +192,23 @@ private struct ParamControlsHost: View {
     var body: some View {
         if vm.mode == .SHAPE_EDIT && shapes.tool == .PARAMS {
             ParamControlsBar(vm: vm, store: vm.store, shapes: shapes, params: shapes.paramShapes).padding(.top, 6)
+        }
+    }
+}
+
+/// Öneriler: büyüklerde balonlar, çocuk tuvalinde maskot (yazı taslağı açıkken gizlenir).
+private struct SuggestionLayer: View {
+    @ObservedObject var vm: EditorViewModel
+    @ObservedObject var hw: HandwritingController
+    @ObservedObject var texts: TextController
+
+    var body: some View {
+        if texts.draft == nil {
+            if vm.store.canvas?.kind == .KIDS {
+                KidsMascotLayer(vm: vm, hw: hw, tutorial: vm.inTutorial(), challengeOn: vm.inChallenge())
+            } else {
+                SuggestionsHost(vm: vm, hw: hw)
+            }
         }
     }
 }

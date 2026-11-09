@@ -200,7 +200,7 @@ enum TemplateSuggester {
 }
 
 /// v38 şekil önerisinin algoritması (Android `ShapeSuggester`).
-final class ShapeSuggester {
+final class ShapeSuggester: @unchecked Sendable {
     private weak var templates: TemplateSource?
     init(_ templates: TemplateSource?) { self.templates = templates }
 
@@ -325,7 +325,7 @@ enum SimpleSuggest {
 }
 
 /// v38 çizgi önerisinin algoritması (Android `LineSuggester`).
-final class LineSuggester {
+final class LineSuggester: @unchecked Sendable {
     static let MIN_SHAPE_SCORE: Float = 0.2
 
     func fit(_ s: Stroke) -> ShapeFix? {
@@ -401,7 +401,7 @@ final class LineSuggester {
 }
 
 /// v23 yazı önerisinin algoritması (Android `TextSuggester`).
-final class TextSuggester {
+final class TextSuggester: @unchecked Sendable {
     static let MIN_CONFIDENCE: Float = 0.5
     static let POOL = 40
 

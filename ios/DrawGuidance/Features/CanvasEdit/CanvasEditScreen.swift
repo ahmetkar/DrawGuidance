@@ -7,6 +7,7 @@ struct CanvasEditScreen: View {
     @StateObject private var ui = CanvasUiEvents()
     @State private var actions: CanvasActions?
     @State private var brushPickerOpen = false
+    @State private var sheet: EditorSheet?
     @Environment(\.dismiss) private var dismiss
 
     init(canvasLocalId: String) {
@@ -15,7 +16,7 @@ struct CanvasEditScreen: View {
 
     var body: some View {
         VStack(spacing: 0) {
-            EditorTopBar(vm: vm, store: vm.store, brush: vm.brush, brushPickerOpen: $brushPickerOpen)
+            EditorTopBar(vm: vm, store: vm.store, brush: vm.brush, brushPickerOpen: $brushPickerOpen, sheet: $sheet)
             if vm.loaded { ModeToolRow(vm: vm, store: vm.store, ruler: vm.ruler) }
             ZStack {
                 if vm.loaded, vm.store.canvas != nil, let actions {
@@ -34,6 +35,13 @@ struct CanvasEditScreen: View {
         .onAppear { if actions == nil { actions = vm.makeCanvasActions(ui) } }
         .onDisappear { vm.close() }
         .sheet(isPresented: $brushPickerOpen) { brushPicker }
+        .sheet(item: $sheet) { s in
+            switch s {
+            case .elements: ElementsPanel(vm: vm, store: vm.store)
+            case .layers: LayersPanel(vm: vm, store: vm.store)
+            case .save: SaveSheet(vm: vm, images: vm.images, v40: vm.v40)
+            }
+        }
         .sheet(isPresented: Binding(get: { vm.loaded && vm.shapes.isPickerOpen }, set: { if !$0 { vm.closeShapePicker() } })) {
             ShapePickerView(kind: vm.store.canvas?.kind ?? .ART) { id in
                 vm.selectShapeId(id)
@@ -91,6 +99,7 @@ private struct EditorTopBar: View {
     @ObservedObject var store: EditorStore
     @ObservedObject var brush: BrushController
     @Binding var brushPickerOpen: Bool
+    @Binding var sheet: EditorSheet?
     @Environment(\.dismiss) private var dismiss
 
     private let modes: [(EditMode, String, String)] = [
@@ -107,6 +116,9 @@ private struct EditorTopBar: View {
                     .accessibilityIdentifier("editor_back")
                 Text(store.canvas?.name ?? "").font(.headline).lineLimit(1)
                 Spacer()
+                Button { sheet = .elements } label: { Image(systemName: "list.bullet.rectangle") }.accessibilityIdentifier("elements_button")
+                Button { sheet = .layers } label: { Image(systemName: "square.3.layers.3d") }.accessibilityIdentifier("layers_button")
+                Button { sheet = .save } label: { Image(systemName: "square.and.arrow.down") }.accessibilityIdentifier("save_button")
                 Button { vm.undo() } label: { Image(systemName: "arrow.uturn.backward") }
                     .disabled(!store.canUndo).accessibilityLabel(L("undo")).accessibilityIdentifier("undo")
                 Button { vm.redo() } label: { Image(systemName: "arrow.uturn.forward") }
@@ -145,4 +157,9 @@ private struct EditorTopBar: View {
         .padding(.horizontal, 12)
         .padding(.bottom, 6)
     }
+}
+
+enum EditorSheet: String, Identifiable {
+    case elements, layers, save
+    var id: String { rawValue }
 }

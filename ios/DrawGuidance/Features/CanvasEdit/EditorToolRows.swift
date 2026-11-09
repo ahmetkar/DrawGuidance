@@ -27,12 +27,14 @@ struct ModeToolRow: View {
     @ObservedObject var store: EditorStore
     @ObservedObject var ruler: RulerController
     @State private var photo: PhotosPickerItem?
+    @State private var comicOpen = false
 
     var body: some View {
         ScrollView(.horizontal, showsIndicators: false) {
             HStack(spacing: 8) { items }.padding(.horizontal, 12)
         }
         .frame(height: 40)
+        .sheet(isPresented: $comicOpen) { ComicInsertSheet(vm: vm) }
         .onChange(of: photo) { _, item in
             guard let item else { return }
             Task {
@@ -94,6 +96,9 @@ struct ModeToolRow: View {
             Divider().frame(height: 26)
             ToolButton(icon: "square.on.circle", label: L("add_shape"), id: "add_shape") { vm.shapes.openPicker() }
             ToolButton(icon: "textformat", label: L("add_text"), id: "add_text") { vm.startAction(.TEXT, target: []) }
+            if store.canvas?.kind == .COMIC {
+                ToolButton(icon: "bubble.left", label: L("add_balloon"), id: "add_comic") { comicOpen = true }
+            }
             if store.canvas?.kind.isNotes == true {
                 ToolButton(icon: "point.3.connected.trianglepath.dotted", label: L("add_diagram"), id: "add_diagram") { vm.diagrams.openPicker() }
                 ToolButton(icon: "function", label: L("add_formula"), id: "add_formula") { vm.formulas.openPicker() }

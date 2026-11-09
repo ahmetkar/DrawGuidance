@@ -352,3 +352,61 @@ struct FormulaPickerSheet: View {
         }
     }
 }
+
+/// v27/v36 çizgi roman ekleme penceresi: konuşma balonları, sayfa şablonları, efektler ve efekt yazıları.
+struct ComicInsertSheet: View {
+    enum Tab: String, CaseIterable { case balloons, templates, effects, sfx }
+    @ObservedObject var vm: EditorViewModel
+    @State var tab: Tab = .balloons
+    @Environment(\.dismiss) private var dismiss
+
+    private static func balloonTitle(_ s: BalloonStyle) -> String {
+        let key = "balloon_" + s.rawValue.lowercased()
+        let t = L(key)
+        return t == key ? s.rawValue.capitalized : t
+    }
+
+    var body: some View {
+        NavigationStack {
+            VStack(spacing: 0) {
+                Picker("", selection: $tab) {
+                    Text(L("add_balloon")).tag(Tab.balloons)
+                    Text(L("add_templates")).tag(Tab.templates)
+                    Text(L("add_effects")).tag(Tab.effects)
+                    Text("SFX").tag(Tab.sfx)
+                }
+                .pickerStyle(.segmented)
+                .padding()
+                List { content }
+            }
+            .navigationTitle(L("add_balloon"))
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar { ToolbarItem(placement: .cancellationAction) { Button(L("close")) { dismiss() } } }
+        }
+    }
+
+    @ViewBuilder private var content: some View {
+        switch tab {
+        case .balloons:
+            Section(footer: Text(L("balloon_hint"))) {
+                ForEach(BalloonStyle.allCases, id: \.self) { s in
+                    Button(Self.balloonTitle(s)) { vm.insertBalloon(s, speakers: 1); dismiss() }
+                }
+            }
+        case .templates:
+            ForEach(ComicTemplates.all) { t in
+                Button(t.title) { let ids = vm.comic.insertTemplate(t.id); vm.inserted(ids); dismiss() }
+            }
+        case .effects:
+            ForEach(ComicEffects.all) { e in
+                Button(e.title) { vm.insertEffect(e, options: EffectOptions()); dismiss() }
+            }
+        case .sfx:
+            ForEach(Array(ComicSfx.presets.enumerated()), id: \.offset) { _, p in
+                Button { vm.insertSfx(p); dismiss() } label: {
+                    Text(p.text).font(.title3.weight(.heavy)).foregroundStyle(Color(hex: p.colors.first ?? "#000000") ?? .primary)
+                }
+            }
+        }
+    }
+}

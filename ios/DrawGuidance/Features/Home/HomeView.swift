@@ -4,6 +4,7 @@ struct HomeView: View {
     @EnvironmentObject private var store: CanvasStore
     @EnvironmentObject private var models3d: Model3DRepository
     @State private var openDoc: CanvasUi?
+    @MainActor private static var entered = false
 
     private let advanced = CanvasKind.Advanced
     private let simple = CanvasKind.Simple
@@ -35,6 +36,16 @@ struct HomeView: View {
                 }
             }
             .navigationTitle(LocalizedStringKey("app.name"))
+            .toolbar {
+                ToolbarItem(placement: .primaryAction) {
+                    NavigationLink { SettingsView(prefs: EditorDependencies.shared.prefs) } label: { Image(systemName: "gearshape") }
+                        .accessibilityIdentifier("home_settings")
+                }
+            }
+            .onAppear {
+                // v39 açılış reklamı (kurallara göre; ilk açılışta yok)
+                if !Self.entered { Self.entered = true; AdsCoordinator.shared.onAppEntry() }
+            }
             .navigationDestination(item: $openDoc) { doc in
                 CanvasEditScreen(canvasLocalId: doc.localId)
             }

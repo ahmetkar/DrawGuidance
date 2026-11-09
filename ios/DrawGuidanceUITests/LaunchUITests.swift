@@ -5,7 +5,7 @@ final class LaunchUITests: XCTestCase {
 
     func testCreateCanvasDrawUndo() throws {
         let app = XCUIApplication()
-        app.launchArguments += ["-AppleLanguages", "(tr)"]
+        app.launchArguments += ["-AppleLanguages", "(tr)", "-uiTesting"]
         app.launch()
 
         let newArt = app.buttons["new_ART"]
@@ -35,13 +35,13 @@ final class LaunchUITests: XCTestCase {
 
     func testInsertLibraryShape() throws {
         let app = XCUIApplication()
-        app.launchArguments += ["-AppleLanguages", "(tr)"]
+        app.launchArguments += ["-AppleLanguages", "(tr)", "-uiTesting"]
         app.launch()
         let newNotes = app.buttons["new_NOTES"]
         XCTAssertTrue(newNotes.waitForExistence(timeout: 10))
         newNotes.tap()
 
-        let tool = app.descendants(matching: .any)["tool_shape"].firstMatch
+        let tool = app.descendants(matching: .any)["add_shape"].firstMatch
         XCTAssertTrue(tool.waitForExistence(timeout: 10))
         tool.tap()
         // Fen kategorisine geçilip ilk hazır şekil seçilir
@@ -81,13 +81,13 @@ final class LaunchUITests: XCTestCase {
 
     func testPickBrushAndDraw() throws {
         let app = XCUIApplication()
-        app.launchArguments += ["-AppleLanguages", "(tr)"]
+        app.launchArguments += ["-AppleLanguages", "(tr)", "-uiTesting"]
         app.launch()
         let newArt = app.buttons["new_ART"]
         XCTAssertTrue(newArt.waitForExistence(timeout: 10))
         newArt.tap()
 
-        let menu = app.descendants(matching: .any)["brush_menu"].firstMatch
+        let menu = app.descendants(matching: .any)["brush_button"].firstMatch
         XCTAssertTrue(menu.waitForExistence(timeout: 10))
         menu.tap()
         let marker = app.descendants(matching: .any)["brush_MARKER"].firstMatch
@@ -105,7 +105,7 @@ final class LaunchUITests: XCTestCase {
 
     func testModel3DEditorMoveUndo() throws {
         let app = XCUIApplication()
-        app.launchArguments += ["-AppleLanguages", "(tr)"]
+        app.launchArguments += ["-AppleLanguages", "(tr)", "-uiTesting"]
         app.launch()
         let models = app.buttons["home_models3d"]
         XCTAssertTrue(models.waitForExistence(timeout: 10))

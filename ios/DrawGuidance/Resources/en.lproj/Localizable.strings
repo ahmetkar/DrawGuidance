@@ -15,3 +15,9 @@
 "tool.shape" = "Shape";
 "shapes.title" = "Shapes";
 "common.close" = "Close";
+"ios.sub.manage" = "Manage subscription in the App Store";
+"ios.sub.restore" = "Restore purchases";
+"ios.sub.store_unavailable" = "Couldn't reach the App Store.";
+"ios.signin.soon" = "Sign-in will be available soon.";
+"ios.signin.title" = "Account";
+"ios.settings.title" = "Settings";

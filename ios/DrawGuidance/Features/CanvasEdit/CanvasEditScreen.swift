@@ -39,7 +39,7 @@ struct CanvasEditScreen: View {
         .navigationBarBackButtonHidden(true)
         .toolbar(.hidden, for: .navigationBar)
         .onAppear { if actions == nil { actions = vm.makeCanvasActions(ui) } }
-        .onDisappear { vm.close() }
+        .onDisappear { vm.close(); AdsCoordinator.shared.onCanvasClosed(vm.store.canvas?.kind) }
         .sheet(isPresented: $brushPickerOpen) { brushPicker }
         .sheet(item: $sheet) { s in
             switch s {

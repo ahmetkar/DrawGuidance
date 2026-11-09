@@ -8,6 +8,12 @@ packages:
   TalsecRuntime:
     url: https://github.com/talsec/Free-RASP-iOS
     exactVersion: 8.1.0
+  GoogleMobileAds:
+    url: https://github.com/googleads/swift-package-manager-google-mobile-ads
+    exactVersion: 11.13.0
+  GoogleUMP:
+    url: https://github.com/googleads/swift-package-manager-google-user-messaging-platform
+    exactVersion: 2.7.0
 settings:
   base:
     MARKETING_VERSION: "1.7.0"
@@ -26,6 +32,9 @@ targets:
         buildPhase: resources
     dependencies:
       - package: TalsecRuntime
+      - package: GoogleMobileAds
+      - package: GoogleUMP
+        product: GoogleUserMessagingPlatform
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.karapp.drawguidance
@@ -79,6 +88,9 @@ schemes:
         DrawGuidance: all
         DrawGuidanceTests: [test]
         DrawGuidanceUITests: [test]
+    run:
+      config: Debug
+      storeKitConfiguration: DrawGuidance/Resources/DrawGuidance.storekit
     test:
       config: Debug
       targets: [DrawGuidanceTests, DrawGuidanceUITests]

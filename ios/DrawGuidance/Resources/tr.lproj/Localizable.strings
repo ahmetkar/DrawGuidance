@@ -15,3 +15,9 @@
 "tool.shape" = "Şekil";
 "shapes.title" = "Şekiller";
 "common.close" = "Kapat";
+"ios.sub.manage" = "Aboneliği App Store'da yönet";
+"ios.sub.restore" = "Satın alımları geri yükle";
+"ios.sub.store_unavailable" = "App Store'a ulaşılamadı.";
+"ios.signin.soon" = "Giriş yakında açılacak.";
+"ios.signin.title" = "Hesap";
+"ios.settings.title" = "Ayarlar";

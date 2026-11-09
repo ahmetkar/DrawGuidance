@@ -40,6 +40,8 @@ struct CanvasEditScreen: View {
             case .elements: ElementsPanel(vm: vm, store: vm.store)
             case .layers: LayersPanel(vm: vm, store: vm.store)
             case .save: SaveSheet(vm: vm, images: vm.images, v40: vm.v40)
+            case .guide: GuideSheet(vm: vm, store: vm.store)
+            case .background: BackgroundSheet(vm: vm, store: vm.store)
             }
         }
         .sheet(isPresented: Binding(get: { vm.loaded && vm.shapes.isPickerOpen }, set: { if !$0 { vm.closeShapePicker() } })) {
@@ -135,6 +137,8 @@ private struct EditorTopBar: View {
                         .accessibilityIdentifier("mode_\(m.0)")
                     }
                     Divider().frame(height: 28)
+                    ToolButton(icon: "grid", label: L("add_guide"), id: "guide_button") { sheet = .guide }
+                    ToolButton(icon: "photo.on.rectangle", label: L("add_background"), id: "background_button") { sheet = .background }
                     Button { brushPickerOpen = true } label: {
                         Image(systemName: "paintbrush.pointed").frame(width: 36, height: 36)
                     }
@@ -160,6 +164,6 @@ private struct EditorTopBar: View {
 }
 
 enum EditorSheet: String, Identifiable {
-    case elements, layers, save
+    case elements, layers, save, guide, background
     var id: String { rawValue }
 }

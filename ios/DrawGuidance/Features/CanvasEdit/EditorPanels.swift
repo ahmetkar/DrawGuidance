@@ -1,3 +1,4 @@
+import PhotosUI
 import SwiftUI
 
 /// Elemanlar paneli (Android `EditorSidePanel` elemanlar sekmesi): en son çizilen en üstte; dokununca seçime eklenir/çıkarılır.
@@ -206,6 +207,94 @@ struct SaveSheet: View {
             case .failed: Text("⚠︎").foregroundStyle(.red)
             default: EmptyView()
             }
+        }
+    }
+}
+
+/// Kılavuz çizgileri ve perspektif penceresi (Android `GuideSheet`).
+struct GuideSheet: View {
+    @ObservedObject var vm: EditorViewModel
+    @ObservedObject var store: EditorStore
+    @Environment(\.dismiss) private var dismiss
+
+    private var spec: GuideSpec { store.canvas?.guide ?? GuideSpec() }
+
+    var body: some View {
+        NavigationStack {
+            Form {
+                Section(L("guide_title")) {
+                    Picker(L("guide_title"), selection: Binding(get: { GuideSpec.GridKinds.contains(spec.kind) ? spec.kind : .NONE }, set: { k in
+                        if k == .NONE { vm.guides.removeGuide() } else { vm.guides.addGuide(k) }
+                    })) {
+                        Text(L("guide_none")).tag(GuideKind.NONE)
+                        Text(L("guide_grid")).tag(GuideKind.GRID)
+                        Text(L("guide_ruled")).tag(GuideKind.RULED)
+                        Text(L("guide_dots")).tag(GuideKind.DOTS)
+                        Text(L("guide_isometric")).tag(GuideKind.ISOMETRIC)
+                    }
+                    .pickerStyle(.segmented)
+                    LabeledContent(L("guide_spacing")) {
+                        Slider(value: Binding(get: { Double(spec.spacing) }, set: { v in var s = spec; s.spacing = Float(v); vm.guides.setGuide(s, persist: false) }),
+                               in: 20...300, onEditingChanged: { e in if !e { vm.guides.setGuide(spec) } })
+                    }
+                    LabeledContent(L("guide_opacity")) {
+                        Slider(value: Binding(get: { Double(spec.opacity) }, set: { v in var s = spec; s.opacity = Float(v); vm.guides.setGuide(s, persist: false) }),
+                               in: 0.05...1, onEditingChanged: { e in if !e { vm.guides.setGuide(spec) } })
+                    }
+                    Toggle(L("save_include_guides"), isOn: Binding(get: { spec.includeInExport }, set: { v in var s = spec; s.includeInExport = v; vm.guides.setGuide(s) }))
+                }
+                if store.canvas?.kind.isNotes != true {
+                    Section(L("add_perspective")) {
+                        Picker(L("add_perspective"), selection: Binding(get: { spec.perspective }, set: { n in
+                            if n == 0 { vm.guides.removePerspective() } else { vm.guides.addPerspective(n) }
+                        })) {
+                            Text(L("guide_none")).tag(0)
+                            Text(L("guide_p1")).tag(1); Text(L("guide_p2")).tag(2); Text(L("guide_p3")).tag(3)
+                        }
+                        .pickerStyle(.segmented)
+                        if spec.perspective > 0 {
+                            LabeledContent(L("guide_horizon")) {
+                                Slider(value: Binding(get: { Double(spec.horizon) }, set: { v in var s = spec; s.horizon = Float(v); vm.guides.setGuide(s, persist: false) }),
+                                       in: 0.05...0.95, onEditingChanged: { e in if !e { vm.guides.setGuide(spec) } })
+                            }
+                            Button(L("perspective_bar_hint")) { dismiss(); vm.startAction(.PERSPECTIVE, target: []) }
+                        }
+                    }
+                }
+                Section { Button(L("guide_clear_all"), role: .destructive) { vm.guides.clearGuides() } }
+            }
+            .navigationTitle(L("add_guide"))
+            .toolbar { ToolbarItem(placement: .confirmationAction) { Button(L("close")) { dismiss() } } }
+        }
+        .presentationDetents([.medium, .large])
+    }
+}
+
+/// Arka plan: kağıt rengi, resim ve kaldırma (Android `BackgroundSheet` temel kısmı).
+struct BackgroundSheet: View {
+    @ObservedObject var vm: EditorViewModel
+    @ObservedObject var store: EditorStore
+    @Environment(\.dismiss) private var dismiss
+    @State private var photo: PhotosPickerItem?
+
+    var body: some View {
+        NavigationStack {
+            Form {
+                ColorPicker(L("add_background"), selection: Binding(
+                    get: { Color(hex: store.canvas?.pagePaperHex ?? "#FFFFFF") ?? .white },
+                    set: { vm.setBackgroundColor($0.hexRGB, coalesce: "bg-color") }), supportsOpacity: false)
+                PhotosPicker(selection: $photo, matching: .images) { Label(L("add_image"), systemImage: "photo") }
+                if !(store.canvas?.pageBackground.isEmpty ?? true) {
+                    Button(L("guide_remove"), role: .destructive) { vm.removeBackground() }
+                }
+            }
+            .navigationTitle(L("add_background"))
+            .toolbar { ToolbarItem(placement: .confirmationAction) { Button(L("close")) { dismiss() } } }
+        }
+        .presentationDetents([.medium])
+        .onChange(of: photo) { _, item in
+            guard let item else { return }
+            Task { if let d = try? await item.loadTransferable(type: Data.self) { vm.importBackground(d) }; photo = nil }
         }
     }
 }

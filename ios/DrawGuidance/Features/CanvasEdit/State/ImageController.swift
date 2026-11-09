@@ -183,19 +183,6 @@ final class ImageController: ObservableObject {
         }
     }
 
-    /// v40 CBZ.
-    func exportCbz(_ options: CbzOptions) {
-        guard let current = store.canvas, let images, pdf != .exporting else { return }
-        pdf = .exporting
-        Task {
-            await Task.yield()
-            do { pdf = .done(try images.exportCbz(current, options)) } catch {
-                AppLog.e("CbzExport", "CBZ kaydedilemedi", error)
-                pdf = .failed
-            }
-        }
-    }
-
     /// v40 CMYK provası için tuvalin küçük resmi.
     func previewImage(_ maxSide: Int = 320) -> CGImage? {
         guard let current = store.canvas, let images else { return nil }

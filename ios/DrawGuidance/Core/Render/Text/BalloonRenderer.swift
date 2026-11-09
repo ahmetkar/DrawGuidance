@@ -312,15 +312,5 @@ enum BalloonRenderer {
     }
 
     /// Varsayılan kuyruklar: [count] konuşana (alt kenar boyunca yayılmış).
-    static func defaultTails(_ count: Int) -> [BalloonTail] {
-        switch count {
-        case 0: return []
-        case 1: return [BalloonTail(x: 0.3, y: 1.65)]
-        default:
-            return (0..<count).map { i in
-                let f = Float(i) / Float(count - 1)
-                return BalloonTail(x: 0.1 + 0.8 * f, y: 1.6 + 0.1 * abs(f - 0.5), curve: f < 0.5 ? 0.3 : -0.3)
-            }
-        }
-    }
+    static func defaultTails(_ count: Int) -> [BalloonTail] { BalloonTails.defaultTails(count) }
 }

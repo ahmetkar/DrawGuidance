@@ -298,3 +298,57 @@ struct BackgroundSheet: View {
         }
     }
 }
+
+/// Diyagram türü seçici: seçilen tür sürüklenerek ya da dokunularak yerleştirilir.
+struct DiagramPickerSheet: View {
+    @ObservedObject var vm: EditorViewModel
+    @Environment(\.dismiss) private var dismiss
+
+    private static func title(_ k: DiagramKind) -> String {
+        let key = "diagram_" + k.rawValue.lowercased()
+        let t = L(key)
+        return t == key ? k.rawValue.replacingOccurrences(of: "_", with: " ").capitalized : t
+    }
+
+    var body: some View {
+        NavigationStack {
+            List(DiagramKind.allCases, id: \.self) { k in
+                Button(Self.title(k)) {
+                    vm.selectDiagram(k)
+                    vm.closeDiagramPicker()
+                    if vm.mode != .DIAGRAM { vm.startAction(.DIAGRAM, target: []) }
+                    dismiss()
+                }
+            }
+            .navigationTitle(L("add_diagram"))
+            .toolbar { ToolbarItem(placement: .cancellationAction) { Button(L("close")) { vm.closeDiagramPicker(); dismiss() } } }
+        }
+    }
+}
+
+/// Hazır formül seçici (kategoriler).
+struct FormulaPickerSheet: View {
+    @ObservedObject var vm: EditorViewModel
+    @Environment(\.dismiss) private var dismiss
+
+    var body: some View {
+        NavigationStack {
+            List {
+                ForEach(FormulaCatalog.categories, id: \.id) { cat in
+                    Section(cat.title) {
+                        ForEach(cat.templates, id: \.id) { t in
+                            Button(t.title) {
+                                vm.selectFormula(t)
+                                vm.closeFormulaPicker()
+                                if vm.mode != .FORMULA { vm.startAction(.FORMULA, target: []) }
+                                dismiss()
+                            }
+                        }
+                    }
+                }
+            }
+            .navigationTitle(L("add_formula"))
+            .toolbar { ToolbarItem(placement: .cancellationAction) { Button(L("close")) { vm.closeFormulaPicker(); dismiss() } } }
+        }
+    }
+}

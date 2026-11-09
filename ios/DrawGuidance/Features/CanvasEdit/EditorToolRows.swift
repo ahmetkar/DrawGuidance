@@ -94,6 +94,10 @@ struct ModeToolRow: View {
             Divider().frame(height: 26)
             ToolButton(icon: "square.on.circle", label: L("add_shape"), id: "add_shape") { vm.shapes.openPicker() }
             ToolButton(icon: "textformat", label: L("add_text"), id: "add_text") { vm.startAction(.TEXT, target: []) }
+            if store.canvas?.kind.isNotes == true {
+                ToolButton(icon: "point.3.connected.trianglepath.dotted", label: L("add_diagram"), id: "add_diagram") { vm.diagrams.openPicker() }
+                ToolButton(icon: "function", label: L("add_formula"), id: "add_formula") { vm.formulas.openPicker() }
+            }
             PhotosPicker(selection: $photo, matching: .images) {
                 Image(systemName: "photo.badge.plus").frame(width: 36, height: 36)
             }

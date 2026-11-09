@@ -44,6 +44,12 @@ struct CanvasEditScreen: View {
             case .background: BackgroundSheet(vm: vm, store: vm.store)
             }
         }
+        .sheet(isPresented: Binding(get: { vm.loaded && vm.diagrams.isPickerOpen }, set: { if !$0 { vm.closeDiagramPicker() } })) {
+            DiagramPickerSheet(vm: vm)
+        }
+        .sheet(isPresented: Binding(get: { vm.loaded && vm.formulas.isPickerOpen }, set: { if !$0 { vm.closeFormulaPicker() } })) {
+            FormulaPickerSheet(vm: vm)
+        }
         .sheet(isPresented: Binding(get: { vm.loaded && vm.shapes.isPickerOpen }, set: { if !$0 { vm.closeShapePicker() } })) {
             ShapePickerView(kind: vm.store.canvas?.kind ?? .ART) { id in
                 vm.selectShapeId(id)

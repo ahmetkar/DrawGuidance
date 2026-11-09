@@ -36,7 +36,7 @@ struct HomeView: View {
             }
             .navigationTitle(LocalizedStringKey("app.name"))
             .navigationDestination(item: $openDoc) { doc in
-                EditorView(canvas: doc)
+                CanvasEditScreen(canvasLocalId: doc.localId)
             }
         }
     }

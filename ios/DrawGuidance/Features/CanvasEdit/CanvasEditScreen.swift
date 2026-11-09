@@ -16,6 +16,7 @@ struct CanvasEditScreen: View {
     var body: some View {
         VStack(spacing: 0) {
             EditorTopBar(vm: vm, store: vm.store, brush: vm.brush, brushPickerOpen: $brushPickerOpen)
+            if vm.loaded { ModeToolRow(vm: vm, store: vm.store, ruler: vm.ruler) }
             ZStack {
                 if vm.loaded, vm.store.canvas != nil, let actions {
                     EditorCanvasHost(vm: vm, store: vm.store, pen: vm.pen, shapes: vm.shapes, diagrams: vm.diagrams,
@@ -25,6 +26,7 @@ struct CanvasEditScreen: View {
                 }
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .overlay(alignment: .bottom) { if vm.loaded { TextDraftBar(vm: vm, texts: vm.texts) } }
         }
         .background(Color(uiColor: CanvasColors.background))
         .navigationBarBackButtonHidden(true)
@@ -32,6 +34,13 @@ struct CanvasEditScreen: View {
         .onAppear { if actions == nil { actions = vm.makeCanvasActions(ui) } }
         .onDisappear { vm.close() }
         .sheet(isPresented: $brushPickerOpen) { brushPicker }
+        .sheet(isPresented: Binding(get: { vm.loaded && vm.shapes.isPickerOpen }, set: { if !$0 { vm.closeShapePicker() } })) {
+            ShapePickerView(kind: vm.store.canvas?.kind ?? .ART) { id in
+                vm.selectShapeId(id)
+                vm.closeShapePicker()
+                if vm.mode != .SHAPE { vm.startAction(.SHAPE, target: []) }
+            }
+        }
     }
 
     private var brushPicker: some View {

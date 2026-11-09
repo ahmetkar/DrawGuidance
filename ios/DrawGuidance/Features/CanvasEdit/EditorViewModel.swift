@@ -150,6 +150,10 @@ final class EditorViewModel: ObservableObject, EditorHost {
         if let fill = canvasPrefs.shapeFill { shapes.setNewShapeFill(fill.isEmpty ? nil : fill) }
         // Alt denetleyicilerin değişimleri ekranı yenilesin
         store.objectWillChange.sink { [weak self] _ in self?.objectWillChange.send() }.store(in: &bag)
+        shapes.objectWillChange.sink { [weak self] _ in self?.objectWillChange.send() }.store(in: &bag)
+        texts.objectWillChange.sink { [weak self] _ in self?.objectWillChange.send() }.store(in: &bag)
+        diagrams.objectWillChange.sink { [weak self] _ in self?.objectWillChange.send() }.store(in: &bag)
+        formulas.objectWillChange.sink { [weak self] _ in self?.objectWillChange.send() }.store(in: &bag)
     }
 
     private func load() async {

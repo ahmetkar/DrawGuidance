@@ -6,6 +6,8 @@ struct DrawGuidanceApp: App {
     @StateObject private var models3d = Model3DRepository()
 
     init() {
+        // freeRASP çalışma zamanı koruması (Android TalsecGuard karşılığı)
+        RaspGuard.start()
         // Tuval resimleri: önbellekten düşen resimler dosyadan yeniden çözülür
         CanvasAssetStore.shared.install()
         // Koddaki Türkçe metinlerin (3B şekil adları, iletiler) çevirisi

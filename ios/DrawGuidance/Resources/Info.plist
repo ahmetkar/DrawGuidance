@@ -25,6 +25,8 @@
 	<key>NSCameraUsageDescription</key><string>Tuvale fotoğraf eklemek için.</string>
 	<!-- AdMob: Google'ın test uygulama kimliği (gerçek kimlik gelene kadar) -->
 	<key>GADApplicationIdentifier</key><string>ca-app-pub-3940256099942544~1458002511</string>
+	<key>DGTeamId</key><string>$(DEVELOPMENT_TEAM)</string>
+	<key>DGRaspEnforce</key><string>$(DG_RASP_ENFORCE)</string>
 	<key>ITSAppUsesNonExemptEncryption</key><false/>
 </dict>
 </plist>

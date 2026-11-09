@@ -157,4 +157,37 @@ final class LaunchUITests: XCTestCase {
         app.buttons["mascot_close"].tap()
         XCTAssertTrue(toggle.waitForExistence(timeout: 5))
     }
+
+    func testKidsChallengeLevelOne() throws {
+        let app = XCUIApplication()
+        app.launchArguments += ["-AppleLanguages", "(tr)", "-uiTesting"]
+        app.launch()
+        let kids = app.buttons["new_KIDS"]
+        XCTAssertTrue(kids.waitForExistence(timeout: 10))
+        var tries = 0
+        while !kids.isHittable && tries < 6 { kids.swipeLeft(); tries += 1 }
+        kids.tap()
+        let tool = app.buttons["kids_challenge"]
+        XCTAssertTrue(tool.waitForExistence(timeout: 10))
+        tool.tap()
+        let start = app.buttons["challenge_start"]
+        XCTAssertTrue(start.waitForExistence(timeout: 5))
+        start.tap()
+        let card = app.descendants(matching: .any)["challenge_card"].firstMatch
+        XCTAssertTrue(card.waitForExistence(timeout: 8))
+        // Güneşin dairesinin üstünden kabaca bir çember çizilir
+        let canvas = app.descendants(matching: .any)["drawing_canvas"].firstMatch
+        XCTAssertTrue(canvas.waitForExistence(timeout: 5))
+        canvas.coordinate(withNormalizedOffset: CGVector(dx: 0.4, dy: 0.5))
+            .press(forDuration: 0.1, thenDragTo: canvas.coordinate(withNormalizedOffset: CGVector(dx: 0.6, dy: 0.5)))
+        app.buttons["challenge_finish"].tap()
+        let result = app.descendants(matching: .any)["challenge_result"].firstMatch
+        XCTAssertTrue(result.waitForExistence(timeout: 8))
+        let shot = XCTAttachment(screenshot: app.screenshot())
+        shot.name = "kids_challenge_result"
+        shot.lifetime = .keepAlways
+        add(shot)
+        app.buttons["challenge_exit"].tap()
+        XCTAssertFalse(card.waitForExistence(timeout: 2))
+    }
 }

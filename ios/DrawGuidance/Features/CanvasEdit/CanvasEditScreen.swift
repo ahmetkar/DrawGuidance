@@ -5,6 +5,7 @@ import SwiftUI
 struct CanvasEditScreen: View {
     @StateObject private var vm: EditorViewModel
     @StateObject private var ui = CanvasUiEvents()
+    @StateObject private var challengeUi = KidsChallengeUi()
     @State private var actions: CanvasActions?
     @State private var brushPickerOpen = false
     @State private var sheet: EditorSheet?
@@ -19,7 +20,7 @@ struct CanvasEditScreen: View {
             EditorTopBar(vm: vm, store: vm.store, brush: vm.brush, brushPickerOpen: $brushPickerOpen, sheet: $sheet)
             if vm.loaded {
                 if vm.store.canvas?.kind == .KIDS {
-                    KidsToolbar(vm: vm, store: vm.store, brush: vm.brush, shapes: vm.shapes)
+                    KidsToolbar(vm: vm, store: vm.store, brush: vm.brush, shapes: vm.shapes, challengeUi: challengeUi)
                 } else {
                     ModeToolRow(vm: vm, store: vm.store, ruler: vm.ruler)
                 }
@@ -28,6 +29,10 @@ struct CanvasEditScreen: View {
                 if vm.loaded, vm.store.canvas != nil, let actions {
                     EditorCanvasHost(vm: vm, store: vm.store, pen: vm.pen, shapes: vm.shapes, diagrams: vm.diagrams,
                                      frame: vm.frame, hw: vm.handwriting, actions: actions)
+                    if vm.store.canvas?.kind == .KIDS {
+                        KidsChallengeLayer(vm: vm, ctl: vm.challenge, ui: challengeUi, viewport: vm.viewport, hw: vm.handwriting,
+                                           tutorial: vm.inTutorial())
+                    }
                 } else {
                     ProgressView()
                 }
@@ -35,7 +40,7 @@ struct CanvasEditScreen: View {
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .overlay(alignment: .bottom) { if vm.loaded { TextDraftBar(vm: vm, texts: vm.texts) } }
             .overlay(alignment: .top) { if vm.loaded { ParamControlsHost(vm: vm, shapes: vm.shapes) } }
-            .overlay(alignment: .bottom) { if vm.loaded { SuggestionLayer(vm: vm, hw: vm.handwriting, texts: vm.texts) } }
+            .overlay(alignment: .bottom) { if vm.loaded { SuggestionLayer(vm: vm, hw: vm.handwriting, texts: vm.texts, ctl: vm.challenge) } }
         }
         .background(Color(uiColor: CanvasColors.background))
         .navigationBarBackButtonHidden(true)
@@ -201,11 +206,12 @@ private struct SuggestionLayer: View {
     @ObservedObject var vm: EditorViewModel
     @ObservedObject var hw: HandwritingController
     @ObservedObject var texts: TextController
+    @ObservedObject var ctl: KidsChallengeController
 
     var body: some View {
         if texts.draft == nil {
             if vm.store.canvas?.kind == .KIDS {
-                KidsMascotLayer(vm: vm, hw: hw, tutorial: vm.inTutorial(), challengeOn: vm.inChallenge())
+                KidsMascotLayer(vm: vm, hw: hw, tutorial: vm.inTutorial(), challengeOn: ctl.active || ctl.suggest)
             } else {
                 SuggestionsHost(vm: vm, hw: hw)
             }

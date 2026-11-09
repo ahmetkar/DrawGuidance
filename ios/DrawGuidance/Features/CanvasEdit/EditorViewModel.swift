@@ -79,6 +79,14 @@ final class EditorViewModel: ObservableObject, EditorHost {
     /// v44 çocuk görevi sürüyor mu.
     var inChallenge: () -> Bool = { false }
 
+    /// v38 çocuk modunda çizim görevi (seviye kurulurken çizim moduna geçilir, öneriler temizlenir).
+    private(set) lazy var challenge: KidsChallengeController = {
+        let c = KidsChallengeController(store, before: { [unowned self] in chooseMode(.DRAW); handwriting.reset() },
+                                        after: { [unowned self] in afterContentReplaced() })
+        inChallenge = { [unowned self, unowned c] in store.canvas?.kind == .KIDS && c.active }
+        return c
+    }()
+
     init(canvasLocalId: String, deps: EditorDependencies) {
         self.canvasLocalId = canvasLocalId
         self.deps = deps

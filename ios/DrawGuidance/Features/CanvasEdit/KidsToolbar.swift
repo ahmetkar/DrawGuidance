@@ -21,6 +21,7 @@ struct KidsToolbar: View {
     @ObservedObject var store: EditorStore
     @ObservedObject var brush: BrushController
     @ObservedObject var shapes: ShapeController
+    var challengeUi: KidsChallengeUi? = nil
 
     private struct Tile: Identifiable {
         let id: String; let icon: String; let label: String; let color: UInt32; let selected: Bool; let enabled: Bool; let action: () -> Void
@@ -48,6 +49,10 @@ struct KidsToolbar: View {
             },
             Tile(id: "shape", icon: "square.on.circle", label: L("add_shape"), color: 0xFFA8_E6FF, selected: vm.mode == .SHAPE, enabled: true) {
                 vm.shapes.openPicker()
+            },
+            Tile(id: "challenge", icon: "trophy.fill", label: L("kids_challenge"), color: 0xFFFF_D59A,
+                 selected: challengeUi?.menu == true || challengeUi?.progress == true, enabled: challengeUi != nil) {
+                challengeUi?.toggleMenu()
             },
             Tile(id: "undo", icon: "arrow.uturn.backward", label: L("undo"), color: 0xFFFF_E08A, selected: false, enabled: store.canUndo) { vm.undo() },
             Tile(id: "redo", icon: "arrow.uturn.forward", label: L("redo"), color: 0xFFFF_E08A, selected: false, enabled: store.canRedo) { vm.redo() },

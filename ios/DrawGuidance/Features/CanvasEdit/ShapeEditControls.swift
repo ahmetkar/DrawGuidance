@@ -96,7 +96,7 @@ struct ParamControlsBar: View {
                 TextField(L("v45_param_formula_hint"), text: $draft)
                     .autocorrectionDisabled()
                     .textInputAutocapitalization(.never)
-                Button(L("apply_button")) { params.applyFormula(draft) }
+                Button(L("apply_button")) { _ = params.applyFormula(draft) }
                 Button(L("cancel_button"), role: .cancel) {}
             } message: { Text(L("v45_param_formula_hint")) }
         }
@@ -116,10 +116,10 @@ struct ParamControlsBar: View {
             let unit = d.unit.isEmpty || d.unit == "°" ? d.unit : " \(d.unit)"
             let label = "\(d.symbol) = \(ParamModel.num(v, 2))\(unit)"
             HStack(spacing: 4) {
-                Button { params.setValue(d.key, v - d.step) } label: { Image(systemName: "minus") }
+                Button { _ = params.setValue(d.key, v - d.step) } label: { Image(systemName: "minus") }
                     .accessibilityLabel(L("v45_param_less", label))
                 Text(label).font(.callout.weight(.medium)).lineLimit(1).padding(.horizontal, 4)
-                Button { params.setValue(d.key, v + d.step) } label: { Image(systemName: "plus") }
+                Button { _ = params.setValue(d.key, v + d.step) } label: { Image(systemName: "plus") }
                     .accessibilityLabel(L("v45_param_more", label))
             }
             .padding(.horizontal, 10)

@@ -41,11 +41,11 @@ enum TextStyleMerge {
 /// Yazı elemanı: tuvalin içinde yazma ve yazı tipi ayarları (Android `TextController`).
 @MainActor
 final class TextController: ObservableObject {
-    static let DRAFT_ID = "__text_draft__"
-    static let MIN_BOX: Float = 24
-    static let MAX_BOX: Float = 20000
-    static let MIN_TEXT_SIZE: Float = 8
-    static let MAX_TEXT_SIZE: Float = 400
+    nonisolated static let DRAFT_ID = "__text_draft__"
+    nonisolated static let MIN_BOX: Float = 24
+    nonisolated static let MAX_BOX: Float = 20000
+    nonisolated static let MIN_TEXT_SIZE: Float = 8
+    nonisolated static let MAX_TEXT_SIZE: Float = 400
 
     private let store: EditorStore
     private let brush: () -> BrushController

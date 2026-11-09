@@ -164,17 +164,6 @@ enum ImageImportState {
     case needsConfirmation(warnings: [ImageIssue], image: PreparedImage, center: P)
 }
 
-/// Kaydedilmiş resim (Android `SavedImageEntity`).
-struct SavedImage: Equatable, Identifiable, Codable {
-    var id: String
-    var canvasLocalId: String?
-    var fileName: String
-    var width: Int
-    var height: Int
-    var createdAt: Int64
-    var format: String = "png"
-}
-
 enum ImageSaveState: Equatable {
     case idle
     case saving

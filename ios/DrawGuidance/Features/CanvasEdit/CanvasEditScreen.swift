@@ -17,7 +17,13 @@ struct CanvasEditScreen: View {
     var body: some View {
         VStack(spacing: 0) {
             EditorTopBar(vm: vm, store: vm.store, brush: vm.brush, brushPickerOpen: $brushPickerOpen, sheet: $sheet)
-            if vm.loaded { ModeToolRow(vm: vm, store: vm.store, ruler: vm.ruler) }
+            if vm.loaded {
+                if vm.store.canvas?.kind == .KIDS {
+                    KidsToolbar(vm: vm, store: vm.store, brush: vm.brush, shapes: vm.shapes)
+                } else {
+                    ModeToolRow(vm: vm, store: vm.store, ruler: vm.ruler)
+                }
+            }
             ZStack {
                 if vm.loaded, vm.store.canvas != nil, let actions {
                     EditorCanvasHost(vm: vm, store: vm.store, pen: vm.pen, shapes: vm.shapes, diagrams: vm.diagrams,
@@ -133,6 +139,7 @@ private struct EditorTopBar: View {
                     .disabled(!store.canRedo).accessibilityLabel(L("redo")).accessibilityIdentifier("redo")
             }
             .font(.title3)
+            if store.canvas?.kind != .KIDS {
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: 8) {
                     ForEach(modes, id: \.2) { m in
@@ -161,6 +168,7 @@ private struct EditorTopBar: View {
                         .accessibilityIdentifier("color_button")
                 }
                 .padding(.horizontal, 12)
+            }
             }
         }
         .padding(.top, 8)

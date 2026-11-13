@@ -20,10 +20,10 @@ enum TutorialV50 {
     private static func templateAnchor(_ simple: Bool) -> String { simple ? TutorialAnchor.simple("template") : TutorialAnchor.TEMPLATE }
 
     private static func imageRect(_ d: TutorialDemo) -> FRect {
-        d.h >= d.w ? FRect(d.w * 0.08, d.h * 0.07, d.w * 0.48, d.h * 0.40) : FRect(d.w * 0.05, d.h * 0.1, d.w * 0.4, d.h * 0.85)
+        d.h >= d.w ? FRect(d.w * 0.05, d.h * 0.05, d.w * 0.53, d.h * 0.42) : FRect(d.w * 0.05, d.h * 0.1, d.w * 0.4, d.h * 0.85)
     }
 
-    private static func copyShift(_ d: TutorialDemo) -> P { d.h >= d.w ? P(d.w * 0.46, 0) : P(d.w * 0.5, 0) }
+    private static func copyShift(_ d: TutorialDemo) -> P { d.h >= d.w ? P(d.w * 0.43, 0) : P(d.w * 0.5, 0) }
 
     private static func image(_ d: TutorialDemo) -> Stroke? { d.host.tutorialCanvas()?.strokes.first { $0.brushType == .IMAGE } }
     private static func traced(_ d: TutorialDemo) -> Stroke? {
@@ -42,7 +42,7 @@ enum TutorialV50 {
     private static func ensureTraced(_ d: TutorialDemo) async -> Stroke? {
         if let t = traced(d) { return t }
         guard let img = await ensureImage(d) else { return nil }
-        return await d.host.vectorizeImage(img.id, mode: .AUTO, lineWidth: d.u * 0.0035, keepImage: true)
+        return await d.host.vectorizeImage(img.id, mode: .AUTO, lineWidth: d.u * 0.005, keepImage: true)
     }
 
     /// Vektör çizgilerden kalıp kurulur ve [by] kadar yana taşınır (parmak taşıma tutamağını sürükler).
@@ -100,7 +100,7 @@ enum TutorialV50 {
                 d.host.editImage(img.id)
                 await d.pause(500)
                 if !simple { await d.tapAnchor(VECTORIZE_AUTO) }
-                if traced(d) == nil { _ = await d.host.vectorizeImage(img.id, mode: .AUTO, lineWidth: d.u * 0.0035, keepImage: true) }
+                if traced(d) == nil { _ = await d.host.vectorizeImage(img.id, mode: .AUTO, lineWidth: d.u * 0.005, keepImage: true) }
                 d.host.mutate { list in list.map { s in var c = s; if c.id == img.id { c.opacity = 0.35 }; return c } }
                 d.host.editImage(img.id)
                 await d.pause(500)

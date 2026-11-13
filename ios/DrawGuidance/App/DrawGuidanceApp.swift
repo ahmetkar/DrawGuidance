@@ -4,6 +4,7 @@ import SwiftUI
 struct DrawGuidanceApp: App {
     @StateObject private var store = EditorDependencies.shared.canvases
     @StateObject private var models3d = EditorDependencies.shared.models3d!
+    @AppStorage(ThemeMode.KEY) private var theme = ThemeMode.SYSTEM.rawValue
 
     init() {
         // freeRASP çalışma zamanı koruması (Android TalsecGuard karşılığı)
@@ -19,6 +20,7 @@ struct DrawGuidanceApp: App {
             HomeView()
                 .environmentObject(store)
                 .environmentObject(models3d)
+                .preferredColorScheme(ThemeMode(rawValue: theme)?.scheme)
         }
     }
 }

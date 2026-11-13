@@ -21,3 +21,5 @@
 "ios.signin.soon" = "Sign-in will be available soon.";
 "ios.signin.title" = "Account";
 "ios.settings.title" = "Settings";
+"ios.privacy.options" = "Privacy options";
+"ios.version" = "Version";

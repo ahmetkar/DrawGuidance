@@ -126,6 +126,12 @@ final class TutorialPrefs: ObservableObject {
     func version(_ kind: String) -> Int { d.object(forKey: "tutorials.version_" + kind) as? Int ?? (offered(kind) ? 1 : 0) }
     func markVersion(_ kind: String, _ v: Int) { d.set(v, forKey: "tutorials.version_" + kind) }
     func markCompleted(_ id: String) { completed.insert(id); d.set(Array(completed), forKey: "tutorials.completed") }
+    /// Ayarlar → "Eğitimleri yeniden öner" (Android `resetOffers`): ilk girişteki eğitim teklifi yeniden çıkar.
+    func resetOffers() {
+        for k in d.dictionaryRepresentation().keys where k.hasPrefix("tutorials.offered_") || k.hasPrefix("tutorials.version_") {
+            d.removeObject(forKey: k)
+        }
+    }
 }
 
 /// v32 eğitim modu (Android `TutorialController`): adımları oynatır; eğitim kum havuzunda çalışır, iptal ya da bitince

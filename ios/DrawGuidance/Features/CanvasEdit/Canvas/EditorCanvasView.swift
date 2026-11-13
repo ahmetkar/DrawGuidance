@@ -166,7 +166,7 @@ final class EditorCanvasView: UIView {
         guard let ctx else { return }
         if t.type == .pencil {
             let maxF = t.maximumPossibleForce
-            ctx.pressure = maxF > 0 ? Float(t.force / maxF).coerceIn(0.05, 1) : 1
+            ctx.pressure = StylusPrefs.pressure && maxF > 0 ? Float(t.force / maxF).coerceIn(0.05, 1) : 1
             ctx.tilt = Float(.pi / 2 - t.altitudeAngle)
             ctx.orient = Float(t.azimuthAngle(in: self))
         } else {
@@ -209,7 +209,7 @@ final class EditorCanvasView: UIView {
             guideMoved = false
             return
         }
-        let fingerPans = mode == .DRAW && Self.pencilUsed && first.type != .pencil
+        let fingerPans = mode == .DRAW && Self.pencilUsed && StylusPrefs.fingerPans && first.type != .pencil
         let t: CanvasTool = fingerPans ? PanTool() : CanvasTools.create(mode, actions.canvasPick(), actions.paintBrush())
         let c = GestureContext(
             viewport: viewport, base: canvas, selected: vm.store.selectedIds, actions: actions, brush: vm.brush.settings,

@@ -109,6 +109,10 @@ protocol TutorialHost: AnyObject {
     var tutorialGuides: RulerController? { get }
     func setPageSettings(_ settings: PageSettings)
     func assetImage(_ path: String, target: FRect, fill: Bool) async -> Stroke?
+    /// v50 resim [id] seçilip Resmi düzenle'ye geçilir.
+    func editImage(_ id: String)
+    /// v50 resim [id] vektörleştirilir (keepImage ise resmin üstüne); bitince vektör çizgiler döner.
+    func vectorizeImage(_ id: String, mode: EdgeMode, lineWidth: Float, keepImage: Bool) async -> Stroke?
 }
 
 /// Eğitim tercihleri (Android `TutorialPrefs`): tamamlanan gruplar, ilk girişte öneri, sürüm.

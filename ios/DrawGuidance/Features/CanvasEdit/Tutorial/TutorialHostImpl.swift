@@ -78,4 +78,27 @@ extension EditorViewModel: TutorialHost {
     var tutorialGuides: RulerController? { ruler }
     func setPageSettings(_ settings: PageSettings) { store.updateCanvas { var c = $0; c.pageSettings = settings; return c } }
     func assetImage(_ path: String, target: FRect, fill: Bool) async -> Stroke? { await images.assetImageStroke(path, target: target, fill: fill) }
+
+    // v50 "Resimden çizim" eğitimi: resmi düzenlemeye açma ve vektörleştirme (bitene kadar beklenir)
+    func editImage(_ id: String) {
+        store.select([id])
+        startAction(.IMAGE_EDIT, target: [id])
+    }
+
+    func vectorizeImage(_ id: String, mode: EdgeMode, lineWidth: Float, keepImage: Bool) async -> Stroke? {
+        guard let image = store.canvas?.strokes.first(where: { $0.id == id && $0.brushType == .IMAGE }) else { return nil }
+        store.select([id])
+        // Resim önbelleğe yüklenene kadar beklenir (en çok 8 sn)
+        var waited = 0
+        while CanvasImageCache.get(image.assetId) == nil && waited < 8_000 {
+            try? await Task.sleep(nanoseconds: 50_000_000); waited += 50
+        }
+        let before = Set(store.canvas?.strokes.map(\.id) ?? [])
+        imageEdit.vectorize(EdgeOptions(mode: mode), lineWidth: lineWidth, keepImage: keepImage)
+        waited = 0
+        while imageEdit.tracing && waited < 30_000 {
+            try? await Task.sleep(nanoseconds: 50_000_000); waited += 50
+        }
+        return store.canvas?.strokes.last { !before.contains($0.id) && $0.shape?.kind == ImageEditController.TRACED }
+    }
 }

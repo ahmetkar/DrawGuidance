@@ -10,26 +10,29 @@ enum TutorialScripts {
     static func groups(_ kind: CanvasKind) -> [TutorialGroup] {
         switch kind {
         // v40/v46/v48 her gelişmiş türde sürümün yenilikleri ayrı grupta
-        case .ART: return [artBasics, artAdd, artAi, TutorialV40.art, TutorialV46.art, TutorialV48.advanced(kind)]
+        case .ART: return [artBasics, artAdd, artAi, TutorialV40.art, TutorialV46.art, TutorialV48.advanced(kind), TutorialV50.advanced(kind)]
         case .NOTES: return [notesWrite, notesFormula, notesAi, TutorialV40.notes, TutorialV46.notes, TutorialV48.advanced(kind)]
-        case .COMIC: return [comicPanels, comicText, comicAi, TutorialV40.comic, TutorialV46.comic, TutorialV48.advanced(kind)]
+        case .COMIC: return [comicPanels, comicText, comicAi, TutorialV40.comic, TutorialV46.comic, TutorialV48.advanced(kind), TutorialV50.advanced(kind)]
         // v40 basit resim ve basit notta kısa, sade dilli tanıtım
-        case .SIMPLE_ART: return [TutorialV40.simpleArt, TutorialV46.simpleArt, TutorialV48.simple(kind)]
+        case .SIMPLE_ART: return [TutorialV40.simpleArt, TutorialV46.simpleArt, TutorialV48.simple(kind), TutorialV50.simpleArt]
         case .SIMPLE_NOTES: return [TutorialV40.simpleNotes, TutorialV46.simpleNotes, TutorialV48.simple(kind)]
         // v37 çocuklar için çizimde maskot Boyacık araçları tanıtır ve örnek resim yapar
-        case .KIDS: return [TutorialKids.intro, TutorialKids.whatsNew, TutorialV48.kids]
+        case .KIDS: return [TutorialKids.intro, TutorialKids.whatsNew, TutorialV48.kids, TutorialV50.kids]
         }
     }
 
     /// v40 eğitimlerin sürümü: eski sürümün eğitimini bitirmiş kullanıcıya [whatsNew] bir kez gösterilir (v48).
-    static let VERSION = 48
+    static let VERSION = 50
 
     /// Bu türde sürümün yenilikleri (v48: yeni menü sistemi).
     static func whatsNew(_ kind: CanvasKind) -> TutorialGroup? {
         switch kind {
-        case .ART, .NOTES, .COMIC: return TutorialV48.advanced(kind)
-        case .SIMPLE_ART, .SIMPLE_NOTES: return TutorialV48.simple(kind)
-        case .KIDS: return TutorialV48.kids
+        // v50 çizim modlarında "Resimden çizim" (vektörleştirme ve kalıpla çizme), not türlerinde v48 menüleri
+        case .ART, .COMIC: return TutorialV50.advanced(kind)
+        case .NOTES: return TutorialV48.advanced(kind)
+        case .SIMPLE_ART: return TutorialV50.simpleArt
+        case .SIMPLE_NOTES: return TutorialV48.simple(kind)
+        case .KIDS: return TutorialV50.kids
         }
     }
 

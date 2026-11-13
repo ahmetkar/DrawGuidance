@@ -2974,3 +2974,25 @@
 "zoom_fit_cd" = "Zoom %%%1$d, fit to screen";
 "zoom_in" = "Zoom in";
 "zoom_out" = "Zoom out";
+
+/* v50 "Resimden çizim" eğitimi (vektörleştirme ve kalıpla çizme) */
+"v50_tut_title" = "Drawing from images";
+"v50_tut_summary" = "Vectorize an image, turn it into a stencil and draw over it.";
+"v50_tut_image_t" = "Add an image";
+"v50_tut_image_b" = "Add an image: a photo, a sketch or a ready-made drawing. Here we use a teapot.";
+"v50_tut_vec_t" = "Vectorize the image";
+"v50_tut_vec_b" = "Select the image and tap \"Auto-vectorize\" under Edit. Its edges become vector lines with editable points.";
+"v50_tut_types_t" = "Three types, fine tuning";
+"v50_tut_types_b" = "\"Vectorize edges\" keeps the outlines, \"Vectorize lines\" follows a sketch's center lines. Detail and smoothing are in the sheet below. Delete the image and only the lines remain.";
+"v50_tut_pick_t" = "Make it a stencil";
+"v50_tut_pick_b" = "Open Shape template and tap the lines: the drawing becomes a see-through stencil. Move and resize it with the handles.";
+"v50_tut_trace_t" = "Draw with the stencil";
+"v50_tut_trace_b" = "Draw near the stencil's edge: your pen follows it and the line stays steady. Tap Lock so the stencil stays in place.";
+"v50_tut_lib_t" = "Stencils from the library";
+"v50_tut_lib_b" = "Tap \"From library\" and pick a shape: a cat, a star, a heart and more. Tap Finish to return to normal drawing.";
+"v50_tut_kids_title" = "Draw with stencils";
+"v50_tut_kids_summary" = "Pick a shape and draw along its edge.";
+"v50_tut_kids_t" = "Pick a stencil";
+"v50_tut_kids_b" = "Tap Stencil and pick a shape. It shows faintly on the canvas.";
+"v50_tut_kids2_t" = "Draw along the edge";
+"v50_tut_kids2_b" = "Draw close to the shape's edge: your pen follows the line by itself!";

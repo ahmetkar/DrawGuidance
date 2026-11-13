@@ -119,7 +119,20 @@ struct ModeToolRow: View {
             ToolButton(icon: "arrow.counterclockwise", label: "reset", id: "crop_reset") { vm.frame.resetCrop() }
         case .SHAPE_EDIT:
             ShapeEditToolRow(vm: vm, shapes: vm.shapes)
-        case .EXPAND, .SHAPE, .DIAGRAM, .FORMULA, .GUIDE, .PERSPECTIVE, .DIAGRAM_EDIT, .IMAGE_EDIT:
+        case .IMAGE_EDIT:
+            // v50 Resmi düzenle: Kırp ve vektörleştirme türleri doğrudan (Android imageEditTools; varsayılan ayarlarla)
+            ToolButton(icon: "crop", label: L("image_crop"), id: "image_crop") { vm.startAction(.CROP, target: store.selection) }
+            ToolButton(icon: "scribble.variable", label: L("vectorize_direct_auto"), selected: vm.imageEdit.tracing, id: "vectorize_auto", anchor: "vectorize_auto") {
+                vm.imageEdit.vectorize(EdgeOptions(mode: .AUTO), lineWidth: 2.5, keepImage: true)
+            }
+            ToolButton(icon: "viewfinder", label: L("vectorize_direct_edges"), id: "vectorize_edges", anchor: "vectorize_edges") {
+                vm.imageEdit.vectorize(EdgeOptions(mode: .EDGES), lineWidth: 2.5, keepImage: true)
+            }
+            ToolButton(icon: "point.topleft.down.to.point.bottomright.curvepath", label: L("vectorize_direct_lines"), id: "vectorize_centerline", anchor: "vectorize_centerline") {
+                vm.imageEdit.vectorize(EdgeOptions(mode: .CENTERLINE), lineWidth: 2.5, keepImage: true)
+            }
+            ToolButton(icon: "checkmark", label: L("apply_button"), id: "finish_action") { vm.finishAction() }
+        case .EXPAND, .SHAPE, .DIAGRAM, .FORMULA, .GUIDE, .PERSPECTIVE, .DIAGRAM_EDIT:
             ToolButton(icon: "checkmark", label: L("apply_button"), id: "finish_action") { vm.finishAction() }
         default:
             EmptyView()
@@ -145,6 +158,7 @@ struct ModeToolRow: View {
             }
             .accessibilityLabel(L("add_image"))
             .accessibilityIdentifier("add_image")
+            .tutorialAnchor(TutorialAnchor.add("image"))
         }
     }
 

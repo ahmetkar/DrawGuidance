@@ -47,14 +47,11 @@ data class Entitlements(
     val autoRenewing: Boolean = false,
     val signedIn: Boolean = false,
     val loaded: Boolean = false,
-    /** v44 geçici istisna hesabı ([ExemptAccounts]): plan değişmeden bütün haklar açık. */
-    val exempt: Boolean = false,
 ) {
     val isPremium: Boolean get() = planId != PlanIds.FREE && features.isNotEmpty()
 
     /** Hak var mı (bitiş zamanı geçtiyse hayır: değer eski kalsa da kapanır). */
     fun has(key: String, now: Long = System.currentTimeMillis()): Boolean {
-        if (exempt) return true
         if (key !in features) return false
         val end = expiryTime ?: return false
         return now < end
@@ -65,6 +62,12 @@ data class Entitlements(
 
     companion object {
         val FREE = Entitlements(loaded = true)
+
+        /** v50 son sunucu doğrulamasından sonra çevrimdışı hakkın en uzun süresi (7 gün). */
+        const val OFFLINE_GRACE_MS: Long = 7L * 24 * 60 * 60 * 1000
+
+        /** v50 cihaz saati ileri alınmışsa: doğrulama zamanı "gelecekte" görünen kayıt (1 gün tolerans) hak vermez. */
+        const val CLOCK_SKEW_MS: Long = 24L * 60 * 60 * 1000
 
         /** Testler için: bütün Premium hakları (bitiş [until]). */
         fun premium(until: Long = Long.MAX_VALUE, signedIn: Boolean = true) = Entitlements(
@@ -91,6 +94,11 @@ data class Entitlements(
                 signedIn = true, loaded = true,
             )
             if (sub.planId == PlanIds.FREE) return base
+            // v50 hak yalnız sunucunun doğruladığı kayıtla ve doğrulama yakın zamanda yapıldıysa açılır
+            // (çevrimdışı en çok [OFFLINE_GRACE_MS]; yerel veritabanında elle yazılmış bir kayıt hak vermez)
+            if (sub.source != "server") return base
+            val verifiedAt = sub.verifiedAt ?: return base
+            if (verifiedAt > now + CLOCK_SKEW_MS || now - verifiedAt > OFFLINE_GRACE_MS) return base
             if (status !in SubscriptionStatuses.GRANTING) return base
             val end = sub.expiryTime ?: return base
             if (now >= end) return base.copy(status = SubscriptionStatuses.EXPIRED)
@@ -100,15 +108,4 @@ data class Entitlements(
             return base.copy(planId = sub.planId, features = features)
         }
     }
-}
-
-/**
- * v44 geçici istisna hesapları (sonraki güncellemede kaldırılabilir): abonelik ayarları dışında her şeye erişir
- * (Premium hakları açık, reklam yok; abonelik ekranı gerçek planı gösterir). Yalnız giriş yapılmış Google hesabının
- * e-postasıyla eşleşir; sunucu da yalnız doğrulanmış e-postaya bakar.
- */
-object ExemptAccounts {
-    val EMAILS: Set<String> = setOf("ahmetkar8040@gmail.com")
-
-    fun isExempt(email: String?): Boolean = email != null && email.trim().lowercase() in EMAILS
 }

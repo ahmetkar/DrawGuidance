@@ -146,8 +146,6 @@ services:
       GCS_BUCKET: dgpackets
       GCS_SERVICE_ACCOUNT_JSON: /run/secrets/gcs.json
       DEVICE_DATA_KEY_FILE: /run/secrets/device_data_key
-      # v44 geçici istisna hesabı (abonelik dışında her şey; sonraki sürümde kaldırılabilir)
-      BILLING_EXEMPT_EMAILS: ahmetkar8040@gmail.com
     secrets:
       - { source: mongo_app_password, target: mongo_app_password, uid: "10001", gid: "10001", mode: 0400 }
       - { source: play_service_account, target: play.json, uid: "10001", gid: "10001", mode: 0400 }

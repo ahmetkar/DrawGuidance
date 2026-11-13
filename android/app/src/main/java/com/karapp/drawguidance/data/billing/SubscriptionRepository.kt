@@ -80,11 +80,8 @@ class SubscriptionRepository(
     private val signedInUser = users.observe().map { u -> u?.takeIf { it.signedIn }?.let { it.firebaseUid to it.email?.takeIf { _ -> it.emailVerified } } }.distinctUntilChanged()
     private val signedInUid = signedInUser.map { it?.first }.distinctUntilChanged()
 
-    private val computed: StateFlow<Entitlements> = combine(signedInUser, dao.observeSubscriptions(), dao.observePlanFeatures(), ticker) { user, subs, pf, now ->
-        val uid = user?.first
-        val e = Entitlements.compute(uid, subs.firstOrNull { it.firebaseUid == uid }, pf, now)
-        // v44 geçici istisna hesabı: bütün haklar (plan aynı kalır)
-        if (uid != null && ExemptAccounts.isExempt(user.second)) e.copy(exempt = true) else e
+    private val computed: StateFlow<Entitlements> = combine(signedInUid, dao.observeSubscriptions(), dao.observePlanFeatures(), ticker) { uid, subs, pf, now ->
+        Entitlements.compute(uid, subs.firstOrNull { it.firebaseUid == uid }, pf, now)
     }.distinctUntilChanged().stateIn(scope, SharingStarted.Eagerly, Entitlements())
 
     /** Kullanıcının o anki hakları (yüklenmeden önce Free, [Entitlements.loaded] false). */
@@ -105,6 +102,7 @@ class SubscriptionRepository(
 
     private val lock = Mutex()
     private var started = false
+    @Volatile private var lastReverifyAttempt = 0L
 
     /**
      * Açılışta bir kez: planlar tohumlanır, satın alma sonuçları dinlenir, giriş yapılınca abonelik güncellenir.
@@ -121,6 +119,16 @@ class SubscriptionRepository(
             }
         }
         if (network) scope.launch { if (connectivity.online.value) runCatching { refreshPlans() } }
+        // v50 bağlantı gelince ve uygulama açık kaldıkça doğrulama tazelenir (iade/iptal kaçmasın; çevrimdışı hak
+        // [Entitlements.OFFLINE_GRACE_MS] ile sınırlı olduğundan Premium kullanıcının hakkı da böylece kesilmez)
+        if (network) scope.launch {
+            combine(signedInUid, connectivity.online, ticker) { uid, online, now -> Triple(uid, online, now) }.collect { (uid, online, now) ->
+                if (uid == null || !online) return@collect
+                val verifiedAt = dao.subscription(uid)?.verifiedAt
+                if (now - lastReverifyAttempt < REVERIFY_RETRY_MS) return@collect
+                if (verifiedAt == null || now - verifiedAt > REVERIFY_AFTER_MS) { lastReverifyAttempt = now; runCatching { refresh() } }
+            }
+        }
     }
 
     /** Uygulamayla gelen planlar (Free ve Premium 100 TL/ay) veritabanında yoksa yazılır. */
@@ -316,6 +324,12 @@ class SubscriptionRepository(
 
     companion object {
         private const val TAG = "Subscription"
+
+        /** v50 sunucu doğrulaması bu süreden eskiyse bağlantı varken yenilenir (12 saat). */
+        const val REVERIFY_AFTER_MS: Long = 12L * 60 * 60 * 1000
+
+        /** v50 başarısız yenilemeden sonra yeniden deneme aralığı (15 dakika). */
+        const val REVERIFY_RETRY_MS: Long = 15L * 60 * 1000
         val PREMIUM_PRODUCT_ID: String = com.karapp.drawguidance.BuildConfig.PLAY_PREMIUM_PRODUCT_ID
         val PREMIUM_BASE_PLAN_ID: String = com.karapp.drawguidance.BuildConfig.PLAY_PREMIUM_BASE_PLAN_ID
     }

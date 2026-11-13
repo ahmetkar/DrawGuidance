@@ -23,23 +23,19 @@ public class SubscriptionController {
     public static final String PATH = "/api/v1/subscriptions";
 
     private final SubscriptionService subscriptions;
-    private final ExemptAccounts exempt;
 
-    public SubscriptionController(SubscriptionService subscriptions, ExemptAccounts exempt) {
+    public SubscriptionController(SubscriptionService subscriptions) {
         this.subscriptions = subscriptions;
-        this.exempt = exempt;
     }
-
-    private SubscriptionView forUser(Jwt jwt, SubscriptionView v) { return exempt.isExempt(jwt) ? ExemptAccounts.grant(v) : v; }
 
     @GetMapping("/me")
     public SubscriptionView me(@AuthenticationPrincipal Jwt jwt) {
-        return forUser(jwt, subscriptions.me(jwt.getSubject()));
+        return subscriptions.me(jwt.getSubject());
     }
 
     @PostMapping("/verify")
     public SubscriptionView verify(@AuthenticationPrincipal Jwt jwt, @Valid @RequestBody VerifyRequest body) {
-        return forUser(jwt, subscriptions.verify(jwt.getSubject(), body));
+        return subscriptions.verify(jwt.getSubject(), body);
     }
 
     /** Hareket geçmişi (sipariş numaraları, yenilemeler, iptaller; yeniden eskiye). */

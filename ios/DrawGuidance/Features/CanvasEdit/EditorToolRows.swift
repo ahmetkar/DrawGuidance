@@ -85,6 +85,11 @@ struct ModeToolRow: View {
                 if ruler.session == .TEMPLATE || ruler.session == .TEMPLATE_PICK { ruler.finish() } else { ruler.openTemplate(); ruler.libraryOpen = true }
             }
             if ruler.session != .NONE { RulerBar(ruler: ruler) }
+            if store.canvas?.kind == .ART {
+                ToolButton(icon: "figure.strengthtraining.traditional", label: L("v50_practice"), selected: vm.practice.active, id: "practice_button") {
+                    vm.practice.listOpen = true
+                }
+            }
             ToolButton(icon: "eyedropper", label: "eyedropper", selected: vm.canvasPick == .EYEDROPPER, id: "eyedropper", anchor: TutorialAnchor.simple("eyedropper")) {
                 vm.toggleCanvasPick(.EYEDROPPER)
             }

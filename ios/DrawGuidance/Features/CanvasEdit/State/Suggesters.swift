@@ -192,6 +192,14 @@ enum TemplateSuggester {
         let base = TemplateFix(key: m.key, name: m.name, category: m.category, confidence: m.confidence, mode: m.mode, strokeIds: orderedIds(group),
                                bounds: bounds, strokes: strokes, drawn: flats, spaces: spaces)
         guard let solidId = m.solid else { return [base] }
+        // v50 alıştırma şablonu: kütüphanedeki düzgün çizim (hazır vektör şekil seçeneği)
+        if solidId.hasPrefix(ShapeLibrary.PREFIX) {
+            var vec = base
+            vec.solid = solidId
+            vec.vector = true
+            vec.confidence = m.confidence - 0.001
+            return [base, vec]
+        }
         var solid = base
         solid.solid = solidId
         solid.confidence = m.confidence + (plane != .FREE || group.contains { $0.params?.depth3d != nil } ? 0.001 : -0.001)

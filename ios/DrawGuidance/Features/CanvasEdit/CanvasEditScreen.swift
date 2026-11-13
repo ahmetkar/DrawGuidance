@@ -38,6 +38,9 @@ struct CanvasEditScreen: View {
                         LocationPlaceOverlay(background: b, panels: vm.comicPanelRects(), viewport: vm.viewport,
                                              onPlace: { vm.placeLocation($0) }, onCancel: { vm.placingLocation = nil })
                     }
+                    if PracticeLevels.available(vm.store.canvas?.kind) {
+                        PracticeLayer(ctl: vm.practice, viewport: vm.viewport, tutorial: vm.inTutorial())
+                    }
                     if vm.store.canvas?.kind == .KIDS {
                         KidsChallengeLayer(vm: vm, ctl: vm.challenge, ui: challengeUi, viewport: vm.viewport, hw: vm.handwriting,
                                            tutorial: vm.inTutorial())

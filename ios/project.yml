@@ -26,7 +26,8 @@ settings:
     MARKETING_VERSION: "1.7.0"
     CURRENT_PROJECT_VERSION: "49"
     SWIFT_VERSION: "5.0"
-    DEVELOPMENT_TEAM: ""
+    # Apple Developer takım kimliği (gizli değil; imzalama ve freeRASP imza denetimi için)
+    DEVELOPMENT_TEAM: "G3LKL7QH6D"
     # Google girişinin geri dönüş adresi: GoogleService-Info.plist'teki REVERSED_CLIENT_ID
     # (com.googleusercontent.apps.…). CI bunu plist'ten okuyup verir; boşsa Google düğmesi kapalı kalır.
     DG_GOOGLE_URL_SCHEME: ""

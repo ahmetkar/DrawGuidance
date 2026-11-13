@@ -1,3 +1,4 @@
+import CoreGraphics
 import Foundation
 
 /// Kotlin `Math.round(Float)`: floor(x + 0.5) (Int32).
@@ -462,5 +463,55 @@ enum Scene3D {
         for p in pts.reversed() { while upper.count >= 2 && cross(upper[upper.count - 2], upper[upper.count - 1], p) <= 0 { upper.removeLast() }; upper.append(p) }
         lower.removeLast(); upper.removeLast()
         return lower + upper
+    }
+}
+
+extension GuideRenderer {
+    /// v22 3B sahnenin ızgarası (Android `GuideRenderer.drawDraw3d`): üç düzlemin (ön X–Y, yan Z–Y, üst X–Z) sahne
+    /// merkezinden geçen çizgileri; etkin düzlem belirgin, ötekiler soluk; eksenler biraz daha koyu. Kamera döndükçe döner.
+    static func drawDraw3d(_ c: CGContext, _ spec: GuideSpec, paper: CGRect, scale: Float, canvasW: Int, canvasH: Int) {
+        guard spec.draw3d else { return }
+        let width = CGFloat(max(0.7, 1.1 * min(1.5, max(0.6, scale))))
+        let base = ArgbColor.parse(spec.colorHex) ?? 0xFF7C_89A6
+        func color(_ a: Double) -> CGColor { ArgbColor.cgColor(ArgbColor.withAlpha(base, Int((a * 255).rounded()))) }
+        let weak = color(0.12), strong = color(0.4), axis = color(0.62)
+        let cam = Scene3D.camera(spec, canvasW, canvasH)
+        let kx = paper.width / CGFloat(max(1, canvasW)), ky = paper.height / CGFloat(max(1, canvasH))
+        func screen(_ x: Float, _ y: Float, _ z: Float) -> CGPoint {
+            let p = cam.project(x, y, z)
+            return CGPoint(x: paper.minX + CGFloat(p.x) * kx, y: paper.minY + CGFloat(p.y) * ky)
+        }
+        func line(_ a: CGPoint, _ b: CGPoint, _ col: CGColor, _ w: CGFloat) {
+            c.setStrokeColor(col); c.setLineWidth(w)
+            c.beginPath(); c.move(to: a); c.addLine(to: b); c.strokePath()
+        }
+        let extent = Float(max(canvasW, canvasH))
+        let reach = extent * 0.42
+        let step = max(20, spec.spacing)
+        let n = Int(reach / step)
+        let r = Float(n) * step
+        func grid(_ plane: Plane3D, _ col: CGColor, _ w: CGFloat) {
+            guard n >= 0 else { return }
+            for i in -n...n {
+                let k = Float(i) * step
+                let pts: [CGPoint]
+                switch plane {
+                case .FRONT: pts = [screen(k, -r, 0), screen(k, r, 0), screen(-r, k, 0), screen(r, k, 0)]
+                case .SIDE: pts = [screen(0, -r, k), screen(0, r, k), screen(0, k, -r), screen(0, k, r)]
+                default: pts = [screen(k, 0, -r), screen(k, 0, r), screen(-r, 0, k), screen(r, 0, k)]
+                }
+                line(pts[0], pts[1], col, w); line(pts[2], pts[3], col, w)
+            }
+        }
+        let active = spec.plane3d
+        c.saveGState()
+        defer { c.restoreGState() }
+        c.clip(to: paper)
+        c.setLineCap(.butt)
+        for p in [Plane3D.TOP, .FRONT, .SIDE] where p != active { grid(p, weak, width * 0.8) }
+        if active != .FREE { grid(active, strong, width) }
+        line(screen(-r, 0, 0), screen(r, 0, 0), axis, width * 1.3)
+        line(screen(0, -r, 0), screen(0, r, 0), axis, width * 1.3)
+        line(screen(0, 0, -r), screen(0, 0, r), axis, width * 1.3)
     }
 }

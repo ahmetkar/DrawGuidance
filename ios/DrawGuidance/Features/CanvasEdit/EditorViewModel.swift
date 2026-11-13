@@ -28,6 +28,8 @@ final class EditorViewModel: ObservableObject, EditorHost {
     @Published private(set) var canvasPick: CanvasPick = .NONE
     @Published private(set) var pendingShapeTool: ShapeTool?
     @Published private(set) var pendingSceneTool: String?
+    /// v41 panele bırakılmayı bekleyen mekân arka planı (yerleştirme katmanı açık)
+    @Published var placingLocation: ComicBackground?
     @Published private(set) var paintBrush = false
     @Published private(set) var textPathPick: String?
     @Published private(set) var transferring = false
@@ -988,6 +990,17 @@ final class EditorViewModel: ObservableObject, EditorHost {
         let leaf = anchor.flatMap { a in panels.first { a.x >= $0.value.left && a.x <= $0.value.right && a.y >= $0.value.top && a.y <= $0.value.bottom }?.key }
         if leaf != nil || panels.isEmpty { insertLocationBackground(b, leaf: leaf); return true }
         return false
+    }
+
+    /// v41 mekân seçildi: panel yoksa ya da ekle noktası bir paneldeyse hemen, yoksa yerleştirme katmanıyla.
+    func pickLocation(_ b: ComicBackground) {
+        if !placeLocationBackgroundDirectly(b) { placingLocation = b }
+    }
+
+    func placeLocation(_ leaf: Int?) {
+        guard let b = placingLocation else { return }
+        placingLocation = nil
+        insertLocationBackground(b, leaf: leaf)
     }
 
     func addPanel(_ leaf: Int?, rows: Bool) -> Int? {

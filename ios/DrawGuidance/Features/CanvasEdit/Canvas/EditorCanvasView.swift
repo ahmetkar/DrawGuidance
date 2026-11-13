@@ -561,6 +561,7 @@ final class EditorCanvasView: UIView {
             g.restoreGState()
         }
         GuideRenderer.draw(g, c.guide, paper: paperCG, scale: scale, highlightVanish: mode == .PERSPECTIVE)
+        GuideRenderer.drawDraw3d(g, c.guide, paper: paperCG, scale: scale, canvasW: c.width, canvasH: c.height)
         if !c.pageSettings.isEmpty {
             let origin = viewport.toScreen(FRect(0, 0, Float(c.width), Float(c.height)))
             PageDecorRenderer.draw(g, c.pageSettings, page: c.currentPage, pageCount: c.pageCount, width: Float(c.width), height: Float(c.height),

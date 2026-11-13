@@ -355,7 +355,7 @@ struct FormulaPickerSheet: View {
 
 /// v27/v36 çizgi roman ekleme penceresi: konuşma balonları, sayfa şablonları, efektler ve efekt yazıları.
 struct ComicInsertSheet: View {
-    enum Tab: String, CaseIterable { case balloons, templates, effects, sfx }
+    enum Tab: String, CaseIterable { case balloons, templates, images, effects, sfx }
     @ObservedObject var vm: EditorViewModel
     @State var tab: Tab = .balloons
     @Environment(\.dismiss) private var dismiss
@@ -372,12 +372,22 @@ struct ComicInsertSheet: View {
                 Picker("", selection: $tab) {
                     Text(L("add_balloon")).tag(Tab.balloons)
                     Text(L("add_templates")).tag(Tab.templates)
+                    if !ComicAssets.catalog.effects.isEmpty { Text(L("effects_tab_effects")).tag(Tab.images) }
                     Text(L("add_effects")).tag(Tab.effects)
                     Text("SFX").tag(Tab.sfx)
                 }
                 .pickerStyle(.segmented)
                 .padding()
-                List { content }
+                if tab == .images {
+                    ScrollView {
+                        VStack(alignment: .leading, spacing: 10) {
+                            Text(L("v42_fx_images_hint")).font(.footnote).foregroundStyle(.secondary).padding(.horizontal, 16)
+                            ComicPropsBrowser(kind: .EFFECT, tag: "fximg") { p in vm.insertComicProp(.EFFECT, p); dismiss() }
+                        }
+                    }
+                } else {
+                    List { content }
+                }
             }
             .navigationTitle(L("add_balloon"))
             .navigationBarTitleDisplayMode(.inline)
@@ -397,6 +407,8 @@ struct ComicInsertSheet: View {
             ForEach(ComicTemplates.all) { t in
                 Button(t.title) { let ids = vm.comic.insertTemplate(t.id); vm.inserted(ids); dismiss() }
             }
+        case .images:
+            EmptyView()
         case .effects:
             ForEach(ComicEffects.all) { e in
                 Button(e.title) { vm.insertEffect(e, options: EffectOptions()); dismiss() }

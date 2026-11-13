@@ -31,6 +31,9 @@ struct ModeToolRow: View {
     @ObservedObject var ruler: RulerController
     @State private var photo: PhotosPickerItem?
     @State private var comicOpen = false
+    @State private var charactersOpen = false
+    @State private var locationsOpen = false
+    @State private var objectsOpen = false
     @State private var panelsOpen = false
 
     var body: some View {
@@ -39,6 +42,9 @@ struct ModeToolRow: View {
         }
         .frame(height: 40)
         .sheet(isPresented: $comicOpen) { ComicInsertSheet(vm: vm) }
+        .sheet(isPresented: $charactersOpen) { CharactersSheet { v in vm.insertCharacter(v) } }
+        .sheet(isPresented: $locationsOpen) { LocationBackgroundsSheet { b in vm.pickLocation(b) } }
+        .sheet(isPresented: $objectsOpen) { ComicObjectsSheet { p in vm.insertComicProp(.OBJECT, p) } }
         .sheet(isPresented: $panelsOpen) { NotesPanelsSheet { id in vm.v45.insertPanels(id); panelsOpen = false } }
         .sheet(isPresented: Binding(get: { ruler.libraryOpen }, set: { ruler.libraryOpen = $0 })) {
             ShapePickerView(kind: store.canvas?.kind ?? .ART) { id in
@@ -118,6 +124,9 @@ struct ModeToolRow: View {
             ToolButton(icon: "textformat", label: L("add_text"), id: "add_text", anchor: TutorialAnchor.add("text")) { vm.startAction(.TEXT, target: []) }
             if store.canvas?.kind == .COMIC {
                 ToolButton(icon: "bubble.left", label: L("add_balloon"), id: "add_comic", anchor: TutorialAnchor.add("balloon")) { comicOpen = true }
+                ToolButton(icon: "figure.wave", label: L("add_characters"), id: "add_characters", anchor: TutorialAnchor.add("characters")) { charactersOpen = true }
+                ToolButton(icon: "mountain.2", label: L("v41_add_location"), id: "add_locations", anchor: TutorialAnchor.add("locations")) { locationsOpen = true }
+                ToolButton(icon: "shippingbox", label: L("v42_add_objects"), id: "add_objects", anchor: TutorialAnchor.add("objects")) { objectsOpen = true }
             }
             if store.canvas?.kind.isNotes == true {
                 ToolButton(icon: "point.3.connected.trianglepath.dotted", label: L("add_diagram"), id: "add_diagram", anchor: TutorialAnchor.add("diagram")) { vm.diagrams.openPicker() }

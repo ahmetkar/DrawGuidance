@@ -34,6 +34,10 @@ struct CanvasEditScreen: View {
                     if vm.store.canvas?.kind != .KIDS && vm.mode == .SELECT && vm.texts.draft == nil {
                         SelectionMenu(vm: vm, store: vm.store, viewport: vm.viewport)
                     }
+                    if let b = vm.placingLocation {
+                        LocationPlaceOverlay(background: b, panels: vm.comicPanelRects(), viewport: vm.viewport,
+                                             onPlace: { vm.placeLocation($0) }, onCancel: { vm.placingLocation = nil })
+                    }
                     if vm.store.canvas?.kind == .KIDS {
                         KidsChallengeLayer(vm: vm, ctl: vm.challenge, ui: challengeUi, viewport: vm.viewport, hw: vm.handwriting,
                                            tutorial: vm.inTutorial())
@@ -47,6 +51,7 @@ struct CanvasEditScreen: View {
             .overlay { if vm.loaded { TutorialLiveLayer(ctl: vm.tutorial, viewport: vm.viewport) } }
             .overlay(alignment: .bottom) { if vm.loaded { TextDraftBar(vm: vm, texts: vm.texts) } }
             .overlay(alignment: .top) { if vm.loaded { ParamControlsHost(vm: vm, shapes: vm.shapes) } }
+            .overlay(alignment: .bottom) { if vm.loaded { Draw3dHost(vm: vm, store: vm.store) } }
             .overlay(alignment: .bottom) { if vm.loaded { SuggestionLayer(vm: vm, hw: vm.handwriting, texts: vm.texts, ctl: vm.challenge) } }
         }
         .background(Color(uiColor: CanvasColors.background))
@@ -226,6 +231,10 @@ private struct ParamControlsHost: View {
         if vm.mode == .SHAPE_EDIT && shapes.tool == .PARAMS {
             ParamControlsBar(vm: vm, store: vm.store, shapes: shapes, params: shapes.paramShapes).padding(.top, 6)
         }
+        if vm.mode == .SHAPE_EDIT && shapes.tool == .GRAPH {
+            GraphControlsBar(store: vm.store, shapes: shapes).padding(.top, 6)
+        }
+        GraphValueHost(shapes: shapes)
     }
 }
 

@@ -39,6 +39,8 @@ android {
         // - Emülatör (AVD) için host makine 10.0.2.2 üzerinden erişilir.
         // - Gerçek cihaz için bilgisayarın LAN IP adresini kullanın.
         buildConfigField("String", "API_BASE_URL", "\"http://10.0.2.2:4747/\"")
+        // Apple ile giriş (Firebase'te Apple sağlayıcısı açılınca): gradle.properties'te dg.appleSignIn=false ile gizlenir
+        buildConfigField("boolean", "APPLE_SIGN_IN", (project.findProperty("dg.appleSignIn")?.toString() ?: "true").toBoolean().toString())
         // v39 Google Play aboneliği (Play Console'da henüz ürün yok: sabit kimlikler)
         buildConfigField("String", "PLAY_PREMIUM_PRODUCT_ID", "\"drawguidance_premium\"")
         buildConfigField("String", "PLAY_PREMIUM_BASE_PLAN_ID", "\"premium-monthly\"")

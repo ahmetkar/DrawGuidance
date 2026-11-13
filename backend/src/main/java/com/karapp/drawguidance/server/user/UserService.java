@@ -73,6 +73,20 @@ public class UserService {
         public String verifiedEmail() { return verified ? email : null; }
     }
 
+    /** Firebase'in desteklediği giriş sağlayıcılarından bu uygulamanın kullandıkları (Google ve Apple). */
+    static final java.util.Set<String> SIGN_IN_PROVIDERS = java.util.Set.of("google.com", "apple.com");
+
+    /**
+     * Jetondaki giriş sağlayıcısı ({@code firebase.sign_in_provider}: {@code google.com} ya da {@code apple.com});
+     * başka/eksikse {@code null}. Firebase jetonu imzalı olduğundan istemci bunu değiştiremez.
+     */
+    public static String signInProvider(Jwt jwt) {
+        Object firebase = jwt.getClaims().get("firebase");
+        if (!(firebase instanceof java.util.Map<?, ?> map)) return null;
+        Object provider = map.get("sign_in_provider");
+        return provider instanceof String p && SIGN_IN_PROVIDERS.contains(p) ? p : null;
+    }
+
     private static Query byUid(String uid) { return Query.query(Criteria.where(UID).is(uid)); }
 
     public User get(String uid) {
@@ -141,6 +155,11 @@ public class UserService {
     }
 
     public User upsert(String uid, UserRequest body, TokenEmail tokenEmail) {
+        return upsert(uid, body, tokenEmail, null);
+    }
+
+    /** @param provider girişin yapıldığı sağlayıcı ({@link #signInProvider}); {@code null} ise kayıttaki değer kalır */
+    public User upsert(String uid, UserRequest body, TokenEmail tokenEmail, String provider) {
         if (!uid.equals(body.firebaseUid())) {
             throw ApiException.forbidden("uid_mismatch", "Gövdedeki firebaseUid jetondaki kullanıcıyla aynı değil");
         }
@@ -154,24 +173,25 @@ public class UserService {
 
         if (newId == null) {
             // Geçersiz id yalnız kayıt varsa yok sayılabilir (id zaten değişmez)
-            User existing = mongo.findAndModify(byUid(uid), fields(body, email, emailVerified, birthDate, now), returnNew, User.class, Stores.USERS);
+            User existing = mongo.findAndModify(byUid(uid), fields(body, email, emailVerified, birthDate, now, provider), returnNew, User.class, Stores.USERS);
             if (existing == null) throw ApiException.badRequest("invalid_id", "id UUID biçiminde olmalı (ör. 0f8fad5b-d9cb-469f-a165-70867728950e)");
             return existing;
         }
-        Update insertOrUpdate = fields(body, email, emailVerified, birthDate, now).setOnInsert("_id", newId).setOnInsert("createdAt", now);
+        Update insertOrUpdate = fields(body, email, emailVerified, birthDate, now, provider).setOnInsert("_id", newId).setOnInsert("createdAt", now);
         try {
             return mongo.findAndModify(byUid(uid), insertOrUpdate, FindAndModifyOptions.options().returnNew(true).upsert(true), User.class, Stores.USERS);
         } catch (DuplicateKeyException e) {
             // Aynı uid için eşzamanlı ilk kayıt: diğer istek önce ekledi → güncelleme olarak yinele
-            User again = mongo.findAndModify(byUid(uid), fields(body, email, emailVerified, birthDate, now), returnNew, User.class, Stores.USERS);
+            User again = mongo.findAndModify(byUid(uid), fields(body, email, emailVerified, birthDate, now, provider), returnNew, User.class, Stores.USERS);
             if (again == null) throw ApiException.conflict("id_conflict", "Bu id başka bir kullanıcı kaydında kullanılıyor");
             return again;
         }
     }
 
     /** Gövdedeki alanların tamamı yazılır (PUT: verilmeyen alan null olur). */
-    private static Update fields(UserRequest b, String email, boolean emailVerified, String birthDate, Instant now) {
+    private static Update fields(UserRequest b, String email, boolean emailVerified, String birthDate, Instant now, String provider) {
         Update update = new Update();
+        if (provider != null) update.set("signInProvider", provider);
         // v36 onay bilgisi yalnız gönderildiyse yazılır (eski istemciler var olan onayı silmesin)
         if (b.termsAcceptedAt() != null) update.set("termsAcceptedAt", b.termsAcceptedAt());
         if (b.termsVersion() != null) update.set("termsVersion", b.termsVersion());

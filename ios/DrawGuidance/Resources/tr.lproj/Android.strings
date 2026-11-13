@@ -53,8 +53,9 @@
 "account_sign_out_text" = "Google hesabından çıkış yapılsın mı? Çizimlerin cihazda kalır; aynı hesapla yeniden girebilirsin.";
 "account_signed_in" = "Giriş yapıldı.";
 "account_signed_out" = "Çıkış yapıldı.";
+"account_signin_apple" = "Apple ile giriş yap";
 "account_signin_google" = "Google ile giriş yap";
-"account_signin_text" = "Google hesabınla giriş yap ve premium ayrıcalıklarından faydalan ve özel deneyimin keyfini çıkar.";
+"account_signin_text" = "Google ya da Apple hesabınla giriş yap ve premium ayrıcalıklarından faydalan ve özel deneyimin keyfini çıkar.";
 "account_sync_pending" = "Bağlantı gelince yazılacak";
 "account_synced" = "Eşitlendi";
 "account_title" = "Hesap";

@@ -33,7 +33,7 @@ public class UserController {
     @PutMapping("/me")
     public User.Response put(@AuthenticationPrincipal Jwt jwt, @Valid @RequestBody UserRequest body) {
         // v40 e-posta ve doğrulanmışlığı jetondan (gövdedeki değerlere güvenilmez; bkz. UserService.TokenEmail)
-        return users.upsert(jwt.getSubject(), body, UserService.TokenEmail.of(jwt)).toResponse();
+        return users.upsert(jwt.getSubject(), body, UserService.TokenEmail.of(jwt), UserService.signInProvider(jwt)).toResponse();
     }
 
     @DeleteMapping("/me")

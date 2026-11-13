@@ -1851,8 +1851,9 @@
     <string name="help_simple_paint_background">Changes the color of the paper (background).</string>
     <string name="account_title">Account</string>
     <string name="account_busy">Signing in…</string>
-    <string name="account_signin_text">Sign in with your Google account to enjoy Premium benefits and your personalized experience.</string>
+    <string name="account_signin_text">Sign in with your Google or Apple account to enjoy Premium benefits and your personalized experience.</string>
     <string name="account_signin_google">Sign in with Google</string>
+    <string name="account_signin_apple">Sign in with Apple</string>
     <string name="account_settings">Account settings</string>
     <string name="account_sign_out">Sign out</string>
     <string name="account_sign_out_text">Sign out of your Google account? Your drawings stay on the device; you can sign back in with the same account.</string>

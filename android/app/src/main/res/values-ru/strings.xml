@@ -1851,8 +1851,9 @@
     <string name="help_simple_paint_background">Меняет цвет листа (фона).</string>
     <string name="account_title">Аккаунт</string>
     <string name="account_busy">Вход…</string>
-    <string name="account_signin_text">Войдите с аккаунтом Google, пользуйтесь преимуществами Premium и наслаждайтесь персональным опытом.</string>
+    <string name="account_signin_text">Войдите с аккаунтом Google или Apple, пользуйтесь преимуществами Premium и наслаждайтесь персональным опытом.</string>
     <string name="account_signin_google">Войти через Google</string>
+    <string name="account_signin_apple">Вход с Apple</string>
     <string name="account_settings">Настройки аккаунта</string>
     <string name="account_sign_out">Выйти</string>
     <string name="account_sign_out_text">Выйти из аккаунта Google? Ваши рисунки останутся на устройстве; позже можно снова войти в тот же аккаунт.</string>

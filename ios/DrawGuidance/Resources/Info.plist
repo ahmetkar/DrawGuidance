@@ -25,6 +25,12 @@
 	<key>NSCameraUsageDescription</key><string>Tuvale fotoğraf eklemek için.</string>
 	<!-- AdMob: Google'ın test uygulama kimliği (gerçek kimlik gelene kadar) -->
 	<key>GADApplicationIdentifier</key><string>ca-app-pub-3940256099942544~1458002511</string>
+	<!-- Google ile giriş: hesap seçiciden dönüş adresi (REVERSED_CLIENT_ID; bkz. project.yml DG_GOOGLE_URL_SCHEME) -->
+	<key>CFBundleURLTypes</key>
+	<array><dict>
+		<key>CFBundleURLName</key><string>google-sign-in</string>
+		<key>CFBundleURLSchemes</key><array><string>$(DG_GOOGLE_URL_SCHEME)</string></array>
+	</dict></array>
 	<key>DGTeamId</key><string>$(DEVELOPMENT_TEAM)</string>
 	<key>DGRaspEnforce</key><string>$(DG_RASP_ENFORCE)</string>
 	<key>ITSAppUsesNonExemptEncryption</key><false/>

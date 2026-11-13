@@ -53,8 +53,9 @@
 "account_sign_out_text" = "هل تريد تسجيل الخروج من حساب Google؟ تبقى رسوماتك على الجهاز؛ ويمكنك الدخول مجددًا بالحساب نفسه.";
 "account_signed_in" = "تم تسجيل الدخول.";
 "account_signed_out" = "تم تسجيل الخروج.";
+"account_signin_apple" = "تسجيل الدخول باستخدام Apple";
 "account_signin_google" = "تسجيل الدخول باستخدام Google";
-"account_signin_text" = "سجّل الدخول بحساب Google واستفد من مزايا Premium واستمتع بتجربتك الخاصة.";
+"account_signin_text" = "سجّل الدخول بحساب Google أو Apple واستفد من مزايا Premium واستمتع بتجربتك الخاصة.";
 "account_sync_pending" = "ستُكتب عند عودة الاتصال";
 "account_synced" = "تمت المزامنة";
 "account_title" = "الحساب";

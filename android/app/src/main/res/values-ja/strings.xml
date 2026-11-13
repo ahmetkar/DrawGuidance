@@ -1851,8 +1851,9 @@
     <string name="help_simple_paint_background">用紙（背景）の色を変更します。</string>
     <string name="account_title">アカウント</string>
     <string name="account_busy">ログイン中…</string>
-    <string name="account_signin_text">Google アカウントでログインして、Premium の特典とあなただけの体験を楽しみましょう。</string>
+    <string name="account_signin_text">Google または Apple アカウントでログインして、Premium の特典とあなただけの体験を楽しみましょう。</string>
     <string name="account_signin_google">Googleでログイン</string>
+    <string name="account_signin_apple">Appleでサインイン</string>
     <string name="account_settings">アカウント設定</string>
     <string name="account_sign_out">ログアウト</string>
     <string name="account_sign_out_text">Googleアカウントからログアウトしますか？作品は端末に残ります。同じアカウントで再びログインできます。</string>

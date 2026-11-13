@@ -90,5 +90,5 @@ fun SignInResultDialog(outcome: SignInOutcome, onRetry: () -> Unit, onDismiss: (
 @Composable
 internal fun SignInResultHost(vm: AccountViewModel, outcome: SignInOutcome?) {
     val context = LocalContext.current
-    outcome?.let { o -> SignInResultDialog(o, onRetry = { context.findActivity()?.let { vm.signIn(it) } }, onDismiss = vm::consumeSignInOutcome) }
+    outcome?.let { o -> SignInResultDialog(o, onRetry = { context.findActivity()?.let { vm.signIn(it, vm.lastMethod) } }, onDismiss = vm::consumeSignInOutcome) }
 }

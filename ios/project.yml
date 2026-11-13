@@ -14,12 +14,23 @@ packages:
   GoogleUMP:
     url: https://github.com/googleads/swift-package-manager-google-user-messaging-platform
     exactVersion: 2.7.0
+  # Google ve Apple ile giriş (Firebase Authentication; Android ile aynı Firebase projesi)
+  Firebase:
+    url: https://github.com/firebase/firebase-ios-sdk
+    exactVersion: 11.15.0
+  GoogleSignIn:
+    url: https://github.com/google/GoogleSignIn-iOS
+    exactVersion: 8.0.0
 settings:
   base:
     MARKETING_VERSION: "1.7.0"
     CURRENT_PROJECT_VERSION: "49"
     SWIFT_VERSION: "5.0"
-    DEVELOPMENT_TEAM: ""
+    # Apple Developer takım kimliği (gizli değil; imzalama ve freeRASP imza denetimi için)
+    DEVELOPMENT_TEAM: "G3LKL7QH6D"
+    # Google girişinin geri dönüş adresi: GoogleService-Info.plist'teki REVERSED_CLIENT_ID
+    # (com.googleusercontent.apps.…). CI bunu plist'ten okuyup verir; boşsa Google düğmesi kapalı kalır.
+    DG_GOOGLE_URL_SCHEME: ""
 targets:
   DrawGuidance:
     type: application
@@ -34,16 +45,27 @@ targets:
       - path: ../android/app/src/main/assets/templates
         type: folder
         buildPhase: resources
+      # Kullanım şartları ve KVKK metni (hesap açılırken onaylanır; Android ile ortak)
+      - path: ../android/app/src/main/assets/legal
+        type: folder
+        buildPhase: resources
     dependencies:
       - package: TalsecRuntime
       - package: GoogleMobileAds
       - package: GoogleUMP
         product: GoogleUserMessagingPlatform
+      - package: Firebase
+        product: FirebaseAuth
+      - package: Firebase
+        product: FirebaseCore
+      - package: GoogleSignIn
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.karapp.drawguidance
         PRODUCT_NAME: DrawGuidance
         INFOPLIST_FILE: DrawGuidance/Resources/Info.plist
+        # Apple ile giriş yetkisi (App ID'de "Sign in with Apple" açık olmalı)
+        CODE_SIGN_ENTITLEMENTS: DrawGuidance/Resources/DrawGuidance.entitlements
         TARGETED_DEVICE_FAMILY: "1,2"
         ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
         ENABLE_TESTABILITY: YES

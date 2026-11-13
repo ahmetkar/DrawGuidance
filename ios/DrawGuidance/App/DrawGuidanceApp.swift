@@ -11,6 +11,8 @@ struct DrawGuidanceApp: App {
         RaspGuard.start()
         // Tuval resimleri: önbellekten düşen resimler dosyadan yeniden çözülür
         CanvasAssetStore.shared.install()
+        // Google ve Apple ile giriş (GoogleService-Info.plist pakette varsa Firebase açılır)
+        FirebaseAuthService.configure()
         // Koddaki Türkçe metinlerin (3B şekil adları, iletiler) çevirisi
         I18n.setLanguage(I18n.systemLanguage())
     }
@@ -21,6 +23,9 @@ struct DrawGuidanceApp: App {
                 .environmentObject(store)
                 .environmentObject(models3d)
                 .preferredColorScheme(ThemeMode(rawValue: theme)?.scheme)
+                // Google hesap seçicisinden dönüş
+                .onOpenURL { _ = FirebaseAuthService.handle($0) }
+                .task { await AccountStore.shared.restore() }
         }
     }
 }

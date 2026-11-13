@@ -11,7 +11,9 @@ import java.time.Instant;
 public record User(@Id String id, String firebaseUid, String displayName, String givenName, String familyName,
                    String email, Boolean emailVerified, String photoUrl, Long accountCreatedAt, String birthDate,
                    Long clientUpdatedAt, Instant createdAt, Instant updatedAt, Long version,
-                   Long termsAcceptedAt, String termsVersion) {
+                   Long termsAcceptedAt, String termsVersion,
+                   // Google ya da Apple ile giriş ("google.com" / "apple.com"); jetondan yazılır, yanıtta yok
+                   String signInProvider) {
 
     /** Sözleşmedeki yanıt alanları (sırasıyla). */
     public record Response(String id, String firebaseUid, String displayName, String givenName, String familyName,

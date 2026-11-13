@@ -53,8 +53,9 @@
 "account_sign_out_text" = "Выйти из аккаунта Google? Ваши рисунки останутся на устройстве; позже можно снова войти в тот же аккаунт.";
 "account_signed_in" = "Вход выполнен.";
 "account_signed_out" = "Выход выполнен.";
+"account_signin_apple" = "Вход с Apple";
 "account_signin_google" = "Войти через Google";
-"account_signin_text" = "Войдите с аккаунтом Google, пользуйтесь преимуществами Premium и наслаждайтесь персональным опытом.";
+"account_signin_text" = "Войдите с аккаунтом Google или Apple, пользуйтесь преимуществами Premium и наслаждайтесь персональным опытом.";
 "account_sync_pending" = "Будет записано, когда появится связь";
 "account_synced" = "Синхронизировано";
 "account_title" = "Аккаунт";

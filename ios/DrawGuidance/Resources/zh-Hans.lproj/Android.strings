@@ -53,8 +53,9 @@
 "account_sign_out_text" = "要退出 Google 账号吗？你的绘图会保留在设备上；之后可用同一账号重新登录。";
 "account_signed_in" = "已登录。";
 "account_signed_out" = "已退出登录。";
+"account_signin_apple" = "通过 Apple 登录";
 "account_signin_google" = "使用 Google 登录";
-"account_signin_text" = "使用 Google 账号登录，享受高级版特权和专属体验。";
+"account_signin_text" = "使用 Google 或 Apple 账号登录，享受高级版特权和专属体验。";
 "account_sync_pending" = "联网后写入";
 "account_synced" = "已同步";
 "account_title" = "账号";

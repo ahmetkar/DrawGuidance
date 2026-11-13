@@ -17,6 +17,7 @@ import com.google.firebase.FirebaseApp
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.GoogleAuthProvider
+import com.google.firebase.auth.OAuthProvider
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
@@ -34,6 +35,9 @@ data class GoogleAccount(
     val accountCreatedAt: Long?,
 )
 
+/** Giriş yöntemi: Google hesabı ya da Apple kimliği (ikisi de Firebase Authentication üzerinden). */
+enum class SignInMethod { GOOGLE, APPLE }
+
 /** Giriş hatası: [reason] kullanıcıya gösterilecek iletiyi seçer. */
 class AuthException(val reason: Reason, message: String? = null) : Exception(message ?: reason.name) {
     enum class Reason { CANCELLED, NO_ACCOUNT, NOT_CONFIGURED, NETWORK, FAILED }
@@ -47,8 +51,14 @@ interface AuthProvider {
     /** Bu derlemede giriş yapılandırılmış mı (google-services.json ile derlendiyse). */
     val available: Boolean
 
-    /** Google hesabıyla giriş: hesap seçici açılır (v34: hesabı değiştir kaldırıldı). */
-    suspend fun signIn(activity: Activity): GoogleAccount
+    /** Apple ile giriş gösterilsin mi (Firebase'te Apple sağlayıcısı açıldıysa derlemede `dg.appleSignIn=true`). */
+    val appleAvailable: Boolean get() = false
+
+    /**
+     * Giriş: Google'da hesap seçici açılır (v34: hesabı değiştir kaldırıldı); Apple'da Apple'ın giriş sayfası (Chrome
+     * Özel Sekmesi) açılır.
+     */
+    suspend fun signIn(activity: Activity, method: SignInMethod = SignInMethod.GOOGLE): GoogleAccount
 
     /**
      * v34 hesap silmeden önce kimliğin yeniden doğrulanması (Firebase, yakın zamanda giriş yapılmış olmasını ister).
@@ -104,7 +114,10 @@ class FirebaseGoogleAuth(private val context: Context) : AuthProvider {
 
     override val available: Boolean get() = webClientId() != null && auth() != null
 
-    override suspend fun signIn(activity: Activity): GoogleAccount {
+    override val appleAvailable: Boolean get() = com.karapp.drawguidance.BuildConfig.APPLE_SIGN_IN && available
+
+    override suspend fun signIn(activity: Activity, method: SignInMethod): GoogleAccount {
+        if (method == SignInMethod.APPLE) return appleSignIn(activity)
         val clientId = webClientId() ?: throw AuthException(AuthException.Reason.NOT_CONFIGURED)
         val firebase = auth() ?: throw AuthException(AuthException.Reason.NOT_CONFIGURED)
         val google = googleToken(activity, clientId, reauth = false)
@@ -126,6 +139,14 @@ class FirebaseGoogleAuth(private val context: Context) : AuthProvider {
     override suspend fun reauthenticate(activity: Activity) {
         val clientId = webClientId() ?: throw AuthException(AuthException.Reason.NOT_CONFIGURED)
         val user = auth()?.currentUser ?: throw AuthException(AuthException.Reason.FAILED, "Oturum yok")
+        if (isAppleUser(user)) {
+            try {
+                user.startActivityForReauthenticateWithProvider(activity, appleProvider()).await()
+            } catch (e: Exception) {
+                throw appleError(e)
+            }
+            return
+        }
         val google = googleToken(activity, clientId, reauth = true)
         try {
             user.reauthenticate(GoogleAuthProvider.getCredential(google.idToken, null)).await()
@@ -143,6 +164,60 @@ class FirebaseGoogleAuth(private val context: Context) : AuthProvider {
             throw AuthException(if (isNetwork(e)) AuthException.Reason.NETWORK else AuthException.Reason.FAILED, e.message)
         }
         runCatching { CredentialManager.create(context).clearCredentialState(ClearCredentialStateRequest()) }
+    }
+
+    /**
+     * Apple ile giriş: Firebase, Apple'ın giriş sayfasını Chrome Özel Sekmesi'nde açar (Android'de Apple'ın yerel
+     * penceresi yok). Apple adı yalnız ilk girişte verir; e-postayı gizleyen kullanıcıda e-posta
+     * `…@privaterelay.appleid.com` olur. Aynı e-posta Google hesabıyla kayıtlıysa Firebase çakışma bildirir: kullanıcı
+     * Google ile girmelidir (hesaplar bu sürümde birleştirilmez).
+     */
+    private suspend fun appleSignIn(activity: Activity): GoogleAccount {
+        val firebase = auth() ?: throw AuthException(AuthException.Reason.NOT_CONFIGURED)
+        if (!com.karapp.drawguidance.BuildConfig.APPLE_SIGN_IN) throw AuthException(AuthException.Reason.NOT_CONFIGURED)
+        val result = try {
+            // Etkinlik giriş sırasında yeniden oluşturulduysa sonuç bekleyen işlemdedir
+            firebase.pendingAuthResult?.await() ?: firebase.startActivityForSignInWithProvider(activity, appleProvider()).await()
+        } catch (e: Exception) {
+            com.karapp.drawguidance.diagnostics.AppLog.w(TAG, "Apple ile giriş başarısız", e)
+            throw appleError(e)
+        }
+        val user = result.user ?: throw AuthException(AuthException.Reason.FAILED)
+        // İlk girişte Apple'ın verdiği ad Firebase profiline yazılır (sonraki girişlerde Apple adı göndermez)
+        val profile = result.additionalUserInfo?.profile
+        val appleName = (profile?.get("name") as? Map<*, *>)
+        val given = appleName?.get("firstName") as? String
+        val family = appleName?.get("lastName") as? String
+        if (user.displayName.isNullOrBlank() && (given != null || family != null)) {
+            val display = listOfNotNull(given, family).joinToString(" ")
+            runCatching { user.updateProfile(com.google.firebase.auth.UserProfileChangeRequest.Builder().setDisplayName(display).build()).await() }
+        }
+        return account(user, given, family, null)
+    }
+
+    private fun appleProvider(): OAuthProvider = OAuthProvider.newBuilder("apple.com")
+        .setScopes(listOf("email", "name"))
+        .addCustomParameter("locale", java.util.Locale.getDefault().toLanguageTag().replace('-', '_'))
+        .build()
+
+    private fun isAppleUser(user: FirebaseUser): Boolean {
+        val ids = user.providerData.map { it.providerId }
+        return "apple.com" in ids && "google.com" !in ids
+    }
+
+    /** Firebase hata kodundan giriş hatası (Apple akışı). */
+    private fun appleError(e: Exception): AuthException {
+        if (e is AuthException) return e
+        val code = (e as? com.google.firebase.auth.FirebaseAuthException)?.errorCode
+        return when {
+            code == "ERROR_WEB_CONTEXT_CANCELED" || code == "ERROR_WEB_CONTEXT_ALREADY_PRESENTED" -> AuthException(AuthException.Reason.CANCELLED)
+            code == "ERROR_OPERATION_NOT_ALLOWED" -> AuthException(AuthException.Reason.NOT_CONFIGURED, "Apple: Firebase'te Apple sağlayıcısı açık değil")
+            e is com.google.firebase.auth.FirebaseAuthUserCollisionException ->
+                AuthException(AuthException.Reason.FAILED, "Bu e-posta adresi Google hesabıyla kayıtlı; Google ile giriş yapın")
+            isNetwork(e) -> AuthException(AuthException.Reason.NETWORK)
+            isAccountProblem(e) -> AuthException(AuthException.Reason.NO_ACCOUNT, "Apple: ${e.message}")
+            else -> AuthException(AuthException.Reason.FAILED, "Apple: ${code ?: e.message}")
+        }
     }
 
     /** Google kimlik jetonu ve Google'ın verdiği ad/fotoğraf. */

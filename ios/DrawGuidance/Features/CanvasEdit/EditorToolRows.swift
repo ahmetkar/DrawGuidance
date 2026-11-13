@@ -8,6 +8,8 @@ struct ToolButton: View {
     var selected = false
     var enabled = true
     var id: String? = nil
+    /// Eğitimde tanıtılan aracın yeri.
+    var anchor: String? = nil
     let action: () -> Void
 
     var body: some View {
@@ -18,6 +20,7 @@ struct ToolButton: View {
         .disabled(!enabled)
         .accessibilityLabel(label)
         .accessibilityIdentifier(id ?? label)
+        .tutorialAnchor(anchor)
     }
 }
 

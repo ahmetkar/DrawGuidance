@@ -104,11 +104,13 @@ struct SuggestionsHost: View {
                         },
                         kind: kind, onDismiss: { vm.handwriting.dismissText() }, onTurnOff: { vm.turnOffTextSuggestions() },
                         turnOffLabel: L("text_suggest_turn_off"), id: "text_suggest_chip")
+                    .tutorialAnchor(TutorialAnchor.SUGGEST_TEXT)
                 }
                 if let s = hw.shape {
                     SuggestBalloon(title: L("shape_suggest_title"), options: Self.shapeOptions(vm, s), kind: kind,
                                    onDismiss: { vm.handwriting.dismissShape() }, onTurnOff: { vm.turnOffShapeSuggestions() },
                                    turnOffLabel: L("shape_suggest_turn_off"), id: "shape_suggest_chip")
+                        .tutorialAnchor(TutorialAnchor.SUGGEST)
                 }
                 if let s = hw.line {
                     let n = s.strokeIds.count
@@ -119,6 +121,7 @@ struct SuggestionsHost: View {
                         }],
                         kind: kind, onDismiss: { vm.handwriting.dismissLine() }, onTurnOff: { vm.turnOffLineSuggestions() },
                         turnOffLabel: L("line_suggest_turn_off"), id: "line_suggest_chip")
+                    .tutorialAnchor(TutorialAnchor.SUGGEST_LINE)
                 }
             }
             .padding(.horizontal, 12)

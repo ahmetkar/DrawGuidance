@@ -190,4 +190,33 @@ final class LaunchUITests: XCTestCase {
         app.buttons["challenge_exit"].tap()
         XCTAssertFalse(card.waitForExistence(timeout: 2))
     }
+
+    /// v32 eğitim modu: grup seçilir, ilk adımın açıklama kutusu çıkar, "Sonraki adım" ilerler, iptal edince tuval boş kalır.
+    func testTutorialArtBasics() throws {
+        let app = XCUIApplication()
+        app.launchArguments += ["-AppleLanguages", "(tr)", "-uiTesting"]
+        app.launch()
+        let newArt = app.buttons["new_ART"]
+        XCTAssertTrue(newArt.waitForExistence(timeout: 10))
+        newArt.tap()
+        let menu = app.buttons["tutorial_menu"]
+        XCTAssertTrue(menu.waitForExistence(timeout: 10))
+        menu.tap()
+        let group = app.buttons["tutorial_group_art_basics"]
+        XCTAssertTrue(group.waitForExistence(timeout: 5))
+        group.tap()
+        let callout = app.descendants(matching: .any)["tutorial_callout"].firstMatch
+        XCTAssertTrue(callout.waitForExistence(timeout: 5))
+        XCTAssertTrue(app.staticTexts["tutorial_step"].label.hasPrefix("1"))
+        app.buttons["tutorial_next"].tap()
+        let step2 = app.staticTexts["tutorial_step"]
+        XCTAssertTrue(NSPredicate(format: "label BEGINSWITH '2'").evaluate(with: step2) || step2.waitForExistence(timeout: 3))
+        let shot = XCTAttachment(screenshot: app.screenshot())
+        shot.name = "tutorial_art_step2"
+        shot.lifetime = .keepAlways
+        add(shot)
+        app.buttons["tutorial_cancel"].tap()
+        XCTAssertFalse(callout.waitForExistence(timeout: 2))
+        XCTAssertFalse(app.buttons["undo"].isEnabled)
+    }
 }

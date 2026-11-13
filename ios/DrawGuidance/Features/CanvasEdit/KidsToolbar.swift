@@ -79,6 +79,7 @@ struct KidsToolbar: View {
                         .disabled(!t.enabled)
                         .accessibilityLabel(t.label)
                         .accessibilityIdentifier("kids_\(t.id)")
+                        .tutorialAnchor(t.id == "undo" ? TutorialAnchor.UNDO : t.id == "redo" ? TutorialAnchor.REDO : TutorialAnchor.simple(t.id))
                     }
                 }
                 .padding(.horizontal, 12)

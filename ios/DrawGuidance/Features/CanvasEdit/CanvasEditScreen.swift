@@ -38,11 +38,25 @@ struct CanvasEditScreen: View {
                 }
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .tutorialAnchor(TutorialAnchor.CANVAS)
+            .overlay { if vm.loaded { TutorialLiveLayer(ctl: vm.tutorial, viewport: vm.viewport) } }
             .overlay(alignment: .bottom) { if vm.loaded { TextDraftBar(vm: vm, texts: vm.texts) } }
             .overlay(alignment: .top) { if vm.loaded { ParamControlsHost(vm: vm, shapes: vm.shapes) } }
             .overlay(alignment: .bottom) { if vm.loaded { SuggestionLayer(vm: vm, hw: vm.handwriting, texts: vm.texts, ctl: vm.challenge) } }
         }
         .background(Color(uiColor: CanvasColors.background))
+        .overlayPreferenceValue(TutorialAnchorKey.self) { anchors in
+            GeometryReader { geo in
+                TutorialOverlay(ctl: vm.tutorial, viewport: vm.viewport, rects: anchors.mapValues { geo[$0] },
+                                mascot: vm.store.canvas?.kind == .KIDS)
+            }
+        }
+        .onChange(of: vm.loaded) { _, loaded in
+            if loaded, let kind = vm.store.canvas?.kind { vm.tutorial.maybeOffer(kind) }
+        }
+        .sheet(isPresented: Binding(get: { vm.tutorial.offer }, set: { if !$0 { vm.tutorial.closeOffer() } })) {
+            TutorialOfferHost(vm: vm, ctl: vm.tutorial)
+        }
         .navigationBarBackButtonHidden(true)
         .toolbar(.hidden, for: .navigationBar)
         .onAppear { if actions == nil { actions = vm.makeCanvasActions(ui) } }
@@ -138,17 +152,21 @@ private struct EditorTopBar: View {
     var body: some View {
         VStack(spacing: 6) {
             HStack(spacing: 14) {
-                Button { vm.close(); dismiss() } label: { Image(systemName: "chevron.backward") }
+                Button { if vm.tutorial.active { vm.tutorial.cancel() }; vm.close(); dismiss() } label: { Image(systemName: "chevron.backward") }
                     .accessibilityIdentifier("editor_back")
                 Text(store.canvas?.name ?? "").font(.headline).lineLimit(1)
                 Spacer()
-                Button { sheet = .elements } label: { Image(systemName: "list.bullet.rectangle") }.accessibilityIdentifier("elements_button")
-                Button { sheet = .layers } label: { Image(systemName: "square.3.layers.3d") }.accessibilityIdentifier("layers_button")
-                Button { sheet = .save } label: { Image(systemName: "square.and.arrow.down") }.accessibilityIdentifier("save_button")
+                if !vm.tutorial.groups(store.canvas?.kind ?? .ART).isEmpty {
+                    Button { vm.tutorial.openOffer() } label: { Image(systemName: "graduationcap") }
+                        .accessibilityLabel(L("tut_menu")).accessibilityIdentifier("tutorial_menu").tutorialAnchor(TutorialAnchor.MORE)
+                }
+                Button { sheet = .elements } label: { Image(systemName: "list.bullet.rectangle") }.accessibilityIdentifier("elements_button").tutorialAnchor(TutorialAnchor.ELEMENTS)
+                Button { sheet = .layers } label: { Image(systemName: "square.3.layers.3d") }.accessibilityIdentifier("layers_button").tutorialAnchor(TutorialAnchor.LAYERS)
+                Button { sheet = .save } label: { Image(systemName: "square.and.arrow.down") }.accessibilityIdentifier("save_button").tutorialAnchor(TutorialAnchor.SAVE)
                 Button { vm.undo() } label: { Image(systemName: "arrow.uturn.backward") }
-                    .disabled(!store.canUndo).accessibilityLabel(L("undo")).accessibilityIdentifier("undo")
+                    .disabled(!store.canUndo).accessibilityLabel(L("undo")).accessibilityIdentifier("undo").tutorialAnchor(TutorialAnchor.UNDO)
                 Button { vm.redo() } label: { Image(systemName: "arrow.uturn.forward") }
-                    .disabled(!store.canRedo).accessibilityLabel(L("redo")).accessibilityIdentifier("redo")
+                    .disabled(!store.canRedo).accessibilityLabel(L("redo")).accessibilityIdentifier("redo").tutorialAnchor(TutorialAnchor.REDO)
             }
             .font(.title3)
             if store.canvas?.kind != .KIDS {
@@ -160,24 +178,28 @@ private struct EditorTopBar: View {
                                 .background(RoundedRectangle(cornerRadius: 10).fill(vm.mode == m.0 ? Color.accentColor.opacity(0.2) : .clear))
                         }
                         .accessibilityIdentifier("mode_\(m.0)")
+                        .tutorialAnchor(TutorialAnchor.mode(m.0))
                     }
                     Divider().frame(height: 28)
-                    ToolButton(icon: "grid", label: L("add_guide"), id: "guide_button") { sheet = .guide }
-                    ToolButton(icon: "photo.on.rectangle", label: L("add_background"), id: "background_button") { sheet = .background }
+                    ToolButton(icon: "grid", label: L("add_guide"), id: "guide_button", anchor: TutorialAnchor.RULER) { sheet = .guide }
+                    ToolButton(icon: "photo.on.rectangle", label: L("add_background"), id: "background_button", anchor: TutorialAnchor.BACKGROUND) { sheet = .background }
                     Button { brushPickerOpen = true } label: {
                         Image(systemName: "paintbrush.pointed").frame(width: 36, height: 36)
                     }
                     .accessibilityIdentifier("brush_button")
+                    .tutorialAnchor(TutorialAnchor.BRUSH)
                     Button { brush.toggleEraser() } label: {
                         Image(systemName: "eraser").frame(width: 36, height: 36)
                             .background(RoundedRectangle(cornerRadius: 10).fill(brush.settings.brushType == .ERASER ? Color.accentColor.opacity(0.2) : .clear))
                     }
                     .accessibilityIdentifier("eraser_button")
+                    .tutorialAnchor(TutorialAnchor.ERASER)
                     ColorPicker(L("brush_color_label"), selection: Binding(
                         get: { Color(hex: brush.settings.colorHex) ?? .black },
                         set: { brush.updateColor($0.hexRGB) }), supportsOpacity: false)
                         .labelsHidden()
                         .accessibilityIdentifier("color_button")
+                        .tutorialAnchor(TutorialAnchor.BRUSH_SETTINGS)
                 }
                 .padding(.horizontal, 12)
             }
@@ -216,6 +238,17 @@ private struct SuggestionLayer: View {
                 SuggestionsHost(vm: vm, hw: hw)
             }
         }
+    }
+}
+
+/// Eğitim grubu seçimi (tamamlananlar işaretli).
+private struct TutorialOfferHost: View {
+    @ObservedObject var vm: EditorViewModel
+    @ObservedObject var ctl: TutorialController
+
+    var body: some View {
+        let kind = vm.store.canvas?.kind ?? .ART
+        TutorialOfferSheet(kind: kind, groups: ctl.groups(kind), completed: ctl.completed, onStart: { ctl.start($0) }, onDismiss: { ctl.closeOffer() })
     }
 }
 

@@ -87,6 +87,14 @@ final class EditorViewModel: ObservableObject, EditorHost {
         return c
     }()
 
+    /// v32 eğitim modu: araç gruplarının adım adım eğitimi (çizim, not alma, çizgi roman, basit türler, çocuk).
+    private(set) lazy var tutorial: TutorialController = {
+        let t = TutorialController(host: self, store: store)
+        inTutorial = { [unowned t] in t.active }
+        tutorialAiStep = { [unowned t] in t.aiStep }
+        return t
+    }()
+
     init(canvasLocalId: String, deps: EditorDependencies) {
         self.canvasLocalId = canvasLocalId
         self.deps = deps

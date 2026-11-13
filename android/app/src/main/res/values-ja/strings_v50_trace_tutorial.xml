@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- v50 "Resimden çizim" eğitimi: resmi vektörleştirme ve şekil kalıbıyla çizme -->
+<resources>
+    <string name="v50_tut_title">画像から描く</string>
+    <string name="v50_tut_summary">画像をベクター化してテンプレートにし、その上からなぞって描きます。</string>
+    <string name="v50_tut_image_t">画像を追加</string>
+    <string name="v50_tut_image_b">写真、スケッチ、完成した絵など画像を追加します。例ではティーポットを使います。</string>
+    <string name="v50_tut_vec_t">画像をベクター化</string>
+    <string name="v50_tut_vec_b">画像を選び、編集の「自動ベクター化」をタップ。輪郭が点を編集できるベクター線になります。</string>
+    <string name="v50_tut_types_t">3つの種類と微調整</string>
+    <string name="v50_tut_types_b">「エッジをベクター化」は外形を、「線をベクター化」はスケッチの中心線をとらえます。細かさとなめらかさは下のパネルで。画像を消すと線だけが残ります。</string>
+    <string name="v50_tut_pick_t">ベクターをテンプレートに</string>
+    <string name="v50_tut_pick_b">図形テンプレートを開いて線をタップすると、半透明のテンプレートになります。ハンドルで移動・拡大縮小できます。</string>
+    <string name="v50_tut_trace_t">テンプレートで描く</string>
+    <string name="v50_tut_trace_b">テンプレートの縁の近くを描くとペンが縁に沿い、線がぶれません。「ロック」でテンプレートを固定できます。</string>
+    <string name="v50_tut_lib_t">ライブラリのテンプレート</string>
+    <string name="v50_tut_lib_b">「ライブラリから」をタップして、ネコ、星、ハートなどの図形を選びます。「完了」で通常の描画に戻ります。</string>
+    <string name="v50_tut_kids_title">型で描こう</string>
+    <string name="v50_tut_kids_summary">形をえらんで、ふちをなぞろう。</string>
+    <string name="v50_tut_kids_t">型をえらぶ</string>
+    <string name="v50_tut_kids_b">「ステンシル」をタップして形をえらぼう。キャンバスにうすく出てくるよ。</string>
+    <string name="v50_tut_kids2_t">ふちをなぞる</string>
+    <string name="v50_tut_kids2_b">形のふちの近くを描くと、ペンが線にそって動くよ！</string>
+</resources>

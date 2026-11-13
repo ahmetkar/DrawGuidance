@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- v50 "Resimden çizim" eğitimi: resmi vektörleştirme ve şekil kalıbıyla çizme -->
+<resources>
+    <string name="v50_tut_title">Рисование по картинке</string>
+    <string name="v50_tut_summary">Векторизуйте изображение, сделайте из него шаблон и рисуйте по нему.</string>
+    <string name="v50_tut_image_t">Добавьте изображение</string>
+    <string name="v50_tut_image_b">Добавьте изображение: фото, эскиз или готовый рисунок. В примере — чайник.</string>
+    <string name="v50_tut_vec_t">Векторизуйте изображение</string>
+    <string name="v50_tut_vec_b">Выберите изображение и нажмите «Автовекторизация» в разделе «Правка». Края превратятся в векторные линии с редактируемыми точками.</string>
+    <string name="v50_tut_types_t">Три вида и тонкая настройка</string>
+    <string name="v50_tut_types_b">«Векторизовать края» берёт контуры, «Векторизовать линии» — осевые линии эскиза. Детализация и сглаживание — в панели внизу. Удалите изображение, и останутся только линии.</string>
+    <string name="v50_tut_pick_t">Вектор как шаблон</string>
+    <string name="v50_tut_pick_b">Откройте шаблон фигуры и коснитесь линий: рисунок станет полупрозрачным шаблоном. Перемещайте и масштабируйте его маркерами.</string>
+    <string name="v50_tut_trace_t">Рисуйте по шаблону</string>
+    <string name="v50_tut_trace_b">Рисуйте у края шаблона: перо следует за краем, линия не дрожит. Нажмите «Закрепить», чтобы шаблон не сдвигался.</string>
+    <string name="v50_tut_lib_t">Шаблон из библиотеки</string>
+    <string name="v50_tut_lib_b">Нажмите «Из библиотеки» и выберите фигуру: кошку, звезду, сердце и другие. «Готово» возвращает к обычному рисованию.</string>
+    <string name="v50_tut_kids_title">Рисуем по трафарету</string>
+    <string name="v50_tut_kids_summary">Выбери фигуру и обведи её край.</string>
+    <string name="v50_tut_kids_t">Выбери трафарет</string>
+    <string name="v50_tut_kids_b">Нажми «Трафарет» и выбери фигуру. Она бледно появится на холсте.</string>
+    <string name="v50_tut_kids2_t">Обведи край</string>
+    <string name="v50_tut_kids2_b">Рисуй рядом с краем фигуры — карандаш сам пойдёт по линии!</string>
+</resources>

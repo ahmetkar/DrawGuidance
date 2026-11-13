@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- v50 "Resimden çizim" eğitimi: resmi vektörleştirme ve şekil kalıbıyla çizme -->
+<resources>
+    <string name="v50_tut_title">이미지로 그리기</string>
+    <string name="v50_tut_summary">이미지를 벡터로 바꾸고 템플릿으로 만들어 그 위에 그려 보세요.</string>
+    <string name="v50_tut_image_t">이미지 추가</string>
+    <string name="v50_tut_image_b">사진, 스케치, 완성된 그림 등 이미지를 추가하세요. 예시에서는 찻주전자를 사용합니다.</string>
+    <string name="v50_tut_vec_t">이미지 벡터화</string>
+    <string name="v50_tut_vec_b">이미지를 선택하고 편집에서 \"자동 벡터화\"를 탭하세요. 가장자리가 점을 편집할 수 있는 벡터 선이 됩니다.</string>
+    <string name="v50_tut_types_t">세 가지 종류와 세부 조정</string>
+    <string name="v50_tut_types_b">\"가장자리 벡터화\"는 윤곽선을, \"선 벡터화\"는 스케치의 중심선을 따릅니다. 디테일과 매끄러움은 아래 창에서 조절합니다. 이미지를 지우면 선만 남습니다.</string>
+    <string name="v50_tut_pick_t">벡터를 템플릿으로</string>
+    <string name="v50_tut_pick_b">도형 템플릿을 열고 선을 탭하면 반투명 템플릿이 됩니다. 핸들로 옮기고 크기를 조절하세요.</string>
+    <string name="v50_tut_trace_t">템플릿으로 그리기</string>
+    <string name="v50_tut_trace_b">템플릿 가장자리 가까이 그리면 펜이 가장자리를 따라가 선이 흔들리지 않습니다. \"잠금\"을 탭하면 템플릿이 고정됩니다.</string>
+    <string name="v50_tut_lib_t">라이브러리 템플릿</string>
+    <string name="v50_tut_lib_b">\"라이브러리에서\"를 탭하고 고양이, 별, 하트 등 도형을 고르세요. \"완료\"를 누르면 일반 그리기로 돌아갑니다.</string>
+    <string name="v50_tut_kids_title">틀로 그리기</string>
+    <string name="v50_tut_kids_summary">모양을 골라 가장자리를 따라 그려요.</string>
+    <string name="v50_tut_kids_t">틀 고르기</string>
+    <string name="v50_tut_kids_b">\"틀\"을 탭하고 모양을 골라요. 캔버스에 흐리게 나타나요.</string>
+    <string name="v50_tut_kids2_t">가장자리 따라 그리기</string>
+    <string name="v50_tut_kids2_b">모양의 가장자리 가까이 그리면 펜이 저절로 선을 따라가요!</string>
+</resources>

@@ -82,7 +82,7 @@ class V41TutorialsTest : V32EditorBase() {
             assertTrue(kind.name, TutorialScripts.groups(kind).any { it.id == fresh!!.id })
         }
         // v48 yenilikler yeni menü sistemini tanıtır (mod menüsü, Özellikler, Taşı/Genişlet)
-        val comic = TutorialScripts.whatsNew(CanvasKind.COMIC)!!
+        val comic = TutorialScripts.groups(CanvasKind.COMIC).first { it.id == "v48_advanced_comic" }
         assertTrue(comic.steps.any { it.anchor == com.karapp.drawguidance.ui.screens.canvasedit.tutorial.TutorialAnchor.BRUSH_SETTINGS })
         // Mekân arka planı eğitimi çizgi romanın tüm grupları arasında korunur
         assertTrue(TutorialScripts.groups(CanvasKind.COMIC).any { g -> g.steps.any { it.anchor == com.karapp.drawguidance.ui.screens.canvasedit.tutorial.TutorialAnchor.add("locations") } })

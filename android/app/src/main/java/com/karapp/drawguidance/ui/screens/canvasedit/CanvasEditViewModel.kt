@@ -12,6 +12,7 @@ import com.karapp.drawguidance.data.images.ImageIssue
 import com.karapp.drawguidance.data.images.ImagesRepository
 import com.karapp.drawguidance.data.images.PreparedImage
 import com.karapp.drawguidance.data.model.BrushType
+import kotlinx.coroutines.flow.first
 import com.karapp.drawguidance.ui.screens.canvasedit.editor.ElementOps
 import com.karapp.drawguidance.data.model.CanvasUi
 import com.karapp.drawguidance.data.model.DiagramBox
@@ -2130,6 +2131,25 @@ class CanvasEditViewModel(
         override val guides get() = ruler
         override fun setPageSettings(settings: com.karapp.drawguidance.data.model.PageSettings) = store.updateCanvas { it.copy(pageSettings = settings) }
         override suspend fun assetImage(path: String, target: Rect, fill: Boolean) = images.assetImageStroke(path, target, fill)
+        // v50 "Resimden çizim" eğitimi: resmi düzenlemeye açma ve vektörleştirme (bitene kadar beklenir)
+        override fun editImage(id: String) {
+            store.select(setOf(id))
+            startAction(EditMode.IMAGE_EDIT, setOf(id))
+        }
+        override suspend fun vectorizeImage(id: String, mode: com.karapp.drawguidance.content.trace.EdgeMode, lineWidth: Float, keepImage: Boolean): Stroke? {
+            val image = store.canvas.value?.strokes?.firstOrNull { it.id == id && it.brushType == BrushType.IMAGE } ?: return null
+            store.select(setOf(id))
+            // Seçim akışı ve resmin önbelleğe yüklenmesi beklenir (resim tuvalde çizilince önbelleğe girer)
+            kotlinx.coroutines.withTimeoutOrNull(8_000) {
+                while (imageEdit.selected.value?.id != id || com.karapp.drawguidance.data.images.CanvasImageCache.get(image.assetId) == null) {
+                    kotlinx.coroutines.delay(50)
+                }
+            } ?: return null
+            val before = store.canvas.value?.strokes?.map { it.id }?.toSet().orEmpty()
+            imageEdit.vectorize(com.karapp.drawguidance.content.trace.EdgeOptions(mode = mode), lineWidth, keepImage)
+            kotlinx.coroutines.withTimeoutOrNull(30_000) { imageEdit.tracing.first { tracing -> !tracing } }
+            return store.canvas.value?.strokes?.lastOrNull { it.id !in before && it.shape?.kind == com.karapp.drawguidance.ui.drawing.ShapeRegistry.TRACED }
+        }
     }
 
     /** v32 eğitim modu: araç gruplarının adım adım eğitimi (çizim, not alma, çizgi roman). */

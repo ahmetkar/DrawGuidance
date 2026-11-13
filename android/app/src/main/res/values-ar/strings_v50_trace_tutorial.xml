@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- v50 "Resimden çizim" eğitimi: resmi vektörleştirme ve şekil kalıbıyla çizme -->
+<resources>
+    <string name="v50_tut_title">الرسم من الصور</string>
+    <string name="v50_tut_summary">حوّل صورة إلى متجهات، واجعلها قالبًا وارسم فوقه.</string>
+    <string name="v50_tut_image_t">أضف صورة</string>
+    <string name="v50_tut_image_b">أضف صورة: صورة فوتوغرافية أو رسمًا تخطيطيًا أو رسمًا جاهزًا. في المثال إبريق شاي.</string>
+    <string name="v50_tut_vec_t">حوّل الصورة إلى متجهات</string>
+    <string name="v50_tut_vec_b">حدد الصورة واضغط \"تحويل تلقائي إلى متجهات\" في التعديل. تتحول حواف الصورة إلى خطوط متجهة بنقاط قابلة للتعديل.</string>
+    <string name="v50_tut_types_t">ثلاثة أنواع وضبط دقيق</string>
+    <string name="v50_tut_types_b">\"تحويل الحواف\" يأخذ الخطوط الخارجية، و\"تحويل الخطوط\" يتبع الخط الأوسط للرسم التخطيطي. التفاصيل والتنعيم في النافذة السفلية. احذف الصورة لتبقى الخطوط وحدها.</string>
+    <string name="v50_tut_pick_t">اجعل المتجه قالبًا</string>
+    <string name="v50_tut_pick_b">افتح قالب الشكل واضغط على الخطوط: يصبح الرسم قالبًا شفافًا. حرّكه وغيّر حجمه بالمقابض.</string>
+    <string name="v50_tut_trace_t">ارسم بالقالب</string>
+    <string name="v50_tut_trace_b">ارسم قرب حافة القالب: يتبع القلم الحافة ويبقى خطك ثابتًا. اضغط \"قفل\" ليبقى القالب في مكانه.</string>
+    <string name="v50_tut_lib_t">قالب من المكتبة</string>
+    <string name="v50_tut_lib_b">اضغط \"من المكتبة\" واختر شكلًا جاهزًا: قطة أو نجمة أو قلب وغير ذلك. اضغط \"إنهاء\" للعودة إلى الرسم العادي.</string>
+    <string name="v50_tut_kids_title">ارسم بالقالب</string>
+    <string name="v50_tut_kids_summary">اختر شكلًا وارسم على حافته.</string>
+    <string name="v50_tut_kids_t">اختر قالبًا</string>
+    <string name="v50_tut_kids_b">اضغط \"قالب\" واختر شكلًا. يظهر الشكل باهتًا على اللوحة.</string>
+    <string name="v50_tut_kids2_t">ارسم على الحافة</string>
+    <string name="v50_tut_kids2_b">ارسم قرب حافة الشكل: يتبع قلمك الخط وحده!</string>
+</resources>

@@ -21,6 +21,8 @@ struct CanvasEditScreen: View {
             if vm.loaded {
                 if vm.store.canvas?.kind == .KIDS {
                     KidsToolbar(vm: vm, store: vm.store, brush: vm.brush, shapes: vm.shapes, challengeUi: challengeUi)
+                } else if vm.store.canvas?.kind.simple == true {
+                    SimpleToolbar(vm: vm, store: vm.store, brush: vm.brush, ruler: vm.ruler, sheet: $sheet, brushPickerOpen: $brushPickerOpen)
                 } else {
                     ModeToolRow(vm: vm, store: vm.store, ruler: vm.ruler)
                 }
@@ -29,6 +31,9 @@ struct CanvasEditScreen: View {
                 if vm.loaded, vm.store.canvas != nil, let actions {
                     EditorCanvasHost(vm: vm, store: vm.store, pen: vm.pen, shapes: vm.shapes, diagrams: vm.diagrams,
                                      frame: vm.frame, hw: vm.handwriting, actions: actions)
+                    if vm.store.canvas?.kind != .KIDS && vm.mode == .SELECT && vm.texts.draft == nil {
+                        SelectionMenu(vm: vm, store: vm.store, viewport: vm.viewport)
+                    }
                     if vm.store.canvas?.kind == .KIDS {
                         KidsChallengeLayer(vm: vm, ctl: vm.challenge, ui: challengeUi, viewport: vm.viewport, hw: vm.handwriting,
                                            tutorial: vm.inTutorial())
@@ -45,6 +50,7 @@ struct CanvasEditScreen: View {
             .overlay(alignment: .bottom) { if vm.loaded { SuggestionLayer(vm: vm, hw: vm.handwriting, texts: vm.texts, ctl: vm.challenge) } }
         }
         .background(Color(uiColor: CanvasColors.background))
+        .overlay { EditorToastHost(events: vm.events) }
         .overlayPreferenceValue(TutorialAnchorKey.self) { anchors in
             GeometryReader { geo in
                 TutorialOverlay(ctl: vm.tutorial, viewport: vm.viewport, rects: anchors.mapValues { geo[$0] },
@@ -169,7 +175,7 @@ private struct EditorTopBar: View {
                     .disabled(!store.canRedo).accessibilityLabel(L("redo")).accessibilityIdentifier("redo").tutorialAnchor(TutorialAnchor.REDO)
             }
             .font(.title3)
-            if store.canvas?.kind != .KIDS {
+            if store.canvas?.kind.simple != true {
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: 8) {
                     ForEach(modes, id: \.2) { m in
@@ -181,7 +187,7 @@ private struct EditorTopBar: View {
                         .tutorialAnchor(TutorialAnchor.mode(m.0))
                     }
                     Divider().frame(height: 28)
-                    ToolButton(icon: "grid", label: L("add_guide"), id: "guide_button", anchor: TutorialAnchor.RULER) { sheet = .guide }
+                    ToolButton(icon: "grid", label: L("add_guide"), id: "guide_button") { sheet = .guide }
                     ToolButton(icon: "photo.on.rectangle", label: L("add_background"), id: "background_button", anchor: TutorialAnchor.BACKGROUND) { sheet = .background }
                     Button { brushPickerOpen = true } label: {
                         Image(systemName: "paintbrush.pointed").frame(width: 36, height: 36)

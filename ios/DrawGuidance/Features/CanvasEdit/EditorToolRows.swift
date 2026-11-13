@@ -31,6 +31,7 @@ struct ModeToolRow: View {
     @ObservedObject var ruler: RulerController
     @State private var photo: PhotosPickerItem?
     @State private var comicOpen = false
+    @State private var panelsOpen = false
 
     var body: some View {
         ScrollView(.horizontal, showsIndicators: false) {
@@ -38,6 +39,15 @@ struct ModeToolRow: View {
         }
         .frame(height: 40)
         .sheet(isPresented: $comicOpen) { ComicInsertSheet(vm: vm) }
+        .sheet(isPresented: $panelsOpen) { NotesPanelsSheet { id in vm.v45.insertPanels(id); panelsOpen = false } }
+        .sheet(isPresented: Binding(get: { ruler.libraryOpen }, set: { ruler.libraryOpen = $0 })) {
+            ShapePickerView(kind: store.canvas?.kind ?? .ART) { id in
+                let v = vm.viewport
+                let center = v.toCanvas(P(v.viewSize.w / 2, v.viewSize.h / 2))
+                _ = ruler.placeLibrary(id, center: center, size: min(v.viewSize.w, v.viewSize.h) * 0.4 / max(v.scale, 0.01))
+                ruler.libraryOpen = false
+            }
+        }
         .onChange(of: photo) { _, item in
             guard let item else { return }
             Task {
@@ -55,10 +65,15 @@ struct ModeToolRow: View {
     @ViewBuilder private var items: some View {
         switch vm.mode {
         case .DRAW, .PEN:
-            ToolButton(icon: "ruler", label: L("v40_ruler"), selected: ruler.session == .RULER, id: "ruler_button") {
+            ToolButton(icon: "ruler", label: L("v40_ruler"), selected: ruler.session == .RULER, id: "ruler_button", anchor: TutorialAnchor.RULER) {
                 if ruler.session == .RULER { ruler.finish() } else { openRuler() }
             }
-            ToolButton(icon: "eyedropper", label: "eyedropper", selected: vm.canvasPick == .EYEDROPPER, id: "eyedropper") {
+            ToolButton(icon: "star.square.on.square", label: L("v40_template"), selected: ruler.session == .TEMPLATE || ruler.session == .TEMPLATE_PICK,
+                       id: "template_button", anchor: TutorialAnchor.TEMPLATE) {
+                if ruler.session == .TEMPLATE || ruler.session == .TEMPLATE_PICK { ruler.finish() } else { ruler.openTemplate(); ruler.libraryOpen = true }
+            }
+            if ruler.session != .NONE { RulerBar(ruler: ruler) }
+            ToolButton(icon: "eyedropper", label: "eyedropper", selected: vm.canvasPick == .EYEDROPPER, id: "eyedropper", anchor: TutorialAnchor.simple("eyedropper")) {
                 vm.toggleCanvasPick(.EYEDROPPER)
             }
             ToolButton(icon: "cube", label: "3D", selected: store.canvas?.guide.draw3d == true, id: "draw3d") { vm.toggleDraw3d() }
@@ -70,7 +85,7 @@ struct ModeToolRow: View {
                 ToolButton(icon: "checkmark.circle", label: L("apply_button"), id: "pen_finish") { vm.pen.finish(closed: false) }
             }
         case .SELECT, .MOVE, .ROTATE, .SCALE:
-            ToolButton(icon: "rectangle.dashed", label: "rect", selected: vm.canvasPick == .RECT_SELECT, id: "rect_select") {
+            ToolButton(icon: "rectangle.dashed", label: "rect", selected: vm.canvasPick == .RECT_SELECT, id: "rect_select", anchor: TutorialAnchor.simple("rect_select")) {
                 if vm.mode != .SELECT { vm.chooseMode(.SELECT) }
                 vm.toggleCanvasPick(.RECT_SELECT)
             }
@@ -99,14 +114,15 @@ struct ModeToolRow: View {
         }
         if vm.mode.family == .DRAW || vm.mode == .SELECT {
             Divider().frame(height: 26)
-            ToolButton(icon: "square.on.circle", label: L("add_shape"), id: "add_shape") { vm.shapes.openPicker() }
-            ToolButton(icon: "textformat", label: L("add_text"), id: "add_text") { vm.startAction(.TEXT, target: []) }
+            ToolButton(icon: "square.on.circle", label: L("add_shape"), id: "add_shape", anchor: TutorialAnchor.add("shape")) { vm.shapes.openPicker() }
+            ToolButton(icon: "textformat", label: L("add_text"), id: "add_text", anchor: TutorialAnchor.add("text")) { vm.startAction(.TEXT, target: []) }
             if store.canvas?.kind == .COMIC {
-                ToolButton(icon: "bubble.left", label: L("add_balloon"), id: "add_comic") { comicOpen = true }
+                ToolButton(icon: "bubble.left", label: L("add_balloon"), id: "add_comic", anchor: TutorialAnchor.add("balloon")) { comicOpen = true }
             }
             if store.canvas?.kind.isNotes == true {
-                ToolButton(icon: "point.3.connected.trianglepath.dotted", label: L("add_diagram"), id: "add_diagram") { vm.diagrams.openPicker() }
-                ToolButton(icon: "function", label: L("add_formula"), id: "add_formula") { vm.formulas.openPicker() }
+                ToolButton(icon: "point.3.connected.trianglepath.dotted", label: L("add_diagram"), id: "add_diagram", anchor: TutorialAnchor.add("diagram")) { vm.diagrams.openPicker() }
+                ToolButton(icon: "function", label: L("add_formula"), id: "add_formula", anchor: TutorialAnchor.add("formula")) { vm.formulas.openPicker() }
+                ToolButton(icon: "rectangle.split.2x2", label: L("v45_panels_add"), id: "add_panels", anchor: TutorialAnchor.add("panels")) { panelsOpen = true }
             }
             PhotosPicker(selection: $photo, matching: .images) {
                 Image(systemName: "photo.badge.plus").frame(width: 36, height: 36)
@@ -120,6 +136,51 @@ struct ModeToolRow: View {
         let v = vm.viewport
         let center = v.toCanvas(P(v.viewSize.w / 2, v.viewSize.h / 2))
         ruler.openRuler(center: center, visibleWidth: v.viewSize.w / max(v.scale, 0.01), thickness: GuideMetrics.THICKNESS / max(v.scale, 0.01))
+    }
+}
+
+/// v40 cetvel ve kalıp çubuğu (Android cetvel çubuğu): tür, birim, ölçek, kilit ve Bitir.
+struct RulerBar: View {
+    @ObservedObject var ruler: RulerController
+
+    private static let types: [(RulerType, String)] = [
+        (.STRAIGHT, "v40_ruler_straight"), (.PROTRACTOR, "v40_ruler_protractor"), (.SET_SQUARE_45, "v40_ruler_set45"),
+        (.SET_SQUARE_30, "v40_ruler_set30"), (.COMPASS, "v40_ruler_compass"), (.ELLIPSE, "v40_ruler_ellipse"), (.FRENCH_CURVE, "v40_ruler_french"),
+    ]
+
+    var body: some View {
+        HStack(spacing: 6) {
+            if ruler.session == .RULER {
+                Menu {
+                    ForEach(Self.types, id: \.1) { t in
+                        Button { ruler.setType(t.0) } label: {
+                            if ruler.settings.type == t.0 { Label(L(t.1), systemImage: "checkmark") } else { Text(L(t.1)) }
+                        }
+                    }
+                } label: { Image(systemName: "triangle").frame(width: 36, height: 36) }
+                .accessibilityLabel(L("v40_ruler_type")).accessibilityIdentifier("ruler_type").tutorialAnchor(TutorialAnchor.RULER_TYPE)
+                Menu {
+                    ForEach(RulerUnit.allCases, id: \.self) { u in Button(u.label) { ruler.setUnit(u) } }
+                } label: { Text(ruler.settings.unit.label).font(.caption.bold()).frame(width: 36, height: 36) }
+                .accessibilityLabel(L("v40_ruler_unit")).accessibilityIdentifier("ruler_unit").tutorialAnchor(TutorialAnchor.RULER_UNIT)
+                Menu {
+                    ForEach([1, 2, 5, 10, 20, 50, 100], id: \.self) { k in Button("1:\(k)") { ruler.setScale(k) } }
+                } label: { Text("1:\(ruler.settings.scale)").font(.caption.bold()).frame(minWidth: 36, minHeight: 36) }
+                .accessibilityLabel(L("v40_ruler_scale")).accessibilityIdentifier("ruler_scale").tutorialAnchor(TutorialAnchor.RULER_SCALE)
+            } else {
+                ToolButton(icon: "books.vertical", label: L("v40_template_library"), id: "template_library", anchor: TutorialAnchor.TEMPLATE_LIBRARY) {
+                    ruler.libraryOpen = true
+                }
+                if ruler.session == .TEMPLATE {
+                    ToolButton(icon: ruler.locked ? "lock.fill" : "lock.open", label: L(ruler.locked ? "v40_template_unlock" : "v40_template_lock"),
+                               selected: ruler.locked, id: "template_lock") { ruler.toggleLock() }
+                }
+            }
+            Button(L("v40_ruler_finish")) { ruler.finish() }
+                .font(.caption.bold()).buttonStyle(.borderedProminent)
+                .accessibilityIdentifier("ruler_finish").tutorialAnchor(TutorialAnchor.RULER_FINISH)
+        }
+        .tutorialAnchor(TutorialAnchor.RULER_BAR)
     }
 }
 

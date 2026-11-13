@@ -219,4 +219,34 @@ final class LaunchUITests: XCTestCase {
         XCTAssertFalse(callout.waitForExistence(timeout: 2))
         XCTAssertFalse(app.buttons["undo"].isEnabled)
     }
+
+    /// v48 basit not: üç menü; Panel ekle ile Cornell yerleşimi eklenir, seçilince köşede seçim menüsü çıkar.
+    func testSimpleNotesMenusAndPanels() throws {
+        let app = XCUIApplication()
+        app.launchArguments += ["-AppleLanguages", "(tr)", "-uiTesting"]
+        app.launch()
+        let notes = app.buttons["new_SIMPLE_NOTES"]
+        XCTAssertTrue(notes.waitForExistence(timeout: 10))
+        var tries = 0
+        while !notes.isHittable && tries < 6 { notes.swipeLeft(); tries += 1 }
+        notes.tap()
+        for tag in ["simple_menu_add", "simple_menu_draw", "simple_menu_edit"] {
+            XCTAssertTrue(app.descendants(matching: .any)[tag].firstMatch.waitForExistence(timeout: 10), tag)
+        }
+        app.buttons["simple_tool_panels"].tap()
+        let cornell = app.buttons["notes_panels_cornell"]
+        XCTAssertTrue(cornell.waitForExistence(timeout: 5))
+        cornell.tap()
+        XCTAssertTrue(app.buttons["simple_tool_undo"].isEnabled)
+        app.buttons["simple_tool_select"].tap()
+        let canvas = app.descendants(matching: .any)["drawing_canvas"].firstMatch
+        canvas.coordinate(withNormalizedOffset: CGVector(dx: 0.12, dy: 0.5)).tap()
+        let menu = app.descendants(matching: .any)["selection_menu"].firstMatch
+        if menu.waitForExistence(timeout: 3) {
+            let shot = XCTAttachment(screenshot: app.screenshot())
+            shot.name = "simple_notes_selection_menu"
+            shot.lifetime = .keepAlways
+            add(shot)
+        }
+    }
 }

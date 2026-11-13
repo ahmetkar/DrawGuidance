@@ -60,9 +60,10 @@ object ShapeTemplates {
      * Katalog değişince artar: veritabanı yeniden doldurulur (kullanıcının öğrettiği örnekler korunur). v29 (4): moda
      * özel şablonlar ([modeOnly]). v30 (5): araştırmayla eklenen not (görsel not tutma) ve çizgi roman (Lexicon of
      * Comicana) şablonları. v34 (6): çocuk boyama şekillerinden üretilen çocuk modu şablonları ("cocuk."). v37 (7):
-     * kütüphaneden üretilen nesne, karakter ve efekt şablonları ([LibraryTemplates]).
+     * kütüphaneden üretilen nesne, karakter ve efekt şablonları ([LibraryTemplates]). v50 (8): yetişkin alıştırma
+     * şekillerinden üretilen şablonlar ("alistirma.").
      */
-    const val VERSION = 7
+    const val VERSION = 8
 
     val all: List<ShapeTemplate> by lazy {
         val scope = TemplateScope()
@@ -99,6 +100,8 @@ object ShapeTemplates {
             comicTemplates()
             // v34 çocuklar için çizimin şablonları (86 boyama şeklinden)
             kidsTemplates()
+            // v50 yetişkin alıştırma şekilleri (desenler, motifler, perspektif, konular)
+            practiceTemplates()
         }
         // v37 kütüphaneden üretilen nesne, karakter ve efekt şablonları (uygulamayla gelen kaynak dosyasından)
         val out = scope.out + LibraryTemplates.all

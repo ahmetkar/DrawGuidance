@@ -49,6 +49,11 @@ object ModeCatalog {
     const val COMIC_PREFIX = "roman."
     /** v34 çocuklar için çizimin şablonları (çocuk boyama şekillerinden üretilir). */
     const val KIDS_PREFIX = "cocuk."
+    /** v50 yetişkin alıştırma şekillerinin şablonları (resim modları; basit resimde yalnız temel olanlar). */
+    const val PRACTICE_PREFIX = "alistirma."
+    /** v50 alıştırma şablonlarının kategorileri: basit resimde de olanlar ve yalnız gelişmiş resimde olanlar. */
+    const val PRACTICE_CATEGORY = "Alıştırma"
+    const val PRACTICE_ADVANCED_CATEGORY = "Alıştırma (ileri)"
 
     private val notesCategories = setOf("Simge", "3B cisim", "Nesne", "Teknoloji", "Alet", "Gökyüzü ve doğa", "Bitki", "Meyve", "Müzik")
     private val comicExcluded = setOf("3B cisim", "Teknoloji")
@@ -60,7 +65,7 @@ object ModeCatalog {
     /** v34 basit resimde aranmayan ayrıntı/teknik kategoriler (parça şablonları ve uzman konular). */
     private val simpleArtExcluded = setOf(
         "Vücut", "Hayvan uzvu", "Saç", "Çatı", "Kapı", "Pencere", "Teknoloji", "Fen", "Matematik", "Şema ve grafik",
-        "Çizgi roman", "Sandalye", "Alet",
+        "Çizgi roman", "Sandalye", "Alet", PRACTICE_ADVANCED_CATEGORY,
     )
 
     /** v34 basit resim kapsamında mı (resim modunun şablonlarından sade konular). */
@@ -71,13 +76,15 @@ object ModeCatalog {
 
     /** Yalnız bir modun kapsamındaki şablon (genel aramada kullanılmaz). */
     fun isModeOnly(key: String): Boolean =
-        key.startsWith(NOTES_PREFIX) || key.startsWith(COMIC_PREFIX) || key.startsWith(KIDS_PREFIX) || key.startsWith(OBJECT_PREFIX)
+        key.startsWith(NOTES_PREFIX) || key.startsWith(COMIC_PREFIX) || key.startsWith(KIDS_PREFIX) || key.startsWith(OBJECT_PREFIX) ||
+            key.startsWith(PRACTICE_PREFIX)
 
     /** Genel katalog ya da (v37) kütüphane nesnesi: resim, not ve çizgi roman modlarında kategoriye göre aranır. */
     private fun general(key: String): Boolean = !isModeOnly(key) || key.startsWith(OBJECT_PREFIX)
 
     fun allows(mode: ShapeMode, key: String, category: String): Boolean = when (mode) {
-        ShapeMode.ART -> general(key)
+        // v50 alıştırma şablonları yalnız resim modlarında
+        ShapeMode.ART -> general(key) || key.startsWith(PRACTICE_PREFIX)
         ShapeMode.NOTES -> key.startsWith(NOTES_PREFIX) || (general(key) && category in notesCategories)
         ShapeMode.COMIC -> key.startsWith(COMIC_PREFIX) || (general(key) && category !in comicExcluded)
         // v37 çocuk modunun kapsamı değişmez (kütüphane nesneleri girmez)

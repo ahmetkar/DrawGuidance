@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- v50 yetişkin çizim alıştırmaları -->
+<resources>
+    <string name="v50_practice">Alıştırmalar</string>
+    <string name="v50_practice_title">Çizim alıştırmaları</string>
+    <string name="v50_practice_subtitle">Bir alıştırma seç. Kâğıttaki çizimin silinmez, yalnız alıştırmada çizdiklerin puanlanır.</string>
+    <string name="v50_practice_kind_trace">Üzerinden çiz</string>
+    <string name="v50_practice_kind_fade">Kaybolan kılavuz</string>
+    <string name="v50_practice_kind_mirror">Simetriyi tamamla</string>
+    <string name="v50_practice_intro_trace">Kesikli çizgilerin üstünden düzgün ve kesintisiz çizgilerle geç.</string>
+    <string name="v50_practice_intro_fade">Kılavuz birkaç saniye görünür. Şekli aklında tut, sonra kılavuz olmadan çiz.</string>
+    <string name="v50_practice_intro_mirror">Sol yarı ve simetri ekseni verildi. Şeklin tamamını çiz.</string>
+    <string name="v50_practice_group_basics">Temel alıştırmalar</string>
+    <string name="v50_practice_group_patterns">Desenler</string>
+    <string name="v50_practice_group_volume">Hacim ve perspektif</string>
+    <string name="v50_practice_group_motifs">Geometri ve motifler</string>
+    <string name="v50_practice_group_subjects">Konular</string>
+    <string name="v50_practice_stop">Alıştırmayı bitir</string>
+    <string name="v50_practice_done">Bitti</string>
+    <string name="v50_practice_hint">İpucu</string>
+    <string name="v50_practice_list">Liste</string>
+    <string name="v50_practice_close">Kapat</string>
+    <string name="v50_practice_score">%1$d / 100</string>
+    <string name="v50_practice_best">En iyi: %1$d</string>
+    <string name="v50_practice_hints_used">%1$d ipucu kullanıldı (−%2$d puan)</string>
+    <string name="v50_practice_passed">Harika!</string>
+    <string name="v50_practice_failed">Biraz daha dene</string>
+    <string name="v50_practice_next">Sonraki</string>
+    <string name="v50_practice_retry">Tekrar</string>
+    <string name="v50_practice_level">%1$d / %2$d</string>
+    <string name="v50_practice_progress">%1$d / %2$d alıştırma geçildi</string>
+</resources>

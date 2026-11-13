@@ -873,6 +873,10 @@ fun CanvasEditScreen(
         else -> null
     }
 
+    // v50 yetişkin çizim alıştırmaları (basit resimde menüde, gelişmiş resimde Çiz satırında)
+    val practiceUi = com.karapp.drawguidance.ui.screens.canvasedit.challenge.rememberPracticeUi()
+    val practiceShown = com.karapp.drawguidance.ui.screens.canvasedit.challenge.PracticeLevels.available(kind)
+    val practiceRun by viewModel.practice.run.collectAsState()
     val toolRow: @Composable (Boolean) -> Unit = { fill ->
         com.karapp.drawguidance.ui.screens.canvasedit.components.ToolHelpScope(toolHelp) {
         EditorToolRow(
@@ -904,6 +908,8 @@ fun CanvasEditScreen(
             // Fırça ayarlarının renk bölümünde ve Seç satırında
             onEyedropper = if (wide) ({ viewModel.toggleCanvasPick(com.karapp.drawguidance.ui.screens.canvasedit.components.CanvasPick.EYEDROPPER) }) else null,
             eyedropperActive = canvasPick == com.karapp.drawguidance.ui.screens.canvasedit.components.CanvasPick.EYEDROPPER,
+            onPractice = if (kind == com.karapp.drawguidance.data.model.CanvasKind.ART) ({ practiceUi.sheet = !practiceUi.sheet }) else null,
+            practiceActive = practiceUi.sheet || practiceRun != null,
         )
         }
     }
@@ -949,6 +955,7 @@ fun CanvasEditScreen(
         }))
         add(com.karapp.drawguidance.ui.screens.canvasedit.components.SimpleTool("shape", Icons.Filled.Category, simpleTexts.shape, mode == EditMode.SHAPE, viewModel::openShapePicker))
         if (kids) add(challengeUi.tool())
+        if (kind == com.karapp.drawguidance.data.model.CanvasKind.SIMPLE_ART) add(practiceUi.tool(practiceRun != null))
         // v36 basit resimde şekil düzenleme (az noktalı vektör düzenleme): seçili ya da dokunulan şekil açılır
         if (kind == com.karapp.drawguidance.data.model.CanvasKind.SIMPLE_ART) {
             add(com.karapp.drawguidance.ui.screens.canvasedit.components.SimpleTool(
@@ -1720,6 +1727,7 @@ fun CanvasEditScreen(
             // v37 çocuk tuvalinde öneriler maskotun balonunda (maskot isteğe göre köşede sürekli durur)
             if (kids) com.karapp.drawguidance.ui.screens.canvasedit.components.KidsMascotLayer(viewModel, mode, modeBarHeightPx, tutorialUi != null)
             if (kids) com.karapp.drawguidance.ui.screens.canvasedit.challenge.KidsChallengeLayer(viewModel, challengeUi, viewport, mode, modeBarHeightPx, tutorialUi != null)
+            if (practiceShown) com.karapp.drawguidance.ui.screens.canvasedit.challenge.PracticeLayer(viewModel, practiceUi, viewport, tutorialUi != null)
 
             // Tuval üstü diyagram düzenleme: odaktaki adımın/okun yanında küçük panel
             if (mode == EditMode.DIAGRAM_EDIT) {

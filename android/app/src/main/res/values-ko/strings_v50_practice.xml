@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- v50 yetişkin çizim alıştırmaları -->
+<resources>
+    <string name="v50_practice">연습</string>
+    <string name="v50_practice_title">그리기 연습</string>
+    <string name="v50_practice_subtitle">연습을 고르세요. 종이 위의 그림은 지워지지 않으며, 연습 중에 그린 선만 채점됩니다.</string>
+    <string name="v50_practice_kind_trace">따라 그리기</string>
+    <string name="v50_practice_kind_fade">사라지는 가이드</string>
+    <string name="v50_practice_kind_mirror">대칭 완성</string>
+    <string name="v50_practice_intro_trace">점선 위를 부드럽고 끊김 없이 따라 그리세요.</string>
+    <string name="v50_practice_intro_fade">가이드가 몇 초 동안 보입니다. 모양을 기억한 뒤 가이드 없이 그리세요.</string>
+    <string name="v50_practice_intro_mirror">왼쪽 절반과 대칭축이 주어집니다. 전체 모양을 그리세요.</string>
+    <string name="v50_practice_group_basics">기본 연습</string>
+    <string name="v50_practice_group_patterns">패턴</string>
+    <string name="v50_practice_group_volume">입체와 원근법</string>
+    <string name="v50_practice_group_motifs">기하학과 문양</string>
+    <string name="v50_practice_group_subjects">주제</string>
+    <string name="v50_practice_stop">연습 끝내기</string>
+    <string name="v50_practice_done">완료</string>
+    <string name="v50_practice_hint">힌트</string>
+    <string name="v50_practice_list">목록</string>
+    <string name="v50_practice_close">닫기</string>
+    <string name="v50_practice_score">%1$d / 100</string>
+    <string name="v50_practice_best">최고: %1$d</string>
+    <string name="v50_practice_hints_used">힌트 %1$d회 사용 (−%2$d점)</string>
+    <string name="v50_practice_passed">훌륭해요!</string>
+    <string name="v50_practice_failed">조금 더 해 봐요</string>
+    <string name="v50_practice_next">다음</string>
+    <string name="v50_practice_retry">다시</string>
+    <string name="v50_practice_level">%1$d / %2$d</string>
+    <string name="v50_practice_progress">%1$d / %2$d개 연습 통과</string>
+</resources>

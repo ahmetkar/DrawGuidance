@@ -85,8 +85,21 @@ final class EditorViewModel: ObservableObject, EditorHost {
     private(set) lazy var challenge: KidsChallengeController = {
         let c = KidsChallengeController(store, before: { [unowned self] in chooseMode(.DRAW); handwriting.reset() },
                                         after: { [unowned self] in afterContentReplaced() })
-        inChallenge = { [unowned self, unowned c] in store.canvas?.kind == .KIDS && c.active }
+        inChallenge = { [unowned self, unowned c] in (store.canvas?.kind == .KIDS && c.active) || practiceActive() }
         return c
+    }()
+
+    /// v50 yetişkin alıştırması sürüyor mu (sürerken çizim önerisi verilmez).
+    private var practiceActive: () -> Bool = { false }
+
+    /// v50 yetişkin çizim alıştırmaları (basit ve gelişmiş resim).
+    private(set) lazy var practice: PracticeController = {
+        let p = PracticeController(store, before: { [unowned self] in chooseMode(.DRAW); handwriting.reset() },
+                                   after: { [unowned self] in afterContentReplaced() })
+        practiceActive = { [unowned p] in p.active }
+        let kids = inChallenge
+        inChallenge = { [unowned p] in kids() || p.active }
+        return p
     }()
 
     /// v32 eğitim modu: araç gruplarının adım adım eğitimi (çizim, not alma, çizgi roman, basit türler, çocuk).

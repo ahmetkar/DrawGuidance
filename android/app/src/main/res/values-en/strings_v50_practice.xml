@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- v50 yetişkin çizim alıştırmaları -->
+<resources>
+    <string name="v50_practice">Practice</string>
+    <string name="v50_practice_title">Drawing practice</string>
+    <string name="v50_practice_subtitle">Pick an exercise. Your drawing on the paper stays; only what you draw during the exercise is scored.</string>
+    <string name="v50_practice_kind_trace">Trace</string>
+    <string name="v50_practice_kind_fade">Fading guide</string>
+    <string name="v50_practice_kind_mirror">Complete the symmetry</string>
+    <string name="v50_practice_intro_trace">Go over the dashed lines with smooth, unbroken strokes.</string>
+    <string name="v50_practice_intro_fade">The guide shows for a few seconds. Memorize the shape, then draw it without the guide.</string>
+    <string name="v50_practice_intro_mirror">The left half and the axis of symmetry are given. Draw the whole shape.</string>
+    <string name="v50_practice_group_basics">Basic drills</string>
+    <string name="v50_practice_group_patterns">Patterns</string>
+    <string name="v50_practice_group_volume">Volume and perspective</string>
+    <string name="v50_practice_group_motifs">Geometry and motifs</string>
+    <string name="v50_practice_group_subjects">Subjects</string>
+    <string name="v50_practice_stop">End practice</string>
+    <string name="v50_practice_done">Done</string>
+    <string name="v50_practice_hint">Hint</string>
+    <string name="v50_practice_list">List</string>
+    <string name="v50_practice_close">Close</string>
+    <string name="v50_practice_score">%1$d / 100</string>
+    <string name="v50_practice_best">Best: %1$d</string>
+    <string name="v50_practice_hints_used">%1$d hint(s) used (−%2$d points)</string>
+    <string name="v50_practice_passed">Great!</string>
+    <string name="v50_practice_failed">Try a bit more</string>
+    <string name="v50_practice_next">Next</string>
+    <string name="v50_practice_retry">Retry</string>
+    <string name="v50_practice_level">%1$d / %2$d</string>
+    <string name="v50_practice_progress">%1$d / %2$d exercises passed</string>
+</resources>

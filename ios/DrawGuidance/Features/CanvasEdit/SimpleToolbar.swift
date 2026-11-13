@@ -62,7 +62,10 @@ struct SimpleToolbar: View {
                  selected: ruler.session == .TEMPLATE || ruler.session == .TEMPLATE_PICK) {
                 if ruler.session == .TEMPLATE || ruler.session == .TEMPLATE_PICK { ruler.finish() } else { ruler.openTemplate(); ruler.libraryOpen = true }
             },
-        ]
+        ] + (store.canvas?.kind == .SIMPLE_ART ? [
+            // v50 yetişkin çizim alıştırmaları
+            Tool(id: "practice", icon: "figure.strengthtraining.traditional", label: L("v50_practice"), selected: vm.practice.active) { vm.practice.listOpen = true },
+        ] : [])
     }
 
     private var editTools: [Tool] {

@@ -15,7 +15,7 @@ struct ShapeTemplate: Equatable {
 /// Şablon kataloğu: Android'deki Kotlin tanımlarından üretilen `shape_templates.bin` (ios/tools/ExportShapeTemplates)
 /// ve kütüphaneden üretilen `library_templates.bin`.
 enum ShapeTemplates {
-    static let VERSION = 7
+    static let VERSION = 8
     private static let MAGIC: Int32 = 0x5348_5450
 
     private static let loaded: ([ShapeTemplate], [ShapeTemplate]) = {

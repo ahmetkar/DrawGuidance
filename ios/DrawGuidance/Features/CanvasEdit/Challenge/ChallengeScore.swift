@@ -20,13 +20,16 @@ enum ChallengeScore {
     private static let MAX_RGB: Float = 441.673
     private static let THIN: Float = 0.05
 
-    static func outline(_ drawn: [[P]], _ target: [[P]]) -> Int {
+    static func outline(_ drawn: [[P]], _ target: [[P]]) -> Int { outline(drawn, target, near: NEAR, far: FAR) }
+
+    /// v50 verilen yakınlık sınırlarıyla (hedef köşegenine oran); yetişkin alıştırmaları daha dar sınır kullanır.
+    static func outline(_ drawn: [[P]], _ target: [[P]], near nearRatio: Float, far farRatio: Float) -> Int {
         guard let tBox = bounds(target) else { return 0 }
         let diag = max(hypot(tBox.width, tBox.height), 1)
         let step = diag / SAMPLES
         let t = resample(target, step), d = resample(drawn, step)
         if t.isEmpty || d.count < 2 { return 0 }
-        let near = diag * NEAR, far = diag * FAR
+        let near = diag * nearRatio, far = diag * farRatio
         let lenT = max(length(target), 1), lenD = length(drawn)
         let inPlace = f1(d, t, near, far) * excess(lenD / lenT)
         var aligned: Float = 0

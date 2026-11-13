@@ -18,6 +18,10 @@ enum ModeCatalog {
     static let NOTES_PREFIX = "ders."
     static let COMIC_PREFIX = "roman."
     static let KIDS_PREFIX = "cocuk."
+    /// v50 yetişkin alıştırma şekillerinin şablonları (resim modları; basit resimde yalnız temel olanlar).
+    static let PRACTICE_PREFIX = "alistirma."
+    static let PRACTICE_CATEGORY = "Alıştırma"
+    static let PRACTICE_ADVANCED_CATEGORY = "Alıştırma (ileri)"
     static let OBJECT_PREFIX = LibraryTemplates.OBJECT_PREFIX
     private static let notesCategories: Set<String> = ["Simge", "3B cisim", "Nesne", "Teknoloji", "Alet", "Gökyüzü ve doğa", "Bitki", "Meyve", "Müzik"]
     private static let comicExcluded: Set<String> = ["3B cisim", "Teknoloji"]
@@ -27,20 +31,21 @@ enum ModeCatalog {
     ]
     private static let simpleArtExcluded: Set<String> = [
         "Vücut", "Hayvan uzvu", "Saç", "Çatı", "Kapı", "Pencere", "Teknoloji", "Fen", "Matematik", "Şema ve grafik",
-        "Çizgi roman", "Sandalye", "Alet",
+        "Çizgi roman", "Sandalye", "Alet", PRACTICE_ADVANCED_CATEGORY,
     ]
 
     static func allowsSimpleArt(_ key: String, _ category: String) -> Bool { allows(.ART, key, category) && !simpleArtExcluded.contains(category) }
 
     static func isModeOnly(_ key: String) -> Bool {
-        key.hasPrefix(NOTES_PREFIX) || key.hasPrefix(COMIC_PREFIX) || key.hasPrefix(KIDS_PREFIX) || key.hasPrefix(OBJECT_PREFIX)
+        key.hasPrefix(NOTES_PREFIX) || key.hasPrefix(COMIC_PREFIX) || key.hasPrefix(KIDS_PREFIX) || key.hasPrefix(OBJECT_PREFIX) ||
+            key.hasPrefix(PRACTICE_PREFIX)
     }
 
     private static func general(_ key: String) -> Bool { !isModeOnly(key) || key.hasPrefix(OBJECT_PREFIX) }
 
     static func allows(_ mode: ShapeMode, _ key: String, _ category: String) -> Bool {
         switch mode {
-        case .ART: return general(key)
+        case .ART: return general(key) || key.hasPrefix(PRACTICE_PREFIX)
         case .NOTES: return key.hasPrefix(NOTES_PREFIX) || (general(key) && notesCategories.contains(category))
         case .COMIC: return key.hasPrefix(COMIC_PREFIX) || (general(key) && !comicExcluded.contains(category))
         case .KIDS: return key.hasPrefix(KIDS_PREFIX) || (!isModeOnly(key) && kidsCategories.contains(category))

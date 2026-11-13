@@ -57,15 +57,21 @@ object ChallengeScore {
     const val OUTLINE_WEIGHT = 0.4f
 
     /** Çizimin ([drawn]) hedef çizgilerine ([target]) yakınlığı, 0–100. */
-    fun outline(drawn: List<List<Offset>>, target: List<List<Offset>>): Int {
+    fun outline(drawn: List<List<Offset>>, target: List<List<Offset>>): Int = outline(drawn, target, NEAR, FAR)
+
+    /**
+     * v50 [outline] verilen yakınlık sınırlarıyla ([nearRatio], [farRatio]: hedef köşegenine oran). Yetişkin
+     * alıştırmaları çocuk görevinden daha dar sınırlar kullanır.
+     */
+    fun outline(drawn: List<List<Offset>>, target: List<List<Offset>>, nearRatio: Float, farRatio: Float): Int {
         val tBox = bounds(target) ?: return 0
         val diag = hypot(tBox.width, tBox.height).coerceAtLeast(1f)
         val step = diag / SAMPLES
         val t = resample(target, step)
         val d = resample(drawn, step)
         if (t.isEmpty() || d.size < 2) return 0
-        val near = diag * NEAR
-        val far = diag * FAR
+        val near = diag * nearRatio
+        val far = diag * farRatio
         val lenT = length(target).coerceAtLeast(1f)
         val lenD = length(drawn)
         val inPlace = f1(d, t, near, far) * excess(lenD / lenT)

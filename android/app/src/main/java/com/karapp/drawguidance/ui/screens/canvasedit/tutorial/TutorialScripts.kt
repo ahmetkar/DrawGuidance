@@ -40,24 +40,27 @@ object TutorialScripts {
         // v40 her gelişmiş türde bu sürümün yenilikleri ayrı grupta
         // v46 yenilikler (iki parçalı üst menü, seçim menüsü, Panel ekle, formülle çizilen şekiller, mekân ve karakterler)
         // v48 yenilikler (yeni mod menüsü, Özellikler, ayrı Taşı/Genişlet, üç basit menü, çocuk sırası)
-        CanvasKind.ART -> listOf(artBasics(), artAdd(), artAi(), TutorialV40.art, TutorialV46.art, TutorialV48.advanced(kind))
+        CanvasKind.ART -> listOf(artBasics(), artAdd(), artAi(), TutorialV40.art, TutorialV46.art, TutorialV48.advanced(kind), TutorialV50.advanced(kind))
         CanvasKind.NOTES -> listOf(notesWrite(), notesFormula(), notesAi(), TutorialV40.notes, TutorialV46.notes, TutorialV48.advanced(kind))
-        CanvasKind.COMIC -> listOf(comicPanels(), comicText(), comicAi(), TutorialV40.comic, TutorialV46.comic, TutorialV48.advanced(kind))
+        CanvasKind.COMIC -> listOf(comicPanels(), comicText(), comicAi(), TutorialV40.comic, TutorialV46.comic, TutorialV48.advanced(kind), TutorialV50.advanced(kind))
         // v40 basit resim ve basit notta kısa, sade dilli tanıtım (v46 yenilikler ayrı grupta)
-        CanvasKind.SIMPLE_ART -> listOf(TutorialV40.simpleArt, TutorialV46.simpleArt, TutorialV48.simple(kind))
+        CanvasKind.SIMPLE_ART -> listOf(TutorialV40.simpleArt, TutorialV46.simpleArt, TutorialV48.simple(kind), TutorialV50.simpleArt)
         CanvasKind.SIMPLE_NOTES -> listOf(TutorialV40.simpleNotes, TutorialV46.simpleNotes, TutorialV48.simple(kind))
         // v37 çocuklar için çizimde maskot Boyacık araçları tanıtır ve örnek resim yapar (v40 yenilikleri ayrıca)
-        CanvasKind.KIDS -> listOf(TutorialKids.intro, TutorialKids.whatsNew, TutorialV48.kids)
+        CanvasKind.KIDS -> listOf(TutorialKids.intro, TutorialKids.whatsNew, TutorialV48.kids, TutorialV50.kids)
     }
 
     /** v40 eğitimlerin sürümü: eski sürümün eğitimini bitirmiş kullanıcıya [whatsNew] bir kez gösterilir (v48). */
-    const val VERSION = 48
+    const val VERSION = 50
 
     /** Bu türde sürümün yenilikleri (v48: yeni menü sistemi). */
     fun whatsNew(kind: CanvasKind): TutorialGroup? = when (kind) {
-        CanvasKind.ART, CanvasKind.NOTES, CanvasKind.COMIC -> TutorialV48.advanced(kind)
-        CanvasKind.SIMPLE_ART, CanvasKind.SIMPLE_NOTES -> TutorialV48.simple(kind)
-        CanvasKind.KIDS -> TutorialV48.kids
+        // v50 çizim modlarında "Resimden çizim" (vektörleştirme ve kalıpla çizme), not türlerinde v48 menüleri
+        CanvasKind.ART, CanvasKind.COMIC -> TutorialV50.advanced(kind)
+        CanvasKind.NOTES -> TutorialV48.advanced(kind)
+        CanvasKind.SIMPLE_ART -> TutorialV50.simpleArt
+        CanvasKind.SIMPLE_NOTES -> TutorialV48.simple(kind)
+        CanvasKind.KIDS -> TutorialV50.kids
     }
 
     // ------------------------------------------------------------------ ortak

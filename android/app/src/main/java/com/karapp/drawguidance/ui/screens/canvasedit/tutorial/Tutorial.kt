@@ -183,6 +183,13 @@ interface TutorialHost {
      * sığar ve alt kenara basar. Okunamazsa null.
      */
     suspend fun assetImage(path: String, target: Rect, fill: Boolean): Stroke? = null
+    /** v50 resim [id] seçilip Resmi düzenle'ye geçilir (vektörleştirme türleri üst menüde görünür). */
+    fun editImage(id: String) {}
+    /**
+     * v50 resim [id] vektörleştirilir ([keepImage] ise resmin üstüne) ve bitince vektör çizgiler döner (bulunamazsa
+     * ya da süre dolarsa null).
+     */
+    suspend fun vectorizeImage(id: String, mode: com.karapp.drawguidance.content.trace.EdgeMode, lineWidth: Float, keepImage: Boolean): Stroke? = null
 }
 
 /**

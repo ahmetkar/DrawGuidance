@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- v50 "Resimden çizim" eğitimi: resmi vektörleştirme ve şekil kalıbıyla çizme -->
+<resources>
+    <string name="v50_tut_title">从图片绘画</string>
+    <string name="v50_tut_summary">将图片矢量化，做成模板，再沿着模板描画。</string>
+    <string name="v50_tut_image_t">添加图片</string>
+    <string name="v50_tut_image_b">添加一张图片：照片、草图或现成的画作。示例中是一把茶壶。</string>
+    <string name="v50_tut_vec_t">矢量化图片</string>
+    <string name="v50_tut_vec_b">选中图片，在\"编辑\"中点按\"自动矢量化\"。图片边缘会变成可编辑节点的矢量线条。</string>
+    <string name="v50_tut_types_t">三种类型，精细调节</string>
+    <string name="v50_tut_types_b">\"矢量化边缘\"保留外轮廓，\"矢量化线条\"提取草图的中心线。细节和平滑度在下方面板中调整。删除图片后只留下线条。</string>
+    <string name="v50_tut_pick_t">把矢量做成模板</string>
+    <string name="v50_tut_pick_b">打开形状模板并点按线条，画作就会变成半透明模板。用控制柄移动和缩放。</string>
+    <string name="v50_tut_trace_t">用模板绘画</string>
+    <string name="v50_tut_trace_b">靠近模板边缘绘画：笔会沿着边缘走，线条不会抖。点按\"锁定\"让模板固定不动。</string>
+    <string name="v50_tut_lib_t">形状库中的模板</string>
+    <string name="v50_tut_lib_b">点按\"从图库\"选择现成的形状：猫、星星、爱心等。点按\"完成\"回到普通绘画。</string>
+    <string name="v50_tut_kids_title">用模板画画</string>
+    <string name="v50_tut_kids_summary">选一个形状，沿着边画。</string>
+    <string name="v50_tut_kids_t">选模板</string>
+    <string name="v50_tut_kids_b">点\"模板\"选一个形状，它会淡淡地出现在画布上。</string>
+    <string name="v50_tut_kids2_t">沿着边画</string>
+    <string name="v50_tut_kids2_b">靠近形状的边画，笔会自己沿着线走！</string>
+</resources>

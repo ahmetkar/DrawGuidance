@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- v50 yetişkin çizim alıştırmaları -->
+<resources>
+    <string name="v50_practice">تمارين</string>
+    <string name="v50_practice_title">تمارين الرسم</string>
+    <string name="v50_practice_subtitle">اختر تمرينًا. يبقى رسمك على الورقة، ويُقيَّم فقط ما ترسمه أثناء التمرين.</string>
+    <string name="v50_practice_kind_trace">ارسم فوق الخطوط</string>
+    <string name="v50_practice_kind_fade">الدليل المتلاشي</string>
+    <string name="v50_practice_kind_mirror">أكمل التناظر</string>
+    <string name="v50_practice_intro_trace">مرّر فوق الخطوط المتقطعة بخطوط ناعمة ومتصلة.</string>
+    <string name="v50_practice_intro_fade">يظهر الدليل لبضع ثوانٍ. احفظ الشكل ثم ارسمه بدون الدليل.</string>
+    <string name="v50_practice_intro_mirror">النصف الأيسر ومحور التناظر معطيان. ارسم الشكل كاملًا.</string>
+    <string name="v50_practice_group_basics">تمارين أساسية</string>
+    <string name="v50_practice_group_patterns">أنماط</string>
+    <string name="v50_practice_group_volume">الحجم والمنظور</string>
+    <string name="v50_practice_group_motifs">هندسة وزخارف</string>
+    <string name="v50_practice_group_subjects">مواضيع</string>
+    <string name="v50_practice_stop">إنهاء التمرين</string>
+    <string name="v50_practice_done">تم</string>
+    <string name="v50_practice_hint">تلميح</string>
+    <string name="v50_practice_list">القائمة</string>
+    <string name="v50_practice_close">إغلاق</string>
+    <string name="v50_practice_score">%1$d / 100</string>
+    <string name="v50_practice_best">الأفضل: %1$d</string>
+    <string name="v50_practice_hints_used">استُخدم %1$d تلميح (−%2$d نقطة)</string>
+    <string name="v50_practice_passed">رائع!</string>
+    <string name="v50_practice_failed">حاول مرة أخرى</string>
+    <string name="v50_practice_next">التالي</string>
+    <string name="v50_practice_retry">إعادة</string>
+    <string name="v50_practice_level">%1$d / %2$d</string>
+    <string name="v50_practice_progress">تم اجتياز %1$d من %2$d تمرين</string>
+</resources>

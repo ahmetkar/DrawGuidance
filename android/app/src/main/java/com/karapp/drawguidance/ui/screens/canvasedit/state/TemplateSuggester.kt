@@ -151,6 +151,11 @@ internal object TemplateSuggester {
         val ids = group.mapTo(LinkedHashSet()) { it.id }
         val base = TemplateFix(m.key, m.name, m.category, m.confidence, m.mode, ids, bounds, strokes, drawn = flats, spaces = spaces)
         if (m.solid == null) return listOf(base)
+        // v50 alıştırma şablonu: kütüphanedeki düzgün çizim (hazır vektör şekil seçeneği)
+        val lib = m.solid
+        if (lib != null && lib.startsWith(com.karapp.drawguidance.content.library.ShapeLibrary.PREFIX)) {
+            return listOf(base, base.copy(solid = lib, vector = true, confidence = m.confidence - 0.001f))
+        }
         // 3B cisim: gölgeli cisim seçeneği (3B çizimde önce)
         val solid = base.copy(solid = m.solid, confidence = m.confidence + if (plane != Plane3D.FREE || group.any { it.params?.depth3d != null }) 0.001f else -0.001f)
         return listOf(base, solid)

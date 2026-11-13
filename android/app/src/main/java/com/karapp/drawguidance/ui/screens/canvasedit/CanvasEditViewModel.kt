@@ -440,7 +440,12 @@ class CanvasEditViewModel(
 
     /** v44 çocuk görevi açık mı (yalnız çocuk tuvalinde; görev denetleyicisi gereksiz yere kurulmaz). */
     private fun inChallenge(): Boolean =
-        store.canvas.value?.kind == com.karapp.drawguidance.data.model.CanvasKind.KIDS && challenge.active.value
+        (store.canvas.value?.kind == com.karapp.drawguidance.data.model.CanvasKind.KIDS && challenge.active.value) ||
+            // v50 yetişkin alıştırması sürerken de öneri verilmez (öneri çizimi hazır şekille değiştirirdi)
+            (practiceCreated && practice.active)
+
+    /** v50 alıştırma denetleyicisi kuruldu mu (öneri denetimi denetleyiciyi gereksiz yere kurmasın). */
+    @Volatile private var practiceCreated = false
 
     private val handwriting = HandwritingController(
         store, this,
@@ -1174,6 +1179,13 @@ class CanvasEditViewModel(
     /** v38 çocuk modunda çizim görevi (seviyeler, puan, ilerleme): seviye kurulurken çizim moduna geçilir. */
     val challenge by lazy {
         com.karapp.drawguidance.ui.screens.canvasedit.challenge.KidsChallengeController(
+            store, viewModelScope, before = { chooseMode(EditMode.DRAW); handwriting.reset() }, after = ::afterContentReplaced,
+        )
+    }
+    /** v50 yetişkin çizim alıştırmaları (basit ve gelişmiş resim): alıştırma kurulurken çizim moduna geçilir. */
+    val practice by lazy {
+        practiceCreated = true
+        com.karapp.drawguidance.ui.screens.canvasedit.challenge.PracticeController(
             store, viewModelScope, before = { chooseMode(EditMode.DRAW); handwriting.reset() }, after = ::afterContentReplaced,
         )
     }

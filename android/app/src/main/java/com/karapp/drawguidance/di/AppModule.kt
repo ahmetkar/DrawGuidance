@@ -238,6 +238,8 @@ fun appModule(apiBaseUrl: String) = module {
     single { com.karapp.drawguidance.data.settings.TutorialPrefs(androidContext(), (androidContext() as? com.karapp.drawguidance.DrawGuidanceApp)?.offerTutorials ?: true) }
     // v37 çocuk modu: maskot ve Ana sayfa önerisi
     single { com.karapp.drawguidance.data.settings.KidsPrefs(androidContext()) }
+    // v50 yetişkin çizim alıştırmalarının en iyi puanları
+    single { com.karapp.drawguidance.data.settings.PracticePrefs(androidContext()) }
     // v39 abonelik (Free/Premium), haklar, reklamlar ve çizim görevi ilerlemesi
     single { get<AppDatabase>().billingDao() }
     // v42 çizgi roman tema paketleri

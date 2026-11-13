@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- v50 yetişkin çizim alıştırmaları -->
+<resources>
+    <string name="v50_practice">Упражнения</string>
+    <string name="v50_practice_title">Упражнения в рисовании</string>
+    <string name="v50_practice_subtitle">Выберите упражнение. Рисунок на листе сохранится, оцениваются только линии, нарисованные во время упражнения.</string>
+    <string name="v50_practice_kind_trace">Обведите</string>
+    <string name="v50_practice_kind_fade">Исчезающая подсказка</string>
+    <string name="v50_practice_kind_mirror">Достройте симметрию</string>
+    <string name="v50_practice_intro_trace">Обведите пунктир плавными непрерывными линиями.</string>
+    <string name="v50_practice_intro_fade">Подсказка видна несколько секунд. Запомните форму и нарисуйте её без подсказки.</string>
+    <string name="v50_practice_intro_mirror">Даны левая половина и ось симметрии. Нарисуйте фигуру целиком.</string>
+    <string name="v50_practice_group_basics">Базовые упражнения</string>
+    <string name="v50_practice_group_patterns">Узоры</string>
+    <string name="v50_practice_group_volume">Объём и перспектива</string>
+    <string name="v50_practice_group_motifs">Геометрия и орнаменты</string>
+    <string name="v50_practice_group_subjects">Сюжеты</string>
+    <string name="v50_practice_stop">Завершить упражнение</string>
+    <string name="v50_practice_done">Готово</string>
+    <string name="v50_practice_hint">Подсказка</string>
+    <string name="v50_practice_list">Список</string>
+    <string name="v50_practice_close">Закрыть</string>
+    <string name="v50_practice_score">%1$d / 100</string>
+    <string name="v50_practice_best">Лучший: %1$d</string>
+    <string name="v50_practice_hints_used">Использовано подсказок: %1$d (−%2$d очков)</string>
+    <string name="v50_practice_passed">Отлично!</string>
+    <string name="v50_practice_failed">Попробуйте ещё</string>
+    <string name="v50_practice_next">Далее</string>
+    <string name="v50_practice_retry">Заново</string>
+    <string name="v50_practice_level">%1$d / %2$d</string>
+    <string name="v50_practice_progress">Пройдено упражнений: %1$d из %2$d</string>
+</resources>

@@ -14,6 +14,8 @@ internal object LibraryCategories {
         // resimleri Nesneler penceresinde)
         // v17 çizim yardımcıları (resim tuvali, renksiz)
         *SketchLibrary.categories.toTypedArray(),
+        // v50 yetişkinler için çizim alıştırmaları (resim tuvali; Alıştırmalar görevleri ve şekil önerisi)
+        *com.karapp.drawguidance.content.library.practice.PracticeShapes.categories.toTypedArray(),
         // Hazır çizimler: v17'de seçiciden kalktı; eski kayıtlar açılabilsin diye kütüphanede duruyor
         *ReadyDrawings.categories.toTypedArray(),
         // v36 çizgi roman efektleri: seçicide listelenmez (Efektler penceresinden eklenir), kimliğiyle bulunur

@@ -24,6 +24,7 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.AccountTree
 import androidx.compose.material.icons.filled.Category
 import androidx.compose.material.icons.filled.Colorize
+import androidx.compose.material.icons.filled.FitnessCenter
 import androidx.compose.material.icons.filled.ContentCut
 import androidx.compose.material.icons.filled.GridOn
 import androidx.compose.material.icons.filled.ViewInAr
@@ -204,6 +205,9 @@ fun EditorToolRow(
     /** v43 damlalık (tuvalden renk al) Çiz satırında. */
     onEyedropper: (() -> Unit)? = null,
     eyedropperActive: Boolean = false,
+    /** v50 yetişkin çizim alıştırmaları (gelişmiş resimde Çiz satırında). */
+    onPractice: (() -> Unit)? = null,
+    practiceActive: Boolean = false,
 ) {
     // Tam genişlikte (telefon) düğmeler biraz küçülür: 9 araç 360 dp'ye sığar; v27 Çiz satırında Kalem de varken
     // (10 düğme) bir kademe daha küçülür ki Katmanlar ekrana sığsın
@@ -254,6 +258,7 @@ fun EditorToolRow(
     val penText = stringResource(R.string.add_pen)
     val rulerText = stringResource(R.string.v40_ruler)
     val templateText = stringResource(R.string.v40_template)
+    val practiceText = stringResource(R.string.v50_practice)
     val fillText = stringResource(R.string.fill_color)
     val backgroundText = stringResource(R.string.add_background)
     val eraserOn = drawToolsEnabled && brushType == BrushType.ERASER
@@ -298,6 +303,12 @@ fun EditorToolRow(
             NeuIconButton(
                 V44Icons.Template, templateText, onTemplate, size = button, selected = templateActive,
                 modifier = Modifier.testTag("tool_template").tutorialAnchor(TutorialAnchor.TEMPLATE),
+            )
+        })
+        if (onPractice != null) add(ToolSlot("practice", selected = practiceActive) {
+            NeuIconButton(
+                Icons.Filled.FitnessCenter, practiceText, onPractice, size = button, selected = practiceActive,
+                modifier = Modifier.testTag("tool_practice"),
             )
         })
         // Boya kutusu: seçim yoksa arka plan, arka planı olan eleman seçiliyse onun dolgusu

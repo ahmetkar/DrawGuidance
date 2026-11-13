@@ -1851,8 +1851,9 @@
     <string name="help_simple_paint_background">يغيّر لون الورقة (الخلفية).</string>
     <string name="account_title">الحساب</string>
     <string name="account_busy">جارٍ تسجيل الدخول…</string>
-    <string name="account_signin_text">سجّل الدخول بحساب Google واستفد من مزايا Premium واستمتع بتجربتك الخاصة.</string>
+    <string name="account_signin_text">سجّل الدخول بحساب Google أو Apple واستفد من مزايا Premium واستمتع بتجربتك الخاصة.</string>
     <string name="account_signin_google">تسجيل الدخول باستخدام Google</string>
+    <string name="account_signin_apple">تسجيل الدخول باستخدام Apple</string>
     <string name="account_settings">إعدادات الحساب</string>
     <string name="account_sign_out">تسجيل الخروج</string>
     <string name="account_sign_out_text">هل تريد تسجيل الخروج من حساب Google؟ تبقى رسوماتك على الجهاز؛ ويمكنك الدخول مجددًا بالحساب نفسه.</string>

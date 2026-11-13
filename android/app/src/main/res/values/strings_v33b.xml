@@ -39,8 +39,9 @@
     <!-- v33 hesap (Google ile giriş, Firebase) -->
     <string name="account_title">Hesap</string>
     <string name="account_busy">Giriş yapılıyor…</string>
-    <string name="account_signin_text">Google hesabınla giriş yap ve premium ayrıcalıklarından faydalan ve özel deneyimin keyfini çıkar.</string>
+    <string name="account_signin_text">Google ya da Apple hesabınla giriş yap ve premium ayrıcalıklarından faydalan ve özel deneyimin keyfini çıkar.</string>
     <string name="account_signin_google">Google ile giriş yap</string>
+    <string name="account_signin_apple">Apple ile giriş yap</string>
     <string name="account_settings">Hesap ayarları</string>
     <string name="account_sign_out">Çıkış yap</string>
     <string name="account_sign_out_text">Google hesabından çıkış yapılsın mı? Çizimlerin cihazda kalır; aynı hesapla yeniden girebilirsin.</string>

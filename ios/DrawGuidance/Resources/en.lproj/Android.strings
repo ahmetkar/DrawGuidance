@@ -53,8 +53,9 @@
 "account_sign_out_text" = "Sign out of your Google account? Your drawings stay on the device; you can sign back in with the same account.";
 "account_signed_in" = "Signed in.";
 "account_signed_out" = "Signed out.";
+"account_signin_apple" = "Sign in with Apple";
 "account_signin_google" = "Sign in with Google";
-"account_signin_text" = "Sign in with your Google account to enjoy Premium benefits and your personalized experience.";
+"account_signin_text" = "Sign in with your Google or Apple account to enjoy Premium benefits and your personalized experience.";
 "account_sync_pending" = "Will be written when connected";
 "account_synced" = "Synced";
 "account_title" = "Account";

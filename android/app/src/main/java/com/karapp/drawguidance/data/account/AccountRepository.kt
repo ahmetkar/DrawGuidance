@@ -73,6 +73,8 @@ class AccountRepository(
 
     /** Bu derlemede giriş açık mı. */
     val available: Boolean get() = auth.available
+    /** Apple ile giriş düğmesi gösterilsin mi. */
+    val appleAvailable: Boolean get() = auth.appleAvailable
 
     init {
         engine.register(SyncTypes.USER_UPSERT) { upsertRemote(it) }
@@ -93,8 +95,8 @@ class AccountRepository(
      * Google ile giriş (hesap seçici açılır). Sunucuda (ya da cihazda) bu hesabın doğum tarihi varsa giriş biter, yoksa
      * doğum tarihi sorulur.
      */
-    suspend fun signIn(activity: Activity): SignInResult {
-        val account = auth.signIn(activity)
+    suspend fun signIn(activity: Activity, method: SignInMethod = SignInMethod.GOOGLE): SignInResult {
+        val account = auth.signIn(activity, method)
         val existing = dao.byUid(account.firebaseUid)
         val remoteUser = fetchRemote()
         val birth = existing?.birthDate ?: remoteUser?.birthDate

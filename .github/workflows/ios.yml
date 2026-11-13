@@ -25,6 +25,23 @@ jobs:
       - name: Xcode sürümü
         run: xcodebuild -version
 
+      # Google ve Apple ile giriş: Firebase iOS yapılandırması depoda yok; GitHub gizli değişkeni
+      # GOOGLE_SERVICE_INFO_PLIST_B64 (GoogleService-Info.plist'in base64 hali) varsa pakete yazılır ve Google'ın
+      # geri dönüş adresi (REVERSED_CLIENT_ID) derlemeye verilir. Yoksa giriş düğmeleri kapalı derlenir.
+      - name: Firebase yapılandırması
+        env:
+          GSI_B64: ${{ secrets.GOOGLE_SERVICE_INFO_PLIST_B64 }}
+        run: |
+          if [ -n "$GSI_B64" ]; then
+            echo "$GSI_B64" | base64 --decode > DrawGuidance/Resources/GoogleService-Info.plist
+            SCHEME=$(/usr/libexec/PlistBuddy -c "Print :REVERSED_CLIENT_ID" DrawGuidance/Resources/GoogleService-Info.plist)
+            echo "DG_GOOGLE_URL_SCHEME=$SCHEME" >> "$GITHUB_ENV"
+            echo "Firebase yapılandırması eklendi"
+          else
+            echo "DG_GOOGLE_URL_SCHEME=" >> "$GITHUB_ENV"
+            echo "::warning::GOOGLE_SERVICE_INFO_PLIST_B64 yok: Google/Apple ile giriş kapalı derlenir"
+          fi
+
       - name: XcodeGen kur ve projeyi üret
         run: |
           brew install xcodegen
@@ -47,7 +64,7 @@ jobs:
           xcodebuild test -project DrawGuidance.xcodeproj -scheme DrawGuidance \
             -destination "id=${{ steps.sim.outputs.udid }}" \
             -resultBundlePath build/TestResults.xcresult \
-            CODE_SIGNING_ALLOWED=NO | tee build/test.log | grep -E "Test Case|error:|\*\* TEST" || true
+            CODE_SIGNING_ALLOWED=NO DG_GOOGLE_URL_SCHEME="$DG_GOOGLE_URL_SCHEME" | tee build/test.log | grep -E "Test Case|error:|\*\* TEST" || true
           grep -q "\*\* TEST SUCCEEDED \*\*" build/test.log
 
       - name: Cihaz için Release derleme (imzasız)
@@ -56,7 +73,8 @@ jobs:
           xcodebuild build -project DrawGuidance.xcodeproj -scheme DrawGuidance \
             -configuration Release -sdk iphoneos -destination "generic/platform=iOS" \
             -derivedDataPath build/dd \
-            CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY="" | tail -20
+            CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY="" \
+            DG_GOOGLE_URL_SCHEME="$DG_GOOGLE_URL_SCHEME" | tail -20
 
       - name: .ipa paketle
         run: |

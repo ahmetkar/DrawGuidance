@@ -1,16 +1,12 @@
-import AuthenticationServices
 import SwiftUI
 import UserMessagingPlatform
 
 /// Ayarlar (Android `SettingsScreen`): Genel (hesap, abonelik, dil, tema), Çizim (öneriler, kalem, eğitimler),
-/// Kaydetme (otomatik kayıt, resim kaydetme, depolama), Gelişmiş (reklam gizliliği, sürüm). Sunucu gerektirenler
-/// (giriş, eşitleme, geri bildirim) şimdilik kapalı.
+/// Kaydetme (otomatik kayıt, resim kaydetme, depolama), Gelişmiş (reklam gizliliği, sürüm). Hesap: Apple ve Google
+/// ile giriş (`AccountSection`); eşitleme ve geri bildirim şimdilik yok.
 struct SettingsView: View {
     @ObservedObject var prefs: EditorPrefsStore
     @ObservedObject var subscription: SubscriptionStore = .shared
-
-    /// Giriş (Google / Apple) eklendi ama Ahmet'in isteğiyle şimdilik kapalı.
-    static let signInEnabled = false
 
     enum Tab: Int, CaseIterable {
         case GENERAL, DRAWING, SAVING, ADVANCED
@@ -54,15 +50,7 @@ struct SettingsView: View {
     // MARK: Genel
 
     @ViewBuilder private var general: some View {
-        Section(NSLocalizedString("ios.signin.title", comment: "")) {
-            SignInWithAppleButton(.signIn) { _ in } onCompletion: { _ in }
-                .frame(height: 44)
-                .disabled(!Self.signInEnabled)
-                .opacity(Self.signInEnabled ? 1 : 0.4)
-            Button { } label: { Label("Google", systemImage: "g.circle") }
-                .disabled(!Self.signInEnabled)
-            if !Self.signInEnabled { Text(NSLocalizedString("ios.signin.soon", comment: "")).font(.footnote).foregroundStyle(.secondary) }
-        }
+        AccountSection()
         Section(L("v39_sub_title")) {
             NavigationLink { SubscriptionView() } label: {
                 HStack { Text(subscription.isPremium ? L("v39_sub_current_premium") : L("v39_sub_current_free")); Spacer() }

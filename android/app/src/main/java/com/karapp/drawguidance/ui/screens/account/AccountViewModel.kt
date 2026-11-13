@@ -7,6 +7,7 @@ import com.karapp.drawguidance.R
 import com.karapp.drawguidance.data.account.AccountRepository
 import com.karapp.drawguidance.data.account.AuthException
 import com.karapp.drawguidance.data.account.GoogleAccount
+import com.karapp.drawguidance.data.account.SignInMethod
 import com.karapp.drawguidance.data.account.SignInResult
 import com.karapp.drawguidance.data.catalog.CatalogStore
 import com.karapp.drawguidance.data.local.LocalUserEntity
@@ -52,6 +53,10 @@ class AccountViewModel(
     val active: StateFlow<LocalUserEntity?> get() = account.active
     val online: StateFlow<Boolean> get() = account.online
     val available: Boolean get() = account.available
+    val appleAvailable: Boolean get() = account.appleAvailable
+    /** Son denenen giriş yöntemi ("yeniden dene" aynı yöntemle açılır). */
+    var lastMethod: SignInMethod = SignInMethod.GOOGLE
+        private set
     /** Bekleyen iş sayısı (ekranda tek akış; her çizimde yeni akış açılmasın). */
     val pendingCount: StateFlow<Int> = engine.pendingCount.stateIn(viewModelScope, kotlinx.coroutines.flow.SharingStarted.WhileSubscribed(5_000), 0)
 
@@ -64,12 +69,13 @@ class AccountViewModel(
     /** v39 son eşitleme (bu açılışta yapıldıysa; yoksa katalog denetim zamanı gösterilir). */
     val lastSync: StateFlow<Long?> get() = engine.lastRun
 
-    fun signIn(activity: Activity) {
+    fun signIn(activity: Activity, method: SignInMethod = SignInMethod.GOOGLE) {
         if (_state.value.busy) return
+        lastMethod = method
         _state.value = AccountUiState(busy = true)
         viewModelScope.launch {
             _state.value = try {
-                when (val r = account.signIn(activity)) {
+                when (val r = account.signIn(activity, method)) {
                     is SignInResult.Done -> AccountUiState(message = R.string.account_signed_in, signInOutcome = SignInOutcome.SUCCESS)
                     is SignInResult.NeedsBirthDate -> AccountUiState(pendingBirth = r.account)
                 }

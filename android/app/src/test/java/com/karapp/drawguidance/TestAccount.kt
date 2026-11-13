@@ -59,7 +59,11 @@ class FakeAuth : AuthProvider {
     @Volatile var reauthFailWith: AuthException.Reason? = null
     @Volatile var deleteFails = false
 
-    override suspend fun signIn(activity: Activity): GoogleAccount {
+    @Volatile var lastMethod: com.karapp.drawguidance.data.account.SignInMethod? = null
+    override val appleAvailable: Boolean = true
+
+    override suspend fun signIn(activity: Activity, method: com.karapp.drawguidance.data.account.SignInMethod): GoogleAccount {
+        lastMethod = method
         failWith?.let { throw AuthException(it) }
         signIns++
         signedIn = account

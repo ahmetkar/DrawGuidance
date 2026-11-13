@@ -18,7 +18,7 @@
 "ios.sub.manage" = "Aboneliği App Store'da yönet";
 "ios.sub.restore" = "Satın alımları geri yükle";
 "ios.sub.store_unavailable" = "App Store'a ulaşılamadı.";
-"ios.signin.soon" = "Giriş yakında açılacak.";
+"ios.signin.not_configured" = "Bu derlemede giriş yapılandırılmamış (GoogleService-Info.plist yok).";
 "ios.signin.title" = "Hesap";
 "ios.settings.title" = "Ayarlar";
 "ios.privacy.options" = "Gizlilik seçenekleri";

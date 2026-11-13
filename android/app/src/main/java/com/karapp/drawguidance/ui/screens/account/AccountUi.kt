@@ -1,5 +1,6 @@
 package com.karapp.drawguidance.ui.screens.account
 
+import com.karapp.drawguidance.data.account.SignInMethod
 import com.karapp.drawguidance.ui.theme.neuOutline
 
 import android.app.Activity
@@ -69,6 +70,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.graphics.drawscope.scale
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.karapp.drawguidance.R
@@ -150,6 +152,10 @@ fun AccountHeader(vm: AccountViewModel, onOpenAccount: () -> Unit) {
                 GoogleSignInButton(
                     { context.findActivity()?.let { vm.signIn(it) } },
                     Modifier.fillMaxWidth().testTag("account_sign_in"), enabled = !state.busy && vm.available,
+                )
+                if (vm.appleAvailable) AppleSignInButton(
+                    { context.findActivity()?.let { vm.signIn(it, SignInMethod.APPLE) } },
+                    Modifier.fillMaxWidth().testTag("account_sign_in_apple"), enabled = !state.busy && vm.appleAvailable,
                 )
                 // Sonsuz dönen gösterge yerine yazı (ekran boşta kalabilsin)
                 if (state.busy) Text(stringResource(R.string.account_busy), style = MaterialTheme.typography.bodySmall, color = colors.accent)
@@ -419,6 +425,10 @@ fun AccountSettingsScreen(onBack: () -> Unit, vm: AccountViewModel) {
                     { context.findActivity()?.let { vm.signIn(it) } },
                     Modifier.fillMaxWidth().testTag("account_screen_sign_in"), enabled = online && vm.available && !state.busy,
                 )
+                if (vm.appleAvailable) AppleSignInButton(
+                    { context.findActivity()?.let { vm.signIn(it, SignInMethod.APPLE) } },
+                    Modifier.fillMaxWidth().testTag("account_screen_sign_in_apple"), enabled = online && vm.appleAvailable && !state.busy,
+                )
                 AccountDialogs(vm)
                 return@Column
             }
@@ -651,6 +661,48 @@ fun GoogleSignInButton(onClick: () -> Unit, modifier: Modifier = Modifier, enabl
     }
 }
 
+/**
+ * Apple ile giriş düğmesi: Apple'ın kurallarına uygun siyah zemin, beyaz Apple işareti ve "Apple ile giriş yap"
+ * (Google düğmesiyle aynı boy ve köşe yuvarlaklığı).
+ */
+@Composable
+fun AppleSignInButton(onClick: () -> Unit, modifier: Modifier = Modifier, enabled: Boolean = true, text: String = stringResource(R.string.account_signin_apple)) {
+    val colors = NeuTheme.colors
+    Row(
+        modifier.clip(CircleShape)
+            .background(if (enabled) Color.Black else colors.contentMuted.copy(alpha = 0.35f))
+            .clickable(enabled = enabled, role = androidx.compose.ui.semantics.Role.Button, onClick = onClick)
+            .padding(start = 6.dp, end = 18.dp, top = 6.dp, bottom = 6.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.Center,
+    ) {
+        Box(Modifier.size(34.dp), contentAlignment = Alignment.Center) { AppleMark(20.dp) }
+        Spacer(Modifier.width(12.dp))
+        Text(text, style = MaterialTheme.typography.labelLarge, fontWeight = FontWeight.SemiBold, color = Color.White, maxLines = 1, overflow = TextOverflow.Ellipsis)
+    }
+}
+
+/** Apple işareti (beyaz, vektör; Apple'ın giriş düğmesi yönergelerindeki logo biçimi). */
+@Composable
+fun AppleMark(size: Dp, tint: Color = Color.White) {
+    val path = remember {
+        androidx.compose.ui.graphics.vector.PathParser().parsePathString(APPLE_LOGO_PATH).toPath()
+    }
+    androidx.compose.foundation.Canvas(Modifier.size(size)) {
+        // Yol 0..24 kutusunda çizilmiştir
+        val k = this.size.minDimension / 24f
+        scale(k, k, pivot = androidx.compose.ui.geometry.Offset.Zero) { drawPath(path, tint) }
+    }
+}
+
+// Apple işareti (Simple Icons, CC0; 24x24 kutu)
+private const val APPLE_LOGO_PATH =
+    "M12.152 6.896c-.948 0-2.415-1.078-3.96-1.04-2.04.027-3.91 1.183-4.961 3.014-2.117 3.675-.546 9.103 1.519 12.09 " +
+    "1.013 1.454 2.208 3.09 3.792 3.039 1.52-.065 2.09-.987 3.935-.987 1.831 0 2.35.987 3.96.948 1.637-.026 2.676-1.48 " +
+    "3.676-2.948 1.156-1.688 1.636-3.325 1.662-3.415-.039-.013-3.182-1.221-3.22-4.857-.026-3.04 2.48-4.494 2.597-4.559 " +
+    "-1.429-2.09-3.623-2.324-4.39-2.376-2-.156-3.675 1.09-4.61 1.09zM15.53 3.83c.843-1.012 1.4-2.427 1.245-3.83 " +
+    "-1.207.052-2.662.805-3.532 1.818-.78.896-1.454 2.338-1.273 3.714 1.338.104 2.715-.688 3.559-1.701"
+
 /** v34 gradyan halkalı profil fotoğrafı (ana sayfa ve hesap ayarları). */
 @Composable
 fun RingAvatar(user: LocalUserEntity, size: Dp, modifier: Modifier = Modifier, background: Color = NeuTheme.colors.background) {
@@ -698,6 +750,10 @@ fun SignInSuggestionCard(vm: AccountViewModel, modifier: Modifier = Modifier) {
                     { context.findActivity()?.let { vm.signIn(it) } },
                     Modifier.fillMaxWidth().testTag("home_sign_in"), enabled = !state.busy && vm.available,
                     text = stringResource(R.string.home_signin_button),
+                )
+                if (vm.appleAvailable) AppleSignInButton(
+                    { context.findActivity()?.let { vm.signIn(it, SignInMethod.APPLE) } },
+                    Modifier.fillMaxWidth().testTag("home_sign_in_apple"), enabled = !state.busy && vm.appleAvailable,
                 )
                 if (state.busy) Text(stringResource(R.string.account_busy), style = MaterialTheme.typography.bodySmall, color = colors.accent)
                 state.message?.takeIf { it != R.string.birth_date_invalid && it != R.string.account_signed_in }?.let {

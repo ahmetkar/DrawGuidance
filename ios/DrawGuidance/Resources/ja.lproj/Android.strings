@@ -53,8 +53,9 @@
 "account_sign_out_text" = "Googleアカウントからログアウトしますか？作品は端末に残ります。同じアカウントで再びログインできます。";
 "account_signed_in" = "ログインしました。";
 "account_signed_out" = "ログアウトしました。";
+"account_signin_apple" = "Appleでサインイン";
 "account_signin_google" = "Googleでログイン";
-"account_signin_text" = "Google アカウントでログインして、Premium の特典とあなただけの体験を楽しみましょう。";
+"account_signin_text" = "Google または Apple アカウントでログインして、Premium の特典とあなただけの体験を楽しみましょう。";
 "account_sync_pending" = "接続後に書き込まれます";
 "account_synced" = "同期済み";
 "account_title" = "アカウント";

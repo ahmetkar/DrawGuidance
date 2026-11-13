@@ -1851,8 +1851,9 @@
     <string name="help_simple_paint_background">용지(배경)의 색을 바꿔요.</string>
     <string name="account_title">계정</string>
     <string name="account_busy">로그인하는 중…</string>
-    <string name="account_signin_text">Google 계정으로 로그인하고 Premium 혜택과 나만의 경험을 즐기세요.</string>
+    <string name="account_signin_text">Google 또는 Apple 계정으로 로그인하고 Premium 혜택과 나만의 경험을 즐기세요.</string>
     <string name="account_signin_google">Google로 로그인</string>
+    <string name="account_signin_apple">Apple로 로그인</string>
     <string name="account_settings">계정 설정</string>
     <string name="account_sign_out">로그아웃</string>
     <string name="account_sign_out_text">Google 계정에서 로그아웃할까요? 그림은 기기에 남고, 같은 계정으로 다시 로그인할 수 있어요.</string>

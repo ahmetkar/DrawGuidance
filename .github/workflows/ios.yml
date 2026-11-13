@@ -14,8 +14,8 @@ concurrency:
 
 jobs:
   build-test:
-    runs-on: macos-15
-    timeout-minutes: 45
+    runs-on: macos-15-intel
+    timeout-minutes: 90
     defaults:
       run:
         working-directory: ios

@@ -32,15 +32,17 @@ struct HomeView: View {
     }
 }
 
+private struct OpenCanvasId: Hashable, Identifiable { let id: String }
+
 /// Tuval açabilen gezinme yığını (her sekmenin kendi yığını).
 private struct OpenCanvasStack<Content: View>: View {
     @ViewBuilder let content: (@escaping (CanvasUi) -> Void) -> Content
-    @State private var open: CanvasUi?
+    @State private var open: OpenCanvasId?
 
     var body: some View {
         NavigationStack {
-            content { open = $0 }
-                .navigationDestination(item: $open) { doc in CanvasEditScreen(canvasLocalId: doc.localId).toolbar(.hidden, for: .tabBar) }
+            content { open = OpenCanvasId(id: $0.localId) }
+                .navigationDestination(item: $open) { doc in CanvasEditScreen(canvasLocalId: doc.id).toolbar(.hidden, for: .tabBar) }
         }
     }
 }

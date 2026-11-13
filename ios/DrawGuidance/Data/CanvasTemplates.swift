@@ -33,7 +33,7 @@ struct TemplateAsset: Codable, Equatable {
     var h = 0
 }
 
-struct TemplateMeta: Codable, Equatable {
+struct CanvasTemplateMeta: Codable, Equatable {
     let width: Int
     let height: Int
     var backgroundColorHex = "#FFFFFF"
@@ -57,7 +57,7 @@ struct TemplateMeta: Codable, Equatable {
 
 /// Kurulmaya hazır şablon: yeni kimlikli resimler ve onlara göre güncellenmiş belge.
 struct PreparedTemplate {
-    let meta: TemplateMeta
+    let meta: CanvasTemplateMeta
     let pages: [[Stroke]]
     let layers: [Layer]
     let background: BackgroundSpec
@@ -105,7 +105,7 @@ enum CanvasTemplates {
     /// Şablonu yeni tuvale hazırlar: resimlere yeni kimlik verir, belgedeki kimlikleri değiştirir ve çizgi roman
     /// kapağının başlığını [canvasName] yapar. Okunamazsa nil.
     static func prepare(_ id: String, canvasName: String, newId: () -> String = { UUID().uuidString.lowercased() }) -> PreparedTemplate? {
-        guard let metaData = opener("\(DIR)/\(id)/meta.json"), let meta = try? JSONDecoder().decode(TemplateMeta.self, from: metaData),
+        guard let metaData = opener("\(DIR)/\(id)/meta.json"), let meta = try? JSONDecoder().decode(CanvasTemplateMeta.self, from: metaData),
               let content = opener("\(DIR)/\(id)/content.bin"), let doc = try? ContentCodec.decodeDocument(content) else { return nil }
         var ids: [String: String] = [:]
         for a in meta.assets { ids[a.id] = newId() }

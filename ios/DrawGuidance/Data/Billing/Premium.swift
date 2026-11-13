@@ -139,7 +139,9 @@ final class SubscriptionStore: ObservableObject {
         guard !busy else { return }
         busy = true
         defer { busy = false }
-        guard let p = product ?? (await loadProduct()) else { message = .productUnavailable; return }
+        var loaded = product
+        if loaded == nil { loaded = await loadProduct() }
+        guard let p = loaded else { message = .productUnavailable; return }
         do {
             switch try await p.purchase() {
             case let .success(result):

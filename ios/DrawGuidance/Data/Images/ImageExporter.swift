@@ -179,7 +179,7 @@ final class ImageExporter {
             pdf.fill(media)
             // y aşağı dikdörtgeni PDF'in y yukarı düzenine çevir
             pdf.draw(img, in: CGRect(x: rect.minX, y: size.height - rect.maxY, width: rect.width, height: rect.height))
-            if let number { drawNumber(pdf, number, size, footer: max(size.height - rect.maxY, PdfLayout.FOOTER), paper: 0xFFFF_FFFF, flipped: false) }
+            if let number { drawNumber(pdf, number, size, footer: max(size.height - rect.maxY, CGFloat(PdfLayout.FOOTER)), paper: 0xFFFF_FFFF, flipped: false) }
             pdf.endPDFPage()
         }
         pdf.closePDF()
@@ -263,7 +263,7 @@ final class ImageExporter {
 
     /// Sayfa numarası: alttaki şeridin ortasında, kağıda göre koyu ya da açık gri (9 pt).
     static func drawNumber(_ c: CGContext, _ text: String, _ size: CGSize, footer: CGFloat, paper: UInt32, flipped: Bool) {
-        let dark = DiagramThemes.luminance(paper) < 0.45
+        let dark = DiagramContrast.luminance(paper) < 0.45
         let font = CTFontCreateWithName("Helvetica" as CFString, 9, nil)
         let attrs: [NSAttributedString.Key: Any] = [
             NSAttributedString.Key(kCTFontAttributeName as String): font,

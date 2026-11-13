@@ -16,7 +16,6 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.karapp.drawguidance.content.comic.ComicFilter
 import com.karapp.drawguidance.content.image.ImageLook
 import com.karapp.drawguidance.data.billing.Entitlements
-import com.karapp.drawguidance.data.billing.ExemptAccounts
 import com.karapp.drawguidance.data.billing.FeatureKeys
 import com.karapp.drawguidance.data.billing.PremiumFeature
 import com.karapp.drawguidance.data.billing.PremiumRules
@@ -237,20 +236,7 @@ class V44RulesTest {
         com.karapp.drawguidance.content.comic.ComicTemplates.all.forEach { assertFalse(it.id, PremiumRules.isAdvancedTemplate(it)) }
     }
 
-    // ------------------------------------------------------------------ 5 istisna hesabı
-
-    @Test
-    fun exemptAccountHasEveryFeatureButKeepsPlan() {
-        assertTrue(ExemptAccounts.isExempt("ahmetkar8040@gmail.com"))
-        assertTrue(ExemptAccounts.isExempt(" AhmetKar8040@gmail.com "))
-        assertFalse(ExemptAccounts.isExempt("ahmetkar2346@gmail.com"))
-        assertFalse(ExemptAccounts.isExempt(null))
-        val exempt = Entitlements.FREE.copy(exempt = true)
-        FeatureKeys.PREMIUM.forEach { assertTrue(it, exempt.has(it)) }
-        // Abonelik ekranı gerçek planı gösterir
-        assertFalse(exempt.isPremium)
-        PremiumFeature.entries.forEach { assertFalse(it.name, PremiumAccess(exempt, CanvasKind.COMIC) {}.locked(it)) }
-    }
+    // ------------------------------------------------------------------ 5 istisna hesabı (v50 kaldırıldı)
 
     // ------------------------------------------------------------------ 6 sunucu ayarı yok
 

@@ -99,8 +99,6 @@ drawguidance:
     package-name: ${GOOGLE_PLAY_PACKAGE_NAME:com.karapp.drawguidance}
     service-account-file: ${GOOGLE_PLAY_SERVICE_ACCOUNT_JSON:}
     require-account-id: ${BILLING_REQUIRE_ACCOUNT_ID:false}
-    # v44 geçici istisna: bu doğrulanmış e-postalar (virgülle) abonelik dışında Premium'un her şeyine erişir
-    exempt-emails: ${BILLING_EXEMPT_EMAILS:ahmetkar8040@gmail.com}
     pubsub:
       # Pub/Sub itme aboneliğinin "Kimlik doğrulamayı etkinleştir" hedef kitlesi; boşsa jeton denetlenmez
       audience: ${PUBSUB_PUSH_AUDIENCE:}

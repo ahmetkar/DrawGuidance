@@ -89,10 +89,10 @@ import java.util.concurrent.CopyOnWriteArrayList
 private const val UID = "uid-ahmet"
 private const val DAY = 86_400_000L
 
-private fun sub(status: String, expiry: Long?, plan: String = PlanIds.PREMIUM, features: String = "") = SubscriptionEntity(
+private fun sub(status: String, expiry: Long?, plan: String = PlanIds.PREMIUM, features: String = "", verifiedAt: Long? = 1_800_000_000_000L - DAY) = SubscriptionEntity(
     firebaseUid = UID, planId = plan, status = status, productId = "drawguidance_premium", basePlanId = "premium-monthly",
     startTime = 0, expiryTime = expiry, autoRenewing = true, acknowledged = true, orderId = null, purchaseToken = null,
-    features = features, source = "server", verifiedAt = 0, updatedAt = 0,
+    features = features, source = "server", verifiedAt = verifiedAt, updatedAt = 0,
 )
 
 private val planFeatures = FeatureKeys.PREMIUM.map { PlanFeatureEntity(PlanIds.PREMIUM, it) }

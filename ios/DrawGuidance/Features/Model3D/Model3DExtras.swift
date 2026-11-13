@@ -41,18 +41,24 @@ struct CatalogGrid3: View {
     var tile: CGFloat = 64
     var selected: String?
     var query = ""
+    /// v33 basit çizimde yalnız bu hazır şekiller (kategori çipleri gizlenir).
+    var only: [String]?
     let onPick: (CatalogItem) -> Void
     @State private var category = Catalog3D.categories[0]
 
-    init(columns: Int = 4, tile: CGFloat = 64, selected: String? = nil, query: String = "", onPick: @escaping (CatalogItem) -> Void) {
-        self.columns = columns; self.tile = tile; self.selected = selected; self.query = query; self.onPick = onPick
+    init(columns: Int = 4, tile: CGFloat = 64, selected: String? = nil, query: String = "", only: [String]? = nil,
+         onPick: @escaping (CatalogItem) -> Void) {
+        self.columns = columns; self.tile = tile; self.selected = selected; self.query = query; self.only = only; self.onPick = onPick
     }
 
     var body: some View {
         let q = query.trimmingCharacters(in: .whitespaces)
-        let items = q.isEmpty ? Catalog3D.all.filter { $0.category == category } : Catalog3D.all.filter { $0.name.tr.localizedCaseInsensitiveContains(q) }
+        let items: [CatalogItem] = only.map { ids in ids.compactMap { id in Catalog3D.all.first { $0.id == id } } }
+            ?? (q.isEmpty ? Catalog3D.all.filter { $0.category == category } : Catalog3D.all.filter { $0.name.tr.localizedCaseInsensitiveContains(q) })
         VStack(alignment: .leading, spacing: 10) {
-            if q.isEmpty {
+            if only != nil {
+                EmptyView()
+            } else if q.isEmpty {
                 ChipRow3 { ForEach(Catalog3D.categories, id: \.self) { c in Chip3(c.tr, c == category) { category = c } } }
             } else if items.isEmpty {
                 Text(L("search_no_result", q)).foregroundStyle(.secondary).padding(8).accessibilityIdentifier("model3d_catalog_empty")

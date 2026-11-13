@@ -355,10 +355,21 @@ struct FormulaPickerSheet: View {
 
 /// v27/v36 çizgi roman ekleme penceresi: konuşma balonları, sayfa şablonları, efektler ve efekt yazıları.
 struct ComicInsertSheet: View {
-    enum Tab: String, CaseIterable { case balloons, templates, images, effects, sfx }
+    enum Tab: String, CaseIterable { case balloons, templates, images, lines, effects, sfx }
     @ObservedObject var vm: EditorViewModel
     @State var tab: Tab = .balloons
     @Environment(\.dismiss) private var dismiss
+    @ObservedObject private var sub = SubscriptionStore.shared
+    @State private var premiumOpen = false
+
+    private var tabs: [(Tab, String)] {
+        var t: [(Tab, String)] = [(.balloons, L("add_balloon")), (.templates, L("add_templates"))]
+        if !ComicAssets.catalog.effects.isEmpty { t.append((.images, L("effects_tab_effects"))) }
+        t += [(.lines, L("effects_tab_lines")), (.effects, L("add_effects")), (.sfx, "SFX")]
+        return t
+    }
+
+    private static func linesTitle(_ k: ComicLinesKind) -> String { L("lines_" + k.rawValue.lowercased()) }
 
     private static func balloonTitle(_ s: BalloonStyle) -> String {
         let key = "balloon_" + s.rawValue.lowercased()
@@ -369,15 +380,22 @@ struct ComicInsertSheet: View {
     var body: some View {
         NavigationStack {
             VStack(spacing: 0) {
-                Picker("", selection: $tab) {
-                    Text(L("add_balloon")).tag(Tab.balloons)
-                    Text(L("add_templates")).tag(Tab.templates)
-                    if !ComicAssets.catalog.effects.isEmpty { Text(L("effects_tab_effects")).tag(Tab.images) }
-                    Text(L("add_effects")).tag(Tab.effects)
-                    Text("SFX").tag(Tab.sfx)
+                ScrollView(.horizontal, showsIndicators: false) {
+                    HStack(spacing: 8) {
+                        ForEach(tabs, id: \.0) { item in
+                            let t = item.0
+                            Button { tab = t } label: {
+                                Text(item.1).font(.subheadline.weight(tab == t ? .semibold : .regular)).lineLimit(1)
+                                    .padding(.horizontal, 12).padding(.vertical, 7)
+                                    .foregroundStyle(tab == t ? Color.accentColor : Color.primary)
+                                    .background(Capsule().fill(tab == t ? Color.accentColor.opacity(0.18) : Color.primary.opacity(0.06)))
+                            }
+                            .buttonStyle(.plain)
+                            .accessibilityIdentifier("comic_tab_\(t.rawValue)")
+                        }
+                    }
+                    .padding(.horizontal, 16).padding(.vertical, 10)
                 }
-                .pickerStyle(.segmented)
-                .padding()
                 if tab == .images {
                     ScrollView {
                         VStack(alignment: .leading, spacing: 10) {
@@ -393,6 +411,7 @@ struct ComicInsertSheet: View {
             .navigationBarTitleDisplayMode(.inline)
             .toolbar { ToolbarItem(placement: .cancellationAction) { Button(L("close")) { dismiss() } } }
         }
+        .sheet(isPresented: $premiumOpen) { PremiumRequiredSheet() }
     }
 
     @ViewBuilder private var content: some View {
@@ -409,6 +428,21 @@ struct ComicInsertSheet: View {
             }
         case .images:
             EmptyView()
+        case .lines:
+            // v29 hız ve odak çizgileri; BURST'ten sonrakiler Premium (Android `PremiumRules.isAdvancedLines`)
+            ForEach(ComicLinesKind.allCases, id: \.self) { k in
+                let locked = k.ordinal > ComicLinesKind.BURST.ordinal && !sub.allows(.COMIC_EFFECTS, .COMIC)
+                Button {
+                    if locked { premiumOpen = true } else { vm.comic.insertLines(k); dismiss() }
+                } label: {
+                    HStack {
+                        Text(Self.linesTitle(k)).foregroundStyle(.primary)
+                        Spacer()
+                        if locked { Image(systemName: "crown.fill").foregroundStyle(.yellow) }
+                    }
+                }
+                .accessibilityIdentifier("lines_\(k.rawValue)")
+            }
         case .effects:
             ForEach(ComicEffects.all) { e in
                 Button(e.title) { vm.insertEffect(e, options: EffectOptions()); dismiss() }

@@ -15,6 +15,7 @@ struct SimpleToolbar: View {
     @Binding var brushPickerOpen: Bool
     @State private var photo: PhotosPickerItem?
     @State private var panelsOpen = false
+    @State private var models3dOpen = false
 
     struct Tool: Identifiable {
         let id: String; let icon: String; let label: String; var selected = false; var enabled = true; let run: () -> Void
@@ -35,6 +36,7 @@ struct SimpleToolbar: View {
                 Tool(id: "panels", icon: "rectangle.split.2x2", label: L("v45_panels_add")) { panelsOpen = true },
             ]
         }
+        t.append(Tool(id: "model3d", icon: "cube.transparent", label: L("add_model3d")) { models3dOpen = true })
         t.append(Tool(id: "background", icon: "photo.on.rectangle", label: L("add_background")) { sheet = .background })
         return t
     }
@@ -110,6 +112,11 @@ struct SimpleToolbar: View {
         .padding(.horizontal, 8)
         .padding(.bottom, 6)
         .accessibilityIdentifier("simple_tool_row")
+        .sheet(isPresented: $models3dOpen) {
+            if let repo = EditorDependencies.shared.models3d {
+                Model3DPickerSheet(vm: vm, repository: repo, kind: store.canvas?.kind ?? .SIMPLE_ART)
+            }
+        }
         .sheet(isPresented: $panelsOpen) { NotesPanelsSheet { id in vm.v45.insertPanels(id); panelsOpen = false } }
         .sheet(isPresented: Binding(get: { ruler.libraryOpen }, set: { ruler.libraryOpen = $0 })) {
             ShapePickerView(kind: store.canvas?.kind ?? .SIMPLE_ART) { id in

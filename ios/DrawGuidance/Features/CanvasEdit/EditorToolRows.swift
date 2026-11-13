@@ -34,6 +34,7 @@ struct ModeToolRow: View {
     @State private var charactersOpen = false
     @State private var locationsOpen = false
     @State private var objectsOpen = false
+    @State private var models3dOpen = false
     @State private var panelsOpen = false
 
     var body: some View {
@@ -44,6 +45,11 @@ struct ModeToolRow: View {
         .sheet(isPresented: $comicOpen) { ComicInsertSheet(vm: vm) }
         .sheet(isPresented: $charactersOpen) { CharactersSheet { v in vm.insertCharacter(v) } }
         .sheet(isPresented: $locationsOpen) { LocationBackgroundsSheet { b in vm.pickLocation(b) } }
+        .sheet(isPresented: $models3dOpen) {
+            if let repo = EditorDependencies.shared.models3d {
+                Model3DPickerSheet(vm: vm, repository: repo, kind: store.canvas?.kind ?? .ART)
+            }
+        }
         .sheet(isPresented: $objectsOpen) { ComicObjectsSheet { p in vm.insertComicProp(.OBJECT, p) } }
         .sheet(isPresented: $panelsOpen) { NotesPanelsSheet { id in vm.v45.insertPanels(id); panelsOpen = false } }
         .sheet(isPresented: Binding(get: { ruler.libraryOpen }, set: { ruler.libraryOpen = $0 })) {
@@ -133,6 +139,7 @@ struct ModeToolRow: View {
                 ToolButton(icon: "function", label: L("add_formula"), id: "add_formula", anchor: TutorialAnchor.add("formula")) { vm.formulas.openPicker() }
                 ToolButton(icon: "rectangle.split.2x2", label: L("v45_panels_add"), id: "add_panels", anchor: TutorialAnchor.add("panels")) { panelsOpen = true }
             }
+            ToolButton(icon: "cube.transparent", label: L("add_model3d"), id: "add_model3d", anchor: TutorialAnchor.add("model3d")) { models3dOpen = true }
             PhotosPicker(selection: $photo, matching: .images) {
                 Image(systemName: "photo.badge.plus").frame(width: 36, height: 36)
             }

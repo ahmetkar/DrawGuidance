@@ -275,27 +275,37 @@ struct BackgroundSheet: View {
     @ObservedObject var vm: EditorViewModel
     @ObservedObject var store: EditorStore
     @Environment(\.dismiss) private var dismiss
-    @State private var photo: PhotosPickerItem?
 
     var body: some View {
+        let kind = store.canvas?.kind ?? .ART
         NavigationStack {
-            Form {
-                ColorPicker(L("add_background"), selection: Binding(
-                    get: { Color(hex: store.canvas?.pagePaperHex ?? "#FFFFFF") ?? .white },
-                    set: { vm.setBackgroundColor($0.hexRGB, coalesce: "bg-color") }), supportsOpacity: false)
-                PhotosPicker(selection: $photo, matching: .images) { Label(L("add_image"), systemImage: "photo") }
-                if !(store.canvas?.pageBackground.isEmpty ?? true) {
-                    Button(L("guide_remove"), role: .destructive) { vm.removeBackground() }
+            ScrollView {
+                VStack(alignment: .leading, spacing: 16) {
+                    ColorPicker(L("canvas_background_color_label"), selection: Binding(
+                        get: { Color(hex: store.canvas?.pagePaperHex ?? "#FFFFFF") ?? .white },
+                        set: { vm.setBackgroundColor($0.hexRGB, coalesce: "bg-color") }), supportsOpacity: false)
+                    // v23 desen, resim ve gradyan (Android çizim ekranındaki arka plan penceresi)
+                    BackgroundPickerView(
+                        usage: kind.isNotes ? .NOTE : .ART,
+                        paperHex: store.canvas?.pagePaperHex ?? "#FFFFFF",
+                        spec: Binding(get: { store.canvas?.pageBackground ?? BackgroundSpec() }, set: { vm.setBackgroundSpec($0) }),
+                        showImages: kind != .COMIC,
+                        onGallery: { vm.importBackground($0) })
+                    if vm.backgroundPerPage() {
+                        Button(L("bg_apply_all")) { vm.applyBackgroundToAllPages() }
+                            .accessibilityIdentifier("bg_apply_all")
+                    }
+                    if !(store.canvas?.pageBackground.isEmpty ?? true) {
+                        Button(L("guide_remove"), role: .destructive) { vm.removeBackground() }
+                    }
                 }
+                .padding(16)
             }
             .navigationTitle(L("add_background"))
+            .navigationBarTitleDisplayMode(.inline)
             .toolbar { ToolbarItem(placement: .confirmationAction) { Button(L("close")) { dismiss() } } }
         }
-        .presentationDetents([.medium])
-        .onChange(of: photo) { _, item in
-            guard let item else { return }
-            Task { if let d = try? await item.loadTransferable(type: Data.self) { vm.importBackground(d) }; photo = nil }
-        }
+        .presentationDetents([.medium, .large])
     }
 }
 

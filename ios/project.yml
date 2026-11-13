@@ -30,6 +30,10 @@ targets:
       - path: ../android/app/src/main/assets/comic
         type: folder
         buildPhase: resources
+      # v46 hazır tuval şablonları (Android ile ortak: templates/catalog.json, templates/<id>/...)
+      - path: ../android/app/src/main/assets/templates
+        type: folder
+        buildPhase: resources
     dependencies:
       - package: TalsecRuntime
       - package: GoogleMobileAds

@@ -3,14 +3,26 @@ import XCTest
 final class LaunchUITests: XCTestCase {
     override func setUp() { continueAfterFailure = false }
 
+    /// Ana sayfadan yeni tuval: grup (basit / gelişmiş) açılır, tür seçilir, formda Oluştur.
+    private func createCanvas(_ app: XCUIApplication, _ kind: String) {
+        let simple = ["SIMPLE_ART", "SIMPLE_NOTES", "KIDS"].contains(kind)
+        let group = app.buttons[simple ? "home_new_simple" : "home_new_advanced"]
+        XCTAssertTrue(group.waitForExistence(timeout: 10))
+        group.tap()
+        let item = app.buttons["new_\(kind)"]
+        XCTAssertTrue(item.waitForExistence(timeout: 5))
+        item.tap()
+        let submit = app.buttons["canvas_form_submit"]
+        XCTAssertTrue(submit.waitForExistence(timeout: 5))
+        submit.tap()
+    }
+
     func testCreateCanvasDrawUndo() throws {
         let app = XCUIApplication()
         app.launchArguments += ["-AppleLanguages", "(tr)", "-uiTesting"]
         app.launch()
 
-        let newArt = app.buttons["new_ART"]
-        XCTAssertTrue(newArt.waitForExistence(timeout: 10))
-        newArt.tap()
+        createCanvas(app, "ART")
 
         // Düzenleyici açılmadan sürüklenirse dokunuş başka yere gider: önce tuvalin görünmesi beklenir
         let canvas = app.descendants(matching: .any)["drawing_canvas"].firstMatch
@@ -37,9 +49,7 @@ final class LaunchUITests: XCTestCase {
         let app = XCUIApplication()
         app.launchArguments += ["-AppleLanguages", "(tr)", "-uiTesting"]
         app.launch()
-        let newNotes = app.buttons["new_NOTES"]
-        XCTAssertTrue(newNotes.waitForExistence(timeout: 10))
-        newNotes.tap()
+        createCanvas(app, "NOTES")
 
         let tool = app.descendants(matching: .any)["add_shape"].firstMatch
         XCTAssertTrue(tool.waitForExistence(timeout: 10))
@@ -83,9 +93,7 @@ final class LaunchUITests: XCTestCase {
         let app = XCUIApplication()
         app.launchArguments += ["-AppleLanguages", "(tr)", "-uiTesting"]
         app.launch()
-        let newArt = app.buttons["new_ART"]
-        XCTAssertTrue(newArt.waitForExistence(timeout: 10))
-        newArt.tap()
+        createCanvas(app, "ART")
 
         let menu = app.descendants(matching: .any)["brush_button"].firstMatch
         XCTAssertTrue(menu.waitForExistence(timeout: 10))
@@ -107,7 +115,7 @@ final class LaunchUITests: XCTestCase {
         let app = XCUIApplication()
         app.launchArguments += ["-AppleLanguages", "(tr)", "-uiTesting"]
         app.launch()
-        let models = app.buttons["home_models3d"]
+        let models = app.tabBars.buttons.element(boundBy: 3)
         XCTAssertTrue(models.waitForExistence(timeout: 10))
         models.tap()
         let new = app.buttons["models3d_new"]
@@ -136,11 +144,7 @@ final class LaunchUITests: XCTestCase {
         let app = XCUIApplication()
         app.launchArguments += ["-AppleLanguages", "(tr)", "-uiTesting"]
         app.launch()
-        let kids = app.buttons["new_KIDS"]
-        XCTAssertTrue(kids.waitForExistence(timeout: 10))
-        var tries = 0
-        while !kids.isHittable && tries < 6 { kids.swipeLeft(); tries += 1 }
-        kids.tap()
+        createCanvas(app, "KIDS")
         // Maskot kapalıysa köşedeki yüz düğmesi açar ve selam verir; açıksa maskota dokununca ipucu söyler
         let toggle = app.descendants(matching: .any)["kids_mascot_toggle"].firstMatch
         let mascot = app.descendants(matching: .any)["kids_mascot"].firstMatch
@@ -162,11 +166,7 @@ final class LaunchUITests: XCTestCase {
         let app = XCUIApplication()
         app.launchArguments += ["-AppleLanguages", "(tr)", "-uiTesting"]
         app.launch()
-        let kids = app.buttons["new_KIDS"]
-        XCTAssertTrue(kids.waitForExistence(timeout: 10))
-        var tries = 0
-        while !kids.isHittable && tries < 6 { kids.swipeLeft(); tries += 1 }
-        kids.tap()
+        createCanvas(app, "KIDS")
         let tool = app.buttons["kids_challenge"]
         XCTAssertTrue(tool.waitForExistence(timeout: 10))
         tool.tap()
@@ -196,9 +196,7 @@ final class LaunchUITests: XCTestCase {
         let app = XCUIApplication()
         app.launchArguments += ["-AppleLanguages", "(tr)", "-uiTesting"]
         app.launch()
-        let newArt = app.buttons["new_ART"]
-        XCTAssertTrue(newArt.waitForExistence(timeout: 10))
-        newArt.tap()
+        createCanvas(app, "ART")
         let menu = app.buttons["tutorial_menu"]
         XCTAssertTrue(menu.waitForExistence(timeout: 10))
         menu.tap()
@@ -225,11 +223,7 @@ final class LaunchUITests: XCTestCase {
         let app = XCUIApplication()
         app.launchArguments += ["-AppleLanguages", "(tr)", "-uiTesting"]
         app.launch()
-        let notes = app.buttons["new_SIMPLE_NOTES"]
-        XCTAssertTrue(notes.waitForExistence(timeout: 10))
-        var tries = 0
-        while !notes.isHittable && tries < 6 { notes.swipeLeft(); tries += 1 }
-        notes.tap()
+        createCanvas(app, "SIMPLE_NOTES")
         for tag in ["simple_menu_add", "simple_menu_draw", "simple_menu_edit"] {
             XCTAssertTrue(app.descendants(matching: .any)[tag].firstMatch.waitForExistence(timeout: 10), tag)
         }

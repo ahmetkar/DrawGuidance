@@ -273,7 +273,7 @@ struct Model3DListView: View {
                     .accessibilityIdentifier("models3d_new")
             }
         }
-        .navigationDestination(item: $open) { o in Model3DEditorView(repository: repository, modelId: o.modelId) }
+        .navigationDestination(item: $open) { o in Model3DEditorView(repository: repository, modelId: o.modelId).toolbar(.hidden, for: .tabBar) }
         .fileImporter(isPresented: $picking, allowedContentTypes: [.glb, .gltf, .data]) { r in
             guard case .success(let url) = r else { return }
             let ok = url.startAccessingSecurityScopedResource()

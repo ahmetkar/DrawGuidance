@@ -39,11 +39,46 @@ final class CanvasStore: ObservableObject {
 
     func create(kind: CanvasKind, name: String) -> CanvasUi {
         let size = kind.defaultSize
+        return create(kind: kind, name: name, width: size.width, height: size.height)
+    }
+
+    /// Yeni tuval (Android `CanvasRepository.createCanvas`). v45 çizgi roman kapakla başlar: ilk sayfa kapak, ardından
+    /// [pageCount] boş sayfa; tuval kapaktan sonraki ilk sayfada açılır.
+    func create(kind: CanvasKind, name: String, width: Int, height: Int, paperHex: String = "#FFFFFF", aiEnabled: Bool = true,
+                pageCount: Int = 1, background: BackgroundSpec = BackgroundSpec(), cover: [Stroke]? = nil, folderId: String? = nil) -> CanvasUi {
         let now = Self.nowMs()
-        let c = CanvasUi(localId: UUID().uuidString.lowercased(), name: name, width: size.width, height: size.height,
-                         backgroundColorHex: "#FFFFFF", aiEnabled: true, pages: [[]], createdAt: now, updatedAt: now, kind: kind)
+        let n = min(max(pageCount, 1), max(kind.maxPages - (cover != nil ? 1 : 0), 1))
+        var pages: [[Stroke]] = Array(repeating: [], count: n)
+        var c = CanvasUi(localId: UUID().uuidString.lowercased(), name: name, width: width, height: height,
+                         backgroundColorHex: paperHex, aiEnabled: aiEnabled, pages: pages, createdAt: now, updatedAt: now, kind: kind)
+        if let cover {
+            pages.insert(cover.enumerated().map { i, s in var t = s; t.order = i; return t }, at: 0)
+            c.pages = pages
+            c.pageBackgrounds = [PageBackground(cover: true)]
+            c.currentPage = 1
+        }
+        c.background = background
+        c.folderId = folderId
         save(c)
-        return c
+        return canvases.first { $0.localId == c.localId } ?? c
+    }
+
+    /// v46 hazır şablondan tuval (Android `createFromTemplate`): boyut, kâğıt, arka plan, sayfalar ve resimler şablondan.
+    func createFromTemplate(_ t: PreparedTemplate, kind: CanvasKind, name: String, aiEnabled: Bool, folderId: String? = nil,
+                            saveAsset: (String, String, Data, TemplateAsset) -> Void = { _, _, _, _ in }) -> CanvasUi {
+        let now = Self.nowMs()
+        let localId = UUID().uuidString.lowercased()
+        for (id, bytes, a) in t.assets { saveAsset(localId, id, bytes, a) }
+        var c = CanvasUi(localId: localId, name: name, width: t.meta.width, height: t.meta.height,
+                         backgroundColorHex: t.meta.backgroundColorHex, aiEnabled: aiEnabled, pages: t.pages.isEmpty ? [[]] : t.pages,
+                         createdAt: now, updatedAt: now, kind: kind)
+        c.layers = t.layers
+        c.background = t.background
+        c.guide = t.guide
+        c.currentPage = min(max(t.meta.currentPage, 0), c.pages.count - 1)
+        c.folderId = folderId
+        save(c)
+        return canvases.first { $0.localId == c.localId } ?? c
     }
 
     static func meta(_ c: CanvasUi) -> Meta {

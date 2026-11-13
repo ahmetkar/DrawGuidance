@@ -175,7 +175,8 @@ final class RulerShape {
             cont = [(hl, true)]
             if bb >= a * 0.999 { b.arc(cx, cy, a, 0, 2 * .pi).endContour() } else { b.polyline(w(hl), closed: true).endContour() }
         case .FRENCH_CURVE:
-            let outer = FrenchCurve.outer.map { $0 * l }, inner = FrenchCurve.inner.map { $0 * l }
+            let len = pose.length
+            let outer = FrenchCurve.outer.map { $0 * len }, inner = FrenchCurve.inner.map { $0 * len }
             body = outer; hole = inner
             cont = [(outer, true), (inner, true)]
             b.polyline(w(outer), closed: true).endContour()

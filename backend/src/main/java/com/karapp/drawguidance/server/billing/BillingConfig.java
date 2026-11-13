@@ -1,5 +1,8 @@
 package com.karapp.drawguidance.server.billing;
 
+import com.karapp.drawguidance.server.billing.apple.AppStoreApi;
+import com.karapp.drawguidance.server.billing.apple.AppleBillingProperties;
+import com.karapp.drawguidance.server.billing.apple.LibraryAppStoreApi;
 import com.karapp.drawguidance.server.billing.play.GooglePlayApi;
 import com.karapp.drawguidance.server.billing.play.HttpGooglePlayApi;
 import com.karapp.drawguidance.server.config.DrawGuidanceProperties;
@@ -12,13 +15,19 @@ import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 
 import java.time.Duration;
 
-/** v39 faturalama bileşenleri: Google Play istemcisi ve Pub/Sub jeton doğrulayıcısı. */
+/** v39 faturalama bileşenleri: Google Play istemcisi, Pub/Sub jeton doğrulayıcısı ve (v50) App Store. */
 @Configuration
 public class BillingConfig {
 
     @Bean
     GooglePlayApi googlePlayApi(DrawGuidanceProperties props, ObjectMapper json) {
         return HttpGooglePlayApi.fromProperties(props.billing(), json);
+    }
+
+    /** v50 App Store: imza doğrulaması her zaman, Server API yalnız anahtar verildiyse. */
+    @Bean
+    AppStoreApi appStoreApi(AppleBillingProperties apple, ObjectMapper json) {
+        return LibraryAppStoreApi.fromProperties(apple, json);
     }
 
     @Bean

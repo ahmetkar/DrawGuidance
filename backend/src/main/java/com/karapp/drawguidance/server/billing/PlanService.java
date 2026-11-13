@@ -53,6 +53,12 @@ public class PlanService {
         return null;
     }
 
+    /** v50 App Store ürününe karşılık gelen plan (planın {@code appleProductIds} listesinde); yoksa {@code null}. */
+    public Document planForAppleProduct(String productId) {
+        if (productId == null) return null;
+        return mongo.getCollection(Stores.PLANS).find(Filters.eq("appleProductIds", productId)).first();
+    }
+
     public Features features(String planId) {
         if (planId == null) return Features.NONE;
         List<String> keys = new ArrayList<>();

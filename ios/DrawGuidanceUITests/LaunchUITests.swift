@@ -3,6 +3,16 @@ import XCTest
 final class LaunchUITests: XCTestCase {
     override func setUp() { continueAfterFailure = false }
 
+    /// Hata olunca erişilebilirlik ağacı günlüğe yazılır (CI'da hangi kimliğin görünmediği anlaşılsın)
+    private var dumped = false
+    override func record(_ issue: XCTIssue) {
+        if !dumped {
+            dumped = true
+            print("DGTREE ---- \(name)\n\(XCUIApplication().debugDescription)\nDGTREE ----")
+        }
+        super.record(issue)
+    }
+
     /// Ana sayfadan yeni tuval: grup (basit / gelişmiş) açılır, tür seçilir, formda Oluştur.
     private func createCanvas(_ app: XCUIApplication, _ kind: String) {
         let simple = ["SIMPLE_ART", "SIMPLE_NOTES", "KIDS"].contains(kind)
@@ -169,6 +179,9 @@ final class LaunchUITests: XCTestCase {
         createCanvas(app, "KIDS")
         let tool = app.buttons["kids_challenge"]
         XCTAssertTrue(tool.waitForExistence(timeout: 10))
+        // Araç şeridi yatay kayar: "Çizim Görevi" dar ekranda sağda, görünene dek sola kaydırılır
+        let strip = app.scrollViews.containing(.button, identifier: "kids_challenge").firstMatch
+        for _ in 0..<4 where !tool.isHittable { strip.swipeLeft() }
         tool.tap()
         let start = app.buttons["challenge_start"]
         XCTAssertTrue(start.waitForExistence(timeout: 5))

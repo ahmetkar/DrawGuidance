@@ -68,6 +68,7 @@ struct TutorialOverlay: View {
             GeometryReader { geo in
                 content(ui, geo.size)
             }
+            .accessibilityElement(children: .contain)
             .accessibilityIdentifier("tutorial_overlay")
             .onDisappear { viewport.fit() }
         }

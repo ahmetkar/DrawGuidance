@@ -4,7 +4,6 @@ import Foundation
 /// Abonelik için gereken hesap bilgisi (Firebase). `AccountStore` bu protokole uyar ve açılışta
 /// `SubscriptionStore.shared.connect(...)` ile bağlanır; giriş yoksa `uid` nil.
 @MainActor
-@MainActor
 protocol SubscriptionAccount: AnyObject {
     /// Giriş yapmış kullanıcının Firebase uid'si (yoksa nil).
     var subscriptionUid: String? { get }

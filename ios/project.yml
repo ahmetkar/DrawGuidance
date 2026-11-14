@@ -23,8 +23,8 @@ packages:
     exactVersion: 8.0.0
 settings:
   base:
-    MARKETING_VERSION: "1.7.0"
-    CURRENT_PROJECT_VERSION: "49"
+    MARKETING_VERSION: "1.8.0"
+    CURRENT_PROJECT_VERSION: "50"
     SWIFT_VERSION: "5.0"
     # Apple Developer takım kimliği (gizli değil; imzalama ve freeRASP imza denetimi için)
     DEVELOPMENT_TEAM: "G3LKL7QH6D"

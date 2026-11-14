@@ -32,8 +32,8 @@ android {
         minSdk = 23
         targetSdk = 36
         // v39 Play'e yükleme: her yüklemede versionCode artmalı
-        versionCode = 49
-        versionName = "1.7.0"
+        versionCode = 50
+        versionName = "1.8.0"
 
         // Emülatör/gerçek cihazda backend'e ulaşmak için:
         // - Emülatör (AVD) için host makine 10.0.2.2 üzerinden erişilir.

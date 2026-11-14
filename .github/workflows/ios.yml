@@ -75,7 +75,7 @@ jobs:
           test -d "$APP"
           mkdir -p build/ipa/Payload
           cp -R "$APP" build/ipa/Payload/
-          (cd build/ipa && zip -qry ../DrawGuidance-v49-ios-unsigned.ipa Payload)
+          (cd build/ipa && zip -qry ../DrawGuidance-v50-ios-unsigned.ipa Payload)
           ls -la build/*.ipa
           echo "Sembol kontrolü (ilk 20):"; nm -U "$APP/DrawGuidance" | head -20 || true
 

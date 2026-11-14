@@ -1,6 +1,8 @@
 pluginManagement {
     repositories {
         google()
+        // İsteğe bağlı Maven Central aynası (ör. DG_MAVEN_MIRROR=https://maven-central.storage-download.googleapis.com/maven2/)
+        System.getenv("DG_MAVEN_MIRROR")?.let { maven { url = uri(it) } }
         mavenCentral()
         gradlePluginPortal()
     }
@@ -15,6 +17,7 @@ dependencyResolutionManagement {
         val gmavenV45 = file("/mnt/project-files/drawguidance/gmaven-v45")
         if (gmavenV45.exists()) maven { url = uri(gmavenV45) }
         google()
+        System.getenv("DG_MAVEN_MIRROR")?.let { maven { url = uri(it) } }
         mavenCentral()
         // v49 freeRASP (Talsec) çalışma zamanı koruması deposu
         maven { url = uri("https://europe-west3-maven.pkg.dev/talsec-artifact-repository/common") }

@@ -117,6 +117,25 @@ final class ImagesRepository {
                                        defaultLocation: target == .defaultLocation))
     }
 
+    /// v51 başka cihazdan alınan resmi (PNG, JPEG, WEBP) olduğu gibi Kaydedilenler'e yazar.
+    func saveReceived(_ bytes: Data, title: String, mime: String, width: Int, height: Int, source: String) throws -> SavedImage {
+        let ext: String
+        switch mime {
+        case "image/jpeg": ext = "jpg"
+        case "image/webp": ext = "webp"
+        case "image/heic": ext = "heic"
+        default: ext = "png"
+        }
+        let name = ImageExporter.safeName(title.isEmpty ? "DrawGuidance" : title) + "." + ext
+        let file = try exporter.write(bytes, name, subfolder: nil, target: .defaultLocation)
+        let (path, bm) = relative(file.url, .defaultLocation)
+        var w = width, h = height
+        if w <= 0 || h <= 0, let img = CanvasImageCache.decode(bytes, maxSide: nil) { w = img.width; h = img.height }
+        return store.insert(SavedImage(id: 0, canvasLocalId: source, title: title, path: path, bookmark: bm, width: w, height: h,
+                                       createdAt: Self.now(), location: file.location, sizeBytes: file.sizeBytes, mime: mime,
+                                       defaultLocation: true))
+    }
+
     private func record(_ canvas: CanvasUi, _ file: ExportedFile, _ mime: String, _ target: SaveTarget) {
         let (path, bm) = relative(file.url, target)
         store.insert(SavedImage(id: 0, canvasLocalId: canvas.localId, title: canvas.name, path: path, bookmark: bm, width: canvas.width,

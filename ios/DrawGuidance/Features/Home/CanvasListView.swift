@@ -104,6 +104,11 @@ struct CanvasListView: View {
                 Button { creating = true } label: { Label(L("new_canvas"), systemImage: "plus") }
                     .accessibilityIdentifier("canvas_list_new")
             }
+            // v51 paylaşım sayfası (sağ üst köşe)
+            ToolbarItem(placement: .primaryAction) {
+                NavigationLink { ShareView() } label: { Label(L("v51_share_open"), systemImage: "antenna.radiowaves.left.and.right") }
+                    .accessibilityIdentifier("canvas_list_share")
+            }
         }
         .overlay(alignment: .bottom) {
             if let message {
@@ -138,7 +143,7 @@ struct CanvasListView: View {
         }
         .alert(L("delete_confirm_title"), isPresented: Binding(get: { deleting != nil }, set: { if !$0 { deleting = nil } })) {
             Button(L("delete_button"), role: .destructive) {
-                if let d = deleting { store.delete(d.localId); EditorDependencies.shared.recent.remove(d.localId) }
+                if let d = deleting { store.delete(d.localId); EditorDependencies.shared.recent.remove(d.localId); SharedCanvasRegistry.shared.forget(d.localId) }
                 deleting = nil
             }
             Button(L("cancel_button"), role: .cancel) { deleting = nil }
@@ -172,15 +177,29 @@ struct CanvasListView: View {
 /// Tuval kartı (Android `CanvasCard`).
 struct CanvasCard: View {
     let canvas: CanvasUi
+    @ObservedObject private var shared = SharedCanvasRegistry.shared
 
     var body: some View {
+        let info = shared.get(canvas.localId)
         VStack(alignment: .leading, spacing: 6) {
             CanvasThumbnail(canvas: canvas)
                 .aspectRatio(CGFloat(max(canvas.width, 1)) / CGFloat(max(canvas.height, 1)) > 1.3 ? 4 / 3 : 3 / 4, contentMode: .fit)
                 .frame(maxWidth: .infinity)
                 .clipShape(RoundedRectangle(cornerRadius: 12))
                 .overlay(RoundedRectangle(cornerRadius: 12).stroke(Color.secondary.opacity(0.2), lineWidth: 1))
+                .overlay(alignment: .topTrailing) {
+                    // v51 başka cihazdan alınan tuval
+                    if info != nil {
+                        Image(systemName: info?.live == true ? "dot.radiowaves.left.and.right" : "arrow.down.circle.fill")
+                            .font(.caption).foregroundStyle(.white).padding(5)
+                            .background(Circle().fill(Color.accentColor)).padding(6)
+                    }
+                }
             Text(canvas.name).font(.callout.weight(.medium)).lineLimit(1)
+            if let info {
+                Text(L(info.live ? "v51_share_shared_live_badge" : "v51_share_shared_badge", info.from))
+                    .font(.caption2.weight(.semibold)).foregroundStyle(Color.accentColor).lineLimit(1)
+            }
             HStack(spacing: 6) {
                 Image(systemName: canvas.kind.systemImage)
                 Text(canvas.kind.label).lineLimit(1)

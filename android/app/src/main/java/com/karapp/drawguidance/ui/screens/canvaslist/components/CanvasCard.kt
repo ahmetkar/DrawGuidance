@@ -19,6 +19,9 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.collectAsState
+import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import com.karapp.drawguidance.ui.i18n.Text
@@ -40,10 +43,37 @@ import com.karapp.drawguidance.ui.theme.NeuTheme
 /** Tuvalin tek satırlık bilgisi: tür (not), boyut ve sayfa sayısı. */
 @Composable
 fun canvasSubtitle(canvas: CanvasUi): String =
+    sharedLabel(canvas.localId).let { if (it != null) "$it · " else "" } +
     (com.karapp.drawguidance.ui.components.canvasKindBadge(canvas.kind)?.let { "$it · " } ?: "") +
         "${canvas.width}×${canvas.height}" + (if (canvas.pageCount > 1) " · " + com.karapp.drawguidance.i18n.I18n.trf("{0} sayfa", canvas.pageCount) else "") +
         // Kayıtlı boyut (çizim verisi + eklenen resimler)
         (if (canvas.sizeBytes > 0) " · " + com.karapp.drawguidance.ui.components.formatFileSize(canvas.sizeBytes) else "")
+
+/** v51 başka cihazdan alınan tuvalin etiketi ("Paylaşılan · gönderen"); alınmamışsa null. */
+@Composable
+fun sharedLabel(canvasId: String): String? {
+    // Koin'siz önizleme ve testlerde rozet yok
+    val registry = androidx.compose.runtime.remember {
+        org.koin.core.context.GlobalContext.getOrNull()?.getOrNull<com.karapp.drawguidance.data.share.SharedCanvasRegistry>()
+    } ?: return null
+    val all by registry.all.collectAsState()
+    val info = all[canvasId] ?: return null
+    return androidx.compose.ui.res.stringResource(
+        if (info.live) com.karapp.drawguidance.R.string.v51_share_shared_live_badge else com.karapp.drawguidance.R.string.v51_share_shared_badge,
+        info.from,
+    )
+}
+
+/** v51 paylaşılan tuvalin önizlemesinin köşesindeki küçük simge. */
+@Composable
+private fun SharedMark(canvasId: String, modifier: Modifier) {
+    if (sharedLabel(canvasId) == null) return
+    val colors = NeuTheme.colors
+    Box(
+        modifier.size(22.dp).clip(CircleShape).background(colors.accent),
+        contentAlignment = Alignment.Center,
+    ) { Icon(Icons.Filled.Share, null, tint = colors.onAccent, modifier = Modifier.size(13.dp)) }
+}
 
 /**
  * Galeri görünümünde tuval: kendi oranındaki sade önizleme (kutu yok), altında adı ve bilgisi.
@@ -76,6 +106,7 @@ fun CanvasCard(
             background = canvas.pageBackground,
         )
         if (isSelected) SelectedMark(Modifier.align(Alignment.TopStart).padding(8.dp))
+        SharedMark(canvas.localId, Modifier.align(Alignment.TopEnd).padding(8.dp))
     }
 }
 
@@ -119,6 +150,7 @@ fun CanvasRow(
                 canvas.pageBackground,
             )
             if (isSelected) SelectedMark(Modifier.align(Alignment.TopStart).padding(4.dp))
+            SharedMark(canvas.localId, Modifier.align(Alignment.TopEnd).padding(3.dp))
         }
         Spacer(Modifier.width(14.dp))
         Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(2.dp)) {

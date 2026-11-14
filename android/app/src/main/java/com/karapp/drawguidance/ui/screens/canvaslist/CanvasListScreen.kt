@@ -17,6 +17,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Share
 import androidx.compose.material.icons.filled.GridView
 import androidx.compose.material.icons.automirrored.filled.Sort
 import androidx.compose.material.icons.automirrored.filled.ViewList
@@ -70,6 +71,8 @@ fun CanvasListScreen(
     onOpenCanvas: (localId: String) -> Unit,
     bottomBar: @Composable () -> Unit = {},
     viewModel: CanvasListViewModel = koinViewModel(),
+    /** v51 sağ üst köşedeki paylaşım düğmesi: cihazlar arası paylaşım sayfası (null: düğme yok). */
+    onOpenShare: (() -> Unit)? = null,
 ) {
     val colors = NeuTheme.colors
     val allCanvases by viewModel.canvases.collectAsState()
@@ -228,6 +231,8 @@ fun CanvasListScreen(
                             { gridView = !gridView },
                         )
                         NeuIconButton(Icons.Filled.Add, stringResource(R.string.new_canvas), { showCreateModal = true }, tint = colors.accent)
+                        // v51 cihazlar arası paylaşım (sağ üst köşe; çocuk kilidinde yok)
+                        if (onOpenShare != null && !kidsLocked) NeuIconButton(Icons.Filled.Share, stringResource(R.string.v51_share_title), onOpenShare, modifier = Modifier.testTag("canvas_list_share"))
                     },
                 )
             } else {
@@ -260,6 +265,8 @@ fun CanvasListScreen(
                             NeuIconButton(Icons.Filled.CreateNewFolder, stringResource(R.string.folder_new), { newFolderOpen = true })
                         }
                         NeuIconButton(Icons.Filled.Add, stringResource(R.string.new_canvas), { showCreateModal = true }, tint = colors.accent)
+                        // v51 cihazlar arası paylaşım (sağ üst köşe; çocuk kilidinde yok)
+                        if (onOpenShare != null && !kidsLocked) NeuIconButton(Icons.Filled.Share, stringResource(R.string.v51_share_title), onOpenShare, modifier = Modifier.testTag("canvas_list_share"))
                     },
                 )
             }

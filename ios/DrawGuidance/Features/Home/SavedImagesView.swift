@@ -80,7 +80,7 @@ struct SavedImagesView: View {
 }
 
 /// Kaydedilen dosyanın küçük resmi (resim değilse belge simgesi).
-private struct SavedThumb: View {
+struct SavedThumb: View {
     let url: URL
     let mime: String
     @State private var image: CGImage?

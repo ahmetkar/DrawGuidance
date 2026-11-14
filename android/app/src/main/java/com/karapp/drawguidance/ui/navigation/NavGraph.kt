@@ -27,6 +27,10 @@ object Routes {
     const val SUBSCRIPTION = "subscription"
     /** v23 3B Şekiller bölümü ve 3B düzenleyici penceresi. */
     const val MODELS = "models3d"
+    /** v51 cihazlar arası paylaşım sayfası ve canlı yayın görüntüleyici (yayını alan taraf). */
+    const val SHARE = "share"
+    const val LIVE = "live/{localId}"
+    fun live(localId: String) = "live/$localId"
     const val MODEL_EDIT = "model3dEdit?modelId={modelId}&canvasId={canvasId}&strokeId={strokeId}&name={name}"
     fun canvasEdit(localId: String) = "canvasEdit/$localId"
     /** v33 [name]: yeni 3B şeklin adı (ana sayfadaki 3B tuval oluşturma). */
@@ -64,6 +68,11 @@ fun DrawGuidanceNavGraph(
         navController.addOnDestinationChangedListener(listener)
         onDispose { navController.removeOnDestinationChangedListener(listener) }
     }
+    // v51 paylaşım pencereleri (bağlantı isteği, gelen teklif, alınan tuval) her ekranda
+    com.karapp.drawguidance.ui.screens.share.ShareHost(
+        onOpenCanvas = { id -> navController.navigate(Routes.canvasEdit(id)) { launchSingleTop = true } },
+        onOpenLive = { id -> navController.navigate(Routes.live(id)) { launchSingleTop = true } },
+    )
     NavHost(navController = navController, startDestination = if (startOnHome) Routes.HOME else Routes.CANVAS_LIST) {
         composable(Routes.HOME) {
             MainSectionFrame(MainTab.HOME, ::openTab) { bar ->
@@ -83,6 +92,7 @@ fun DrawGuidanceNavGraph(
                 CanvasListScreen(
                     onOpenCanvas = { localId -> navController.navigate(Routes.canvasEdit(localId)) },
                     bottomBar = bar,
+                    onOpenShare = { navController.navigate(Routes.SHARE) },
                 )
             }
         }
@@ -124,7 +134,10 @@ fun DrawGuidanceNavGraph(
         }
         composable(Routes.SETTINGS) {
             MainSectionFrame(MainTab.SETTINGS, ::openTab) { bar ->
-                SettingsScreen(bottomBar = bar, onOpenAccount = { navController.navigate(Routes.ACCOUNT) }, onOpenSubscription = { navController.navigate(Routes.SUBSCRIPTION) })
+                SettingsScreen(
+                    bottomBar = bar, onOpenAccount = { navController.navigate(Routes.ACCOUNT) }, onOpenSubscription = { navController.navigate(Routes.SUBSCRIPTION) },
+                    onOpenShare = { navController.navigate(Routes.SHARE) },
+                )
             }
         }
         composable(Routes.ACCOUNT) {
@@ -137,6 +150,22 @@ fun DrawGuidanceNavGraph(
             if (!com.karapp.drawguidance.ui.kids.kidsBlocked { navController.popBackStack() }) com.karapp.drawguidance.ui.screens.subscription.SubscriptionScreen(
                 onBack = { navController.popBackStack() },
                 vm = org.koin.androidx.compose.koinViewModel(),
+            )
+        }
+        composable(Routes.SHARE) {
+            // v51 çocuk kilidinde paylaşım kapalı
+            if (!com.karapp.drawguidance.ui.kids.kidsBlocked { navController.popBackStack() }) com.karapp.drawguidance.ui.screens.share.ShareScreen(
+                onBack = { navController.popBackStack() },
+                onOpenCanvas = { id -> navController.navigate(Routes.canvasEdit(id)) },
+                onOpenLive = { id -> navController.navigate(Routes.live(id)) },
+            )
+        }
+        composable(Routes.LIVE) { entry ->
+            val localId = entry.arguments?.getString("localId") ?: return@composable
+            com.karapp.drawguidance.ui.screens.share.LiveCanvasScreen(
+                canvasId = localId,
+                onBack = { navController.popBackStack() },
+                onEdit = { id -> navController.navigate(Routes.canvasEdit(id)) { popUpTo(Routes.LIVE) { inclusive = true } } },
             )
         }
         composable(Routes.LOGS) {

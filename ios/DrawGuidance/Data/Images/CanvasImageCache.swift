@@ -126,6 +126,12 @@ final class CanvasAssetStore {
 
     func bytes(_ id: String) -> Data? { meta(id).flatMap { try? Data(contentsOf: file($0)) } }
 
+    /// v51 tuvalin bütün resim/veri kayıtları (cihazlar arası paylaşım paketi).
+    func metas(forCanvas canvasLocalId: String) -> [Meta] {
+        lock.lock(); defer { lock.unlock() }
+        return index.values.filter { $0.canvasLocalId == canvasLocalId }
+    }
+
     func mimeType(_ id: String) -> String? { meta(id)?.mimeType }
 
     /// Bir resmi başka tuvale kopyalar (yeni kimlik).

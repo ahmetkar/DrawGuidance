@@ -686,6 +686,15 @@ class ImageExporter(
         return saveImage(bytes, name, format.mime, bitmap.width, bitmap.height, null, target)
     }
 
+    /**
+     * v51 başka cihazdan alınan resim dosyası olduğu gibi (yeniden kodlanmadan) varsayılan kayıt yerine yazılır.
+     * [extension] dosya türüne göre (png, jpg, webp).
+     */
+    fun saveReceived(bytes: ByteArray, baseName: String, mime: String, extension: String, width: Int, height: Int): ExportedImage {
+        val name = defaultFileName(baseName.ifBlank { "Paylaşılan" }) + "." + extension
+        return saveImage(bytes, name, mime, width, height, null, SaveTarget.Default)
+    }
+
     /** Kayıtlı bir resmin dosya boyutu (bulunamazsa 0). */
     fun sizeOf(uri: String): Long = runCatching {
         val parsed = Uri.parse(uri)

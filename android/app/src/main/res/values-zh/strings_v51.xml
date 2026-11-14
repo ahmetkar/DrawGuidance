@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- v51 işlev eğitim grupları, yeni alıştırma türleri, puan parçaları ve ödüllü reklam -->
+<resources>
+    <string name="tut51_draw">绘图工具与保存</string>
+    <string name="tut51_draw_text">画笔、填充、橡皮擦、钢笔、撤销、图层、背景和保存。</string>
+    <string name="tut51_edit">添加、选择与编辑</string>
+    <string name="tut51_edit_text">添加形状和文字；选择、移动、缩放、复制和编辑；模式菜单。</string>
+    <string name="tut51_guides">直尺与形状模板</string>
+    <string name="tut51_guides_text">旋转和调整直尺，选择类型、单位和比例，沿边缘及用模板绘制。</string>
+    <string name="tut51_notes_write">文字、笔与页面</string>
+    <string name="tut51_notes_write_text">标题、笔记笔、荧光笔、页面滑块、页面设置和 PDF。</string>
+    <string name="tut51_notes_add">公式、图表与形状</string>
+    <string name="tut51_notes_add_text">添加菜单、公式、图表、箭头和形状、面板、按公式绘制的形状和元素形状。</string>
+    <string name="tut51_select_guides">选择、移动与直尺</string>
+    <string name="tut51_select_guides_text">模式菜单、属性、移动与扩展、长按移动以及用直尺绘制。</string>
+    <string name="tut51_comic_pages">分格、模板与页面</string>
+    <string name="tut51_comic_pages_text">分格模板、墨水笔、速度线、封面、页码、PDF 和 CBZ。</string>
+    <string name="tut51_comic_cast">角色、场景、对白框与特效</string>
+    <string name="tut51_comic_cast_text">现成角色、场景背景、对白框、旁白框和拟声字。</string>
+    <string name="tut51_simple_draw">绘画与上色</string>
+    <string name="tut51_simple_draw_text">画笔、形状、颜料和属性；顶部菜单的两部分。</string>
+    <string name="tut51_simple_edit">选择、文字与背景</string>
+    <string name="tut51_simple_edit_text">三个菜单、选择与移动、矩形选择、文本框、吸管、背景和保存。</string>
+    <string name="tut51_simple_guides">直尺、模板与从图片绘制</string>
+    <string name="tut51_simple_guides_text">直尺和形状模板；将图片矢量化、做成模板并用其绘制。</string>
+    <string name="tut51_kids_more">直尺、模板与挑战</string>
+    <string name="tut51_kids_more_text">吉祥物演示直尺、移动图画、绘画挑战和用模板绘制。</string>
+    <string name="v51_practice_kind_copy">看图绘画</string>
+    <string name="v51_practice_intro_copy">看着角落里的示例，在虚线框中画出形状。位置和大小随意，比例最重要。</string>
+    <string name="v51_practice_kind_timed">限时绘画</string>
+    <string name="v51_practice_intro_timed">在时间结束前描摹参考线。计时从第一笔开始，提前完成可获得速度分。</string>
+    <string name="v51_practice_group_observe">观察写生</string>
+    <string name="v51_practice_group_figures">人物与肖像</string>
+    <string name="v51_practice_time_up">时间到</string>
+    <string name="v51_practice_points">分</string>
+    <string name="v51_practice_record">新纪录！</string>
+    <string name="v51_practice_accuracy">准确度</string>
+    <string name="v51_practice_coverage">完整度</string>
+    <string name="v51_practice_smoothness">流畅度</string>
+    <string name="v51_practice_speed">速度</string>
+    <string name="v51_practice_reward_title">观看广告解锁</string>
+    <string name="v51_practice_reward_body">观看一段简短的激励广告即可永久解锁此练习。高级会员可使用全部练习。</string>
+    <string name="v51_practice_reward_failed">暂时无法加载广告。请检查网络连接后稍后重试。</string>
+    <string name="v51_practice_reward_watch">观看广告</string>
+    <string name="v51_practice_reward_later">以后再说</string>
+    <string name="v51_practice_reward_badge">看广告解锁</string>
+</resources>

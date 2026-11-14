@@ -1,5 +1,6 @@
 package com.karapp.drawguidance.ui.screens.canvasedit.components
 
+import com.karapp.drawguidance.ui.components.sheetBodyHeight
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -116,11 +117,11 @@ fun balloonLabelRes(style: BalloonStyle): Int = (
 @Composable
 internal fun ComicSheetFrame(title: String, hint: String, tag: String, onDismiss: () -> Unit, content: @Composable (columns: Int) -> Unit) {
     val colors = NeuTheme.colors
-    NeuSheet(onDismiss) {
+    NeuSheet(onDismiss, full = true) {
         BoxWithConstraints(Modifier.fillMaxWidth().navigationBarsPadding().testTag(tag)) {
             val columns = (maxWidth / 104.dp).toInt().coerceIn(3, 6)
             Column(
-                Modifier.fillMaxWidth().heightIn(max = 620.dp).verticalScroll(rememberScrollState()).padding(start = 20.dp, end = 20.dp, bottom = 20.dp),
+                Modifier.fillMaxWidth().sheetBodyHeight(620.dp).verticalScroll(rememberScrollState()).padding(start = 20.dp, end = 20.dp, bottom = 20.dp),
                 verticalArrangement = Arrangement.spacedBy(12.dp),
             ) {
                 Text(title, style = MaterialTheme.typography.titleLarge)

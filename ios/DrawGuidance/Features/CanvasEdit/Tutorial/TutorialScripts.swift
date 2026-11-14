@@ -7,19 +7,86 @@ import Foundation
 @MainActor
 enum TutorialScripts {
 
+    /// v51 eğitimler sürümlere ("Yenilikler v40/v46/v48") göre değil işlevlerine göre gruplanır (Android
+    /// `TutorialScripts.groups`): aynı işi anlatan adımlar tek grupta; her adım dizisi kendi boş sayfasında başlar
+    /// ([merge]). Eski grup kimlikleri (tamamlandı işareti) mümkün olduğunca korunur.
     static func groups(_ kind: CanvasKind) -> [TutorialGroup] {
+        if let g = groupCache[kind] { return g }
+        let g = makeGroups(kind)
+        groupCache[kind] = g
+        return g
+    }
+
+    private static var groupCache: [CanvasKind: [TutorialGroup]] = [:]
+
+    private static func makeGroups(_ kind: CanvasKind) -> [TutorialGroup] {
         switch kind {
-        // v40/v46/v48 her gelişmiş türde sürümün yenilikleri ayrı grupta
-        case .ART: return [artBasics, artAdd, artAi, TutorialV40.art, TutorialV46.art, TutorialV48.advanced(kind), TutorialV50.advanced(kind)]
-        // v51 tek not alma modu basit çizimde: basit notun tek menülü eğitimleri
-        case .NOTES: return [TutorialV40.simpleNotes, TutorialV46.simpleNotes, TutorialV48.simple(kind)]
-        case .COMIC: return [comicPanels, comicText, comicAi, TutorialV40.comic, TutorialV46.comic, TutorialV48.advanced(kind), TutorialV50.advanced(kind)]
-        // v40 basit resim ve basit notta kısa, sade dilli tanıtım
-        case .SIMPLE_ART: return [TutorialV40.simpleArt, TutorialV46.simpleArt, TutorialV48.simple(kind), TutorialV50.simpleArt]
-        case .SIMPLE_NOTES: return [TutorialV40.simpleNotes, TutorialV46.simpleNotes, TutorialV48.simple(kind)]
-        // v37 çocuklar için çizimde maskot Boyacık araçları tanıtır ve örnek resim yapar
-        case .KIDS: return [TutorialKids.intro, TutorialKids.whatsNew, TutorialV48.kids, TutorialV50.kids]
+        case .ART:
+            let a40 = TutorialV40.art.steps, a46 = TutorialV46.art.steps, m48 = TutorialV48.advanced(kind).steps
+            return [
+                merge("art_basics", kind, "tut51_draw", "tut51_draw_text", "paintbrush", [artBasics.steps, Array(a46.prefix(1)), [a40[1], a40[6]]]),
+                merge("art_add", kind, "tut51_edit", "tut51_edit_text", "square.on.circle", [artAdd.steps, Array(a46.dropFirst()), Array(a40.prefix(1)), [m48[0], m48[2]]]),
+                merge("art_guides", kind, "tut51_guides", "tut51_guides_text", "ruler", [Array(a40[2..<6])]),
+                TutorialV50.advanced(kind),
+                artAi,
+            ]
+        case .COMIC:
+            let c40 = TutorialV40.comic.steps, c46 = TutorialV46.comic.steps, m48 = TutorialV48.advanced(kind).steps
+            return [
+                merge("comic_panels", kind, "tut51_comic_pages", "tut51_comic_pages_text", "rectangle.split.2x2", [comicPanels.steps, [c46[0]], [c46[5]], Array(c40[2..<4])]),
+                merge("comic_text", kind, "tut51_comic_cast", "tut51_comic_cast_text", "bubble.left", [Array(c40.prefix(2)), Array(c46[1..<5]), comicText.steps]),
+                merge("comic_guides", kind, "tut51_select_guides", "tut51_select_guides_text", "ruler", [m48, Array(c40[4..<7])]),
+                TutorialV50.advanced(kind),
+                comicAi,
+            ]
+        case .SIMPLE_ART:
+            let s40 = TutorialV40.simpleArt.steps, s46 = TutorialV46.simpleArt.steps, s48 = TutorialV48.simple(kind).steps
+            return [
+                merge("simple_art_intro", kind, "tut51_simple_draw", "tut51_simple_draw_text", "paintbrush", [Array(s40.prefix(3)), Array(s46.prefix(2)), Array(s48.dropFirst())]),
+                merge("simple_art_v46", kind, "tut51_simple_edit", "tut51_simple_edit_text", "square.on.circle", [Array(s48.prefix(1)), Array(s40[3..<6]), Array(s46.dropFirst(2)), [s40[7]]]),
+                merge("v50_trace_simple_art", kind, "tut51_simple_guides", "tut51_simple_guides_text", "ruler", [[s40[6]], TutorialV50.simpleArt.steps]),
+            ]
+        // v51 tek not alma modu basit çizimde (eski SIMPLE_NOTES kayıtları NOTES okunur): basit notun tek menülü eğitimleri
+        case .NOTES, .SIMPLE_NOTES:
+            let n40 = TutorialV40.simpleNotes.steps
+            return [
+                merge("simple_notes_intro", kind, "tut51_notes_write", "tut51_notes_write_text", "square.and.pencil", [TutorialV48.simple(kind).steps, Array(n40.prefix(2)), Array(n40[5..<7])]),
+                merge("simple_notes_v46", kind, "tut51_notes_add", "tut51_notes_add_text", "function", [[n40[2]], TutorialV46.simpleNotes.steps]),
+                merge("simple_notes_guides", kind, "tut51_select_guides", "tut51_select_guides_text", "ruler", [Array(n40[3..<5])]),
+            ]
+        // v37 çocuklar için maskot Boyacık araçları tanıtır; sonraki araçlar tek grupta (maskot adımları sarılmaz)
+        case .KIDS:
+            return [
+                TutorialKids.intro,
+                TutorialGroup(id: "kids_v40", kind: kind, title: "tut51_kids_more", summary: "tut51_kids_more_text", icon: "ruler", ai: false,
+                              steps: Array(TutorialKids.whatsNew.steps.dropFirst()) + TutorialV48.kids.steps + TutorialV50.kids.steps),
+            ]
         }
+    }
+
+    /// v51 adım dizilerinden işlev grubu: sonraki her dizinin ilk adımı önce sayfayı temizler.
+    private static func merge(_ id: String, _ kind: CanvasKind, _ title: String, _ summary: String, _ icon: String,
+                              _ segments: [[TutorialStep]]) -> TutorialGroup {
+        let parts = segments.filter { !$0.isEmpty }
+        var steps: [TutorialStep] = []
+        for (i, seg) in parts.enumerated() {
+            if i == 0 { steps += seg } else { steps.append(cleared(seg[0])); steps += seg.dropFirst() }
+        }
+        return TutorialGroup(id: id, kind: kind, title: title, summary: summary, icon: icon, ai: steps.contains { $0.ai }, steps: steps)
+    }
+
+    /// Adımın gösteriminden önce sayfayı boşaltır (önceki adıma bağlı cetvel adımı sarılmaz).
+    private static func cleared(_ step: TutorialStep) -> TutorialStep {
+        if step.guide { return step }
+        let demo = step.demo
+        var s = step
+        s.demo = { d in
+            d.host.select([])
+            d.host.setPaperGradient(nil)
+            if !(d.host.tutorialCanvas()?.strokes.isEmpty ?? true) { d.host.mutate { _ in [] } }
+            await demo?(d)
+        }
+        return s
     }
 
     /// v40 eğitimlerin sürümü: eski sürümün eğitimini bitirmiş kullanıcıya [whatsNew] bir kez gösterilir (v48).

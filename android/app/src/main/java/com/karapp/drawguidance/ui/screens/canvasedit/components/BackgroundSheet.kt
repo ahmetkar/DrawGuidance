@@ -107,7 +107,7 @@ fun BackgroundSheet(
             draftState = draftState.pick(draftState.spec.copy(imageId = BackgroundSpec.ASSET + assetId, imageFit = com.karapp.drawguidance.data.model.BoxFit.COVER))
         }
     }
-    NeuSheet(onDismiss) {
+    NeuSheet(onDismiss, full = true) {
         Column(
             Modifier.fillMaxWidth().verticalScroll(rememberScrollState()).padding(horizontal = 20.dp).navigationBarsPadding()
                 .padding(bottom = 20.dp).testTag("background_sheet"),

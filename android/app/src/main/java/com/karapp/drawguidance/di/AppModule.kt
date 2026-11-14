@@ -278,6 +278,7 @@ fun appModule(apiBaseUrl: String) = module {
             androidContext(), get(), get<com.karapp.drawguidance.data.billing.SubscriptionRepository>().entitlements,
             users.observe().stateIn(scope, kotlinx.coroutines.flow.SharingStarted.Eagerly, null),
             BuildConfig.ADMOB_INTERSTITIAL_ID,
+            rewardedUnitId = BuildConfig.ADMOB_REWARDED_ID,
         )
     }
     single {

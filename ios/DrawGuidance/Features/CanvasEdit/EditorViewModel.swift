@@ -109,6 +109,7 @@ final class EditorViewModel: ObservableObject, EditorHost {
         let p = PracticeController(store, before: { [unowned self] in chooseMode(.DRAW); handwriting.reset() },
                                    after: { [unowned self] in afterContentReplaced() })
         practiceActive = { [unowned p] in p.active }
+        p.newCanvas = { [unowned self] index in practiceInNewCanvas(index) }
         let kids = inChallenge
         inChallenge = { [unowned p] in kids() || p.active }
         return p
@@ -283,6 +284,25 @@ final class EditorViewModel: ObservableObject, EditorHost {
         tempFinished = true
         TempImageEditor.commit(canvasLocalId, canvas: store.canvas ?? c, deps: deps)
         tempClosed = true
+    }
+
+    /// v51 düzenleyici bu tuvale geçsin (yeni alıştırma yeni tuvalde).
+    @Published var switchToCanvas: String?
+
+    /// v51 başka bir alıştırmaya geçilirken önceki alıştırmada çizim vardı: bu tuval kaydedilir, aynı tür, boyut, kâğıt ve
+    /// klasörde yeni tuval oluşturulur, alıştırma orada açılır (Android `practiceInNewCanvas`).
+    private func practiceInNewCanvas(_ index: Int) {
+        guard let c = store.canvas else { return }
+        let list = PracticeLevels.forCanvas(c.kind)
+        guard list.indices.contains(index) else { return }
+        texts.commitOpenDraft()
+        store.saveNow()
+        deps.canvases.saveQueue.flushNow()
+        let name = I18n.tr(list[index].title) + " · \(index + 1)"
+        let created = deps.canvases.create(kind: c.kind, name: name, width: c.width, height: c.height, paperHex: c.backgroundColorHex,
+                                           aiEnabled: c.aiEnabled, background: c.background, folderId: c.folderId)
+        PracticeHandoff.put(created.localId, index)
+        switchToCanvas = created.localId
     }
 
     /// Ekran kapanırken: bekleyen kayıt yazılır, eğitim yarıda kaldıysa geri alınır.

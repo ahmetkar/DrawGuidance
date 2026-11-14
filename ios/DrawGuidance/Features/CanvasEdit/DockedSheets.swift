@@ -51,7 +51,20 @@ private struct DockedEditorSheet: ViewModifier {
     }
 }
 
+/// v51 ekleme pencereleri (karakterler, efektler, nesneler, şekiller, alıştırmalar vb.): dikey ekranda da ekranın
+/// tamamını kaplar (Android `NeuSheet(full = true)`).
+private struct FullEditorSheet: ViewModifier {
+    func body(content: Content) -> some View {
+        content
+            .presentationDetents([.large])
+            .presentationDragIndicator(.visible)
+    }
+}
+
 extension View {
+    /// v51 tam ekran düzenleyici penceresi (ekleme ve seçim pencereleri; bkz. [FullEditorSheet]).
+    func fullEditorSheet() -> some View { modifier(FullEditorSheet()) }
+
     /// v50 düzenleyici alt penceresi: dikey telefonda küçük ve tuvali kapatmayan (bkz. [DockedSheetState]).
     func dockedEditorSheet() -> some View { modifier(DockedEditorSheet()) }
 }

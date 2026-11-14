@@ -202,9 +202,13 @@ struct KidsChallengeLayer: View {
             if !tutorial {
                 if let current {
                     ChallengeGuide(run: current, live: ctl.live, viewport: viewport).allowsHitTesting(false)
-                    VStack {
-                        ChallengeCard(run: current) { _ = ctl.finish() }.padding(.top, 8).padding(.horizontal, 12)
-                        Spacer()
+                    // v51 yatay ekranda kart solda dar (çizimi kapatmaz)
+                    GeometryReader { geo in
+                        let portrait = geo.size.height >= geo.size.width
+                        ChallengeCard(run: current) { _ = ctl.finish() }
+                            .frame(maxWidth: portrait ? 460 : 280)
+                            .padding(.top, 8).padding(.horizontal, portrait ? 12 : 8)
+                            .frame(maxWidth: .infinity, alignment: portrait ? .center : .leading)
                     }
                     if !suggesting {
                         ChallengeMascot(vm: vm, run: current, live: ctl.live)

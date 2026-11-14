@@ -421,7 +421,7 @@ struct ComicInsertSheet: View {
             .navigationBarTitleDisplayMode(.inline)
             .toolbar { ToolbarItem(placement: .cancellationAction) { Button(L("close")) { dismiss() } } }
         }
-        .dockedEditorSheet()
+        .fullEditorSheet()
         .sheet(isPresented: $premiumOpen) { PremiumRequiredSheet() }
     }
 

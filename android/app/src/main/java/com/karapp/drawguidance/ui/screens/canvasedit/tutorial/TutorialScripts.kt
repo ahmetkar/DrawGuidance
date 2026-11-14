@@ -8,6 +8,7 @@ import androidx.compose.material.icons.filled.ChatBubble
 import androidx.compose.material.icons.filled.Dashboard
 import androidx.compose.material.icons.filled.EditNote
 import androidx.compose.material.icons.filled.Functions
+import androidx.compose.material.icons.filled.Straighten
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import com.karapp.drawguidance.R
@@ -36,19 +37,102 @@ import kotlin.math.sin
  */
 object TutorialScripts {
 
+    /**
+     * v51 eğitimler sürümlere ("Yenilikler v40/v46/v48") göre değil işlevlerine göre gruplanır: aynı işi anlatan adımlar
+     * (ör. bütün cetvel adımları, bütün seçim adımları) tek grupta. Gruplar eski grupların adım dizilerinden kurulur;
+     * her dizi kendi boş sayfasında başlar ([merge]). Eski grupların kimlikleri (tamamlandı işareti) mümkün olduğunca
+     * korunur.
+     */
     fun groups(kind: CanvasKind): List<TutorialGroup> = when (kind) {
-        // v40 her gelişmiş türde bu sürümün yenilikleri ayrı grupta
-        // v46 yenilikler (iki parçalı üst menü, seçim menüsü, Panel ekle, formülle çizilen şekiller, mekân ve karakterler)
-        // v48 yenilikler (yeni mod menüsü, Özellikler, ayrı Taşı/Genişlet, üç basit menü, çocuk sırası)
-        CanvasKind.ART -> listOf(artBasics(), artAdd(), artAi(), TutorialV40.art, TutorialV46.art, TutorialV48.advanced(kind), TutorialV50.advanced(kind))
-        // v51 tek not alma modu basit çizimde: basit notun tek menülü eğitimleri (eski gelişmiş not eğitimleri mod menüsü ister)
-        CanvasKind.NOTES -> listOf(TutorialV40.simpleNotes, TutorialV46.simpleNotes, TutorialV48.simple(kind))
-        CanvasKind.COMIC -> listOf(comicPanels(), comicText(), comicAi(), TutorialV40.comic, TutorialV46.comic, TutorialV48.advanced(kind), TutorialV50.advanced(kind))
-        // v40 basit resim ve basit notta kısa, sade dilli tanıtım (v46 yenilikler ayrı grupta)
-        CanvasKind.SIMPLE_ART -> listOf(TutorialV40.simpleArt, TutorialV46.simpleArt, TutorialV48.simple(kind), TutorialV50.simpleArt)
-        CanvasKind.SIMPLE_NOTES -> listOf(TutorialV40.simpleNotes, TutorialV46.simpleNotes, TutorialV48.simple(kind))
-        // v37 çocuklar için çizimde maskot Boyacık araçları tanıtır ve örnek resim yapar (v40 yenilikleri ayrıca)
-        CanvasKind.KIDS -> listOf(TutorialKids.intro, TutorialKids.whatsNew, TutorialV48.kids, TutorialV50.kids)
+        CanvasKind.ART -> {
+            val a40 = TutorialV40.art.steps
+            val a46 = TutorialV46.art.steps
+            val m48 = TutorialV48.advanced(kind).steps
+            listOf(
+                merge("art_basics", kind, R.string.tut51_draw, R.string.tut51_draw_text, Icons.Filled.Brush, false,
+                    artBasics().steps, a46.take(1), listOf(a40[1], a40[6])),
+                merge("art_add", kind, R.string.tut51_edit, R.string.tut51_edit_text, Icons.Filled.Category, false,
+                    artAdd().steps, a46.drop(1), a40.take(1), listOf(m48[0], m48[2])),
+                merge("art_guides", kind, R.string.tut51_guides, R.string.tut51_guides_text, Icons.Filled.Straighten, false,
+                    a40.subList(2, 6)),
+                TutorialV50.advanced(kind),
+                artAi(),
+            )
+        }
+        CanvasKind.COMIC -> {
+            val c40 = TutorialV40.comic.steps
+            val c46 = TutorialV46.comic.steps
+            val m48 = TutorialV48.advanced(kind).steps
+            listOf(
+                merge("comic_panels", kind, R.string.tut51_comic_pages, R.string.tut51_comic_pages_text, Icons.Filled.Dashboard, false,
+                    comicPanels().steps, listOf(c46[0]), listOf(c46[5]), c40.subList(2, 4)),
+                merge("comic_text", kind, R.string.tut51_comic_cast, R.string.tut51_comic_cast_text, Icons.Filled.ChatBubble, false,
+                    c40.take(2), c46.subList(1, 5), comicText().steps),
+                merge("comic_guides", kind, R.string.tut51_select_guides, R.string.tut51_select_guides_text, Icons.Filled.Straighten, false,
+                    m48, c40.subList(4, 7)),
+                TutorialV50.advanced(kind),
+                comicAi(),
+            )
+        }
+        CanvasKind.SIMPLE_ART -> {
+            val s40 = TutorialV40.simpleArt.steps
+            val s46 = TutorialV46.simpleArt.steps
+            val s48 = TutorialV48.simple(kind).steps
+            listOf(
+                merge("simple_art_intro", kind, R.string.tut51_simple_draw, R.string.tut51_simple_draw_text, Icons.Filled.Brush, false,
+                    s40.take(3), s46.take(2), s48.drop(1)),
+                merge("simple_art_v46", kind, R.string.tut51_simple_edit, R.string.tut51_simple_edit_text, Icons.Filled.Category, false,
+                    s48.take(1), s40.subList(3, 6), s46.drop(2), listOf(s40[7])),
+                merge("v50_trace_simple_art", kind, R.string.tut51_simple_guides, R.string.tut51_simple_guides_text, Icons.Filled.Straighten, false,
+                    listOf(s40[6]), TutorialV50.simpleArt.steps),
+            )
+        }
+        // v51 tek not alma modu basit çizimde (eski SIMPLE_NOTES kayıtları NOTES okunur): basit notun tek menülü
+        // eğitimleri işleve göre (eski gelişmiş not eğitimleri mod menüsü ister)
+        CanvasKind.NOTES, CanvasKind.SIMPLE_NOTES -> {
+            val n40 = TutorialV40.simpleNotes.steps
+            listOf(
+                merge("simple_notes_intro", kind, R.string.tut51_notes_write, R.string.tut51_notes_write_text, Icons.Filled.EditNote, false,
+                    TutorialV48.simple(kind).steps, n40.take(2), n40.subList(5, 7)),
+                merge("simple_notes_v46", kind, R.string.tut51_notes_add, R.string.tut51_notes_add_text, Icons.Filled.Functions, false,
+                    listOf(n40[2]), TutorialV46.simpleNotes.steps),
+                merge("simple_notes_guides", kind, R.string.tut51_select_guides, R.string.tut51_select_guides_text, Icons.Filled.Straighten, false,
+                    n40.subList(3, 5)),
+            )
+        }
+        // v37 çocuklar için maskot Boyacık araçları tanıtır; sonraki araçlar (cetvel, taşıma, görev, kalıp) tek grupta.
+        // Maskotun yüz ifadesi adım nesnesine bağlı olduğundan çocuk adımları sarılmaz (sayfa temizlenmez).
+        CanvasKind.KIDS -> listOf(
+            TutorialKids.intro,
+            TutorialGroup(
+                "kids_v40", kind, R.string.tut51_kids_more, R.string.tut51_kids_more_text, Icons.Filled.Straighten, false,
+                TutorialKids.whatsNew.steps.drop(1) + TutorialV48.kids.steps + TutorialV50.kids.steps,
+            ),
+        )
+    }
+
+    /**
+     * v51 adım dizilerinden işlev grubu: ilk dizi grubun boş sayfasında başlar, sonraki her dizinin ilk adımı önce
+     * sayfayı temizler (çizimler, kâğıt gradyanı, seçim) ki her dizinin gösterimi kendi sahnesinde çalışsın.
+     */
+    private fun merge(
+        id: String, kind: CanvasKind, title: Int, summary: Int, icon: androidx.compose.ui.graphics.vector.ImageVector, ai: Boolean,
+        vararg segments: List<TutorialStep>,
+    ): TutorialGroup = TutorialGroup(
+        id, kind, title, summary, icon, ai || segments.any { seg -> seg.any { it.ai } },
+        segments.filter { it.isNotEmpty() }.flatMapIndexed { i, seg -> if (i == 0) seg else listOf(cleared(seg.first())) + seg.drop(1) },
+    )
+
+    /** Adımın gösteriminden önce sayfayı boşaltır (cetvel/kalıp adımı önceki adıma bağlıysa sarılmaz). */
+    private fun cleared(step: TutorialStep): TutorialStep {
+        if (step.guide) return step
+        val demo = step.demo
+        return TutorialStep(step.anchor, step.title, step.body, ai = step.ai, mode = step.mode, guide = false) {
+            host.select(emptySet())
+            host.setPaperGradient(null)
+            if (host.canvas()?.strokes?.isNotEmpty() == true) host.mutate { emptyList() }
+            demo?.invoke(this)
+        }
     }
 
     /** v40 eğitimlerin sürümü: eski sürümün eğitimini bitirmiş kullanıcıya [whatsNew] bir kez gösterilir (v48). */

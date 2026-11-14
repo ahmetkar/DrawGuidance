@@ -10,6 +10,8 @@ import com.google.android.gms.ads.MobileAds
 import com.google.android.gms.ads.RequestConfiguration
 import com.google.android.gms.ads.interstitial.InterstitialAd
 import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback
+import com.google.android.gms.ads.rewarded.RewardedAd
+import com.google.android.gms.ads.rewarded.RewardedAdLoadCallback
 import com.google.android.ump.ConsentRequestParameters
 import com.google.android.ump.UserMessagingPlatform
 import java.util.concurrent.atomic.AtomicBoolean
@@ -88,5 +90,40 @@ class AdMobGateway : AdsGateway {
             override fun onAdFailedToShowFullScreenContent(error: AdError) = onFinished(false)
         }
         ad.show(activity)
+    }
+
+    // v51 ödüllü reklam
+
+    @Volatile private var rewarded: RewardedAd? = null
+    @Volatile private var rewardedLoading = false
+
+    override fun loadRewarded(context: Context, adUnitId: String, onResult: (Boolean) -> Unit) {
+        if (rewarded != null) { onResult(true); return }
+        if (rewardedLoading) { onResult(false); return }
+        rewardedLoading = true
+        RewardedAd.load(context, adUnitId, AdRequest.Builder().build(), object : RewardedAdLoadCallback() {
+            override fun onAdLoaded(ad: RewardedAd) {
+                rewardedLoading = false
+                rewarded = ad
+                onResult(true)
+            }
+
+            override fun onAdFailedToLoad(error: LoadAdError) {
+                rewardedLoading = false
+                rewarded = null
+                onResult(false)
+            }
+        })
+    }
+
+    override fun showRewarded(activity: Activity, onFinished: (Boolean) -> Unit) {
+        val ad = rewarded ?: run { onFinished(false); return }
+        rewarded = null
+        var earned = false
+        ad.fullScreenContentCallback = object : FullScreenContentCallback() {
+            override fun onAdDismissedFullScreenContent() = onFinished(earned)
+            override fun onAdFailedToShowFullScreenContent(error: AdError) = onFinished(false)
+        }
+        ad.show(activity) { earned = true }
     }
 }

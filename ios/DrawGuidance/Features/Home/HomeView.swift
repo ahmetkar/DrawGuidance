@@ -42,7 +42,7 @@ private struct OpenCanvasStack<Content: View>: View {
     var body: some View {
         NavigationStack {
             content { open = OpenCanvasId(id: $0.localId) }
-                .navigationDestination(item: $open) { doc in CanvasEditScreen(canvasLocalId: doc.id).toolbar(.hidden, for: .tabBar) }
+                .navigationDestination(item: $open) { doc in CanvasEditHost(canvasLocalId: doc.id).toolbar(.hidden, for: .tabBar) }
         }
     }
 }

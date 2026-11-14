@@ -25,6 +25,10 @@ enum class PracticeKind(@StringRes val label: Int, @StringRes val intro: Int, va
     TRACE(R.string.v50_practice_kind_trace, R.string.v50_practice_intro_trace, 0.022f, 0.07f),
     FADE(R.string.v50_practice_kind_fade, R.string.v50_practice_intro_fade, 0.035f, 0.10f),
     MIRROR(R.string.v50_practice_kind_mirror, R.string.v50_practice_intro_mirror, 0.03f, 0.09f),
+    /** v51 Bakarak çiz: örnek köşede küçük durur, şekil boş alana (çerçeveye) bakarak çizilir; yer ve boy serbest. */
+    COPY(R.string.v51_practice_kind_copy, R.string.v51_practice_intro_copy, 0.04f, 0.11f),
+    /** v51 Süreli çizim: kılavuzun üstünden süre bitmeden çizilir; hız da puanlanır. */
+    TIMED(R.string.v51_practice_kind_timed, R.string.v51_practice_intro_timed, 0.026f, 0.08f),
 }
 
 enum class PracticeGroup(@StringRes val title: Int) {
@@ -33,11 +37,18 @@ enum class PracticeGroup(@StringRes val title: Int) {
     VOLUME(R.string.v50_practice_group_volume),
     MOTIFS(R.string.v50_practice_group_motifs),
     SUBJECTS(R.string.v50_practice_group_subjects),
+    /** v51 Gözlem çizimi: hayvanlar, nesneler, doğa ve taşıtlar (eskiz kütüphanesi). */
+    OBSERVE(R.string.v51_practice_group_observe),
+    /** v51 İnsan ve portre: vücut oranları, yüz açıları, göz, burun, dudak, kulak, el. */
+    FIGURES(R.string.v51_practice_group_figures),
 }
 
-/** Bir alıştırma: [shape] kütüphane şeklinin kayıt türü ("lib.practice.<ad>"). [id] en iyi puanın kayıt anahtarıdır. */
-class PracticeLevel(val shape: String, val kind: PracticeKind, val group: PracticeGroup, val size: Float = 0.72f) {
-    val id: String = "adult." + shape.removePrefix(PREFIX) + "." + kind.name.lowercase()
+/**
+ * Bir alıştırma: [shape] kütüphane şeklinin kayıt türü ("lib.practice.<ad>" ya da v51 "lib.sketch.<ad>"). [id] en iyi
+ * puanın kayıt anahtarıdır. [reward] v51: ödüllü reklam izlenerek açılır (Premium'da açık).
+ */
+class PracticeLevel(val shape: String, val kind: PracticeKind, val group: PracticeGroup, val size: Float = 0.72f, val reward: Boolean = false) {
+    val id: String = "adult." + shape.removePrefix(PREFIX).removePrefix(SKETCH) + "." + kind.name.lowercase()
 
     /** Basit resimde de sunulur mu. */
     val simple: Boolean get() = shape.removePrefix("lib.") in PracticeShapes.simpleIds
@@ -47,6 +58,7 @@ class PracticeLevel(val shape: String, val kind: PracticeKind, val group: Practi
 
     companion object {
         const val PREFIX = "lib.practice."
+        const val SKETCH = "lib.sketch."
     }
 }
 
@@ -54,15 +66,32 @@ class PracticeLevel(val shape: String, val kind: PracticeKind, val group: Practi
  * Alıştırmanın kâğıttaki hedefi: yeri ([box]), puanlanan çizgiler ([lines], tuval koordinatı), görünen kılavuz
  * ([guide]; simetri görevinde sol yarı) ve simetri ekseni ([axis]; yalnız simetri görevinde).
  */
-class PracticeTarget(val level: PracticeLevel, val box: Rect, val lines: List<List<Offset>>, val guide: List<List<Offset>>, val axis: Float?)
+class PracticeTarget(
+    val level: PracticeLevel,
+    val box: Rect,
+    val lines: List<List<Offset>>,
+    val guide: List<List<Offset>>,
+    val axis: Float?,
+    /** v51 Bakarak çiz: örneğin durduğu küçük çerçeve (kılavuz bu çerçevede çizilir). */
+    val reference: Rect? = null,
+    /** v51 Süreli çizim: süre (saniye). */
+    val seconds: Int = 0,
+)
 
 object PracticeLevels {
     private val T = PracticeKind.TRACE
     private val F = PracticeKind.FADE
     private val M = PracticeKind.MIRROR
 
-    private fun l(name: String, kind: PracticeKind, group: PracticeGroup, size: Float = 0.72f) =
-        PracticeLevel(PracticeLevel.PREFIX + name, kind, group, size)
+    private val C = PracticeKind.COPY
+    private val S = PracticeKind.TIMED
+
+    private fun l(name: String, kind: PracticeKind, group: PracticeGroup, size: Float = 0.72f, reward: Boolean = false) =
+        PracticeLevel(PracticeLevel.PREFIX + name, kind, group, size, reward)
+
+    /** v51 eskiz kütüphanesinden alıştırma (yalnız gelişmiş resim). */
+    private fun k(name: String, kind: PracticeKind, group: PracticeGroup, size: Float = 0.74f, reward: Boolean = false) =
+        PracticeLevel(PracticeLevel.SKETCH + name, kind, group, size, reward)
 
     /** Bütün alıştırmalar (kolaydan zora; sıra ve kimlikler kalıcı). */
     val all: List<PracticeLevel> = listOf(
@@ -103,6 +132,61 @@ object PracticeLevels {
         l("eye", F, PracticeGroup.SUBJECTS, 0.8f),
         l("rose", F, PracticeGroup.SUBJECTS),
         l("cup", F, PracticeGroup.SUBJECTS),
+        // v51 yeni alıştırmalar (sona eklenir; kimlikler kalıcı). [reward]: ödüllü reklamla açılır.
+        l("lines", S, PracticeGroup.BASICS),
+        l("ellipses", S, PracticeGroup.BASICS),
+        l("radial", F, PracticeGroup.BASICS),
+        l("waves", F, PracticeGroup.BASICS),
+        l("spiral", S, PracticeGroup.BASICS),
+        l("waves", S, PracticeGroup.BASICS),
+        l("honeycomb", F, PracticeGroup.PATTERNS),
+        l("honeycomb", M, PracticeGroup.PATTERNS),
+        l("mandala", F, PracticeGroup.PATTERNS, reward = true),
+        l("scales", S, PracticeGroup.PATTERNS),
+        l("box_2p", F, PracticeGroup.VOLUME, 0.8f),
+        l("sphere", F, PracticeGroup.VOLUME),
+        l("cylinder", F, PracticeGroup.VOLUME),
+        l("box_2p", C, PracticeGroup.VOLUME, 0.8f, reward = true),
+        l("cylinder", C, PracticeGroup.VOLUME),
+        l("star12", M, PracticeGroup.MOTIFS),
+        l("rumi", M, PracticeGroup.MOTIFS),
+        l("star8", F, PracticeGroup.MOTIFS),
+        l("rumi", F, PracticeGroup.MOTIFS, reward = true),
+        l("star12", S, PracticeGroup.MOTIFS),
+        l("leaf", M, PracticeGroup.SUBJECTS, 0.8f),
+        l("cup", M, PracticeGroup.SUBJECTS),
+        l("face", F, PracticeGroup.SUBJECTS, reward = true),
+        l("tulip", C, PracticeGroup.SUBJECTS),
+        k("cat", PracticeKind.TRACE, PracticeGroup.OBSERVE),
+        k("bird", PracticeKind.TRACE, PracticeGroup.OBSERVE),
+        k("apple", C, PracticeGroup.OBSERVE),
+        k("pear", C, PracticeGroup.OBSERVE),
+        k("butterfly", M, PracticeGroup.OBSERVE, reward = true),
+        k("mug", C, PracticeGroup.OBSERVE),
+        k("teapot", PracticeKind.TRACE, PracticeGroup.OBSERVE),
+        k("vase", M, PracticeGroup.OBSERVE),
+        k("tree", PracticeKind.TRACE, PracticeGroup.OBSERVE, reward = true),
+        k("mushroom", M, PracticeGroup.OBSERVE),
+        k("fish", C, PracticeGroup.OBSERVE),
+        k("chair", C, PracticeGroup.OBSERVE, reward = true),
+        k("lighthouse", M, PracticeGroup.OBSERVE),
+        k("car_side", C, PracticeGroup.OBSERVE),
+        k("bicycle", PracticeKind.TRACE, PracticeGroup.OBSERVE, reward = true),
+        k("sailboat", C, PracticeGroup.OBSERVE),
+        k("owl", PracticeKind.TRACE, PracticeGroup.OBSERVE),
+        k("house_perspective", PracticeKind.TRACE, PracticeGroup.OBSERVE, reward = true),
+        k("figure_standing", PracticeKind.TRACE, PracticeGroup.FIGURES),
+        k("head_construction", PracticeKind.TRACE, PracticeGroup.FIGURES),
+        k("face_front", M, PracticeGroup.FIGURES),
+        k("eye_detail", C, PracticeGroup.FIGURES),
+        k("nose_detail", PracticeKind.TRACE, PracticeGroup.FIGURES, reward = true),
+        k("lips_detail", M, PracticeGroup.FIGURES),
+        k("ear_detail", C, PracticeGroup.FIGURES),
+        k("face_three_quarter", PracticeKind.TRACE, PracticeGroup.FIGURES, reward = true),
+        k("face_profile", C, PracticeGroup.FIGURES),
+        k("hand_open", PracticeKind.TRACE, PracticeGroup.FIGURES, reward = true),
+        k("figure_walking", PracticeKind.TRACE, PracticeGroup.FIGURES),
+        k("figure_sitting", C, PracticeGroup.FIGURES, reward = true),
     )
 
     /** Tuval türünde sunulan alıştırmalar: basit resimde temel olanlar, gelişmiş resimde hepsi; ötekilerde yok. */
@@ -125,8 +209,32 @@ object PracticeLevels {
     /** Kılavuzun kenar biçimi (hedef şekil kurulurken; görünmez, yalnız çizgiler alınır). */
     private val style = ShapeStyle(strokeColorHex = "#2A2A33", strokeWidth = 3f)
 
+    /** v51 Bakarak çiz: örnek çerçevesinin ve çizim çerçevesinin boyu (kâğıdın kısa kenarına oran). */
+    const val COPY_REF = 0.30f
+    const val COPY_SIZE = 0.58f
+    private const val COPY_PAD = 0.04f
+
+    /** v51 Süreli çizim: süre, kılavuzun toplam boyuna göre (kutunun köşegeni başına 2,5 sn), 15–90 sn. */
+    fun seconds(lines: List<List<Offset>>, box: Rect): Int {
+        val diag = kotlin.math.hypot(box.width, box.height).coerceAtLeast(1f)
+        return (10 + ChallengeScore.length(lines) / diag * 2.5f).toInt().coerceIn(15, 90)
+    }
+
+    /** [aspect] oranlı şeklin [side] boyundaki kutusunun [cx],[cy] merkezli yeri. */
+    private fun fit(aspect: Float, side: Float, cx: Float, cy: Float): Rect {
+        val w = if (aspect >= 1f) side else side * aspect
+        val h = if (aspect >= 1f) side / aspect else side
+        return Rect(cx - w / 2f, cy - h / 2f, cx + w / 2f, cy + h / 2f)
+    }
+
     fun box(level: PracticeLevel, paperW: Int, paperH: Int): Rect {
         val aspect = ShapeRegistry.aspect(level.shape)
+        if (level.kind == PracticeKind.COPY) {
+            // Çizim çerçevesi sağ altta, örnek sol üstte (çakışmazlar)
+            val m = min(paperW, paperH).toFloat()
+            val side = m * COPY_SIZE
+            return fit(aspect, side, paperW - m * COPY_PAD - side / 2f, paperH - m * COPY_PAD - side / 2f)
+        }
         val side = min(paperW, paperH) * level.size
         val w = if (aspect >= 1f) side else side * aspect
         val h = if (aspect >= 1f) side / aspect else side
@@ -141,6 +249,15 @@ object PracticeLevels {
         val lines = stroke?.let { ShapeFactory.subPaths(it) }.orEmpty()
             .filter { it.label == null && it.points.size >= 2 && (it.widthScale ?: 1f) > 0f }
             .map { p -> if (p.closed) p.points + p.points.first() else p.points }
+        if (level.kind == PracticeKind.COPY) {
+            val m = min(paperW, paperH).toFloat()
+            val side = m * COPY_REF
+            val ref = fit(ShapeRegistry.aspect(level.shape), side, m * COPY_PAD + side / 2f, m * COPY_PAD + side / 2f)
+            val k = ref.width / box.width.coerceAtLeast(1f)
+            val guide = lines.map { line -> line.map { p -> Offset(ref.left + (p.x - box.left) * k, ref.top + (p.y - box.top) * k) } }
+            return PracticeTarget(level, box, lines, guide, null, reference = ref)
+        }
+        if (level.kind == PracticeKind.TIMED) return PracticeTarget(level, box, lines, lines, null, seconds = seconds(lines, box))
         if (level.kind != PracticeKind.MIRROR) return PracticeTarget(level, box, lines, lines, null)
         val axis = box.center.x
         return PracticeTarget(level, box, lines, leftHalf(lines, axis), axis)

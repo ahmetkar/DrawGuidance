@@ -24,10 +24,13 @@ fun CanvasEditRoute(
     onBack: () -> Unit,
     onOpenModel3d: (modelId: String?, strokeId: String?) -> Unit,
     onOpenSubscription: () -> Unit,
-    /** v51 notta resim düzenleme: geçici basit resim tuvali açılır. */
+    /** v51 notta resim düzenleme: geçici basit resim tuvali açılır (bu düzenleyicinin üstünde). */
     onOpenCanvas: (String) -> Unit = {},
+    /** v51 başka bir tuvale geç (yeni alıştırma yeni tuvalde; bu düzenleyici kapanır). */
+    onSwitchCanvas: (localId: String) -> Unit = {},
 ) {
     val vm: CanvasEditViewModel = koinViewModel(parameters = { parametersOf(canvasLocalId) })
+    androidx.compose.runtime.LaunchedEffect(vm) { vm.openCanvas.collect { onSwitchCanvas(it) } }
     val canvas by vm.canvas.collectAsState()
     val kind = canvas?.kind ?: CanvasKind.ART
     // v44 çocuk kilidinde yalnız çocuk tuvalleri açılır

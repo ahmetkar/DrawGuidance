@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- v51 işlev eğitim grupları, yeni alıştırma türleri, puan parçaları ve ödüllü reklam -->
+<resources>
+    <string name="tut51_draw">Drawing tools and saving</string>
+    <string name="tut51_draw_text">Brush, fill, eraser, pen, undo, layers, background and saving.</string>
+    <string name="tut51_edit">Adding, selecting and editing</string>
+    <string name="tut51_edit_text">Add shapes and text; select, move, scale, copy and edit; the mode menu.</string>
+    <string name="tut51_guides">Ruler and shape stencil</string>
+    <string name="tut51_guides_text">Rotate and resize the ruler, pick type, unit and scale, draw along its edge and with a stencil.</string>
+    <string name="tut51_notes_write">Text, pens and pages</string>
+    <string name="tut51_notes_write_text">Titles, note pens, highlighter, page scrubber, page settings and PDF.</string>
+    <string name="tut51_notes_add">Formulas, diagrams and shapes</string>
+    <string name="tut51_notes_add_text">The Add menu, formulas, diagrams, arrows and shapes, panels, formula-driven and element shapes.</string>
+    <string name="tut51_select_guides">Selecting, moving and ruler</string>
+    <string name="tut51_select_guides_text">The mode menu, Properties, Move and Expand, press-and-hold to move and drawing with the ruler.</string>
+    <string name="tut51_comic_pages">Panels, templates and pages</string>
+    <string name="tut51_comic_pages_text">Panel templates, ink pen, speed lines, cover, page numbers, PDF and CBZ.</string>
+    <string name="tut51_comic_cast">Characters, places, balloons and effects</string>
+    <string name="tut51_comic_cast_text">Ready characters, place backgrounds, speech balloons, caption boxes and sound effects.</string>
+    <string name="tut51_simple_draw">Drawing and painting</string>
+    <string name="tut51_simple_draw_text">Brush, shapes, paint and Properties; the two parts of the top menu.</string>
+    <string name="tut51_simple_edit">Selecting, text and background</string>
+    <string name="tut51_simple_edit_text">The three menus, select and move, rectangle select, text box, eyedropper, background and saving.</string>
+    <string name="tut51_simple_guides">Ruler, stencil and drawing from a picture</string>
+    <string name="tut51_simple_guides_text">Ruler and shape stencil; vectorize a picture, turn it into a stencil and draw with it.</string>
+    <string name="tut51_kids_more">Ruler, stencils and challenges</string>
+    <string name="tut51_kids_more_text">The mascot shows the ruler, moving a picture, drawing challenges and drawing with a stencil.</string>
+    <string name="v51_practice_kind_copy">Draw by looking</string>
+    <string name="v51_practice_intro_copy">Look at the example in the corner and draw the shape in the dashed frame. Position and size are free; proportions matter.</string>
+    <string name="v51_practice_kind_timed">Timed drawing</string>
+    <string name="v51_practice_intro_timed">Trace the guide before time runs out. The timer starts with your first line; finishing early earns speed points.</string>
+    <string name="v51_practice_group_observe">Observational drawing</string>
+    <string name="v51_practice_group_figures">Figures and portraits</string>
+    <string name="v51_practice_time_up">Time is up</string>
+    <string name="v51_practice_points">points</string>
+    <string name="v51_practice_record">New record!</string>
+    <string name="v51_practice_accuracy">Accuracy</string>
+    <string name="v51_practice_coverage">Coverage</string>
+    <string name="v51_practice_smoothness">Smoothness</string>
+    <string name="v51_practice_speed">Speed</string>
+    <string name="v51_practice_reward_title">Unlock with an ad</string>
+    <string name="v51_practice_reward_body">Watch a short rewarded ad to unlock this exercise for good. All exercises are open for Premium members.</string>
+    <string name="v51_practice_reward_failed">The ad could not be loaded right now. Check your connection and try again shortly.</string>
+    <string name="v51_practice_reward_watch">Watch ad</string>
+    <string name="v51_practice_reward_later">Later</string>
+    <string name="v51_practice_reward_badge">Unlocks with an ad</string>
+</resources>

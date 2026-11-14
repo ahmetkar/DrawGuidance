@@ -545,7 +545,9 @@ class CanvasEditViewModel(
             store.load(fitted)
             store.elements.value = withContext(store.worker) { store.indexer.update(fitted?.strokes.orEmpty()) }
             // v32 bu türe ilk girişte eğitim önerilir
-            fitted?.let { tutorialOrNull?.maybeOffer(it.kind) }
+            // v51 önceki tuvalden yeni alıştırmayla gelindiyse alıştırma hemen açılır (eğitim önerisi yerine)
+            val handoff = fitted?.let { com.karapp.drawguidance.ui.screens.canvasedit.challenge.PracticeHandoff.take(canvasLocalId) }
+            if (handoff != null) practice.open(handoff) else fitted?.let { tutorialOrNull?.maybeOffer(it.kind) }
             if (fitted != null) drawing.cleanOnOpen(fitted)
             // v51 notta: geçici tuvalde düzenlenen resimler nota aktarılır, açık kalmamış geçici tuvaller silinir
             if (fitted != null && fitted.kind.isNotes && tempSession == null && tempImages != null) {
@@ -1281,7 +1283,41 @@ class CanvasEditViewModel(
         practiceCreated = true
         com.karapp.drawguidance.ui.screens.canvasedit.challenge.PracticeController(
             store, viewModelScope, before = { chooseMode(EditMode.DRAW); handwriting.reset() }, after = ::afterContentReplaced,
+            newCanvas = ::practiceInNewCanvas,
+            adFree = {
+                runCatching {
+                    org.koin.core.context.GlobalContext.getOrNull()?.getOrNull<com.karapp.drawguidance.data.billing.SubscriptionRepository>()
+                        ?.entitlements?.value?.adFree(System.currentTimeMillis())
+                }.getOrNull() == true
+            },
         )
+    }
+
+    private val _openCanvas = MutableSharedFlow<String>(extraBufferCapacity = 1)
+    /** v51 düzenleyici bu tuvale geçsin (yeni alıştırma yeni tuvalde). */
+    val openCanvas: SharedFlow<String> = _openCanvas
+
+    /**
+     * v51 başka bir alıştırmaya geçilirken önceki alıştırmada çizim vardı: bu tuval kaydedilir, aynı tür, boyut, kâğıt
+     * ve klasörde yeni bir tuval oluşturulur ve alıştırma orada açılır ([PracticeHandoff]).
+     */
+    private fun practiceInNewCanvas(index: Int) {
+        val c = store.canvas.value ?: return
+        val level = com.karapp.drawguidance.ui.screens.canvasedit.challenge.PracticeLevels.forCanvas(c.kind).getOrNull(index) ?: return
+        viewModelScope.launch {
+            texts.commitOpenDraft()
+            store.saveNow()
+            saveQueue.flushNow()
+            withContext(Dispatchers.Default) { saveQueue.awaitIdle() }
+            val name = com.karapp.drawguidance.i18n.I18n.tr(level.title) + " · " + (index + 1)
+            val created = runCatching {
+                repository.createCanvas(
+                    name, c.width, c.height, c.backgroundColorHex, c.aiEnabled, c.kind, 1, folderId = c.folderId, background = c.background,
+                )
+            }.getOrNull() ?: return@launch
+            com.karapp.drawguidance.ui.screens.canvasedit.challenge.PracticeHandoff.put(created.localId, index)
+            _openCanvas.emit(created.localId)
+        }
     }
     /** Şekil düzenlemede seçime dahil parçalar (Özellik bunlara uygulanır; boşsa tüm şekle). */
     val shapeParts: StateFlow<Set<Int>> get() = shapes.parts

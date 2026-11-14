@@ -24,19 +24,36 @@ enum ChallengeScore {
 
     /// v50 verilen yakınlık sınırlarıyla (hedef köşegenine oran); yetişkin alıştırmaları daha dar sınır kullanır.
     static func outline(_ drawn: [[P]], _ target: [[P]], near nearRatio: Float, far farRatio: Float) -> Int {
-        guard let tBox = bounds(target) else { return 0 }
+        outlineParts(drawn, target, near: nearRatio, far: farRatio).score
+    }
+
+    /// v51 çizgi puanının parçaları (Android `ChallengeScore.OutlineParts`).
+    struct OutlineParts: Equatable {
+        let score: Int, precision: Int, recall: Int
+        static let ZERO = OutlineParts(score: 0, precision: 0, recall: 0)
+    }
+
+    /// v51 çizgi puanı ve parçaları: isabet, kapsama ve F1 ([alignedFactor]: kutusu uydurulan çizimin çarpanı).
+    static func outlineParts(_ drawn: [[P]], _ target: [[P]], near nearRatio: Float, far farRatio: Float,
+                             alignedFactor: Float = ALIGNED) -> OutlineParts {
+        guard let tBox = bounds(target) else { return .ZERO }
         let diag = max(hypot(tBox.width, tBox.height), 1)
         let step = diag / SAMPLES
         let t = resample(target, step), d = resample(drawn, step)
-        if t.isEmpty || d.count < 2 { return 0 }
+        if t.isEmpty || d.count < 2 { return .ZERO }
         let near = diag * nearRatio, far = diag * farRatio
         let lenT = max(length(target), 1), lenD = length(drawn)
-        let inPlace = f1(d, t, near, far) * excess(lenD / lenT)
-        var aligned: Float = 0
+        let (p0, r0) = pr(d, t, near, far)
+        let inPlace = f1(p0, r0) * excess(lenD / lenT)
+        var best = OutlineParts(score: percent(inPlace), precision: percent(p0), recall: percent(r0))
         if let dBox = bounds(drawn), let (pts, s) = align(d, dBox, tBox) {
-            aligned = f1(pts, t, near, far) * excess(lenD * s / lenT) * ALIGNED
+            let (p1, r1) = pr(pts, t, near, far)
+            let aligned = f1(p1, r1) * excess(lenD * s / lenT) * alignedFactor
+            if aligned > inPlace {
+                best = OutlineParts(score: percent(aligned), precision: percent(p1 * alignedFactor), recall: percent(r1 * alignedFactor))
+            }
         }
-        return percent(max(inPlace, aligned))
+        return best
     }
 
     /// Boyanacak yerlerin puanı (beklenen renk → görünen renk; nil boyanmamış).
@@ -75,10 +92,19 @@ enum ChallengeScore {
     }
 
     private static func f1(_ d: [P], _ t: [P], _ near: Float, _ far: Float) -> Float {
+        let (precision, recall) = pr(d, t, near, far)
+        return f1(precision, recall)
+    }
+
+    private static func f1(_ precision: Float, _ recall: Float) -> Float {
+        precision + recall <= 0 ? 0 : 2 * precision * recall / (precision + recall)
+    }
+
+    private static func pr(_ d: [P], _ t: [P], _ near: Float, _ far: Float) -> (Float, Float) {
         let tGrid = PointGrid(t, far), dGrid = PointGrid(d, far)
         let precision = Float(d.reduce(Double(0)) { $0 + Double(credit(tGrid.nearest($1), near, far)) } / Double(d.count))
         let recall = Float(t.reduce(Double(0)) { $0 + Double(credit(dGrid.nearest($1), near, far)) } / Double(t.count))
-        return precision + recall <= 0 ? 0 : 2 * precision * recall / (precision + recall)
+        return (precision, recall)
     }
 
     private static func credit(_ d: Float, _ near: Float, _ far: Float) -> Float {

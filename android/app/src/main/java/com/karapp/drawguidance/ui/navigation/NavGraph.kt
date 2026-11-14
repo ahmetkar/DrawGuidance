@@ -153,6 +153,12 @@ fun DrawGuidanceNavGraph(
                     onOpenSubscription = { navController.navigate(Routes.SUBSCRIPTION) },
                     // v51 notta resim düzenleme: geçici basit resim tuvali (kaydedince ya da çıkınca nota dönülür)
                     onOpenCanvas = { id -> navController.navigate(Routes.canvasEdit(id)) },
+                    // v51 yeni alıştırma yeni tuvalde: eski düzenleyici yığından çıkar
+                    onSwitchCanvas = { id ->
+                        navController.navigate(Routes.canvasEdit(id)) {
+                            popUpTo(backStackEntry.destination.id) { inclusive = true }
+                        }
+                    },
                 )
             }
         }

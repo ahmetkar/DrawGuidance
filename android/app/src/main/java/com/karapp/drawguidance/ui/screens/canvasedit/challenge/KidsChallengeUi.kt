@@ -167,8 +167,8 @@ fun KidsChallengeLayer(viewModel: CanvasEditViewModel, ui: KidsChallengeUi, view
 
     Box(Modifier.fillMaxSize().testTag("challenge_layer")) {
         if (current != null) {
-            ChallengeCard(current, // Çiz modundaki fırça/yakınlaştırma satırının altında
-                Modifier.align(Alignment.TopCenter).padding(top = 52.dp, start = 12.dp, end = 12.dp), ctl::finish)
+            // Çiz modundaki fırça/yakınlaştırma satırının altında; v51 yatay ekranda solda dar (çizimi kapatmaz)
+            ChallengeCard(current, Modifier.compactNotice(), ctl::finish)
             if (!suggesting) {
                 val bottom = with(LocalDensity.current) {
                     val bar = mode !in NO_BAR && !(mode == EditMode.SELECT && selected.isEmpty())

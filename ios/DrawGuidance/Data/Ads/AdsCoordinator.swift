@@ -105,11 +105,68 @@ final class AdsCoordinator: NSObject, GADFullScreenContentDelegate {
         Task { @MainActor in self.preload() }
     }
 
+    // MARK: - v51 ödüllü reklam (kilitli alıştırmayı açmak için; Android `AdsCoordinator.requestReward`)
+
+    static let TEST_REWARDED = "ca-app-pub-3940256099942544/1712485313"
+    private var rewardedUnitId: String {
+        (Bundle.main.object(forInfoDictionaryKey: "DGRewardedUnitId") as? String).flatMap { $0.isEmpty ? nil : $0 } ?? Self.TEST_REWARDED
+    }
+
+    /// Ödüllü reklam: Premium'da reklamsız [RewardOutcome.FREE]; onay yoksa önce alınır; 12 sn'de yüklenmezse UNAVAILABLE.
+    func requestReward(_ done: @escaping (RewardOutcome) -> Void) {
+        Task { @MainActor in
+            if await premiumState() == true { done(.FREE); return }
+            if disabled { done(.UNAVAILABLE); return }
+            let go = { [weak self] in
+                guard let self else { return }
+                guard self.consent else { done(.UNAVAILABLE); return }
+                if !self.started { self.started = true; GADMobileAds.sharedInstance().start(completionHandler: nil) }
+                var finished = false
+                let timeout = Task { @MainActor in
+                    try? await Task.sleep(nanoseconds: 12_000_000_000)
+                    if !finished { finished = true; done(.UNAVAILABLE) }
+                }
+                GADRewardedAd.load(withAdUnitID: self.rewardedUnitId, request: GADRequest()) { ad, _ in
+                    Task { @MainActor in
+                        guard !finished else { return }
+                        finished = true
+                        timeout.cancel()
+                        guard let ad, let vc = Self.topController() else { done(.UNAVAILABLE); return }
+                        let relay = RewardRelay(done)
+                        self.rewardRelay = relay
+                        ad.fullScreenContentDelegate = relay
+                        ad.present(fromRootViewController: vc) { relay.earned = true }
+                    }
+                }
+            }
+            if consent { go() } else { requestConsent(go) }
+        }
+    }
+
+    private var rewardRelay: RewardRelay?
+
     private static func topController() -> UIViewController? {
         let scene = UIApplication.shared.connectedScenes.compactMap { $0 as? UIWindowScene }.first { $0.activationState == .foregroundActive }
             ?? UIApplication.shared.connectedScenes.compactMap { $0 as? UIWindowScene }.first
         var vc = scene?.windows.first { $0.isKeyWindow }?.rootViewController ?? scene?.windows.first?.rootViewController
         while let p = vc?.presentedViewController { vc = p }
         return vc
+    }
+}
+
+/// v51 ödüllü reklamın sonucu (Android `RewardOutcome`).
+enum RewardOutcome { case EARNED, FREE, CANCELLED, UNAVAILABLE }
+
+/// Ödüllü reklam kapanınca sonucu bildirir.
+private final class RewardRelay: NSObject, GADFullScreenContentDelegate {
+    private let done: (RewardOutcome) -> Void
+    var earned = false
+    init(_ done: @escaping (RewardOutcome) -> Void) { self.done = done }
+    func adDidDismissFullScreenContent(_ ad: GADFullScreenPresentingAd) {
+        let e = earned
+        Task { @MainActor in self.done(e ? .EARNED : .CANCELLED) }
+    }
+    func ad(_ ad: GADFullScreenPresentingAd, didFailToPresentFullScreenContentWithError error: Error) {
+        Task { @MainActor in self.done(.UNAVAILABLE) }
     }
 }

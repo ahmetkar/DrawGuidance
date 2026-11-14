@@ -18,6 +18,9 @@ import kotlinx.coroutines.withTimeoutOrNull
 /** v39 reklamın gösterildiği geçişler. */
 enum class AdTrigger { APP_ENTRY, CANVAS_CLOSED }
 
+/** v51 ödüllü reklamın sonucu: ödül kazanıldı, Premium (reklamsız açılır), yarıda kapatıldı, reklam yok. */
+enum class RewardOutcome { EARNED, FREE, CANCELLED, UNAVAILABLE }
+
 /** v39 reklam kararı ve nedeni (testlerde ve günlükte). */
 enum class AdDecision { SHOW, NOT_LOADED_YET, PREMIUM, KIDS_CANVAS, CHILD_USER, FIRST_LAUNCH, NO_CONSENT, FREQUENCY_CAP, UNAVAILABLE }
 
@@ -72,6 +75,8 @@ class AdsCoordinator(
     private val entitlements: StateFlow<Entitlements>,
     private val user: StateFlow<LocalUserEntity?>,
     private val adUnitId: String,
+    /** v51 ödüllü reklam birimi (boşsa ödüllü reklam yok). */
+    private val rewardedUnitId: String = "",
     private val policy: AdsPolicy = AdsPolicy(),
     private val scope: CoroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate),
     private val clock: () -> Long = System::currentTimeMillis,
@@ -128,6 +133,43 @@ class AdsCoordinator(
             gateway.initialize(app) {
                 if (gateway.interstitialReady) show(activity) else preload()
             }
+        }
+    }
+
+    /**
+     * v51 ödüllü reklam (kullanıcı kilitli alıştırmayı açmak istedi). Premium'da reklamsız [RewardOutcome.FREE]; çocuk
+     * kullanıcıda gösterilmez. Onay (UMP) yoksa önce alınır; reklam en çok 12 sn'de yüklenmezse [RewardOutcome.UNAVAILABLE].
+     */
+    fun requestReward(activity: Activity, onResult: (RewardOutcome) -> Unit) {
+        scope.launch {
+            val e = loadedEntitlements()
+            if (e.adFree(clock())) { onResult(RewardOutcome.FREE); return@launch }
+            if (!gateway.available || rewardedUnitId.isBlank()) { onResult(RewardOutcome.UNAVAILABLE); return@launch }
+            if (AdsPolicy.isChild(user.value)) { onResult(RewardOutcome.UNAVAILABLE); return@launch }
+            val go: (Boolean) -> Unit = { ok ->
+                consent = consent || ok
+                if (!ok) onResult(RewardOutcome.UNAVAILABLE) else {
+                    gateway.setRequestConfiguration(childDirected = false, underAgeOfConsent = false)
+                    gateway.initialize(app) {
+                        var done = false
+                        val timeout = scope.launch {
+                            kotlinx.coroutines.delay(12_000)
+                            if (!done) { done = true; onResult(RewardOutcome.UNAVAILABLE) }
+                        }
+                        gateway.loadRewarded(app, rewardedUnitId) { loaded ->
+                            if (done) return@loadRewarded
+                            done = true
+                            timeout.cancel()
+                            if (!loaded || activity.isFinishing) { onResult(RewardOutcome.UNAVAILABLE); return@loadRewarded }
+                            gateway.showRewarded(activity) { earned ->
+                                AppLog.i("Ads", "ödüllü reklam: kazanıldı=$earned")
+                                onResult(if (earned) RewardOutcome.EARNED else RewardOutcome.CANCELLED)
+                            }
+                        }
+                    }
+                }
+            }
+            if (consent || gateway.canRequestAds(app)) go(true) else gateway.gatherConsent(activity, underAgeOfConsent = false, onDone = go)
         }
     }
 

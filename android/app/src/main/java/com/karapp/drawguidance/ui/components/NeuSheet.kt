@@ -1,6 +1,15 @@
 package com.karapp.drawguidance.ui.components
 
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.staticCompositionLocalOf
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.rememberModalBottomSheetState
@@ -13,7 +22,26 @@ import com.karapp.drawguidance.ui.theme.NeuTheme
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun NeuSheet(onDismiss: () -> Unit, content: @Composable ColumnScope.() -> Unit) {
+fun NeuSheet(onDismiss: () -> Unit, full: Boolean = false, content: @Composable ColumnScope.() -> Unit) {
+    // v51 ekleme ve seçim pencereleri (karakterler, efektler, nesneler, şekiller, alıştırmalar, eğitimler...) dikey
+    // ekranda da ekranın tamamını kaplar; içlerinde açılan pencereler yerleşik değil, normal alt pencere olur.
+    if (full && com.karapp.drawguidance.ui.screens.canvasedit.components.dockedSheetHostOrNull() != null) {
+        val colors = NeuTheme.colors
+        ModalBottomSheet(
+            onDismissRequest = onDismiss,
+            sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
+            containerColor = colors.background,
+            contentColor = colors.content,
+        ) {
+            CompositionLocalProvider(
+                com.karapp.drawguidance.ui.screens.canvasedit.components.LocalDockedSheets provides null,
+                LocalFullSheet provides true,
+            ) {
+                Column(Modifier.fillMaxWidth().fillMaxHeight(), content = content)
+            }
+        }
+        return
+    }
     // v50 dikey ekranda düzenleyicinin pencereleri çizim alanının altında küçük, kalıcı olmayan pencere (seçim menüsü
     // de kullanılabilir; son dokunulan üstte)
     val docked = com.karapp.drawguidance.ui.screens.canvasedit.components.dockedSheetHostOrNull()
@@ -45,3 +73,14 @@ fun NeuSheet(onDismiss: () -> Unit, content: @Composable ColumnScope.() -> Unit)
 fun NeuSheetOrInline(inline: Boolean, onDismiss: () -> Unit, content: @Composable () -> Unit) {
     if (inline) content() else NeuSheet(onDismiss) { content() }
 }
+
+/** v51 pencere tam ekran açıldı mı (içerik yüksekliğini sınırlamaz, ekranı doldurur). */
+val LocalFullSheet = staticCompositionLocalOf { false }
+
+/**
+ * v51 pencere gövdesinin yüksekliği: tam ekran pencerede kalan alanı doldurur, ötekilerde en çok [max] (eskiden
+ * `heightIn(max = 620.dp)`).
+ */
+@Composable
+fun Modifier.sheetBodyHeight(max: Dp = 620.dp): Modifier =
+    if (LocalFullSheet.current) this.fillMaxHeight() else this.heightIn(max = max)

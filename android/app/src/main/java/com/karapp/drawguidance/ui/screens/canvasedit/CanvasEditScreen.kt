@@ -1255,28 +1255,33 @@ fun CanvasEditScreen(
                         }
                     }
                 } else if (wide) {
+                    // v51 tablette üst menü başlıkla aynı satırda sıkışıp kesiliyordu: başlık satırında yalnız geri, ad,
+                    // ⋮ ve kaydet; menü başlık alanının altında kendi satırında (sığmazsa yana kayar)
                     NeuTopBar(
                         title = canvas?.name ?: "",
                         subtitleContent = styleLine,
                         titleStyle = MaterialTheme.typography.titleMedium,
                         navigation = { NeuIconButton(Icons.AutoMirrored.Filled.ArrowBack, stringResource(R.string.back), requestBack) },
                         actions = {
-                            // v45 gelişmiş modların dikey ekranında (tablet) düğme adları düğmenin içinde; tablette menü sürüklenir
-                            androidx.compose.runtime.CompositionLocalProvider(
-                                com.karapp.drawguidance.ui.components.LocalButtonLabels provides landscape,
-                                com.karapp.drawguidance.ui.components.LocalInlineLabels provides (!landscape && !simple),
-                            ) {
-                                Row(Modifier.weight(3f, fill = false).tabletWindow(topMenuWindow), verticalAlignment = Alignment.CenterVertically) {
-                                    topMenuWindow?.let { com.karapp.drawguidance.ui.screens.canvasedit.components.WindowDragHandle(it) }
-                                    Box(contentAlignment = Alignment.CenterEnd) { topRow(false) }
-                                }
-                            }
                             androidx.compose.runtime.CompositionLocalProvider(com.karapp.drawguidance.ui.components.LocalButtonLabels provides landscape) {
                                 headerActions(); saveImageButton()
                             }
                         },
                         modifier = Modifier.padding(vertical = 0.dp),
                     )
+                    // v45 gelişmiş modların dikey ekranında (tablet) düğme adları düğmenin içinde; tablette menü sürüklenir
+                    androidx.compose.runtime.CompositionLocalProvider(
+                        com.karapp.drawguidance.ui.components.LocalButtonLabels provides landscape,
+                        com.karapp.drawguidance.ui.components.LocalInlineLabels provides (!landscape && !simple),
+                    ) {
+                        Row(
+                            Modifier.fillMaxWidth().padding(horizontal = 16.dp).tabletWindow(topMenuWindow).testTag("tablet_top_menu"),
+                            verticalAlignment = Alignment.CenterVertically,
+                        ) {
+                            topMenuWindow?.let { com.karapp.drawguidance.ui.screens.canvasedit.components.WindowDragHandle(it) }
+                            Box(Modifier.weight(1f), contentAlignment = Alignment.CenterStart) { topRow(false) }
+                        }
+                    }
                 } else {
                     NeuTopBar(
                         title = canvas?.name ?: "",

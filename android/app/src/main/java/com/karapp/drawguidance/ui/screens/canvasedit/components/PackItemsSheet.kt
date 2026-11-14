@@ -1,5 +1,6 @@
 package com.karapp.drawguidance.ui.screens.canvasedit.components
 
+import com.karapp.drawguidance.ui.components.sheetBodyHeight
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
@@ -96,7 +97,7 @@ fun PackItemsSheet(
     val windows = PackWindows.forMode(mode).filter { PackWindows.items(packs, mode, it).isNotEmpty() }
     var window by rememberSaveable { mutableStateOf(windows.firstOrNull() ?: "shapes") }
     val colors = NeuTheme.colors
-    NeuSheet(onDismiss) {
+    NeuSheet(onDismiss, full = true) {
         Column(Modifier.fillMaxWidth().padding(horizontal = 16.dp).padding(bottom = 16.dp).testTag("pack_items_sheet"), verticalArrangement = Arrangement.spacedBy(10.dp)) {
             Text(stringResource(R.string.v43_add_packs), style = MaterialTheme.typography.titleLarge)
             Row(Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -108,7 +109,7 @@ fun PackItemsSheet(
             if (list.isEmpty()) {
                 Text(stringResource(R.string.v43_pack_empty), style = MaterialTheme.typography.bodyMedium, color = colors.contentMuted)
             } else {
-                LazyVerticalGrid(GridCells.Adaptive(96.dp), Modifier.fillMaxWidth().heightIn(max = 460.dp), horizontalArrangement = Arrangement.spacedBy(10.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                LazyVerticalGrid(GridCells.Adaptive(96.dp), Modifier.fillMaxWidth().sheetBodyHeight(460.dp), horizontalArrangement = Arrangement.spacedBy(10.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
                     items(list, key = { (p, i) -> p.id + "/" + i.id }) { (p, i) ->
                         Column(
                             Modifier.clip(RoundedCornerShape(12.dp)).clickable { onPick(p, i) }.padding(4.dp).testTag("pack_item_${p.id}_${i.id}"),

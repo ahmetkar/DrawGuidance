@@ -6,6 +6,22 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <!-- v40 yerel bildirimler (güncelleme, hatırlatma); Android 13+ çalışma zamanında, önce uygulama içi açıklamayla istenir -->
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <!-- v51 cihazlar arası tuval paylaşımı ve yayını: Nearby Connections (Bluetooth/BLE ile bulma, Wi-Fi Direct ile
+         aktarım) ve aynı Wi-Fi ağındaki cihazlar (Bonjour/NSD + TCP; iOS ile). İzinler yalnız paylaşım sayfasında istenir. -->
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
+    <uses-permission android:name="android.permission.CHANGE_WIFI_MULTICAST_STATE" />
+    <uses-permission android:name="android.permission.BLUETOOTH" android:maxSdkVersion="30" />
+    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" android:maxSdkVersion="30" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" android:maxSdkVersion="32" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" android:maxSdkVersion="32" />
+    <uses-permission android:name="android.permission.BLUETOOTH_ADVERTISE" />
+    <uses-permission android:name="android.permission.BLUETOOTH_CONNECT" />
+    <uses-permission android:name="android.permission.BLUETOOTH_SCAN" />
+    <uses-permission android:name="android.permission.NEARBY_WIFI_DEVICES" />
+    <uses-feature android:name="android.hardware.bluetooth" android:required="false" />
+    <uses-feature android:name="android.hardware.bluetooth_le" android:required="false" />
+    <uses-feature android:name="android.hardware.wifi.direct" android:required="false" />
 
     <!-- Paylaşım hedeflerinin (WhatsApp, Instagram, Pinterest) yüklü olup olmadığını görebilmek için -->
     <queries>

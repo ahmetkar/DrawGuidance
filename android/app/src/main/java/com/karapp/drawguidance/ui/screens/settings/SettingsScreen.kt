@@ -161,6 +161,8 @@ fun SettingsScreen(
     accountViewModel: com.karapp.drawguidance.ui.screens.account.AccountViewModel = koinViewModel(),
     /** v39 abonelik sayfası. */
     onOpenSubscription: () -> Unit = {},
+    /** v51 cihazlar arası paylaşım sayfası. */
+    onOpenShare: () -> Unit = {},
 ) {
     val colors = NeuTheme.colors
     // v36 ayarlar sekmelere bölünür; hesap başlığı en üstte, ekran genişliğinde ve beyaz zeminde
@@ -215,6 +217,8 @@ fun SettingsScreen(
                         val online by accountViewModel.online.collectAsState()
                         val lastRun by accountViewModel.lastSync.collectAsState()
                         SyncControlCard(lastSync = lastRun ?: accountViewModel.catalogLastCheck)
+                        // v51 cihazlar arası paylaşım (Wi-Fi Direct / Bluetooth / aynı Wi-Fi) ve ayarları
+                        if (!com.karapp.drawguidance.ui.kids.LocalKidsLocked.current) com.karapp.drawguidance.ui.screens.share.ShareSettingsCard(onOpenShare = onOpenShare)
                     }
                     SettingsTab.ADVANCED -> {
                         // v37 hata raporları

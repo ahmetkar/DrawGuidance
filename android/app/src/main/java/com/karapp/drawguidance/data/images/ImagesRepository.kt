@@ -79,6 +79,19 @@ class ImagesRepository(
         entity.copy(id = dao.insert(entity))
     }
 
+    /** v51 başka cihazdan alınan resmi Kaydedilenler'e ekler ([source]: "share:<gönderen>"). */
+    suspend fun saveReceived(bytes: ByteArray, title: String, mime: String, width: Int, height: Int, source: String): SavedImageEntity =
+        withContext(Dispatchers.IO) {
+            val type = when (mime) { "image/jpeg" -> "image/jpeg" to "jpg"; "image/webp" -> "image/webp" to "webp"; else -> "image/png" to "png" }
+            val image = exporter.saveReceived(bytes, title, type.first, type.second, width, height)
+            val entity = SavedImageEntity(
+                canvasLocalId = source, title = title, uri = image.uri, width = width, height = height,
+                createdAt = System.currentTimeMillis(), location = image.location, sizeBytes = image.sizeBytes,
+                mime = type.first, defaultLocation = SavedImageEntity.isDefaultUri(image.uri),
+            )
+            entity.copy(id = dao.insert(entity))
+        }
+
     private suspend fun folderForCanvas(canvas: CanvasUi): com.karapp.drawguidance.data.local.FolderEntity? {
         val dao = folders ?: return null
         val kind = com.karapp.drawguidance.data.local.FolderKind.IMAGE.name

@@ -1,6 +1,9 @@
 package com.karapp.drawguidance.ui.screens.canvasedit
 
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.ui.unit.dp
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -59,5 +62,25 @@ fun CanvasEditRoute(
     }
     }
     }
+    // v51 canlı yayın: bu tuval yayındaysa düzenleyicideki her değişiklik karşı cihaza gönderilir
+    LiveBroadcastBridge(canvasLocalId, vm)
     }
+}
+
+@Composable
+private fun androidx.compose.foundation.layout.BoxScope.LiveBroadcastBridge(canvasLocalId: String, vm: CanvasEditViewModel) {
+    val share = koinInject<com.karapp.drawguidance.data.share.ShareManager>()
+    val liveOut by share.liveOut.collectAsState()
+    val live = liveOut?.takeIf { it.canvasId == canvasLocalId } ?: return
+    androidx.compose.runtime.LaunchedEffect(canvasLocalId, live.peerKey) {
+        vm.canvas.collect { c -> if (c != null) share.publishLive(c) }
+    }
+    val canvas by vm.canvas.collectAsState()
+    com.karapp.drawguidance.ui.screens.share.LiveBroadcastBadge(
+        canvasName = canvas?.name.orEmpty(),
+        peerName = live.peerName,
+        onStop = share::stopLive,
+        modifier = androidx.compose.ui.Modifier.align(androidx.compose.ui.Alignment.BottomCenter)
+            .navigationBarsPadding().padding(bottom = 6.dp),
+    )
 }

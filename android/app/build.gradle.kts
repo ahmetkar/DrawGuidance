@@ -190,6 +190,8 @@ dependencies {
     implementation(libs.billing.ktx)
     implementation(libs.play.services.ads)
     implementation(libs.ump)
+    // v51 cihazlar arası tuval paylaşımı ve yayını (Nearby Connections)
+    implementation(libs.play.services.nearby)
 
     testImplementation(libs.junit)
     testImplementation(libs.robolectric)

@@ -62,6 +62,35 @@ class BrushController(
     private val _isPickerOpen = MutableStateFlow(false)
     val isPickerOpen: StateFlow<Boolean> = _isPickerOpen.asStateFlow()
 
+    /**
+     * v51 klon/onarma kaynağı: "Kaynak seç"ten sonraki dokunuş kaynak noktasını belirler ([cloneSource]); ondan sonraki
+     * ilk boyama, kaynağın o boyamanın başlangıcına göre kaymasını fırçanın ayarına yazar (hizalı klon).
+     */
+    private val _cloneSourcePicking = MutableStateFlow(false)
+    val cloneSourcePicking: StateFlow<Boolean> = _cloneSourcePicking.asStateFlow()
+    private val _cloneSource = MutableStateFlow<com.karapp.drawguidance.data.model.StrokePoint?>(null)
+    val cloneSource: StateFlow<com.karapp.drawguidance.data.model.StrokePoint?> = _cloneSource.asStateFlow()
+
+    fun startPickCloneSource() { _cloneSourcePicking.value = !_cloneSourcePicking.value }
+
+    /**
+     * Klon/onarma fırçasıyla biten bir boyama: kaynak seçiliyorsa kaynak olur (true döner: iz eklenmez); bekleyen
+     * kaynak varsa kayma ayara yazılır.
+     */
+    fun consumeCloneStroke(first: com.karapp.drawguidance.data.model.StrokePoint): Boolean {
+        val type = _settings.value.brushType
+        if (type != BrushType.FX_CLONE && type != BrushType.FX_HEAL) return false
+        if (_cloneSourcePicking.value) {
+            _cloneSource.value = first
+            _cloneSourcePicking.value = false
+            return true
+        }
+        val src = _cloneSource.value ?: return false
+        _cloneSource.value = null
+        updateTuning { it.copy(fx = it.fx.copy(srcDx = src.x - first.x, srcDy = src.y - first.y)) }
+        return false
+    }
+
     val savedColors: StateFlow<List<String>> = paletteStore.colors
 
     /** Tuval açılınca: çalışma/not tuvalinde yalnızca not kalemleri kullanılır. */

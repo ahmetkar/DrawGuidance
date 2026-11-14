@@ -931,6 +931,10 @@ class CanvasEditViewModel(
     /** v20 seçili fırçanın ayarları (aralık, çizim hızı, sabitleme, eğim, 3B). */
     fun updateBrushTuning(change: (com.karapp.drawguidance.data.settings.BrushTuning) -> com.karapp.drawguidance.data.settings.BrushTuning) = brush.updateTuning(change)
     fun resetBrushTuning() = brush.resetTuning()
+    /** v51 klon/onarma kaynağı seçimi. */
+    val cloneSourcePicking get() = brush.cloneSourcePicking
+    val cloneSource get() = brush.cloneSource
+    fun pickCloneSource() = brush.startPickCloneSource()
     fun saveCurrentColor() = brush.saveCurrentColor()
     fun saveColor(colorHex: String) = brush.saveColor(colorHex)
     fun removeSavedColor(colorHex: String) = brush.removeSavedColor(colorHex)

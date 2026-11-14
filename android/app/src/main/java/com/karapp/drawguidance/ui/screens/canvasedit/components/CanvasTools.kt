@@ -87,6 +87,8 @@ internal class GestureContext(
     var pressure: Float = 1f
     var tilt: Float = 0f
     var orient: Float = 0f
+    /** v51 gövde basıncı (kalem yan tuşu basılıyken 1; yan tuş silgi değilse). */
+    var barrel: Float = 0f
 
     /** v20 sıradaki noktanın zamanı (ms; olay zamanı) — çizim hızı süzgeci için. */
     var eventTime: Long = 0L
@@ -288,7 +290,7 @@ internal class DrawTool(private val penEraser: Boolean = false) : CanvasTool() {
         val g = guide
         if (g != null && guideLock >= 0) { g.project(guideLock, x0, y0, snapOut); x = snapOut[0]; y = snapOut[1] }
         val q = mapping?.map(x, y) ?: com.karapp.drawguidance.ui.drawing.Iso3D.project(plane, anchor, x, y)
-        ctx.live.add(q.x, q.y, pressure, tilt, orient)
+        ctx.live.add(q.x, q.y, pressure, tilt, orient, 0f, ctx.barrel)
     }
 
     private fun emit(ctx: GestureContext, points: List<com.karapp.drawguidance.ui.drawing.InkFilter.Point>) {

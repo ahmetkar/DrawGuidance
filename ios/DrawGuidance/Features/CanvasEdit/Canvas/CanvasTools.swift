@@ -121,6 +121,9 @@ final class GestureContext {
     var pressure: Float = 1
     var tilt: Float = 0
     var orient: Float = 0
+    /// v51 kalem gövdesinin dönüşü (0..1; 0: bilinmiyor) ve gövde sıkma basıncı (0..1).
+    var roll: Float = 0
+    var barrel: Float = 0
     var eventTime: Int64 = 0
     /// Süren önizleme (araçlar `end`'de okur).
     var preview: CanvasPreview?
@@ -301,7 +304,7 @@ final class DrawTool: CanvasTool {
         var x = x0, y = y0
         if let g = guide, guideLock >= 0 { let p = g.project(guideLock, x0, y0); x = p.x; y = p.y }
         let q = mapping?.map(x, y) ?? Iso3D.project(plane, anchor, x, y)
-        ctx.live.add(q.x, q.y, pressure, tilt, orient)
+        ctx.live.add(q.x, q.y, pressure, tilt, orient, roll: ctx.roll, barrel: ctx.barrel)
     }
 
     private func emit(_ ctx: GestureContext, _ points: [InkFilter.Point]) {

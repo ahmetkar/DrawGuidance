@@ -111,7 +111,14 @@ final class EditorCanvasView: UIView {
             let hoverer = UIHoverGestureRecognizer(target: self, action: #selector(onHover(_:)))
             addGestureRecognizer(hoverer)
         }
+        // v51 Apple Pencil Pro sıkma: sıkılırken gövde basıncı 1 (kalem dinamiklerindeki "Gövde basıncı")
+        let pencil = UIPencilInteraction()
+        pencil.delegate = self
+        addInteraction(pencil)
     }
+
+    /// v51 Apple Pencil Pro sıkma durumu (0/1).
+    fileprivate var squeeze: Float = 0
 
     required init?(coder: NSCoder) { fatalError("init(coder:) kullanılmaz") }
 
@@ -169,8 +176,15 @@ final class EditorCanvasView: UIView {
             ctx.pressure = StylusPrefs.pressure && maxF > 0 ? Float(t.force / maxF).coerceIn(0.05, 1) : 1
             ctx.tilt = Float(.pi / 2 - t.altitudeAngle)
             ctx.orient = Float(t.azimuthAngle(in: self))
+            // v51 Apple Pencil Pro: gövde dönüşü (0..1) ve sıkma (gövde basıncı)
+            if #available(iOS 17.5, *) {
+                let r = Float(t.rollAngle) / (2 * .pi)
+                let unit = r - r.rounded(.down)
+                ctx.roll = unit == 0 ? 0 : unit
+            }
+            ctx.barrel = squeeze
         } else {
-            ctx.pressure = 1; ctx.tilt = 0; ctx.orient = 0
+            ctx.pressure = 1; ctx.tilt = 0; ctx.orient = 0; ctx.roll = 0; ctx.barrel = 0
         }
     }
 
@@ -472,7 +486,7 @@ final class EditorCanvasView: UIView {
             if cacheVersion == version { cacheDrawn = target; return }
             if Self.isAppend(cacheDrawn, target) {
                 let added = Array(target[cacheDrawn.count...])
-                if !added.contains(where: { $0.brushType == .ERASER }) {
+                if !added.contains(where: { $0.brushType == .ERASER || $0.brushType.isRaster }) {
                     let px = contentScaleFactor
                     cacheImage = Bitmaps.draw(img.width, img.height) { g in
                         Bitmaps.drawUpright(g, img, in: CGRect(x: 0, y: 0, width: img.width, height: img.height))
@@ -570,7 +584,7 @@ final class EditorCanvasView: UIView {
 
         let fresh = cacheKey != nil && cacheDrawn.count <= target.count && Self.isAppend(cacheDrawn, target)
         let pending: [Stroke] = (cacheVersion != vm.store.visualVersion && fresh)
-            ? Array(target[(cacheImage == nil ? 0 : cacheDrawn.count)...]).filter { $0.brushType != .ERASER } : []
+            ? Array(target[(cacheImage == nil ? 0 : cacheDrawn.count)...]).filter { $0.brushType != .ERASER && !$0.brushType.isHelper } : []
         let liveVisible = live.isActive && !(live.finished && cacheVersion == vm.store.visualVersion)
         let moving = visible.filter { excluded.contains($0.id) }
 
@@ -608,7 +622,7 @@ final class EditorCanvasView: UIView {
             g.setLineDash(phase: 0, lengths: [CGFloat(12 / scale), CGFloat(7 / scale)]); g.strokePath()
             g.setLineDash(phase: 0, lengths: [])
         }
-        if liveVisible, let s = live.stroke() { StrokeRenderer.drawStroke(g, s) }
+        if liveVisible, let s = live.stroke() { StrokeRenderer.drawLive(g, s) }
         // Silgi nesneleri silmez: silerken nesneler canlı silginin üstünde gösterilir
         if liveVisible && live.isEraser {
             for s in visible where s.brushType.isObject && !s.hidden { StrokeRenderer.drawStroke(g, s) }
@@ -1070,5 +1084,15 @@ struct EditorCanvas: UIViewRepresentable {
         v.actions = actions
         v.overlay = overlay
         v.refresh()
+    }
+}
+
+extension EditorCanvasView: UIPencilInteractionDelegate {
+    @available(iOS 17.5, *)
+    func pencilInteraction(_ interaction: UIPencilInteraction, didReceiveSqueeze squeeze: UIPencilInteraction.Squeeze) {
+        switch squeeze.phase {
+        case .began, .changed: self.squeeze = 1
+        default: self.squeeze = 0
+        }
     }
 }

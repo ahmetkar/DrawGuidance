@@ -39,6 +39,8 @@ class DrawingController(
             host.emit(EditEvent.LayerLocked)
             return
         }
+        // v51 klon/onarma: kaynak seçimi iz eklemez; bekleyen kaynak bu izin ayarına yazılır
+        if (!penEraser && brush().consumeCloneStroke(points.first())) return
         val current0 = brush().settings.value
         val settings = if (!penEraser || current0.brushType == BrushType.ERASER) current0
         else current0.copy(brushType = BrushType.ERASER, sizePx = brush().eraserSize(), opacity = 1f, flow = 1f, strength = 1f)
@@ -167,6 +169,9 @@ class DrawingController(
                 ContentCodec.quantize(it.x), ContentCodec.quantize(it.y), ContentCodec.quantizeUnit(it.pressure), ContentCodec.quantizeUnit(it.tilt),
                 // Yön 0 "bilinmiyor" demektir: gerçek 0° yönü en küçük adıma yuvarlanır
                 if (it.orient == 0f) 0f else ContentCodec.quantizeUnit(it.orient).coerceAtLeast(1f / 255f),
+                // v51 gövde dönüşü ve basıncı (0 "yok" demektir)
+                if (it.roll == 0f) 0f else ContentCodec.quantizeUnit(it.roll).coerceAtLeast(1f / 255f),
+                ContentCodec.quantizeUnit(it.barrel),
             )
         }
         if (q.size <= 2) return q

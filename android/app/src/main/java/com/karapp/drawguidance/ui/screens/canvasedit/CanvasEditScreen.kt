@@ -1952,6 +1952,9 @@ fun CanvasEditScreen(
                             onRemoveColor = viewModel::removeSavedColor,
                             onTuning = viewModel::updateBrushTuning,
                             onResetTuning = viewModel::resetBrushTuning,
+                            cloneSourcePicking = viewModel.cloneSourcePicking.collectAsState().value,
+                            cloneSourcePending = viewModel.cloneSource.collectAsState().value != null,
+                            onPickCloneSource = viewModel::pickCloneSource,
                             // v51 not almada damlalık yok
                             onEyedropper = if (kind.isNotes) null else ({
                                 viewModel.closePanel()

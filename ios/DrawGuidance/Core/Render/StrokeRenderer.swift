@@ -5,6 +5,10 @@ import Foundation
 enum StrokeRenderer {
     /// Tek çizim: kırpma dörtgeni varsa içinde.
     static func drawStroke(_ c: CGContext, _ stroke: Stroke) {
+        clipped(c, stroke) { drawUnclipped(c, stroke) }
+    }
+
+    private static func clipped(_ c: CGContext, _ stroke: Stroke, _ body: () -> Void) {
         if let clip = stroke.clip, clip.count == 4 {
             c.saveGState()
             let path = CGMutablePath()
@@ -12,11 +16,31 @@ enum StrokeRenderer {
             for i in 1..<4 { path.addLine(to: CGPoint(x: CGFloat(clip[i].x), y: CGFloat(clip[i].y))) }
             path.closeSubpath()
             c.addPath(path); c.clip()
-            drawUnclipped(c, stroke)
+            body()
             c.restoreGState()
             return
         }
-        drawUnclipped(c, stroke)
+        body()
+    }
+
+    /// v51 yardımcı fırçanın canlı önizleme rengi ve opaklığı.
+    static let HELPER_PREVIEW_COLOR: UInt32 = 0xFF7A_8699
+    static let HELPER_PREVIEW_ALPHA: Float = 0.35
+
+    /// Parmak/kalem hâlâ ekrandayken canlı çizim: piksel motorlu fırçalar her noktada yeniden hesaplanmaz, yumuşak
+    /// damgalarla önizlenir (yardımcı fırçalar işlenecek alanı yarı saydam gri gösterir). Diğer fırçalar `drawStroke` gibi.
+    static func drawLive(_ c: CGContext, _ stroke: Stroke) {
+        guard stroke.brushType.isRaster, !stroke.points.isEmpty else { drawStroke(c, stroke); return }
+        clipped(c, stroke) {
+            let helper = stroke.brushType.isHelper
+            let xs = stroke.points.map(\.x), ys = stroke.points.map(\.y)
+            let d = BrushPainter.dynamicsOf(stroke.points)
+            BrushPainter.paint(c, xs: xs, ys: ys, color: helper ? HELPER_PREVIEW_COLOR : ArgbColor.hex(stroke.colorHex),
+                               type: stroke.brushType, sizePx: stroke.sizePx, opacity: helper ? HELPER_PREVIEW_ALPHA : stroke.opacity,
+                               seed: stroke.id.javaHashCode, flow: stroke.flow, strength: stroke.strength,
+                               pressures: d.pressures, tilts: d.tilts, params: stroke.params, orients: d.orients,
+                               rolls: d.rolls, barrels: d.barrels)
+        }
     }
 
     private static func drawUnclipped(_ c: CGContext, _ stroke: Stroke) {
@@ -29,6 +53,8 @@ enum StrokeRenderer {
         default:
             let n = stroke.points.count
             if n == 0 { return }
+            // v51 piksel tabanlı fırça: bağlamsız çizim (önizleme, bekleyen çizim); listede bağlamıyla çizilir
+            if stroke.brushType.isRaster { RasterStrokes.draw(c, stroke, context: nil); return }
             if let r = paintBounds(stroke) {
                 let clip = c.boundingBoxOfClipPath
                 if !clip.isNull && !clip.isInfinite && !clip.intersects(r) { return }
@@ -37,13 +63,14 @@ enum StrokeRenderer {
             let d = BrushPainter.dynamicsOf(stroke.points)
             BrushPainter.paint(c, xs: xs, ys: ys, color: ArgbColor.hex(stroke.colorHex), type: stroke.brushType, sizePx: stroke.sizePx,
                                opacity: stroke.opacity, seed: stroke.id.javaHashCode, flow: stroke.flow, strength: stroke.strength,
-                               pressures: d.pressures, tilts: d.tilts, params: stroke.params, orients: d.orients)
+                               pressures: d.pressures, tilts: d.tilts, params: stroke.params, orients: d.orients,
+                               rolls: d.rolls, barrels: d.barrels)
         }
     }
 
     /// Silgiler yalnız kendi katmanlarındaki, kendilerinden önceki fırça izlerini siler; nesneler etkilenmez.
     static func drawStrokeList(_ c: CGContext, _ strokes: [Stroke]) {
-        if !strokes.contains(where: { $0.brushType == .ERASER }) {
+        if !strokes.contains(where: { $0.brushType == .ERASER || $0.brushType.isRaster }) {
             for s in strokes where !s.hidden { drawStroke(c, s) }
             return
         }
@@ -63,12 +90,26 @@ enum StrokeRenderer {
             }
             if (i..<j).contains(where: { strokes[$0].brushType != .ERASER }) {
                 c.beginTransparencyLayer(auxiliaryInfo: nil)
-                for m in i..<j where !strokes[m].hidden { drawStroke(c, strokes[m]) }
+                for m in i..<j where !strokes[m].hidden { drawInRun(c, strokes, m, layer) }
                 for e in laterErasers where !e.hidden { drawStroke(c, e) }
                 c.endTransparencyLayer()
             }
             i = j
         }
+    }
+
+    /// v51 katman ara katmanındaki bir çizim: piksel tabanlı fırça izi, aynı katmanda kendisinden önce çizilenleri
+    /// (nesneler dahil) okuyarak çizilir; diğerleri her zamanki gibi.
+    private static func drawInRun(_ c: CGContext, _ strokes: [Stroke], _ m: Int, _ layer: String) {
+        let s = strokes[m]
+        guard s.brushType.isRaster else { drawStroke(c, s); return }
+        var context: [Stroke] = []
+        context.reserveCapacity(m)
+        for q in 0..<m {
+            let o = strokes[q]
+            if (o.layerId ?? "") == layer && !o.hidden { context.append(o) }
+        }
+        clipped(c, s) { RasterStrokes.draw(c, s, context: context) }
     }
 
     /// Kağıt rengi + arka plan (gradyan, resim, desen) + çizimler (silgi kâğıdı silmesin diye çizimler ayrı katmanda).

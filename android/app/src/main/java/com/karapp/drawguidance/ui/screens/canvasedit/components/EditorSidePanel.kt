@@ -156,6 +156,10 @@ fun BrushPanelContent(
     /** v20 fırça başına ayarlar (aralık, çizim hızı, sabitleme, eğim, 3B). */
     onTuning: ((com.karapp.drawguidance.data.settings.BrushTuning) -> com.karapp.drawguidance.data.settings.BrushTuning) -> Unit = {},
     onResetTuning: () -> Unit = {},
+    /** v51 klon/onarma kaynağı seçimi. */
+    cloneSourcePicking: Boolean = false,
+    cloneSourcePending: Boolean = false,
+    onPickCloneSource: () -> Unit = {},
     /** v43 damlalık: tuvalden renk al (panel kapanır, dokunulan yerin rengi fırça rengi olur). */
     onEyedropper: (() -> Unit)? = null,
     /** v33 çocuklar için sade panel: fırça, kalınlık ve büyük renk paleti. */
@@ -241,7 +245,7 @@ fun BrushPanelContent(
             NeuSlider(value = settings.strength, onValueChange = onStrengthChange, valueRange = 0.1f..1f)
         }
 
-        BrushTuningSection(settings.brushType, settings.tuning, onTuning, onResetTuning)
+        BrushTuningSection(settings.brushType, settings.tuning, onTuning, onResetTuning, cloneSourcePicking, cloneSourcePending, onPickCloneSource)
 
         Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {

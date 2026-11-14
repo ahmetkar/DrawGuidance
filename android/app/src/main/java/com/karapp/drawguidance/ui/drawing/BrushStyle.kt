@@ -36,6 +36,11 @@ enum class BrushEngine {
     SURFACE,
     /** v21 ıslak izler: mürekkep lekeleri ve damlacıklar, aşağı akan boya damlaları */
     TRAIL,
+    /**
+     * v51 piksel tabanlı uç motoru ([RasterBrush]): boya fırçaları (akrilik, yağlı boya, bulut/duman) ve yardımcı
+     * fırçalar. Canlı çizimde yumuşak damgalarla önizlenir; bitince alttaki içerikle birlikte piksel olarak hesaplanır.
+     */
+    RASTER,
     IMAGE,
 }
 
@@ -189,6 +194,14 @@ fun BrushType.style(): BrushStyle = when (this) {
     BrushType.TEXTURE_IRON -> surface(SurfaceKind.IRON)
     BrushType.TEXTURE_METAL -> surface(SurfaceKind.METAL)
 
+    // v51 boya ve yardımcı fırçalar: piksel motoru (önizlemede yumuşak damga)
+    BrushType.ACRYLIC -> BrushStyle(widthFactor = 1.4f, alphaFactor = 1f, engine = BrushEngine.RASTER, spacing = 0.08f, hardness = 0.8f, textured = true)
+    BrushType.OIL_PAINT -> BrushStyle(widthFactor = 1.6f, alphaFactor = 1f, engine = BrushEngine.RASTER, spacing = 0.06f, hardness = 0.7f, textured = true)
+    BrushType.CLOUD_SMOKE -> BrushStyle(widthFactor = 2.6f, alphaFactor = 0.85f, engine = BrushEngine.RASTER, spacing = 0.12f, hardness = 0f, textured = true)
+    BrushType.FX_BLUR, BrushType.FX_SHARPEN, BrushType.FX_DODGE, BrushType.FX_BURN, BrushType.FX_SPONGE,
+    BrushType.FX_CLONE, BrushType.FX_HEAL, BrushType.FX_MIXER ->
+        BrushStyle(widthFactor = 1.6f, alphaFactor = 1f, engine = BrushEngine.RASTER, spacing = 0.1f, hardness = 0.3f, textured = true)
+
     // Gerçek silme: altındaki çizimleri şeffaflaştırır (kağıt rengi görünür)
     BrushType.ERASER -> BrushStyle(widthFactor = 2f, alphaFactor = 1f, blendMode = BlendMode.Clear)
     // Resim fırça değildir; çizgi kalınlığı yoktur
@@ -246,6 +259,12 @@ fun BrushType.defaultSize(): Float = when (this) {
     BrushType.PATTERN_CARPET, BrushType.PATTERN_WALLPAPER, BrushType.PATTERN_WOODPAINT -> 36f
     BrushType.TEXTURE_SKIN, BrushType.TEXTURE_FUR, BrushType.TEXTURE_PLANT,
     BrushType.TEXTURE_WOOD, BrushType.TEXTURE_IRON, BrushType.TEXTURE_METAL -> 36f
+    BrushType.ACRYLIC -> 22f
+    BrushType.OIL_PAINT -> 26f
+    BrushType.CLOUD_SMOKE -> 48f
+    BrushType.FX_BLUR, BrushType.FX_SHARPEN, BrushType.FX_DODGE, BrushType.FX_BURN, BrushType.FX_SPONGE -> 40f
+    BrushType.FX_CLONE, BrushType.FX_HEAL -> 30f
+    BrushType.FX_MIXER -> 32f
     BrushType.ERASER -> 30f
     BrushType.IMAGE -> 1f
     BrushType.SHAPE, BrushType.DIAGRAM -> 4f
@@ -276,6 +295,15 @@ enum class BrushCategory(val brushes: List<BrushType>, val kind: CanvasKind = Ca
     HALFTONE(listOf(BrushType.HALFTONE_DOTS, BrushType.HALFTONE_LINES)),
     /** v15: nokta izi ve 3B fırça (resim tuvali) */
     EFFECTS(listOf(BrushType.DOT_PEN, BrushType.BRUSH_3D)),
+    /** v51 boya fırçaları (akrilik, yağlı boya, bulut/duman). */
+    PAINT(listOf(BrushType.ACRYLIC, BrushType.OIL_PAINT, BrushType.CLOUD_SMOKE)),
+    /** v51 yardımcı fırçalar: alttaki çizimi işler. */
+    HELPER(
+        listOf(
+            BrushType.FX_BLUR, BrushType.FX_SHARPEN, BrushType.FX_DODGE, BrushType.FX_BURN,
+            BrushType.FX_SPONGE, BrushType.FX_CLONE, BrushType.FX_HEAL, BrushType.FX_MIXER,
+        ),
+    ),
     NOTE_WRITING(
         listOf(BrushType.NOTE_PENCIL, BrushType.NOTE_BALLPOINT, BrushType.NOTE_FOUNTAIN, BrushType.NOTE_GEL, BrushType.NOTE_FINELINER),
         CanvasKind.NOTES,
@@ -380,7 +408,10 @@ internal class BrushDynamics(
             BrushType.SOFT_ROUND, BrushType.AIRBRUSH, BrushType.HARD_ROUND, BrushType.TEXTURE_SPONGE, BrushType.TEXTURE_CANVAS,
             BrushType.PATTERN_CARPET, BrushType.PATTERN_WALLPAPER, BrushType.PATTERN_WOODPAINT,
             BrushType.TEXTURE_SKIN, BrushType.TEXTURE_FUR, BrushType.TEXTURE_PLANT,
-            BrushType.TEXTURE_WOOD, BrushType.TEXTURE_IRON, BrushType.TEXTURE_METAL -> SOFT
+            BrushType.TEXTURE_WOOD, BrushType.TEXTURE_IRON, BrushType.TEXTURE_METAL,
+            BrushType.CLOUD_SMOKE, BrushType.FX_BLUR, BrushType.FX_SHARPEN, BrushType.FX_DODGE, BrushType.FX_BURN,
+            BrushType.FX_SPONGE, BrushType.FX_CLONE, BrushType.FX_HEAL, BrushType.FX_MIXER -> SOFT
+            BrushType.ACRYLIC, BrushType.OIL_PAINT -> MARKER
             BrushType.PAINT_TRAIL -> MARKER
             BrushType.MARKER, BrushType.NOTE_FELT, BrushType.FLAT_BRUSH -> MARKER
             BrushType.HIGHLIGHTER, BrushType.NOTE_HIGHLIGHTER -> HIGHLIGHT
@@ -397,7 +428,7 @@ fun BrushType.defaultSpacing(): Float? {
     val st = style()
     return when (st.engine) {
         BrushEngine.DABS, BrushEngine.SOFT_DABS, BrushEngine.STAMP_SHAPE, BrushEngine.HALFTONE,
-        BrushEngine.SURFACE, BrushEngine.TRAIL -> st.spacing
+        BrushEngine.SURFACE, BrushEngine.TRAIL, BrushEngine.RASTER -> st.spacing
         BrushEngine.SCATTER -> 0.45f
         BrushEngine.PATTERN -> when (st.pattern) {
             PatternKind.DOTS -> 1.6f
@@ -425,6 +456,10 @@ fun BrushType.reachFactor(params: com.karapp.drawguidance.data.model.BrushParams
     val st = style()
     val widen = BrushDynamics.of(this).with(params).maxWidth
     var r = st.widthFactor * 0.5f * st.reach * widen * 1.15f
+    // v51 boyut aralığı (en büyük boyut) ve piksel motorunun yumuşak kenar payı
+    val tipMax = params?.tip?.maxSize?.coerceIn(0.1f, 3f) ?: 1f
+    if (tipMax > 1f) r *= tipMax
+    if (st.engine == BrushEngine.RASTER) r *= 1f + 0.6f * (RasterBrush.effectiveTip(this, params).softness ?: 0f)
     // v21 döküm izinde damlalar izden aşağı uzar
     if (this == BrushType.DRIP_TRAIL) r += st.widthFactor * DRIP_MAX_LENGTH * widen
     if (this == BrushType.BRUSH_3D) {

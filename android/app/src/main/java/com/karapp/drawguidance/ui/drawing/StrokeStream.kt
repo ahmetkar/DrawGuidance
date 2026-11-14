@@ -14,6 +14,7 @@ import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.StrokeJoin
 import com.karapp.drawguidance.data.model.BrushType
+import com.karapp.drawguidance.data.model.isHelper
 import kotlin.math.PI
 import kotlin.math.abs
 import kotlin.math.atan2
@@ -350,35 +351,60 @@ internal abstract class StrokeStream(
     protected var pt: FloatArray? = null
     /** v20 kalem yönü (0..1 → 0..360°; 0: bilinmiyor). */
     protected var po: FloatArray? = null
+    /** v51 gövde dönüşü ve gövde basıncı (0..1; yoksa null). */
+    protected var pr: FloatArray? = null
+    protected var pb: FloatArray? = null
     protected val dynamics = BrushDynamics.of(type).with(params)
-    val hasDynamics: Boolean get() = pp != null || pt != null
+    val hasDynamics: Boolean get() = pp != null || pt != null || penModel != null
 
-    fun add(x: Float, y: Float, pressure: Float = 1f, tilt: Float = 0f, orient: Float = 0f) {
+    fun add(x: Float, y: Float, pressure: Float = 1f, tilt: Float = 0f, orient: Float = 0f, roll: Float = 0f, barrel: Float = 0f) {
         if (ended) return
         if (count == px.size) {
             px = px.copyOf(count * 2); py = py.copyOf(count * 2)
             pp?.let { pp = it.copyOf(count * 2) }
             pt?.let { pt = it.copyOf(count * 2) }
             po?.let { po = it.copyOf(count * 2) }
+            pr?.let { pr = it.copyOf(count * 2) }
+            pb?.let { pb = it.copyOf(count * 2) }
         }
         if (pressure != 1f && pp == null) pp = FloatArray(px.size) { 1f }
         if (tilt != 0f && pt == null) pt = FloatArray(px.size)
         if (orient != 0f && po == null) po = FloatArray(px.size)
+        if (roll != 0f && pr == null) pr = FloatArray(px.size)
+        if (barrel != 0f && pb == null) pb = FloatArray(px.size)
         px[count] = x; py[count] = y
         pp?.set(count, pressure)
         pt?.set(count, tilt)
         po?.set(count, orient)
+        pr?.set(count, roll)
+        pb?.set(count, barrel)
         count++
     }
 
-    fun setPoints(xs: FloatArray, ys: FloatArray, n: Int, pressures: FloatArray? = null, tilts: FloatArray? = null, orients: FloatArray? = null) {
+    fun setPoints(
+        xs: FloatArray, ys: FloatArray, n: Int, pressures: FloatArray? = null, tilts: FloatArray? = null, orients: FloatArray? = null,
+        rolls: FloatArray? = null, barrels: FloatArray? = null,
+    ) {
         px = xs; py = ys; count = n
-        pp = pressures; pt = tilts; po = orients
+        pp = pressures; pt = tilts; po = orients; pr = rolls; pb = barrels
     }
 
     fun pointsPressure(): FloatArray? = pp
     fun pointsTilt(): FloatArray? = pt
     fun pointsOrient(): FloatArray? = po
+    fun pointsRoll(): FloatArray? = pr
+    fun pointsBarrel(): FloatArray? = pb
+
+    /** v51 kalem/hareket dinamikleri ve boyut aralığı (ayar yoksa null). */
+    protected val penModel: PenModel? = PenModel.of(params)
+    private var penData: PenModel.PointData? = null
+
+    /** v51 dinamiklerin okuduğu güncel nokta dizileri. */
+    protected fun penPoints(): PenModel.PointData {
+        val d = penData ?: PenModel.PointData(px, py, count, pp, pt, po, pr, pb, width).also { penData = it }
+        d.update(px, py, count, pp, pt, po, pr, pb)
+        return d
+    }
 
     /** v20 ham nokta [raw]'daki kalem yönü (radyan) ya da bilinmiyorsa null. */
     protected fun orientAt(raw: Int): Float? {
@@ -397,10 +423,18 @@ internal abstract class StrokeStream(
     }
 
     /** Ham nokta [raw]'daki kalınlık çarpanı (basınç ve eğim; en çok ~1, eğimle genişleyen fırçalarda daha fazla). */
-    protected fun wf(raw: Int): Float = if (!hasDynamics) 1f else dynamics.width(dynAt(pp, raw, 1f), dynAt(pt, raw, 0f))
+    protected fun wf(raw: Int): Float {
+        val pm = penModel
+        val base = if (!hasDynamics) 1f else dynamics.width(if (pm?.overridesPressure == true) 1f else dynAt(pp, raw, 1f), dynAt(pt, raw, 0f))
+        return if (pm == null) base else pm.size(base, penPoints(), raw.coerceIn(0, max(0, count - 1)))
+    }
 
     /** Ham nokta [raw]'daki koyuluk çarpanı (karakalem, pastel, yumuşak fırçalar). */
-    protected fun af(raw: Int): Float = if (!hasDynamics) 1f else dynamics.alpha(dynAt(pp, raw, 1f), dynAt(pt, raw, 0f))
+    protected fun af(raw: Int): Float {
+        val pm = penModel
+        val base = if (!hasDynamics) 1f else dynamics.alpha(dynAt(pp, raw, 1f), dynAt(pt, raw, 0f))
+        return if (pm == null) base else base * pm.alpha(penPoints(), raw.coerceIn(0, max(0, count - 1)))
+    }
 
     fun end() { ended = true }
 
@@ -488,6 +522,9 @@ internal abstract class StrokeStream(
     companion object {
         /** Bu akışkanlıktan sonrası tam boya sayılır (doku yok). */
         const val FULL_FLOW = 0.97f
+        /** v51 yardımcı fırçanın canlı önizleme rengi ve opaklığı. */
+        const val HELPER_PREVIEW_COLOR = 0xFF7A8699.toInt()
+        const val HELPER_PREVIEW_ALPHA = 0.35f
 
         fun create(
             type: BrushType, color: Int, sizePx: Float, opacity: Float, seed: Int, flow: Float, strength: Float,
@@ -496,6 +533,8 @@ internal abstract class StrokeStream(
         ): StrokeStream {
             val style = type.style()
             val fullEraser = type == BrushType.ERASER && flow >= 0.99f && opacity >= 0.99f
+            // v51 yardımcı fırçalar renk bırakmaz: canlı çizimde işlenecek alan yarı saydam gri gösterilir
+            if (type.isHelper) return SampleDabStream(type, HELPER_PREVIEW_COLOR, sizePx, HELPER_PREVIEW_ALPHA, seed, flow, strength, eraserMask, params)
             return when {
                 type == BrushType.ERASER && !fullEraser -> SampleDabStream(type, color, sizePx, opacity, seed, flow, strength, eraserMask, params)
                 style.engine == BrushEngine.PATH -> PathStream(type, color, sizePx, opacity, seed, flow, strength, eraserMask, params)
@@ -586,7 +625,8 @@ internal class SampleDabStream(
     params: com.karapp.drawguidance.data.model.BrushParams? = null,
 ) : StrokeStream(type, color, sizePx, opacity, seed, flow, strength, eraserMask, params) {
 
-    private val engine = if (isEraser) BrushEngine.DABS else style.engine
+    // v51 piksel motorlu fırçalar canlı çizimde yumuşak damgalarla önizlenir
+    private val engine = if (isEraser) BrushEngine.DABS else if (style.engine == BrushEngine.RASTER) BrushEngine.SOFT_DABS else style.engine
     /** v20 kullanıcının seçtiği damga aralığı (genişliğin katı). */
     private val spacingOverride: Float? = if (isEraser) null else params?.spacing?.coerceIn(MIN_SPACING, MAX_SPACING)
     /** Akışkanlığın damga başına hesabında kullanılan aralık. */

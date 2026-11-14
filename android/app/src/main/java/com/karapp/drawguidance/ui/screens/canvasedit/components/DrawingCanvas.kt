@@ -68,6 +68,8 @@ import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.karapp.drawguidance.data.model.BrushType
+import com.karapp.drawguidance.data.model.isHelper
+import com.karapp.drawguidance.data.model.isRaster
 import com.karapp.drawguidance.data.model.isObject
 import com.karapp.drawguidance.data.model.CanvasUi
 import com.karapp.drawguidance.data.model.Stroke
@@ -344,7 +346,8 @@ fun DrawingCanvas(
                     holder.version == visualVersion -> holder.drawn = cacheTarget
                     // Silgi eklendiyse görüntü baştan üretilir: silgi yalnızca kendi katmanındaki fırça izlerini silmeli
                     isAppend(holder.drawn, cacheTarget) &&
-                        cacheTarget.subList(holder.drawn.size, cacheTarget.size).none { it.brushType == BrushType.ERASER } -> {
+                        // v51 piksel tabanlı fırça izi alttaki çizimi okur: görüntü baştan üretilir
+                        cacheTarget.subList(holder.drawn.size, cacheTarget.size).none { it.brushType == BrushType.ERASER || it.brushType.isRaster } -> {
                         val added = cacheTarget.subList(holder.drawn.size, cacheTarget.size)
                         val handoff = live.finished && added.size == 1 && added[0].id == live.strokeId &&
                             live.matches(cacheKey.scale, cacheKey.offset.x, cacheKey.offset.y)
@@ -721,7 +724,7 @@ fun DrawingCanvas(
             val pendingAppended = if (holder.drawn !== cacheTarget && isAppend(holder.drawn, cacheTarget)) {
                 // Bekleyen silgiler doğrudan çizilmez (nesneleri de silerdi); görüntü yenilenince görünür
                 cacheTarget.subList(if (holder.bitmap == null) 0 else holder.drawn.size, cacheTarget.size)
-                    .filter { it.brushType != BrushType.ERASER }
+                    .filter { it.brushType != BrushType.ERASER && !it.brushType.isHelper }
             } else emptyList()
             val liveVisible = liveTick >= 0 && live.isActive && !(live.finished && holder.drawn === cacheTarget)
             // Silgi yalnızca çizimleri silsin diye ayrı katman; gerekmedikçe (çoğu karede) açılmaz

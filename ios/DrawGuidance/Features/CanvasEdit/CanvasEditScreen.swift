@@ -124,7 +124,8 @@ struct CanvasEditScreen: View {
             size: Binding(get: { Double(b.settings.sizePx) }, set: { b.updateSize(Float($0)) }),
             flow: Binding(get: { Double(b.settings.flow) }, set: { b.updateFlow(Float($0)) }),
             opacity: Binding(get: { Double(b.settings.opacity) }, set: { b.updateOpacity(Float($0)) }),
-            color: ArgbColor.hex(b.settings.colorHex))
+            color: ArgbColor.hex(b.settings.colorHex),
+            controller: b)
     }
 }
 

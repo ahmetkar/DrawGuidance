@@ -69,6 +69,13 @@ object ContentCodec {
      */
     private const val EXT2_TEXTPATH = 8
     private const val VERSION_V9: Byte = 9
+    /**
+     * v51: yeni fırça türleri (boya ve yardımcı fırçalar) ya da gövde dönüşü/basıncı ([EXT2_BARREL]) taşıyan bir çizim
+     * varsa bu sürüm yazılır; eski uygulamalar bilmedikleri tür kodunu bozuk okumak yerine belgeyi açmaz.
+     */
+    private const val VERSION_V10: Byte = 10
+    /** v51 nokta başına gövde dönüşü ve gövde basıncı (her biri 1 bayt). */
+    private const val EXT2_BARREL = 16
     private const val EXT_CLIP = 1
     /** v13: yazının paragraf biçimi (başlık/liste), 1 bayt. */
     private const val EXT_PARAGRAPH = 2
@@ -131,6 +138,10 @@ object ContentCodec {
         BrushType.PATTERN_CARPET to 41, BrushType.PATTERN_WALLPAPER to 42, BrushType.PATTERN_WOODPAINT to 43,
         BrushType.TEXTURE_SKIN to 44, BrushType.TEXTURE_FUR to 45, BrushType.TEXTURE_PLANT to 46,
         BrushType.TEXTURE_WOOD to 47, BrushType.TEXTURE_IRON to 48, BrushType.TEXTURE_METAL to 49,
+        // v51
+        BrushType.ACRYLIC to 50, BrushType.OIL_PAINT to 51, BrushType.CLOUD_SMOKE to 52,
+        BrushType.FX_BLUR to 53, BrushType.FX_SHARPEN to 54, BrushType.FX_DODGE to 55, BrushType.FX_BURN to 56,
+        BrushType.FX_SPONGE to 57, BrushType.FX_CLONE to 58, BrushType.FX_HEAL to 59, BrushType.FX_MIXER to 60,
     )
     private val fontCodes = mapOf(
         TextFont.SANS to 0, TextFont.SERIF to 1, TextFont.MONO to 2, TextFont.CONDENSED to 3, TextFont.HANDWRITING to 4, TextFont.CASUAL to 5,
@@ -212,13 +223,14 @@ object ContentCodec {
         val v6 = pages.any { page -> page.any { s -> s.params != null || hasOrient(s) } }
         val v7 = pages.any { page -> page.any { s -> s.space != null } }
         val v9 = pages.any { page -> page.any { s -> needsV9(s) } }
+        val v10 = pages.any { page -> page.any { s -> needsV10(s) } }
 
         val deflater = Deflater(Deflater.BEST_COMPRESSION, true)
         try {
             deflater.setInput(raw.raw(), 0, raw.length())
             deflater.finish()
             val out = ByteArrayOutputStream(raw.length() / 2 + 16)
-            out.write(byteArrayOf(MAGIC_0, MAGIC_1, if (v9) VERSION_V9 else if (v8) VERSION_V8 else if (v7) VERSION_V7 else if (v6) VERSION_V6 else if (dynamics) VERSION_V5 else VERSION_V4))
+            out.write(byteArrayOf(MAGIC_0, MAGIC_1, if (v10) VERSION_V10 else if (v9) VERSION_V9 else if (v8) VERSION_V8 else if (v7) VERSION_V7 else if (v6) VERSION_V6 else if (dynamics) VERSION_V5 else VERSION_V4))
             val buffer = ByteArray(8192)
             while (!deflater.finished()) {
                 val n = deflater.deflate(buffer)
@@ -242,7 +254,7 @@ object ContentCodec {
             return Document(listOf(decodeStrokes(String(data, Charsets.UTF_8))), listOf(Layer.Default))
         }
         val version = data[2]
-        require(version == VERSION || version == VERSION_PAGES || version == VERSION_V3 || version == VERSION_V4 || version == VERSION_V5 || version == VERSION_V6 || version == VERSION_V7 || version == VERSION_V8 || version == VERSION_V9) {
+        require(version == VERSION || version == VERSION_PAGES || version == VERSION_V3 || version == VERSION_V4 || version == VERSION_V5 || version == VERSION_V6 || version == VERSION_V7 || version == VERSION_V8 || version == VERSION_V9 || version == VERSION_V10) {
             "Desteklenmeyen içerik sürümü: $version"
         }
         val inflater = Inflater(true)
@@ -277,9 +289,12 @@ object ContentCodec {
     }
 
     /** v23: v8 biçimi gerektiren çizim (yazı kutusu ya da 3B şekil). */
-    private fun needsV8(s: Stroke): Boolean = s.hidden || s.model != null || (s.brushType == BrushType.TEXT && (s.text?.box != null || s.text?.path != null))
+    private fun needsV8(s: Stroke): Boolean = needsV10(s) || s.hidden || s.model != null || (s.brushType == BrushType.TEXT && (s.text?.box != null || s.text?.path != null))
 
     /** v42: yol üzerinde yazı içeren eleman. */
+    /** v51 yeni fırça türü ya da gövde dinamiği. */
+    private fun needsV10(s: Stroke): Boolean = typeCodes.getValue(s.brushType) >= 50 || s.points.any { it.hasBarrel }
+
     private fun needsV9(s: Stroke): Boolean = s.brushType == BrushType.TEXT && s.text?.path != null
 
     private fun writeStroke(w: Writer, s: Stroke, layerIndex: Map<String, Int>, v8: Boolean = false) {
@@ -314,13 +329,18 @@ object ContentCodec {
             val box = s.text?.box?.takeIf { s.brushType == BrushType.TEXT }
             val model = s.model
             val textPath = s.text?.path?.takeIf { s.brushType == BrushType.TEXT }
+            val barrel = s.points.any { it.hasBarrel }
             w.byte(
                 (if (box != null) EXT2_TEXTBOX else 0) or (if (model != null) EXT2_MODEL else 0) or (if (s.hidden) EXT2_HIDDEN else 0) or
-                    (if (textPath != null) EXT2_TEXTPATH else 0),
+                    (if (textPath != null) EXT2_TEXTPATH else 0) or (if (barrel) EXT2_BARREL else 0),
             )
             box?.let { w.string(paramsJson.encodeToString(com.karapp.drawguidance.data.model.TextBox.serializer(), it)) }
             model?.let { w.string(it.modelId); w.string(it.dataAssetId) }
             textPath?.let { w.string(paramsJson.encodeToString(com.karapp.drawguidance.data.model.TextPathSpec.serializer(), it)) }
+            if (barrel) {
+                for (p in s.points) w.byte(unitByte(p.roll))
+                for (p in s.points) w.byte(unitByte(p.barrel))
+            }
         }
     }
 
@@ -470,6 +490,12 @@ object ContentCodec {
             if (ext2 and EXT2_TEXTPATH != 0) {
                 val path = runCatching { paramsJson.decodeFromString(com.karapp.drawguidance.data.model.TextPathSpec.serializer(), r.string()) }.getOrNull()
                 if (path != null && out.text != null) out = out.copy(text = out.text!!.copy(path = path))
+            }
+            if (ext2 and EXT2_BARREL != 0) {
+                val n = out.points.size
+                val roll = FloatArray(n) { r.byte() / 255f }
+                val barrel = FloatArray(n) { r.byte() / 255f }
+                out = out.copy(points = out.points.mapIndexed { i, p -> p.copy(roll = roll[i], barrel = barrel[i]) })
             }
         }
         if (paragraph != null && out.text != null) out = out.copy(text = out.text!!.copy(paragraph = paragraph))

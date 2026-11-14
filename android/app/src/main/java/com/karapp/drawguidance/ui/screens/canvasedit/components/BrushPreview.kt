@@ -1,5 +1,7 @@
 package com.karapp.drawguidance.ui.screens.canvasedit.components
 
+import com.karapp.drawguidance.data.model.isHelper
+
 import android.util.LruCache
 import androidx.compose.foundation.Canvas
 import androidx.compose.runtime.Composable
@@ -52,6 +54,26 @@ object BrushPreviewCache {
 
     fun get(key: Key): ImageBitmap? = cache.get(key)
 
+    /** v51 yardımcı fırça örneği: üç renkli şerit ve üstünde dalga biçiminde yardımcı fırça izi. */
+    private fun helperSample(key: Key): List<com.karapp.drawguidance.data.model.Stroke> {
+        fun line(id: String, y: Float, hex: String, type: BrushType, size: Float) = com.karapp.drawguidance.data.model.Stroke(
+            id = id, points = (0..20).map { com.karapp.drawguidance.data.model.StrokePoint(6f + it * 6.4f, y) },
+            colorHex = hex, brushType = type, sizePx = size, opacity = 1f, order = 0,
+        )
+        val ink = String.format("#%06X", key.color and 0xFFFFFF)
+        val backdrop = listOf(
+            line("pv-a", 14f, "#E4572E", BrushType.MARKER, 9f),
+            line("pv-b", 26f, ink, BrushType.MARKER, 9f),
+            line("pv-c", 38f, "#2E86AB", BrushType.MARKER, 9f),
+        )
+        val fx = com.karapp.drawguidance.data.model.Stroke(
+            id = "pv-fx-${key.type.name}", points = points.map { com.karapp.drawguidance.data.model.StrokePoint(it.x, it.y) },
+            colorHex = ink, brushType = key.type, sizePx = 12f, opacity = key.opacity, order = 1, flow = key.flow, strength = key.strength,
+            params = key.params,
+        )
+        return backdrop + fx
+    }
+
     /** Önizlemeyi çizer (48 birim yüksekliğinde 140 birimlik dalga, [Key.heightPx] yüksekliğe ölçekli). */
     fun render(key: Key): ImageBitmap {
         cache.get(key)?.let { return it }
@@ -68,6 +90,9 @@ object BrushPreviewCache {
                         // Silginin etkisi görünsün diye önce dolu bir şerit, sonra silgi
                         drawStroke(listOf(Offset(8f, 24f), Offset(132f, 24f)), ink, BrushType.MARKER, 18f, 1f, seed = 1)
                         drawStroke(points, ink, BrushType.ERASER, 6f, key.opacity, seed = 2, flow = key.flow, strength = key.strength)
+                    } else if (key.type.isHelper) {
+                        // v51 yardımcı fırça: renkli bir zemin çizilir, fırça onun üstünde etkisini gösterir
+                        with(com.karapp.drawguidance.ui.drawing.StrokeRenderer) { drawStrokeList(helperSample(key)) }
                     } else {
                         // Her fırça kendi karakterini gösterecek bir boyutta çizilir
                         val size = (key.type.defaultSize() * 0.5f).coerceIn(4f, 14f)

@@ -18,7 +18,7 @@ struct SampleDabBuilder {
     init(_ b: StaticBrush) {
         self.b = b
         let st = b.style
-        engine = b.isEraser ? .DABS : st.engine
+        engine = b.isEraser ? .DABS : (st.engine == .RASTER ? .SOFT_DABS : st.engine)
         let override: Float? = b.isEraser ? nil : b.params?.spacing.map { min(max($0, Self.MIN_SPACING), Self.MAX_SPACING) }
         flowSpacing = override ?? st.spacing
         let w = b.width

@@ -165,6 +165,10 @@ final class BrushController: ObservableObject {
     /// Silgiden dönülecek fırça.
     @Published private(set) var drawingBrush: BrushType = .PENCIL
     @Published private(set) var isPickerOpen = false
+    /// v51 klon/onarma kaynağı: "Kaynak seç"ten sonraki dokunuş kaynak noktasını belirler (`cloneSource`); ondan sonraki
+    /// ilk boyama, kaynağın o boyamanın başlangıcına göre kaymasını fırçanın ayarına yazar (hizalı klon).
+    @Published private(set) var cloneSourcePicking = false
+    @Published private(set) var cloneSource: StrokePoint?
 
     private var sizes: [BrushType: Float] = Dictionary(uniqueKeysWithValues: BrushType.allCases.map { ($0, $0.defaultSize) })
     private var tunings = [BrushType: BrushTuning]()
@@ -275,6 +279,24 @@ final class BrushController: ObservableObject {
     }
 
     func resetTuning() { updateTuning { _ in BrushTuning() } }
+
+    func startPickCloneSource() { cloneSourcePicking.toggle() }
+
+    /// Klon/onarma fırçasıyla biten bir boyama: kaynak seçiliyorsa kaynak olur (true döner: iz eklenmez); bekleyen
+    /// kaynak varsa kayma ayara yazılır.
+    func consumeCloneStroke(_ first: StrokePoint) -> Bool {
+        let type = settings.brushType
+        guard type == .FX_CLONE || type == .FX_HEAL else { return false }
+        if cloneSourcePicking {
+            cloneSource = first
+            cloneSourcePicking = false
+            return true
+        }
+        guard let src = cloneSource else { return false }
+        cloneSource = nil
+        updateTuning { t in var n = t; n.fx.srcDx = src.x - first.x; n.fx.srcDy = src.y - first.y; return n }
+        return false
+    }
 
     func updateColor(_ colorHex: String) { settings.colorHex = colorHex.uppercased() }
     func updateOpacity(_ opacity: Float) { settings.opacity = opacity }

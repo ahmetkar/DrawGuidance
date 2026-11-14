@@ -1,5 +1,7 @@
 package com.karapp.drawguidance.ui.screens.canvasedit.components
 
+import androidx.compose.material.icons.filled.ExpandLess
+import androidx.compose.material.icons.filled.ExpandMore
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.clickable
@@ -36,6 +38,8 @@ import androidx.compose.ui.unit.dp
 import com.karapp.drawguidance.R
 import com.karapp.drawguidance.data.model.BrushType
 import com.karapp.drawguidance.data.model.TubeMaterial
+import com.karapp.drawguidance.data.model.isHelper
+import com.karapp.drawguidance.data.model.isRaster
 import com.karapp.drawguidance.data.settings.BrushTuning
 import com.karapp.drawguidance.ui.components.NeuButton
 import com.karapp.drawguidance.ui.components.NeuChip
@@ -190,9 +194,16 @@ internal fun BrushTuningSection(
     tuning: BrushTuning,
     onTuning: ((BrushTuning) -> BrushTuning) -> Unit,
     onReset: () -> Unit,
+    /** v51 klon/onarma kaynağı seçimi. */
+    cloneSourcePicking: Boolean = false,
+    cloneSourcePending: Boolean = false,
+    onPickCloneSource: () -> Unit = {},
 ) {
     val colors = NeuTheme.colors
     Column(Modifier.testTag("brush_tuning_section"), verticalArrangement = Arrangement.spacedBy(16.dp)) {
+        // v51 yardımcı fırça, boyut/şekil, boya ve kalem ayarları
+        BrushAdvancedSections(type, tuning, onTuning, cloneSourcePicking, cloneSourcePending, onPickCloneSource)
+
         // Damga aralığı: yalnız damgalarla çizen fırçalarda
         type.defaultSpacing()?.let { default ->
             val spacing = tuning.spacing ?: default
@@ -305,5 +316,201 @@ private fun LightDial(angle: Float, modifier: Modifier) {
         drawLine(colors.accent, c, c + dir * (r - 6f), strokeWidth = 4f, cap = StrokeCap.Round)
         drawCircle(colors.accent, 5f, c + dir * (r - 6f))
         drawCircle(colors.content.copy(alpha = 0.6f), 3f, c)
+    }
+}
+
+// ---------------------------------------------------------------------------------------------
+// v51 gelişmiş fırça ayarları: boyut ve şekil, boyama ve yoğunluk, kalem, yardımcı fırça
+// ---------------------------------------------------------------------------------------------
+
+/** Başlığına dokununca açılıp kapanan bölüm. */
+@Composable
+private fun ExpandableSection(title: String, tag: String, content: @Composable () -> Unit) {
+    var open by androidx.compose.runtime.saveable.rememberSaveable(tag) { mutableStateOf(false) }
+    Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+        Row(
+            Modifier.fillMaxWidth().testTag(tag).clickable { open = !open }.padding(vertical = 4.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Text(title, style = MaterialTheme.typography.titleSmall, color = NeuTheme.colors.accent, modifier = Modifier.weight(1f))
+            androidx.compose.material3.Icon(
+                if (open) androidx.compose.material.icons.Icons.Filled.ExpandLess else androidx.compose.material.icons.Icons.Filled.ExpandMore,
+                contentDescription = null, tint = NeuTheme.colors.accent,
+            )
+        }
+        if (open) content()
+    }
+}
+
+private fun r2(v: Float) = (v * 100).roundToInt() / 100f
+private fun signedPct(v: Float) = if (v > 0f) "+%${(v * 100).roundToInt()}" else if (v < 0f) "−%${(-v * 100).roundToInt()}" else "%0"
+
+/** v51 piksel motorlu ya da tüm fırçalar için gelişmiş ayarlar. */
+@OptIn(ExperimentalLayoutApi::class)
+@Composable
+internal fun BrushAdvancedSections(
+    type: BrushType,
+    tuning: BrushTuning,
+    onTuning: ((BrushTuning) -> BrushTuning) -> Unit,
+    cloneSourcePicking: Boolean,
+    cloneSourcePending: Boolean,
+    onPickCloneSource: () -> Unit,
+) {
+    if (type == BrushType.ERASER) return
+    val raster = type.isRaster
+    val eff = com.karapp.drawguidance.ui.drawing.RasterBrush.effectiveTip(type, com.karapp.drawguidance.data.model.BrushParams(tip = tuning.tip))
+    val tip = tuning.tip
+    fun setTip(f: (com.karapp.drawguidance.data.model.TipParams) -> com.karapp.drawguidance.data.model.TipParams) = onTuning { it.copy(tip = f(it.tip)) }
+    fun setPen(f: (com.karapp.drawguidance.data.model.PenDynamics) -> com.karapp.drawguidance.data.model.PenDynamics) = onTuning { it.copy(pen = f(it.pen)) }
+
+    // Yardımcı fırça: açıklama, kip ve kaynak
+    if (type.isHelper) {
+        ExpandableSection(stringResource(R.string.v51_sec_helper), "brush_v51_helper") {
+            val hint = when (type) {
+                BrushType.FX_BLUR -> R.string.v51_fx_blur_hint
+                BrushType.FX_SHARPEN -> R.string.v51_fx_sharpen_hint
+                BrushType.FX_DODGE -> R.string.v51_fx_dodge_hint
+                BrushType.FX_BURN -> R.string.v51_fx_burn_hint
+                BrushType.FX_SPONGE -> R.string.v51_fx_sponge_hint
+                BrushType.FX_CLONE -> R.string.v51_fx_clone_hint
+                BrushType.FX_HEAL -> R.string.v51_fx_heal_hint
+                else -> R.string.v51_fx_mixer_hint
+            }
+            Text(stringResource(hint), style = MaterialTheme.typography.bodySmall)
+            if (type != BrushType.FX_MIXER) Text(stringResource(R.string.v51_fx_hint), style = MaterialTheme.typography.bodySmall, color = NeuTheme.colors.contentMuted)
+            if (type == BrushType.FX_DODGE || type == BrushType.FX_BURN) {
+                Text(stringResource(R.string.v51_fx_range), style = MaterialTheme.typography.labelLarge)
+                val mode = tuning.fx.mode.takeIf { it in 0..2 } ?: 1
+                FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    listOf(0 to R.string.v51_fx_shadows, 1 to R.string.v51_fx_midtones, 2 to R.string.v51_fx_highlights).forEach { (m, label) ->
+                        NeuChip(stringResource(label), mode == m, { onTuning { it.copy(fx = it.fx.copy(mode = m)) } }, Modifier.testTag("brush_v51_range_$m"))
+                    }
+                }
+            }
+            if (type == BrushType.FX_SPONGE) {
+                Text(stringResource(R.string.v51_fx_mode), style = MaterialTheme.typography.labelLarge)
+                FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    listOf(0 to R.string.v51_fx_desaturate, 1 to R.string.v51_fx_saturate).forEach { (m, label) ->
+                        NeuChip(stringResource(label), tuning.fx.mode == m, { onTuning { it.copy(fx = it.fx.copy(mode = m)) } }, Modifier.testTag("brush_v51_sponge_$m"))
+                    }
+                }
+            }
+            if (type == BrushType.FX_CLONE || type == BrushType.FX_HEAL) {
+                Text(stringResource(R.string.v51_fx_source), style = MaterialTheme.typography.labelLarge)
+                val dx = tuning.fx.srcDx; val dy = tuning.fx.srcDy
+                Text(
+                    when {
+                        cloneSourcePicking -> stringResource(R.string.v51_fx_picking)
+                        cloneSourcePending -> stringResource(R.string.v51_fx_source_wait)
+                        dx != null && dy != null -> stringResource(R.string.v51_fx_source_set, dx.roundToInt(), dy.roundToInt())
+                        else -> stringResource(R.string.v51_fx_source_auto)
+                    },
+                    style = MaterialTheme.typography.bodySmall, color = NeuTheme.colors.contentMuted, modifier = Modifier.testTag("brush_v51_source_state"),
+                )
+                FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    NeuChip(stringResource(R.string.v51_fx_pick_source), cloneSourcePicking, onPickCloneSource, Modifier.testTag("brush_v51_pick_source"))
+                    if (dx != null) NeuChip(stringResource(R.string.v51_fx_source_reset), false, { onTuning { it.copy(fx = it.fx.copy(srcDx = null, srcDy = null)) } })
+                }
+            }
+        }
+    }
+
+    // Boyut ve şekil
+    ExpandableSection(stringResource(R.string.v51_sec_shape), "brush_v51_shape") {
+        val minS = tip.minSize ?: if (raster) eff.minSize ?: 0f else 0f
+        val maxS = tip.maxSize ?: 1f
+        LabeledSlider(stringResource(R.string.v51_min_size), pct(minS), minS, 0f..1f, { v -> setTip { it.copy(minSize = r2(v)) } }, "brush_v51_min_size")
+        LabeledSlider(stringResource(R.string.v51_max_size), pct(maxS), maxS, 0.2f..3f, { v -> setTip { it.copy(maxSize = r2(v)) } }, "brush_v51_max_size")
+        if (raster) {
+            val h = eff.hardness ?: 0.5f
+            LabeledSlider(stringResource(R.string.v51_hardness), pct(h), h, 0f..1f, { v -> setTip { it.copy(hardness = r2(v)) } }, "brush_v51_hardness")
+            val so = eff.softness ?: 0f
+            LabeledSlider(stringResource(R.string.v51_softness), pct(so), so, 0f..1f, { v -> setTip { it.copy(softness = r2(v)) } }, "brush_v51_softness")
+            val asp = eff.aspect ?: 1f
+            LabeledSlider(stringResource(R.string.v51_aspect), pct(asp), asp, 0.05f..1f, { v -> setTip { it.copy(aspect = r2(v)) } }, "brush_v51_aspect")
+            val ang = eff.angle ?: 0f
+            LabeledSlider(stringResource(R.string.v51_angle), stringResource(R.string.degree_value, ang.roundToInt()), ang, 0f..359f, { v -> setTip { it.copy(angle = v.roundToInt().toFloat()) } }, "brush_v51_angle")
+            val rot = eff.rotation ?: 0f
+            LabeledSlider(stringResource(R.string.v51_rotation), pct(rot), rot, 0f..1f, { v -> setTip { it.copy(rotation = r2(v)) } }, "brush_v51_rotation")
+            val rnd = eff.roundness ?: 1f
+            LabeledSlider(stringResource(R.string.v51_roundness), pct(rnd), rnd, 0f..1f, { v -> setTip { it.copy(roundness = r2(v)) } }, "brush_v51_roundness")
+            val edge = eff.edge ?: 0.5f
+            LabeledSlider(stringResource(R.string.v51_edge), pct(edge), edge, 0f..1f, { v -> setTip { it.copy(edge = r2(v)) } }, "brush_v51_edge")
+            Text(stringResource(R.string.v51_tip_shape), style = MaterialTheme.typography.labelLarge)
+            val shape = eff.shape ?: com.karapp.drawguidance.data.model.TipShape.ROUND
+            FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                listOf(
+                    com.karapp.drawguidance.data.model.TipShape.ROUND to R.string.v51_tip_round,
+                    com.karapp.drawguidance.data.model.TipShape.SQUARE to R.string.v51_tip_square,
+                    com.karapp.drawguidance.data.model.TipShape.FLAT to R.string.v51_tip_flat,
+                    com.karapp.drawguidance.data.model.TipShape.CHISEL to R.string.v51_tip_chisel,
+                    com.karapp.drawguidance.data.model.TipShape.BRISTLE to R.string.v51_tip_bristle,
+                    com.karapp.drawguidance.data.model.TipShape.SPONGE to R.string.v51_tip_sponge,
+                    com.karapp.drawguidance.data.model.TipShape.SPLATTER to R.string.v51_tip_splatter,
+                    com.karapp.drawguidance.data.model.TipShape.CLOUD to R.string.v51_tip_cloud,
+                ).forEach { (sh, label) ->
+                    NeuChip(stringResource(label), shape == sh, { setTip { it.copy(shape = sh) } }, Modifier.testTag("brush_v51_tip_${sh.name.lowercase()}"))
+                }
+            }
+        }
+    }
+
+    // Boyama ve yoğunluk (piksel motorlu fırçalar; opaklık ve akışkanlık panelin üstünde)
+    if (raster) {
+        ExpandableSection(stringResource(R.string.v51_sec_paint), "brush_v51_paint") {
+            Text(stringResource(R.string.v51_paint_hint), style = MaterialTheme.typography.bodySmall, color = NeuTheme.colors.contentMuted)
+            val den = eff.density ?: 1f
+            LabeledSlider(stringResource(R.string.v51_density), pct(den), den, 0f..1f, { v -> setTip { it.copy(density = r2(v)) } }, "brush_v51_density")
+            val bu = eff.buildUp ?: 0f
+            LabeledSlider(stringResource(R.string.v51_buildup), pct(bu), bu, 0f..1f, { v -> setTip { it.copy(buildUp = r2(v)) } }, "brush_v51_buildup")
+            if (com.karapp.drawguidance.ui.drawing.RasterBrush.paints(type)) {
+                val wet = eff.wetness ?: 0f
+                LabeledSlider(stringResource(R.string.v51_wetness), pct(wet), wet, 0f..1f, { v -> setTip { it.copy(wetness = r2(v)) } }, "brush_v51_wetness")
+                val pa = eff.paintAmount ?: 1f
+                LabeledSlider(stringResource(R.string.v51_paint_amount), pct(pa), pa, 0f..1f, { v -> setTip { it.copy(paintAmount = r2(v)) } }, "brush_v51_paint_amount")
+                val th = eff.thickness ?: 0f
+                LabeledSlider(stringResource(R.string.v51_thickness), pct(th), th, 0f..1f, { v -> setTip { it.copy(thickness = r2(v)) } }, "brush_v51_thickness")
+                val ca = eff.colorAmount ?: 1f
+                LabeledSlider(stringResource(R.string.v51_color_amount), pct(ca), ca, 0f..1f, { v -> setTip { it.copy(colorAmount = r2(v)) } }, "brush_v51_color_amount")
+                val sm = eff.smudge ?: 0f
+                LabeledSlider(stringResource(R.string.v51_smudge), pct(sm), sm, 0f..1f, { v -> setTip { it.copy(smudge = r2(v)) } }, "brush_v51_smudge")
+                val bl = eff.blend ?: 0f
+                LabeledSlider(stringResource(R.string.v51_blend), pct(bl), bl, 0f..1f, { v -> setTip { it.copy(blend = r2(v)) } }, "brush_v51_blend")
+            }
+        }
+    }
+
+    // Kalem ve hareket dinamikleri
+    ExpandableSection(stringResource(R.string.v51_sec_pen), "brush_v51_pen") {
+        val pen = tuning.pen
+        Text(stringResource(R.string.v51_pen_hint), style = MaterialTheme.typography.bodySmall, color = NeuTheme.colors.contentMuted)
+        val p = pen.pressure ?: 0f
+        LabeledSlider(stringResource(R.string.v51_pen_pressure), if (pen.pressure == null) stringResource(R.string.v51_default) else pct(p), p, 0f..1f, { v -> setPen { it.copy(pressure = r2(v)) } }, "brush_v51_pen_pressure")
+        val po = pen.pressureOpacity ?: 0f
+        LabeledSlider(stringResource(R.string.v51_pen_pressure_opacity), pct(po), po, 0f..1f, { v -> setPen { it.copy(pressureOpacity = r2(v).takeIf { x -> x > 0f }) } }, "brush_v51_pen_pressure_opacity")
+        val tx = pen.tiltX ?: 0f
+        LabeledSlider(stringResource(R.string.v51_pen_tilt_x), signedPct(tx), tx, -1f..1f, { v -> setPen { it.copy(tiltX = r2(v).takeIf { x -> x != 0f }) } }, "brush_v51_pen_tilt_x")
+        val ty = pen.tiltY ?: 0f
+        LabeledSlider(stringResource(R.string.v51_pen_tilt_y), signedPct(ty), ty, -1f..1f, { v -> setPen { it.copy(tiltY = r2(v).takeIf { x -> x != 0f }) } }, "brush_v51_pen_tilt_y")
+        if (raster) {
+            val td = pen.tiltDirection ?: 0f
+            LabeledSlider(stringResource(R.string.v51_pen_tilt_dir), pct(td), td, 0f..1f, { v -> setPen { it.copy(tiltDirection = r2(v).takeIf { x -> x > 0f }) } }, "brush_v51_pen_tilt_dir")
+            val ro = pen.rotation ?: 0f
+            LabeledSlider(stringResource(R.string.v51_pen_rotation), pct(ro), ro, 0f..1f, { v -> setPen { it.copy(rotation = r2(v).takeIf { x -> x > 0f }) } }, "brush_v51_pen_rotation",
+                hint = stringResource(R.string.v51_pen_rotation_hint))
+        }
+        val ve = pen.velocity ?: 0f
+        LabeledSlider(stringResource(R.string.v51_pen_velocity), signedPct(ve), ve, -1f..1f, { v -> setPen { it.copy(velocity = r2(v).takeIf { x -> x != 0f }) } }, "brush_v51_pen_velocity")
+        if (raster) {
+            val di = pen.direction ?: 0f
+            LabeledSlider(stringResource(R.string.v51_pen_direction), pct(di), di, 0f..1f, { v -> setPen { it.copy(direction = r2(v).takeIf { x -> x > 0f }) } }, "brush_v51_pen_direction")
+        }
+        val ds = pen.distance ?: 0f
+        LabeledSlider(stringResource(R.string.v51_pen_distance), pct(ds), ds, 0f..1f, { v -> setPen { it.copy(distance = r2(v).takeIf { x -> x > 0f }) } }, "brush_v51_pen_distance")
+        val ti = pen.time ?: 0f
+        LabeledSlider(stringResource(R.string.v51_pen_time), pct(ti), ti, 0f..1f, { v -> setPen { it.copy(time = r2(v).takeIf { x -> x > 0f }) } }, "brush_v51_pen_time")
+        val ba = pen.barrel ?: 0f
+        LabeledSlider(stringResource(R.string.v51_pen_barrel), signedPct(ba), ba, -1f..1f, { v -> setPen { it.copy(barrel = r2(v).takeIf { x -> x != 0f }) } }, "brush_v51_pen_barrel",
+            hint = stringResource(R.string.v51_pen_barrel_hint))
     }
 }

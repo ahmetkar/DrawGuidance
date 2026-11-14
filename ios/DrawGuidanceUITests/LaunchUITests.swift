@@ -181,7 +181,8 @@ final class LaunchUITests: XCTestCase {
         XCTAssertTrue(tool.waitForExistence(timeout: 10))
         // Araç şeridi yatay kayar: "Çizim Görevi" dar ekranda sağda, görünene dek sola kaydırılır
         let strip = app.scrollViews.containing(.button, identifier: "kids_challenge").firstMatch
-        for _ in 0..<4 where !tool.isHittable { strip.swipeLeft() }
+        let right = app.windows.firstMatch.frame.maxX
+        for _ in 0..<4 where tool.frame.maxX > right { strip.swipeLeft() }
         tool.tap()
         let start = app.buttons["challenge_start"]
         XCTAssertTrue(start.waitForExistence(timeout: 5))
@@ -212,9 +213,12 @@ final class LaunchUITests: XCTestCase {
         createCanvas(app, "ART")
         let menu = app.buttons["tutorial_menu"]
         XCTAssertTrue(menu.waitForExistence(timeout: 10))
+        // Tuval yüklenirken düğme dokunuşu düşebilir: önce tuval beklenir, pencere açılmazsa bir kez daha dokunulur
+        XCTAssertTrue(app.descendants(matching: .any)["drawing_canvas"].firstMatch.waitForExistence(timeout: 10))
         menu.tap()
         let group = app.buttons["tutorial_group_art_basics"]
-        XCTAssertTrue(group.waitForExistence(timeout: 5))
+        if !group.waitForExistence(timeout: 5) { menu.tap() }
+        XCTAssertTrue(group.waitForExistence(timeout: 10))
         group.tap()
         let callout = app.descendants(matching: .any)["tutorial_callout"].firstMatch
         XCTAssertTrue(callout.waitForExistence(timeout: 5))

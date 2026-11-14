@@ -47,6 +47,7 @@ struct KidsMascotLayer: View {
                 .padding(.trailing, 10)
                 .padding(.bottom, 20)
                 .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottomTrailing)
+                .accessibilityElement(children: .contain)
                 .accessibilityIdentifier("kids_mascot_layer")
         }
     }

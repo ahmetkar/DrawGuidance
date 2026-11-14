@@ -114,6 +114,7 @@ struct SimpleToolbar: View {
         }
         .padding(.horizontal, 8)
         .padding(.bottom, 6)
+        .accessibilityElement(children: .contain)
         .accessibilityIdentifier("simple_tool_row")
         .sheet(isPresented: $models3dOpen) {
             if let repo = EditorDependencies.shared.models3d {

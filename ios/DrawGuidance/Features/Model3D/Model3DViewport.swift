@@ -148,18 +148,9 @@ struct Model3DViewport: View {
                 o.selectedFaces = t == .FACE || t == .PAINT ? sel.faces.asSet : []
                 o.wireframe = t == .EDGE || t == .POINT
                 if Task.isCancelled { return nil }
-                #if DEBUG
-                let t0 = Date()
-                #endif
                 let f = Renderer3D.render(m, view, o)
-                #if DEBUG
-                NSLog("DG3D render #%d %dx%d %.0f ms", seq, w, h, Date().timeIntervalSince(t0) * 1000)
-                #endif
                 return Bitmaps.image(argb: f.color, w, h)
             }.value
-            #if DEBUG
-            NSLog("DG3D result #%d img=%d cancelled=%d latest=%d", seq, img == nil ? 0 : 1, Task.isCancelled ? 1 : 0, renderSeq)
-            #endif
             if let img, !Task.isCancelled, seq == renderSeq { image = img }
         }
     }

@@ -350,6 +350,7 @@ struct TutorialOfferSheet: View {
             }
             .padding(20)
         }
+        .accessibilityElement(children: .contain)
         .accessibilityIdentifier("tutorial_offer")
         .presentationDetents([.medium, .large])
     }

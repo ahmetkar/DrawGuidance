@@ -42,6 +42,7 @@ struct Model3DEditorView: View {
             ModeBar3(mode: vm.mode) { vm.setMode($0) }
         }
         .background(Color(uiColor: .systemGroupedBackground))
+        .accessibilityElement(children: .contain)
         .accessibilityIdentifier("model3d_editor")
         .navigationBarBackButtonHidden(true)
         .toolbar(.hidden, for: .navigationBar)

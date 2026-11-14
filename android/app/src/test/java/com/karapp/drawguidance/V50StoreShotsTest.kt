@@ -272,7 +272,7 @@ abstract class V50StoreShotsBase : V32EditorBase() {
             "art_name" to listOf("Sahil Macerası", "Beach Adventure", "مغامرة الشاطئ", "海辺の冒険", "해변 모험", "Приключение на пляже", "海滩探险"),
             "notes_name" to listOf("Fizik notu", "Physics notes", "ملاحظات الفيزياء", "物理ノート", "물리 노트", "Конспект по физике", "物理笔记"),
             "kids_name" to listOf("Boyacık", "Painty", "رسّام", "ぬりえ", "색칠놀이", "Раскраска", "小画家"),
-            "simple_name" to listOf("Ev", "Home", "البيت", "おうち", "우리 집", "Дом", "我的家"),
+            "simple_name" to listOf("Ev", "My house", "البيت", "おうち", "우리 집", "Дом", "我的家"),
             "simple_notes_name" to listOf("Ders notu", "Class notes", "ملاحظات الدرس", "授業ノート", "수업 노트", "Заметки урока", "课堂笔记"),
             "trace_name" to listOf("Demlik", "Teapot", "إبريق الشاي", "ティーポット", "찻주전자", "Чайник", "茶壶"),
             "b1" to listOf("Şehir bu gece bizim!", "The city is ours tonight!", "المدينة لنا الليلة!", "今夜、街は俺たちのものだ！", "오늘 밤 도시는 우리 거야!", "Сегодня город наш!", "今晚这座城市属于我们！"),

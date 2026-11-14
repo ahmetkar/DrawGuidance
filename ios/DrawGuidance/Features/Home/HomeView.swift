@@ -100,6 +100,16 @@ private struct HomeTab: View {
             }
         }
         .fullScreenCover(isPresented: $new3d) { NavigationStack { Model3DEditorView(repository: models3d, modelId: nil) } }
+        #if DEBUG
+        // CI açılış tanısı: `-dgOpenNew ART` ile açılışta yeni tuval doğrudan düzenleyicide açılır
+        .task {
+            let a = ProcessInfo.processInfo.arguments
+            guard let i = a.firstIndex(of: "-dgOpenNew"), i + 1 < a.count, let k = CanvasKind(rawValue: a[i + 1]) else { return }
+            try? await Task.sleep(nanoseconds: 1_000_000_000)
+            onOpen(CanvasCreator.create(CanvasFormResult(name: "Tanı", width: k.defaultSize.width, height: k.defaultSize.height,
+                                                         paperHex: "#FFFFFF", aiEnabled: true, kind: k), store: store))
+        }
+        #endif
     }
 
     private var greeting: String {

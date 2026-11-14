@@ -108,6 +108,21 @@ jobs:
           xcrun simctl spawn "$UDID" log show --last 2m --predicate 'process == "DrawGuidance"' --style compact > build/diag/app.log 2>&1 || true
           tail -40 build/diag/app.log
           xcrun simctl terminate "$UDID" com.karapp.drawguidance || true
+          # Düzenleyici: açılışta yeni ART tuvali açılır (yalnız Debug), ekran görüntüsü ve ana iş parçacığı örneği
+          xcrun simctl launch --terminate-running-process "$UDID" com.karapp.drawguidance -uiTesting -dgOpenNew ART
+          for t in 10 30 60; do
+            sleep $([ $t = 10 ] && echo 10 || ([ $t = 30 ] && echo 20 || echo 30))
+            xcrun simctl io "$UDID" screenshot build/diag/editor-$t.png || true
+          done
+          PID=$(pgrep -f "DrawGuidance.app/DrawGuidance" | head -1)
+          if [ -n "$PID" ]; then
+            ps -o pid,%cpu,rss,etime -p "$PID" | tee build/diag/editor-ps.txt
+            sample "$PID" 5 -file build/diag/editor-sample.txt || true
+            grep -A80 "com.apple.main-thread" build/diag/editor-sample.txt | head -140
+          fi
+          xcrun simctl spawn "$UDID" log show --last 2m --predicate 'process == "DrawGuidance"' --style compact > build/diag/editor-app.log 2>&1 || true
+          tail -40 build/diag/editor-app.log
+          xcrun simctl terminate "$UDID" com.karapp.drawguidance || true
 
       - name: Birim ve arayüz testleri (simülatör)
         if: success()

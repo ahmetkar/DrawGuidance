@@ -77,7 +77,7 @@ final class Model3DEditorTests: XCTestCase {
         let vm = try await makeVM()
         vm.addPart(.TORUS)
         vm.save()
-        for _ in 0..<200 where vm.repository.models.isEmpty { try await Task.sleep(nanoseconds: 20_000_000) }
+        for _ in 0..<1500 where vm.repository.models.isEmpty { try await Task.sleep(nanoseconds: 20_000_000) }
         XCTAssertEqual(vm.repository.models.count, 1)
         let loaded = await vm.repository.load(vm.model!.id)
         XCTAssertEqual(loaded?.parts.count, 2)

@@ -59,7 +59,7 @@ final class ShapeRendererTests: XCTestCase {
                 built += 1
             }
         }
-        XCTAssertEqual(built, 502)
+        XCTAssertEqual(built, 525)
 
         let id = try XCTUnwrap(cat.items.first)
         let img = try XCTUnwrap(ShapePicker.thumbnail(id))

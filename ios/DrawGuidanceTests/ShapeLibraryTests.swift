@@ -4,8 +4,8 @@ import XCTest
 final class ShapeLibraryTests: XCTestCase {
     func testBundledCatalogLoads() throws {
         let lib = ShapeLibrary(bundle: Bundle(for: CanvasStore.self))
-        XCTAssertEqual(lib.bundledCategories.count, 41)
-        XCTAssertEqual(lib.bundledCategories.reduce(0) { $0 + $1.shapes.count }, 502)
+        XCTAssertEqual(lib.bundledCategories.count, 44)
+        XCTAssertEqual(lib.bundledCategories.reduce(0) { $0 + $1.shapes.count }, 525)
         XCTAssertEqual(lib.bundledCategories.first?.id, "sci_physics")
         let cat = try XCTUnwrap(lib.find("lib.cat") ?? lib.bundledCategories.flatMap(\.shapes).first)
         XCTAssertFalse(cat.paths.isEmpty)

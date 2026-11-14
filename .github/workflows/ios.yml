@@ -79,6 +79,30 @@ jobs:
           ls -la build/*.ipa
           echo "Sembol kontrolü (ilk 20):"; nm -U "$APP/DrawGuidance" | head -20 || true
 
+      - name: Açılış tanısı (simülatör, ekran görüntüsü ve ana iş parçacığı örneği)
+        if: success()
+        continue-on-error: true
+        run: |
+          mkdir -p build/diag
+          xcodebuild build -project DrawGuidance.xcodeproj -scheme DrawGuidance -configuration Debug \
+            -destination "id=${{ steps.sim.outputs.udid }}" -derivedDataPath build/sim \
+            CODE_SIGNING_ALLOWED=NO DG_GOOGLE_URL_SCHEME="$DG_GOOGLE_URL_SCHEME" > build/diag/sim-build.log 2>&1 || { tail -30 build/diag/sim-build.log; exit 1; }
+          UDID=${{ steps.sim.outputs.udid }}
+          xcrun simctl boot "$UDID" || true
+          xcrun simctl bootstatus "$UDID" -b
+          xcrun simctl install "$UDID" build/sim/Build/Products/Debug-iphonesimulator/DrawGuidance.app
+          xcrun simctl launch --terminate-running-process "$UDID" com.karapp.drawguidance -uiTesting
+          for t in 5 20 45; do
+            sleep $([ $t = 5 ] && echo 5 || echo 20)
+            xcrun simctl io "$UDID" screenshot build/diag/launch-$t.png || true
+          done
+          PID=$(pgrep -f "DrawGuidance.app/DrawGuidance" | head -1)
+          echo "pid=$PID"
+          if [ -n "$PID" ]; then sample "$PID" 5 -file build/diag/sample.txt || true; grep -A60 "Thread_.*DispatchQueue_1\|com.apple.main-thread" build/diag/sample.txt | head -120; fi
+          xcrun simctl spawn "$UDID" log show --last 2m --predicate 'process == "DrawGuidance"' --style compact > build/diag/app.log 2>&1 || true
+          tail -40 build/diag/app.log
+          xcrun simctl terminate "$UDID" com.karapp.drawguidance || true
+
       - name: Birim ve arayüz testleri (simülatör)
         if: success()
         continue-on-error: true
@@ -98,5 +122,6 @@ jobs:
             ios/build/*.ipa
             ios/build/test.log
             ios/build/release.log
+            ios/build/diag
             ios/build/TestResults.xcresult
           if-no-files-found: warn

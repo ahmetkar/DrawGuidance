@@ -35,7 +35,12 @@ enum RaspGuard {
         started = true
         // Birim/arayüz testlerinde çalıştırma
         if ProcessInfo.processInfo.environment["XCTestConfigurationFilePath"] != nil { return }
-        if ProcessInfo.processInfo.arguments.contains("-uitest") { return }
+        let args = ProcessInfo.processInfo.arguments
+        if args.contains("-uitest") || args.contains("-uiTesting") { return }
+        // Simülatörde çalıştırılmaz: kanca taraması (isAppHooked) simülatörde dakikalarca sürüyor
+        #if targetEnvironment(simulator)
+        return
+        #endif
         #if canImport(TalsecRuntime)
         #if DEBUG
         let prod = false
@@ -44,7 +49,8 @@ enum RaspGuard {
         #endif
         let config = TalsecConfig(appBundleIds: [bundleId], appTeamId: teamId.isEmpty ? "UNSIGNED" : teamId,
                                   watcherMailAddress: watcherMail, isProd: prod)
-        Talsec.start(config: config)
+        // İlk denetimler eşzamanlı (bellek bölgelerini tarar): açılışı ve ana iş parçacığını bekletmemesi için arka planda
+        DispatchQueue.global(qos: .utility).async { Talsec.start(config: config) }
         #endif
     }
 

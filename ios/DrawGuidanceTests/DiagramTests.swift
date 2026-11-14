@@ -123,6 +123,10 @@ final class DiagramTests: XCTestCase {
     func testNewStepsInheritStructureAndValues() {
         XCTAssertEqual(DiagramCatalog.inheritRole("stage"), "stage")
         XCTAssertNil(DiagramCatalog.inheritRole("focal"))
+        // v50 örnek yazılar uygulamanın dilinde: Türkçede sınanır
+        let lang = I18n.language
+        I18n.setLanguage("tr")
+        defer { I18n.setLanguage(lang) }
         XCTAssertEqual(DiagramCatalog.newNodeText(.BAR, 7, "Haz 210"), "Yeni 210")
         XCTAssertEqual(DiagramCatalog.newNodeText(.GANTT, 7, "Yayın 11-12"), "Yeni iş 13-14")
         XCTAssertEqual(DiagramCatalog.newNodeText(.FLOW, 3, "Karar"), "Adım 3")

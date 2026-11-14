@@ -9,7 +9,7 @@ _2026-11-14. Hafızası olmayan yeni bir Claude sohbeti için. Önce bunu, sonra
 - **Kaynak:** GitHub `github.com/ahmetkar/DrawGuidance` (**public**), dal **`ios/v49-port`**: Android, iOS, sunucu ve
   araçlar tek dalda. `android-v49` dalı v49'un sır içermeyen kopyasıdır (taban). `main` yalnız README.
 - **PC:** `C:\Users\ahmet\Documents\DrawGuidance` asıl kopya. v50 değişen dosyaları zip ile açıldı (eskiler
-  `_eski_v49\v50-oncesi\`), ardından ek düzeltmeler zip'i (`DrawGuidance-v50-ek-duzeltmeler.zip`), ardından iOS düzeltme zip'i (`DrawGuidance-v50-ios-duzeltme.zip`). PC'de
+  `_eski_v49\v50-oncesi\`), ardından ek düzeltmeler zip'i (`DrawGuidance-v50-ek-duzeltmeler.zip`), ardından iOS düzeltme zip'leri (`DrawGuidance-v50-ios-duzeltme.zip`, `DrawGuidance-v50-ios-duzeltme-2.zip`). PC'de
   yeni `ios\` klasörü var.
 - **Teslimler** (`/mnt/project-files/drawguidance/v50/` ve sohbette): `DrawGuidance-v50.apk` ve `.aab` (yükleme
   anahtarıyla imzalı, R8 + freeRASP), `DrawGuidance-v50-mapping.txt.gz`, Device Farm için imzasız
@@ -61,7 +61,7 @@ _2026-11-14. Hafızası olmayan yeni bir Claude sohbeti için. Önce bunu, sonra
   4. Açılış tanısı (ekran görüntüsü ve `sample`)
   5. Birim ve arayüz testleri (`continue-on-error`)
 
-  Çıktılar `ios-build` adlı yapıtta. Tam koşu yaklaşık 1,5 saat sürer.
+  Çıktılar `ios-build` adlı yapıtta. Tam koşu 1,5-2 saat sürer (iş sınırı 150 dk).
 - **Linux'ta Swift denetimi:** SwiftUI ve CoreGraphics derlenmez; yalnız saf Swift çekirdeği denetlenebilir. Gerçek
   derleme için CI kullanılır.
 
@@ -79,9 +79,13 @@ _2026-11-14. Hafızası olmayan yeni bir Claude sohbeti için. Önce bunu, sonra
   `updateUIView`/düzen içinde yayınlanan değer yalnız değişince yayınlanmalı.
 - iOS tanı: DEBUG derlemede `-dgOpenNew <TÜR>` açılış argümanı doğrudan yeni tuval açar (`HomeView.swift`); CI bununla
   düzenleyici ekran görüntüleri alır (`diag/editor-*.png`). `ShapeTests` şablon sayıları 766/5362.
-- iOS testleri (ce3db5a): birim 180/180. Arayüz testleri 3/8; kalan 5'i (çocuk görevi düğmesi ekran dışında, maskot,
-  3B görünüm, eğitim grubu, basit not menüsü) test betiğinin güncel arayüzü bulamamasından. 3B düzenleyicide küp
-  simülatörde çizilmiyor; gerçek cihazda bakılmalı.
+- iOS testleri: birim 180/180, arayüz 8/8 (f33fc31). Arayüz testlerinin düşmesinin sebebi: SwiftUI'de kimlikli bir
+  kapsayıcı (`.accessibilityIdentifier` bir VStack/ZStack'te) **çocuklarının kimliğini ezer**. Kapsayıcıya kimlik
+  verirken önce `.accessibilityElement(children: .contain)` ekleyin. Test hatasında CI erişilebilirlik ağacını
+  konsola yazar (`DGTREE`); `workflow_dispatch` ile `ui_only=true` yalnız arayüz testlerini çalıştırır (~35 dk).
+- **iOS "Eğitim modu" düğmesi pencereyi açmıyordu:** `CanvasEditScreen` yalnız `vm`'i izliyor, `vm.tutorial.offer`
+  değişimi ekranı yenilemiyordu (önceki sonsuz döngü bunu gizliyordu). Pencere artık `TutorialOfferPresenter`
+  ile, denetleyiciyi izleyerek açılıyor. İç içe `ObservableObject` okunan başka yerlerde aynı soruna dikkat.
 - Android birim testleri: v49'da geçen her sınıf v50'de de geçiyor. Kalan başarısızlıklar ortamdan kaynaklanıyor
   (Robolectric SDK 21/24/29 jar'ları, yerel sunucu, temel paketler) ve v49'da da başarısız. Bulutta çalıştırmak için
   init betiği `robolectric.dependency.repo.url` ve `maxParallelForks=1` ayarlar.

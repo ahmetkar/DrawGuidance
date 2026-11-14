@@ -114,9 +114,8 @@ openssl rand -base64 32 | tr -d '\n' | docker secret create device_data_key -
 # v50 App Store Server API anahtarı (App Store Connect → Kullanıcılar ve Erişim → Entegrasyonlar → Uygulama İçi
 # Satın Alma). api içinde /run/secrets/apple_iap.p8 olarak bağlanır. Bu sır yoksa yığın dağıtılamaz: henüz anahtar
 # yoksa geçici olarak boş bir dosyayla oluşturun (App Store doğrulaması 503 billing_not_configured döner).
-docker secret create apple_iap_key <YOL>/SubscriptionKey_XXXXXXXXXX.p8
-#   Kimlikler gizli değil; dağıtım kabuğunda verilir:
-#   export APPLE_APP_APPLE_ID=<sayı> APPLE_IAP_ISSUER_ID=<uuid> APPLE_IAP_KEY_ID=<10 karakter>
+docker secret create apple_iap_key <YOL>/SubscriptionKey_MTT897CZ3J.p8
+#   Kimlikler gizli değil; stack.yml'de yazılı (Apple ID 6834536997, Key ID MTT897CZ3J).
 
 docker secret ls
 ```

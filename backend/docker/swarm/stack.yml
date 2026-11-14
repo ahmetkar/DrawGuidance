@@ -147,9 +147,9 @@ services:
       GCS_SERVICE_ACCOUNT_JSON: /run/secrets/gcs.json
       DEVICE_DATA_KEY_FILE: /run/secrets/device_data_key
       # v50 App Store abonelikleri: kimlikler gizli değil (dağıtım kabuğundan), .p8 anahtarı Docker sırrı
-      APPLE_APP_APPLE_ID: ${APPLE_APP_APPLE_ID:-}
-      APPLE_IAP_ISSUER_ID: ${APPLE_IAP_ISSUER_ID:-}
-      APPLE_IAP_KEY_ID: ${APPLE_IAP_KEY_ID:-}
+      APPLE_APP_APPLE_ID: "6834536997"
+      APPLE_IAP_ISSUER_ID: 9c6a0a17-8b74-4124-a44d-0e2101126b6a
+      APPLE_IAP_KEY_ID: MTT897CZ3J
       APPLE_IAP_PRIVATE_KEY_FILE: /run/secrets/apple_iap.p8
     secrets:
       - { source: mongo_app_password, target: mongo_app_password, uid: "10001", gid: "10001", mode: 0400 }

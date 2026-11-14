@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- v50 düzenleyici, çeviri ve çizgi roman iyileştirmeleri -->
+<resources>
+    <string name="lines_krackle">Energy krackle</string>
+    <string name="lines_impact">Impact star</string>
+    <string name="lines_surprise">Surprise marks</string>
+    <string name="lines_electric">Electric</string>
+    <string name="lines_benday">Ben-Day dots</string>
+    <string name="lines_gloom">Gloom lines (tate-sen)</string>
+    <string name="lines_sparkle">Sparkles (kira-kira)</string>
+    <string name="lines_crosshatch">Crosshatch (kake-ami)</string>
+    <string name="lines_speed_dense">Dense speed (ryūsen)</string>
+    <string name="v50_lines_style_comic">Comic</string>
+    <string name="v50_lines_style_manga">Manga</string>
+    <string name="v50_lines_add">Add: %1$s</string>
+    <string name="v50_lines_reset">Reset</string>
+</resources>

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- v50 düzenleyici, çeviri ve çizgi roman iyileştirmeleri -->
+<resources>
+    <string name="lines_krackle">Enerji çıtırtısı</string>
+    <string name="lines_impact">Darbe yıldızı</string>
+    <string name="lines_surprise">Şaşkınlık çizgileri</string>
+    <string name="lines_electric">Elektrik</string>
+    <string name="lines_benday">Nokta tramı (Ben-Day)</string>
+    <string name="lines_gloom">Kasvet (tate-sen)</string>
+    <string name="lines_sparkle">Parıltı (kira-kira)</string>
+    <string name="lines_crosshatch">Tarama (kake-ami)</string>
+    <string name="lines_speed_dense">Yoğun hız (ryūsen)</string>
+    <string name="v50_lines_style_comic">Çizgi roman</string>
+    <string name="v50_lines_style_manga">Manga</string>
+    <string name="v50_lines_add">Ekle: %1$s</string>
+    <string name="v50_lines_reset">Sıfırla</string>
+</resources>

@@ -32,6 +32,8 @@ struct SelectionMenu: View {
     @Environment(\.layoutDirection) private var direction
     @State private var size: CGSize = .zero
     @State private var listOpen = false
+    /// v50 dikeyde yerleşik alt pencere açıksa menü onun üstüne yerleşir; menüye dokununca pencere alçalır.
+    @ObservedObject private var docked = DockedSheetState.shared
 
     private struct Action: Identifiable {
         let id: String; let label: String; let icon: String; var danger = false; var selected = false; let run: () -> Void
@@ -70,13 +72,17 @@ struct SelectionMenu: View {
         if let box = anchorRect {
             GeometryReader { geo in
                 let rtl = direction == .rightToLeft
-                let at = CanvasMenuPlacement.aboveOrBelow(box, menu: size, area: geo.size, gap: 8, margin: 8, rtl: rtl)
+                let screenH = UIScreen.main.bounds.height
+                let covered = max(0, geo.frame(in: .global).maxY - screenH * (1 - docked.coveredFraction))
+                let area = CGSize(width: geo.size.width, height: max(geo.size.height - covered, 80))
+                let at = CanvasMenuPlacement.aboveOrBelow(box, menu: size, area: area, gap: 8, margin: 8, rtl: rtl)
                 VStack(alignment: rtl ? .leading : .trailing, spacing: 6) {
                     row
                     if listOpen { list }
                 }
                 .fixedSize()
                 .background(GeometryReader { Color.clear.preference(key: MenuSizeKey.self, value: $0.size) })
+                .simultaneousGesture(TapGesture().onEnded { docked.menuTouched() })
                 .offset(x: at.x, y: at.y)
                 .opacity(size == .zero ? 0 : 1)
             }

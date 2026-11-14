@@ -69,7 +69,18 @@ enum class ComicLinesKind {
     SPEED_DIAG, MOTION_CURVE, FOCUS_ROUGH, FLASH, RADIATE, DRIP, WAVER, BLUSH, SWIRL, RINGS,
     /** v36 bir noktaya (karaktere) yakınlaştırma, perspektif/derinlik, daralan-genişleyen ışınlar, yoğun manga, yumuşak anime. */
     ZOOM, PERSPECTIVE, BEAMS, MANGA_DENSE, ANIME_SOFT,
+    /**
+     * v50 Batı çizgi romanı: enerji çıtırtısı (Kirby krackle, kozmik enerji noktaları), darbe yıldızı (tırtıklı patlama
+     * kenarı), şaşkınlık çizgileri (emanata: başın çevresinde kısa çizgiler), elektrik (zikzak şimşekler) ve Ben-Day
+     * nokta tramı. Manga: kasvet (tate-sen, yukarıdan inen dikey çizgiler), parıltı (kira-kira, dört köşeli yıldızlar),
+     * tarama (kake-ami, çapraz tram) ve yoğun hız (ryūsen-beta, ortası boş sık yatay çizgiler).
+     */
+    KRACKLE, IMPACT, SURPRISE, ELECTRIC, BENDAY,
+    GLOOM, SPARKLE, CROSSHATCH, SPEED_DENSE,
 }
+
+/** v50 odak çizgilerinin tarzı (pencerede iki bölüm): Batı çizgi romanı ve manga/anime. */
+enum class ComicLinesStyle { COMIC, MANGA }
 
 /** Tek çizgi: noktalar (x, y) ve nokta başına basınç (incelme). */
 class ComicLine(val xs: FloatArray, val ys: FloatArray, val pressures: FloatArray)
@@ -83,12 +94,49 @@ object ComicLines {
     const val MIN_LENGTH = 0.2f
     const val MAX_LENGTH = 1.6f
 
+    /** v50 türün tarzı (pencerede Çizgi roman ya da Manga bölümünde). */
+    fun style(kind: ComicLinesKind): ComicLinesStyle = if (kind in MANGA_KINDS) ComicLinesStyle.MANGA else ComicLinesStyle.COMIC
+
+    /** v50 tarzın türleri (pencere sırası). */
+    fun kinds(style: ComicLinesStyle): List<ComicLinesKind> = when (style) {
+        ComicLinesStyle.COMIC -> listOf(
+            ComicLinesKind.SPEED_H, ComicLinesKind.SPEED_V, ComicLinesKind.SPEED_DIAG, ComicLinesKind.MOTION_CURVE, ComicLinesKind.BURST,
+            ComicLinesKind.IMPACT, ComicLinesKind.ZOOM, ComicLinesKind.PERSPECTIVE, ComicLinesKind.BEAMS, ComicLinesKind.RINGS,
+            ComicLinesKind.SWIRL, ComicLinesKind.KRACKLE, ComicLinesKind.ELECTRIC, ComicLinesKind.SURPRISE, ComicLinesKind.BENDAY,
+        )
+        ComicLinesStyle.MANGA -> listOf(
+            ComicLinesKind.FOCUS, ComicLinesKind.MANGA_DENSE, ComicLinesKind.FOCUS_ROUGH, ComicLinesKind.FLASH, ComicLinesKind.RADIATE,
+            ComicLinesKind.SPEED_DENSE, ComicLinesKind.DRIP, ComicLinesKind.GLOOM, ComicLinesKind.WAVER, ComicLinesKind.BLUSH,
+            ComicLinesKind.SPARKLE, ComicLinesKind.CROSSHATCH, ComicLinesKind.ANIME_SOFT,
+        )
+    }
+
+    private val MANGA_KINDS = setOf(
+        ComicLinesKind.FOCUS, ComicLinesKind.MANGA_DENSE, ComicLinesKind.FOCUS_ROUGH, ComicLinesKind.FLASH, ComicLinesKind.RADIATE,
+        ComicLinesKind.SPEED_DENSE, ComicLinesKind.DRIP, ComicLinesKind.GLOOM, ComicLinesKind.WAVER, ComicLinesKind.BLUSH,
+        ComicLinesKind.SPARKLE, ComicLinesKind.CROSSHATCH, ComicLinesKind.ANIME_SOFT,
+    )
+
+    /**
+     * v50 türün önerilen ayarları (her tür kendi ayarlarıyla başlar): sıklık, uzunluk ve kalınlık çarpanı. Sıra:
+     * (density, length, thickness).
+     */
+    fun defaults(kind: ComicLinesKind): Triple<Float, Float, Float> = when (kind) {
+        ComicLinesKind.MANGA_DENSE, ComicLinesKind.SPEED_DENSE -> Triple(1.2f, 1f, 0.8f)
+        ComicLinesKind.IMPACT -> Triple(1f, 1f, 1.6f)
+        ComicLinesKind.ELECTRIC -> Triple(1f, 1f, 1.4f)
+        ComicLinesKind.SPARKLE, ComicLinesKind.KRACKLE -> Triple(1f, 1f, 1.2f)
+        ComicLinesKind.CROSSHATCH, ComicLinesKind.BENDAY -> Triple(1f, 1f, 0.7f)
+        ComicLinesKind.GLOOM -> Triple(1f, 0.8f, 0.9f)
+        else -> Triple(1f, 1f, 1f)
+    }
+
     /** Odak noktası ayarı olan türler (merkezden yayılan, yakınlaştırma, derinlik, ışın). */
     fun usesFocus(kind: ComicLinesKind): Boolean = kind in FOCUSED
 
     /** Yön ayarı olan türler (paralel hız çizgileri, ışın yelpazesi). */
     fun usesAngle(kind: ComicLinesKind): Boolean = kind == ComicLinesKind.SPEED_H || kind == ComicLinesKind.SPEED_V ||
-        kind == ComicLinesKind.SPEED_DIAG || kind == ComicLinesKind.BEAMS
+        kind == ComicLinesKind.SPEED_DIAG || kind == ComicLinesKind.BEAMS || kind == ComicLinesKind.CROSSHATCH || kind == ComicLinesKind.SPEED_DENSE
 
     /** Türün çizgi kalınlığı çarpanı (ışın ve yoğun manga çizgileri kalın). */
     fun widthFactor(kind: ComicLinesKind): Float = when (kind) {
@@ -105,6 +153,8 @@ object ComicLines {
         ComicLinesKind.FOCUS, ComicLinesKind.BURST, ComicLinesKind.FOCUS_ROUGH, ComicLinesKind.FLASH, ComicLinesKind.RADIATE,
         ComicLinesKind.SWIRL, ComicLinesKind.RINGS, ComicLinesKind.WAVER,
         ComicLinesKind.ZOOM, ComicLinesKind.PERSPECTIVE, ComicLinesKind.BEAMS, ComicLinesKind.MANGA_DENSE, ComicLinesKind.ANIME_SOFT,
+        ComicLinesKind.IMPACT, ComicLinesKind.SURPRISE, ComicLinesKind.ELECTRIC, ComicLinesKind.KRACKLE, ComicLinesKind.SPARKLE,
+        ComicLinesKind.SPEED_DENSE,
     )
 
     /**
@@ -413,8 +463,167 @@ object ComicLines {
                     out += taper(cx + ca * outer, cy + sa * outer, ix, iy, startThin = false, end = 0.1f)
                 }
             }
+            ComicLinesKind.KRACKLE -> {
+                // Enerji çıtırtısı (Kirby krackle): odağın çevresinde kümelenen, boyları farklı küçük halkalar
+                val n = count(46, 10, 160)
+                val rMax = min(w, h) * 0.05f
+                for (i in 0 until n) {
+                    val a = rnd.nextDouble() * 2 * PI
+                    val dist = (0.15f + rnd.nextFloat() * 0.8f) * len.coerceAtMost(1.2f)
+                    val px = cx + cos(a).toFloat() * w / 2f * dist; val py = cy + sin(a).toFloat() * h / 2f * dist
+                    val rr = rMax * (0.25f + rnd.nextFloat() * 0.75f) * (1.1f - dist * 0.5f).coerceAtLeast(0.3f)
+                    circle(px, py, rr, l, t, r, b)?.let { out += it }
+                }
+            }
+            ComicLinesKind.IMPACT -> {
+                // Darbe yıldızı: odağın çevresinde sivri uçlu, düzensiz tek bir patlama kenarı ve içinde ikinci kenar
+                val spikes = count(14, 7, 40)
+                for (ring in 0 until 2) {
+                    val m = spikes * 2 + 1
+                    val xs = FloatArray(m); val ys = FloatArray(m); val ps = FloatArray(m) { 1f }
+                    val k = if (ring == 0) 1f else 0.62f
+                    for (j in 0 until m) {
+                        val a = 2 * PI * j / (m - 1) + ring * 0.2
+                        val tip = j % 2 == 0
+                        val rr = (if (tip) 0.72f + rnd.nextFloat() * 0.26f else 0.36f + rnd.nextFloat() * 0.12f) * k * len.coerceAtMost(1.3f)
+                        xs[j] = (cx + cos(a).toFloat() * w / 2f * rr).coerceIn(l, r); ys[j] = (cy + sin(a).toFloat() * h / 2f * rr).coerceIn(t, b)
+                    }
+                    xs[m - 1] = xs[0]; ys[m - 1] = ys[0]
+                    out += ComicLine(xs, ys, ps)
+                }
+            }
+            ComicLinesKind.SURPRISE -> {
+                // Şaşkınlık çizgileri (emanata): odağın üstünde yelpaze gibi açılan kısa, kalın çizgiler
+                val n = count(5, 3, 14)
+                for (i in 0 until n) {
+                    val a = -PI / 2 + (i / (n - 1.0).coerceAtLeast(1.0) - 0.5) * 1.6
+                    val ca = cos(a).toFloat(); val sa = sin(a).toFloat()
+                    val r0 = 0.42f; val r1 = r0 + 0.38f * len
+                    out += taper(cx + ca * w / 2f * r0, cy + sa * h / 2f * r0, cx + ca * w / 2f * r1, cy + sa * h / 2f * r1, startThin = true, end = 0.35f)
+                }
+            }
+            ComicLinesKind.ELECTRIC -> {
+                // Elektrik: odaktan dışa doğru zikzak şimşekler (her biri 5–8 kırık)
+                val n = count(7, 3, 24)
+                for (i in 0 until n) {
+                    val a = 2 * PI * (i + rnd.nextFloat() * 0.5f) / n
+                    val ca = cos(a).toFloat(); val sa = sin(a).toFloat()
+                    val outer = edgeFrom(cx, cy, ca, sa, l, t, r, b) * len.coerceAtMost(1f)
+                    val segs = 5 + rnd.nextInt(4)
+                    val m = segs + 1
+                    val xs = FloatArray(m); val ys = FloatArray(m); val ps = FloatArray(m)
+                    val r0 = outer * 0.18f
+                    for (j in 0 until m) {
+                        val f = j / segs.toFloat()
+                        val d = r0 + (outer - r0) * f
+                        val j0 = if (j == 0 || j == segs) 0f else (if (j % 2 == 0) 1f else -1f) * outer * (0.04f + rnd.nextFloat() * 0.05f)
+                        xs[j] = (cx + ca * d - sa * j0).coerceIn(l, r); ys[j] = (cy + sa * d + ca * j0).coerceIn(t, b)
+                        ps[j] = 1f - 0.85f * f
+                    }
+                    out += ComicLine(xs, ys, ps)
+                }
+            }
+            ComicLinesKind.BENDAY -> {
+                // Ben-Day nokta tramı: düzgün ızgarada küçük halkalar (çizgi romanların klasik baskı noktaları)
+                val cols = count(12, 5, 32)
+                val step = w / cols
+                val rows = (h / step).toInt().coerceIn(1, 64)
+                val rr = step * 0.3f * len.coerceIn(0.4f, 1.4f)
+                for (ry in 0 until rows) for (rx in 0 until cols) {
+                    val px = l + step * (rx + 0.5f + if (ry % 2 == 1) 0.5f else 0f)
+                    val py = t + step * (ry + 0.5f)
+                    if (px + rr > r || py + rr > b) continue
+                    circle(px, py, rr, l, t, r, b, segments = 10)?.let { out += it }
+                }
+            }
+            ComicLinesKind.GLOOM -> {
+                // Kasvet (tate-sen): üst kenardan inen sık dikey çizgiler; uzunluk alanın yarısı kadar, uçları incelir
+                val n = count(56, 12, 220)
+                for (i in 0 until n) {
+                    val x = l + (i + 0.5f + (rnd.nextFloat() - 0.5f) * 0.5f) / n * w
+                    val ln = (h * (0.35f + rnd.nextFloat() * 0.3f) * len).coerceAtMost(h)
+                    out += taper(x, t, x, t + ln, startThin = false, end = 0.05f)
+                }
+            }
+            ComicLinesKind.SPARKLE -> {
+                // Parıltı (kira-kira): dört köşeli yıldızlar (iki kesişen ince uçlu çizgi), boyları farklı
+                val n = count(9, 3, 40)
+                val base = min(w, h) * 0.09f * len.coerceIn(0.3f, 1.6f)
+                for (i in 0 until n) {
+                    val px = l + w * (0.08f + rnd.nextFloat() * 0.84f); val py = t + h * (0.08f + rnd.nextFloat() * 0.84f)
+                    val s = base * (0.35f + rnd.nextFloat() * 0.65f)
+                    val hx = s.coerceAtMost(minOf(px - l, r - px)); val vy = s.coerceAtMost(minOf(py - t, b - py))
+                    out += star(px - hx, py, px + hx, py)
+                    out += star(px, py - vy, px, py + vy)
+                }
+            }
+            ComicLinesKind.CROSSHATCH -> {
+                // Tarama (kake-ami): iki yönde çapraz paralel çizgiler, alanın içine kırpılır
+                val n = count(22, 6, 90)
+                val a = (45.0 + angle) * PI / 180.0
+                hatch(out, a, l, t, r, b, n)
+                hatch(out, a + PI / 2, l, t, r, b, n)
+            }
+            ComicLinesKind.SPEED_DENSE -> {
+                // Yoğun hız (ryūsen-beta): çok sık yatay çizgiler, ortada boş bir şerit (karakterin geçtiği yer)
+                val ang = angle * PI / 180.0
+                val ux = cos(ang).toFloat(); val uy = sin(ang).toFloat()
+                val px = -uy; val py = ux
+                val span = hypot(w, h)
+                val n = count(110, 20, 360)
+                for (i in 0 until n) {
+                    val off = ((i + 0.5f + (rnd.nextFloat() - 0.5f) * 0.6f) / n - 0.5f) * span
+                    // Ortadaki şerit (odak yüksekliğinde) boş kalır
+                    val center = (focusY - 0.5f) * h
+                    if (kotlin.math.abs(off - center) < h * 0.12f * (0.6f + rnd.nextFloat() * 0.6f)) continue
+                    val ln = (span * (0.35f + rnd.nextFloat() * 0.6f) * len).coerceAtMost(span)
+                    val along = (rnd.nextFloat() - 0.5f) * (span - ln)
+                    val mx = (l + r) / 2f; val my = (t + b) / 2f
+                    val sx = mx + px * off + ux * (along - ln / 2f); val sy = my + py * off + uy * (along - ln / 2f)
+                    clip(sx, sy, sx + ux * ln, sy + uy * ln, l, t, r, b)?.let { c -> out += taper(c[0], c[1], c[2], c[3], startThin = rnd.nextBoolean(), end = 0.05f) }
+                }
+            }
         }
         return out
+    }
+
+    /** v50 [x],[y] merkezli [rr] yarıçaplı halka (alanın dışına taşıyorsa null). */
+    private fun circle(x: Float, y: Float, rr: Float, l: Float, t: Float, r: Float, b: Float, segments: Int = 14): ComicLine? {
+        if (rr < 0.5f || x - rr < l || x + rr > r || y - rr < t || y + rr > b) return null
+        val m = segments + 1
+        val xs = FloatArray(m); val ys = FloatArray(m)
+        for (j in 0 until m) {
+            val a = 2 * PI * j / segments
+            xs[j] = x + cos(a).toFloat() * rr; ys[j] = y + sin(a).toFloat() * rr
+        }
+        return ComicLine(xs, ys, FloatArray(m) { 0.8f })
+    }
+
+    /** v50 iki ucu ince, ortası kalın çizgi (parıltının kolu). */
+    private fun star(x0: Float, y0: Float, x1: Float, y1: Float): ComicLine {
+        val n = 9
+        val xs = FloatArray(n); val ys = FloatArray(n); val ps = FloatArray(n)
+        for (i in 0 until n) {
+            val f = i / (n - 1f)
+            xs[i] = x0 + (x1 - x0) * f; ys[i] = y0 + (y1 - y0) * f
+            ps[i] = 0.05f + 0.95f * (1f - abs1(f - 0.5f) * 2f)
+        }
+        return ComicLine(xs, ys, ps)
+    }
+
+    /** v50 [rad] doğrultusunda eşit aralıklı paralel çizgiler (alanın içine kırpılır). */
+    private fun hatch(out: MutableList<ComicLine>, rad: Double, l: Float, t: Float, r: Float, b: Float, n: Int) {
+        val ux = cos(rad).toFloat(); val uy = sin(rad).toFloat()
+        val px = -uy; val py = ux
+        val cx = (l + r) / 2f; val cy = (t + b) / 2f
+        val span = hypot(r - l, b - t)
+        for (i in 0 until n) {
+            val off = ((i + 0.5f) / n - 0.5f) * span
+            val sx = cx + px * off - ux * span / 2f; val sy = cy + py * off - uy * span / 2f
+            clip(sx, sy, sx + ux * span, sy + uy * span, l, t, r, b)?.let { c ->
+                out += ComicLine(floatArrayOf(c[0], (c[0] + c[2]) / 2f, c[2]), floatArrayOf(c[1], (c[1] + c[3]) / 2f, c[3]), floatArrayOf(0.7f, 0.7f, 0.7f))
+            }
+        }
     }
 
     /** v36 açıyla ([rad]) paralel hız çizgileri, alanın içine kırpılır. */

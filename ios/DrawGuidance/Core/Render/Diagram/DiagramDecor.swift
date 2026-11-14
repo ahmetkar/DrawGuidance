@@ -399,7 +399,8 @@ enum DiagramDecor {
         if m > 1 { for i in 1..<m { let xx = left + colW * Float(i); x.c.drawLine(xx, 0, xx, 0.94 * U, x.p) } }
         let s = tick(x)
         let rowNames: [(String, Float)] = [("AŞAMA", 0.065), ("DUYGU", 0.35), ("EYLEM", 0.68), ("SIKINTI", 0.85)]
-        for (t, y) in rowNames {
+        for (t0, y) in rowNames {
+            let t = I18n.tr(t0)
             let ls = fitSize(t, mono, s, (left - 12) / x.k, 0.06)
             drawText(x, t, 0.01 * U, y * U + ls * 0.36, mono, ls, x.pal.muted, spacing: 0.06)
         }
@@ -437,8 +438,9 @@ enum DiagramDecor {
         let s = tick(x) * 0.9
         let names: [(String, Float, Float)] = [("HIZLI KAZANÇ", 0.05, 0.12), ("BÜYÜK İŞ", 0.52, 0.12), ("DOLGU İŞLER", 0.05, 0.94), ("ZAMAN KAYBI", 0.52, 0.94)]
         for (i, item) in names.enumerated() {
-            let ls = fitSize(item.0, mono, s, (0.4 * U) / x.k, 0.08)
-            drawText(x, item.0, item.1 * U, item.2 * U, mono, ls, i == 0 ? P.accent : P.muted, spacing: 0.08)
+            let t = I18n.tr(item.0)
+            let ls = fitSize(t, mono, s, (0.4 * U) / x.k, 0.08)
+            drawText(x, t, item.1 * U, item.2 * U, mono, ls, i == 0 ? P.accent : P.muted, spacing: 0.08)
         }
     }
 
@@ -454,12 +456,13 @@ enum DiagramDecor {
         stroke(x, P.ink, x.line)
         x.c.drawLine(l, b, r - 6, b, x.p); arrowHead(x, r, b, l, b, P.ink)
         let s = tick(x) * 0.85
-        for (i, t) in wardleyStages.enumerated() {
+        for (i, t0) in wardleyStages.enumerated() {
+            let t = I18n.tr(t0)
             let cx = l + (r - l) * (Float(i) + 0.5) / 4
             let ls = fitSize(t, mono, s, ((r - l) / 4 - 8) / x.k, 0.06)
             drawText(x, t, cx - measure(t, mono, ls, 0.06) * x.k / 2, b + ls * 1.6, mono, ls, P.muted, spacing: 0.06)
         }
-        drawText(x, "GÖRÜNÜRLÜK", l + 8 * x.k, 0.045 * U, mono, s, P.muted, spacing: 0.06)
+        drawText(x, I18n.tr("GÖRÜNÜRLÜK"), l + 8 * x.k, 0.045 * U, mono, s, P.muted, spacing: 0.06)
     }
 
     private static func wardleyMoves(_ x: Ctx) {

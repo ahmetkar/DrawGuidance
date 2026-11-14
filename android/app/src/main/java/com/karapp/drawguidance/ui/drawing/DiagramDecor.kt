@@ -418,7 +418,8 @@ internal object DiagramDecor {
         for (i in 1 until m) { val xx = left + colW * i; x.c.drawLine(xx, 0.0f, xx, 0.94f * U, p) }
         // Satır adları
         val s = tick(x)
-        listOf("AŞAMA" to 0.065f, "DUYGU" to 0.35f, "EYLEM" to 0.68f, "SIKINTI" to 0.85f).forEach { (t, y) ->
+        listOf("AŞAMA" to 0.065f, "DUYGU" to 0.35f, "EYLEM" to 0.68f, "SIKINTI" to 0.85f).forEach { (t0, y) ->
+            val t = com.karapp.drawguidance.i18n.I18n.tr(t0)
             val ls = fitSize(t, mono, s, (left - 12f) / x.k, 0.06f)
             drawText(x, t, 0.01f * U, y * U + ls * 0.36f, mono, ls, x.pal.muted, spacing = 0.06f)
         }
@@ -456,7 +457,8 @@ internal object DiagramDecor {
         arrowHead(x, 0.855f * U, 0.5f * U, 0.5f * U, 0.5f * U, P.ink)
         val s = tick(x) * 0.9f
         val names = listOf("HIZLI KAZANÇ" to (0.05f to 0.12f), "BÜYÜK İŞ" to (0.52f to 0.12f), "DOLGU İŞLER" to (0.05f to 0.94f), "ZAMAN KAYBI" to (0.52f to 0.94f))
-        names.forEachIndexed { i, (t, pos) ->
+        names.forEachIndexed { i, (t0, pos) ->
+            val t = com.karapp.drawguidance.i18n.I18n.tr(t0)
             val ls = fitSize(t, mono, s, (0.4f * U) / x.k, 0.08f)
             drawText(x, t, pos.first * U, pos.second * U, mono, ls, if (i == 0) P.accent else P.muted, spacing = 0.08f)
         }
@@ -473,12 +475,13 @@ internal object DiagramDecor {
         x.c.drawLine(l, b, l, 0.035f * U, p); arrowHead(x, l, 0.03f * U, l, b, P.ink)
         x.c.drawLine(l, b, r - 6f, b, p); arrowHead(x, r, b, l, b, P.ink)
         val s = tick(x) * 0.85f
-        wardleyStages.forEachIndexed { i, t ->
+        wardleyStages.forEachIndexed { i, t0 ->
+            val t = com.karapp.drawguidance.i18n.I18n.tr(t0)
             val cx = l + (r - l) * (i + 0.5f) / 4f
             val ls = fitSize(t, mono, s, ((r - l) / 4f - 8f) / x.k, 0.06f)
             drawText(x, t, cx - measure(t, mono, ls, 0.06f) * x.k / 2f, b + ls * 1.6f, mono, ls, P.muted, spacing = 0.06f)
         }
-        drawText(x, "GÖRÜNÜRLÜK", l + 8f * x.k, 0.045f * U, mono, s, P.muted, spacing = 0.06f)
+        drawText(x, com.karapp.drawguidance.i18n.I18n.tr("GÖRÜNÜRLÜK"), l + 8f * x.k, 0.045f * U, mono, s, P.muted, spacing = 0.06f)
     }
 
     private fun wardleyMoves(x: Ctx) {

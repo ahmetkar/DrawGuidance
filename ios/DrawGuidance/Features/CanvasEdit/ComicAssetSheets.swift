@@ -141,7 +141,7 @@ struct CharactersSheet: View {
             .navigationBarTitleDisplayMode(.inline)
             .toolbar { ToolbarItem(placement: .cancellationAction) { Button(L("close")) { dismiss() } } }
         }
-        .presentationDetents([.medium, .large])
+        .dockedEditorSheet()
         .accessibilityIdentifier("characters_sheet")
         .sheet(isPresented: $premiumOpen) { PremiumRequiredSheet() }
     }
@@ -249,7 +249,7 @@ struct LocationBackgroundsSheet: View {
             .navigationBarTitleDisplayMode(.inline)
             .toolbar { ToolbarItem(placement: .cancellationAction) { Button(L("close")) { dismiss() } } }
         }
-        .presentationDetents([.medium, .large])
+        .dockedEditorSheet()
         .accessibilityIdentifier("locations_sheet")
         .sheet(isPresented: $premiumOpen) { PremiumRequiredSheet() }
     }
@@ -262,14 +262,14 @@ struct ComicPropsBrowser: View {
     let onPick: (ComicProp) -> Void
     @ObservedObject private var sub = SubscriptionStore.shared
     @State private var style: ComicStyle = .COMIC
-    @State private var theme: String?
+    /// v50 efekt ve nesnelerde tema paketleri gösterilmez (yalnız içerik kategorileri; Android ile aynı).
+    private let theme: String? = nil
     @State private var category: String?
     @State private var premiumOpen = false
     private let columns = [GridItem(.adaptive(minimum: 84), spacing: 10)]
 
     var body: some View {
         let lang = I18n.language
-        let themes = ComicAssets.themesFor(kind, style)
         let categories = ComicAssets.propCategories(kind, style, theme)
         let list = ComicAssets.props(kind, style, category, theme)
         let cats = (kind == .EFFECT ? ComicAssets.catalog.effectCategories : ComicAssets.catalog.objectCategories)
@@ -278,13 +278,8 @@ struct ComicPropsBrowser: View {
             // v43 nesneler stile ayrılmaz
             if kind != .OBJECT {
                 ComicChipRow(tag: "\(tag)_style", items: ComicStyle.allCases.map { (id: $0.id, label: styleLabel($0)) }, selected: style.id) { id in
-                    style = ComicStyle.allCases.first { $0.id == id } ?? .COMIC; theme = nil; category = nil
+                    style = ComicStyle.allCases.first { $0.id == id } ?? .COMIC; category = nil
                 }
-            }
-            if !themes.isEmpty {
-                Text(L("v40_comic_theme")).font(.subheadline.weight(.semibold)).padding(.horizontal, 16)
-                ComicChipRow(tag: "\(tag)_theme", items: themes.map { (id: $0.id, label: ComicAssets.name($0.names, lang)) }, selected: theme,
-                             allLabel: L("shape_filter_all")) { theme = $0; category = nil }
             }
             if categories.count > 1 {
                 ComicChipRow(tag: "\(tag)_cat", items: categories.map { (id: $0.id, label: ComicAssets.name($0.names, lang)) }, selected: category,
@@ -327,7 +322,7 @@ struct ComicObjectsSheet: View {
             .navigationBarTitleDisplayMode(.inline)
             .toolbar { ToolbarItem(placement: .cancellationAction) { Button(L("close")) { dismiss() } } }
         }
-        .presentationDetents([.medium, .large])
+        .dockedEditorSheet()
         .accessibilityIdentifier("objects_sheet")
     }
 }

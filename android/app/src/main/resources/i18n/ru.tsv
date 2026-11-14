@@ -3086,3 +3086,257 @@ Alıştırma	Упражнение
 Alıştırma (ileri)	Упражнение (продвинутое)
 Apple: Firebase'te Apple sağlayıcısı açık değil	Apple: провайдер Apple не включён в Firebase
 Bu e-posta adresi Google hesabıyla kayıtlı; Google ile giriş yapın	Этот адрес электронной почты зарегистрирован через Google; войдите через Google
+Fizik · Dinamik · Ders notu	Физика · Динамика · Конспект
+1. EYLEMSİZLİK YASASI	1. ЗАКОН ИНЕРЦИИ
+Net kuvvet sıfırsa duran cisim durur, hareket eden cisim sabit hızla doğrusal hareketine devam eder.	Если равнодействующая сила равна нулю, покоящееся тело остаётся в покое, а движущееся продолжает двигаться прямолинейно и равномерно.
+2. TEMEL YASA	2. ОСНОВНОЙ ЗАКОН
+Net kuvvet, kütle ile ivmenin çarpımına eşittir. Kuvvet ile ivme aynı yöndedir.	Равнодействующая сила равна произведению массы на ускорение. Сила и ускорение направлены одинаково.
+3. ETKİ–TEPKİ YASASI	3. ЗАКОН ДЕЙСТВИЯ И ПРОТИВОДЕЙСТВИЯ
+Bir cisim ötekine kuvvet uygularsa öteki de ona eşit büyüklükte ve zıt yönde kuvvet uygular. Kuvvetler farklı cisimlere etki ettiği için birbirini yok etmez.	Если одно тело действует на другое с некоторой силой, то второе действует на первое с равной по модулю и противоположной по направлению силой. Силы приложены к разным телам, поэтому не уравновешивают друг друга.
+ANAHTAR SORULAR	КЛЮЧЕВЫЕ ВОПРОСЫ
+Konu: Dinamik\nTarih: ____	Тема: Динамика\nДата: ____
+Cisim neden hareketini sürdürür?	Почему тело продолжает двигаться?
+F = m·a neyi anlatır? Birimler?	Что описывает F = m·a? Единицы?
+Sürtünme ivmeyi nasıl değiştirir?	Как трение меняет ускорение?
+Etki ve tepki birbirini yok eder mi?	Уравновешивают ли друг друга действие и противодействие?
+ÖZET	ИТОГ
+Kuvvet hareketi değil, hareketteki değişimi (ivmeyi) belirler: a = F_net / m. Kuvvetler her zaman çiftler hâlinde oluşur; serbest cisim diyagramında yalnız cisme etki edenler çizilir.	Сила определяет не движение, а его изменение (ускорение): a = F_net / m. Силы всегда возникают парами; на схеме сил изображают только силы, действующие на тело.
+Deney Raporu: Basit Sarkacın Periyodu	Лабораторный отчёт: период математического маятника
+Amaç: Periyodun ip uzunluğuna bağlılığını ölçmek.   Hipotez: T, √L ile artar; kütleye bağlı değildir.	Цель: измерить зависимость периода от длины нити.   Гипотеза: T растёт как √L и не зависит от массы.
+Ad: ______________   ·   Sınıf: ______   ·   Tarih: ________	Имя: ______________   ·   Класс: ______   ·   Дата: ________
+MALZEMELER	МАТЕРИАЛЫ
+• Statif ve ip\n• 50 g ve 100 g kütle\n• Kronometre\n• Şerit metre	• Штатив и нить\n• Грузы 50 г и 100 г\n• Секундомер\n• Рулетка
+YÖNTEM	ХОД РАБОТЫ
+1. İpi 20 cm uzunluğa ayarla.\n2. Kütleyi 10°'den küçük açıyla bırak.\n3. 10 tam salınımın süresini ölç, 10'a böl.\n4. Ölçümü 20 cm artırarak 100 cm'ye kadar tekrarla.\n5. Kütleyi değiştirip bir ölçümü yinele.	1. Установите длину нити 20 см.\n2. Отпустите груз под углом меньше 10°.\n3. Измерьте время 10 полных колебаний и разделите на 10.\n4. Повторите, увеличивая длину на 20 см до 100 см.\n5. Смените груз и повторите одно измерение.
+VERİLER	ДАННЫЕ
+Ölçülen periyotlar T = 2π√(L/g) ile uyumludur: uzunluk 4 katına çıkınca periyot 2 katına çıkar. Kütle değişince periyot değişmedi; hipotez doğrulandı.	Измеренные периоды согласуются с T = 2π√(L/g): при увеличении длины в 4 раза период удваивается. При смене массы период не изменился; гипотеза подтвердилась.
+HATA KAYNAKLARI	ИСТОЧНИКИ ПОГРЕШНОСТЕЙ
+• Kronometreyi başlatma ve durdurma gecikmesi\n• Büyük açılarda yaklaşımın bozulması\n• Hava direnci	• Задержка при пуске и остановке секундомера\n• Приближение нарушается при больших углах\n• Сопротивление воздуха
+İkinci Dereceden Denklemler	Квадратные уравнения
+Çalışma kâğıdı   ·   Ad: ______________   ·   Tarih: ________	Рабочий лист   ·   Имя: ______________   ·   Дата: ________
+Hedef: ax² + bx + c = 0 denklemini çarpanlara ayırarak ve diskriminantla çözmek.	Цель: решать ax² + bx + c = 0 разложением на множители и через дискриминант.
+FORMÜLLER	ФОРМУЛЫ
+Δ > 0: iki farklı kök   ·   Δ = 0: çakışık kök   ·   Δ < 0: gerçek kök yok	Δ > 0: два различных корня   ·   Δ = 0: один (кратный) корень   ·   Δ < 0: нет действительных корней
+ÇÖZÜMLÜ ÖRNEK	РАЗОБРАННЫЙ ПРИМЕР
+Ç = { 1, 3 }	Ответ: { 1, 3 }
+Kökler, parabolün x eksenini kestiği noktalardır: x = 1 ve x = 3. Tepe noktası (2, −1).	Корни — точки пересечения параболы с осью x: x = 1 и x = 3. Вершина (2, −1).
+ALIŞTIRMALAR	УПРАЖНЕНИЯ
+☐ x² − 5x + 6 = 0\n☐ 2x² + 3x − 2 = 0\n☐ x² + 6x + 9 = 0\n☐ x² + x + 1 = 0  (Δ < 0 ise?)	☐ x² − 5x + 6 = 0\n☐ 2x² + 3x − 2 = 0\n☐ x² + 6x + 9 = 0\n☐ x² + x + 1 = 0  (а если Δ < 0?)
+Haftalık Ürün Toplantısı	Еженедельная встреча по продукту
+Tarih: __.__.____   ·   Saat: 10.00–10.45   ·   Katılımcılar: Ayşe, Can, Ece, Mert	Дата: __.__.____   ·   Время: 10:00–10:45   ·   Участники: Ayşe, Can, Ece, Mert
+Amaç: Sürüm takvimini kesinleştirmek ve geri bildirimleri önceliklendirmek.	Цель: утвердить график выпуска и расставить приоритеты отзывов.
+GÜNDEM	ПОВЕСТКА
+1. Geçen haftanın değerlendirmesi\n2. Yeni sürüm takvimi\n3. Kullanıcı geri bildirimleri\n4. Riskler ve engeller	1. Итоги прошлой недели\n2. Новый график выпуска\n3. Отзывы пользователей\n4. Риски и препятствия
+NOTLAR	ЗАМЕТКИ
+• Geri bildirimlerin çoğu arama hızıyla ilgili.\n• Ödeme ekranında iki hata bildirildi.\n• Test ortamı perşembeye hazır olacak.	• Большинство отзывов касается скорости поиска.\n• На экране оплаты обнаружены две ошибки.\n• Тестовая среда будет готова к четвергу.
+KARARLAR	РЕШЕНИЯ
+• Sürüm 20 Mart'ta mağazaya gönderilecek.\n• Arama iyileştirmesi bu sürüme alınacak.	• Версия будет отправлена в магазин 20 марта.\n• Улучшение поиска войдёт в этот выпуск.
+SÜRÜM TAKVİMİ	ГРАФИК ВЫПУСКА
+YAPILACAKLAR	ЗАДАЧИ
+☐ Sürüm notlarını yaz — Ayşe · 14 Mart\n☐ Test planını güncelle — Mert · 15 Mart\n☐ Ödeme hatalarını düzelt — Can · 16 Mart\n☐ Anket sonuçlarını özetle — Ece · 17 Mart	☐ Написать примечания к выпуску — Ayşe · 14 марта\n☐ Обновить план тестирования — Mert · 15 марта\n☐ Исправить ошибки оплаты — Can · 16 марта\n☐ Подвести итоги опроса — Ece · 17 марта
+AÇIK SORULAR	ОТКРЫТЫЕ ВОПРОСЫ
+• Arama için ek sunucu gerekli mi?\n• Mağaza görselleri kimde?	• Нужен ли дополнительный сервер для поиска?\n• У кого скриншоты для магазина?
+SONRAKİ TOPLANTI	СЛЕДУЮЩАЯ ВСТРЕЧА
+Pazartesi 10.00 · Konu: test sonuçları	Понедельник 10:00 · Тема: результаты тестов
+Fotosentez · Zihin Haritası	Фотосинтез · Ментальная карта
+Biyoloji · Canlılarda enerji dönüşümleri	Биология · Превращения энергии в живых организмах
+TEPKİME	РЕАКЦИЯ
+(ışık ve klorofil varlığında, kloroplastta)	(при наличии света и хлорофилла, в хлоропласте)
+ANAHTAR KAVRAMLAR	КЛЮЧЕВЫЕ ПОНЯТИЯ
+• Klorofil: ışığı soğuran yeşil pigment\n• Kloroplast: fotosentezin yapıldığı organel\n• Stoma: gaz alışverişini sağlayan gözenek\n• ATP: hücrenin enerji taşıyıcısı	• Хлорофилл: зелёный пигмент, поглощающий свет\n• Хлоропласт: органоид, где идёт фотосинтез\n• Устьице: пора для газообмена\n• АТФ: переносчик энергии в клетке
+Su Döngüsü	Круговорот воды
+Fen bilimleri · Ders notu · Tarih: ________	Естествознание · Конспект · Дата: ________
+• Buharlaşma: Güneş'in ısıttığı su buhar olup havaya yükselir.\n• Yoğuşma: Yükselen buhar soğuyup küçük damlacıklara dönüşür, bulutlar oluşur.\n• Yağış: Damlacıklar büyüyüp ağırlaşınca yağmur, kar ya da dolu olarak düşer.\n• Toplanma: Su derelerde, göllerde, denizlerde ve yer altında birikir.	• Испарение: нагретая Солнцем вода превращается в пар и поднимается.\n• Конденсация: поднявшийся пар остывает, образуются капли и облака.\n• Осадки: капли укрупняются и выпадают дождём, снегом или градом.\n• Сбор: вода скапливается в ручьях, озёрах, морях и под землёй.
+Su, Güneş'ten aldığı enerjiyle sürekli yer değiştirir; miktarı değişmez, yalnız hâli (sıvı, gaz, katı) ve yeri değişir.	Благодаря энергии Солнца вода постоянно перемещается; её количество не меняется, меняются лишь состояние (жидкость, газ, твёрдое) и место.
+Soru: Bulutlar neden yüksekte oluşur?	Вопрос: почему облака образуются высоко?
+Bu haftanın yapılacakları	Дела на эту неделю
+Tarih: __.__.____ – __.__.____	Дата: __.__.____ – __.__.____
+OKUL	ШКОЛА
+☐ Matematik ödevi\n☐ Fen deney raporu\n☐ Kitap okuma (her gün 30 dakika)\n☐ Yabancı dil kelime tekrarı	☐ Домашнее задание по математике\n☐ Отчёт по лабораторной\n☐ Чтение (30 минут каждый день)\n☐ Повторение слов иностранного языка
+EV	ДОМ
+☐ Odayı toplamak\n☐ Bitkileri sulamak\n☐ Çantayı hazırlamak	☐ Убрать в комнате\n☐ Полить растения\n☐ Собрать портфель
+KENDİM İÇİN	ДЛЯ СЕБЯ
+☐ Spor ya da yürüyüş\n☐ Resim çizmek\n☐ Erken uyumak	☐ Спорт или прогулка\n☐ Рисование\n☐ Лечь спать пораньше
+En önemli üç iş: ______________________	Три главных дела: ______________________
+Haftalık Plan	План на неделю
+PAZARTESİ	ПОНЕДЕЛЬНИК
+SALI	ВТОРНИК
+ÇARŞAMBA	СРЕДА
+PERŞEMBE	ЧЕТВЕРГ
+CUMA	ПЯТНИЦА
+CUMARTESİ	СУББОТА
+PAZAR	ВОСКРЕСЕНЬЕ
+oku	чтение
+yaz	запись
+Müşteri	Клиент
+ad	имя
+e-posta	e-mail
+Sipariş	Заказ
+müşteri_id	customer_id
+tarih	дата
+toplam	итого
+Sipariş kalemi	Позиция заказа
+sipariş_id	order_id
+ürün_id	product_id
+adet	кол-во
+Ürün	Товар
+fiyat	цена
+verir	оформляет
+Varlık	Сущность
+eşit(o): Bool	equals(o): Bool
+arayüz»	interface»
+Depo	Репозиторий
+bul(id): T	find(id): T
+kaydet(t: T)	save(t: T)
+ad: String	name: String
+e-posta: String	email: String
+giriş(): Bool	login(): Bool
+KullanıcıDeposu	UserRepository
+bul(id): Kullanıcı	find(id): User
+sil(id)	delete(id)
+HATA	ОШИБКА
+DESTEK	ПОДДЕРЖКА
+Giriş sayfası	Страница входа
+Arama filtresi	Фильтр поиска
+Ödeme API	API оплаты
+Bildirimler	Уведомления
+Profil	Профиль
+Tema	Тема
+ETKİNLİK	ДЕЙСТВИЕ
+Veriyi bul	Найти данные
+Rapor kur	Собрать отчёт
+Paylaş	Поделиться
+Güven	Доверие
+SONRA	ПОЗЖЕ
+Katalog arama	Поиск по каталогу
+Hazır şablon	Готовый шаблон
+Bağlantı paylaş	Поделиться ссылкой
+Satır izinleri	Права на строки
+Kayıtlı sorgular	Сохранённые запросы
+Grafik türleri	Типы графиков
+Zamanlanmış e-posta	Письмо по расписанию
+KENAR	ГРАНИЦА
+statik	статика
+Çalışan	Воркер
+YÖNETİLEN	УПРАВЛЯЕМЫЙ
+RDS birincil	RDS основной
+RDS yedek	RDS реплика
+KUYRUK	ОЧЕРЕДЬ
+PROJE	ПРОЕКТ
+DOSYA	ФАЙЛ
+Sunum	Представление
+Uygulama	Приложение
+uygulama	приложение
+Etki alanı	Домен
+iş kuralları	бизнес-правила
+Altyapı	Инфраструктура
+Topla	Собрать
+sinyaller	сигналы
+Araştır	Исследовать
+kanıt	доказательства
+insan onaylar	человек одобряет
+Uygula	Применить
+iş çıkar	выдаёт работу
+Ölç	Измерить
+sonuçlar	результаты
+Öğren	Учиться
+yöntem güncellenir	метод обновляется
+Ortak hafıza	Общая память
+tek kayıt, her tur	одна запись, каждый круг
+db-istemci	db-client
+TOPLAMA	СБОР
+YAYIN	ПУБЛИКАЦИЯ
+Anket sistemi	Система опросов
+Eski uygulamalar	Устаревшие приложения
+yönetim portalları	админ-порталы
+Nüfus kaydı	Реестр населения
+dış kaynak	внешний источник
+Ortak sürücü	Общий диск
+sürüm denetimi yok	без контроля версий
+Analist makineleri	Машины аналитиков
+şirket içi	локально
+Eski portal	Старый портал
+elle darboğaz	ручное узкое место
+Web sitesi	Веб-сайт
+statik sayfalar	статические страницы
+Bakanlıklar	Министерства
+~6 kurum	~6 ведомств
+KAYNAKLAR	ИСТОЧНИКИ
+ALIM	ЗАГРУЗКА
+DEPOLAMA	ХРАНЕНИЕ
+KOPYALA	КОПИЯ
+Web formları	Веб-формы
+zamanlayıcı	планировщик
+alım	загрузка
+nesne deposu	объектное хранилище
+SORGU	ЗАПРОС
+Defterler	Блокноты
+panolar	дашборды
+HAM	СЫРЫЕ
+ham-kova	raw-bucket
+Veri mühendisi	Инженер данных
+ANONİM	АНОНИМ.
+anonim-kova	anon-bucket
+HAZIRLIK	ПОДГОТОВКА
+hazırlık-kova	staging-bucket
+temiz	чистые
+ağırlıklı	взвешенные
+Veri bilimci	Специалист по данным
+TOPLU	АГРЕГАТ
+toplu-kova	agg-bucket
+göstergeler	показатели
+ARŞİV	АРХИВ
+arşiv-kova	archive-bucket
+soğuk katman	холодный уровень
+TOPLA	СОБРАТЬ
+DEPOLA	ХРАНИТЬ
+YAYINLA	ПУБЛИКОВАТЬ
+YÖN	АДМ
+Proje kurulumu	Настройка проекта
+Erişim denetimi	Контроль доступа
+MÜH	ИНЖ
+Kaynak alımı	Загрузка источников
+Ham depo	Сырое хранилище
+Temizle	Очистить
+BİL	НАУКА
+Keşfet ve modelle	Изучить и смоделировать
+Bulguları yayınla	Опубликовать выводы
+TÜK	ПОТР
+Sorgula	Запросить
+Veritabanları	Базы данных
+dosya	файл
+E-posta	Почта
+birleşik SQL	федеративный SQL
+madalyon depo	медальонное хранилище
+defter	блокнот
+Masaüstü	Рабочий стол
+Raporlar	Отчёты
+Sipariş API	API заказов
+doğrudan gönderim	прямая отправка
+kuyruğa yazar	пишет в очередь
+doğrudan → kuyruk	напрямую → очередь
+eklendi	добавлено
+kaldırıldı	удалено
+Yalnız SELECT	Только SELECT
+cam	стекло
+Ana kart	Материнская плата
+işlemci	процессор
+bellek	память
+Kasa	Корпус
+alüminyum	алюминий
+Otopark	Парковка
+1 kat	1 этаж
+2 kat	2 этажа
+4 kat	4 этажа
+Yeni iş	Новая задача
+E-POSTA	ПОЧТА
+arama	поиск
+profil	профиль
+Oku/Yaz	Чтение/запись
+Mar	Мар
+May	Май
+TIK TAK	ТИК-ТАК
+DUYGU	ЭМОЦИЯ
+EYLEM	ДЕЙСТВИЕ
+SIKINTI	БОЛЬ
+ZAMAN KAYBI	ПОТЕРЯ ВРЕМЕНИ

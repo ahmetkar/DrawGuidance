@@ -93,8 +93,10 @@ class DiagramController(
             left = cx - w / 2f; right = cx + w / 2f; top = cy - h / 2f; bottom = cy + h / 2f
         }
         val nodes = DiagramRenderer.layout(kind, DiagramRenderer.defaultNodes(kind))
+        // v50 örnek yazılar uygulamanın dilinde eklenir (sayılar ve kodlar korunur)
+        val edges = DiagramRenderer.defaultEdges(kind, nodes).map { DiagramCatalog.localize(it) }
         val spec = DiagramSpec(
-            kind = kind, nodes = nodes, edges = DiagramRenderer.defaultEdges(kind, nodes), style = shapes.newShapeStyle(), theme = _theme.value,
+            kind = kind, nodes = nodes.map { it.copy(text = DiagramCatalog.localizeText(it.text)) }, edges = edges, style = shapes.newShapeStyle(), theme = _theme.value,
             manual = DiagramCatalog.template(kind)?.manual ?: false,
         )
         val id = UUID.nameUUIDFromBytes("$gestureId-diagram".toByteArray()).toString()

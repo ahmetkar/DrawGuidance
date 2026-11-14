@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- v50 düzenleyici, çeviri ve çizgi roman iyileştirmeleri -->
+<resources>
+    <string name="lines_krackle">能量爆点</string>
+    <string name="lines_impact">冲击星</string>
+    <string name="lines_surprise">惊讶线</string>
+    <string name="lines_electric">电击</string>
+    <string name="lines_benday">班戴点</string>
+    <string name="lines_gloom">阴沉竖线</string>
+    <string name="lines_sparkle">闪光</string>
+    <string name="lines_crosshatch">交叉排线</string>
+    <string name="lines_speed_dense">密集速度线</string>
+    <string name="v50_lines_style_comic">美漫</string>
+    <string name="v50_lines_style_manga">日漫</string>
+    <string name="v50_lines_add">添加：%1$s</string>
+    <string name="v50_lines_reset">重置</string>
+</resources>

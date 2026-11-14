@@ -59,7 +59,7 @@ class ComicController(
     fun insertBalloon(style: BalloonStyle, speakers: Int, center: Offset?, options: BalloonTextOptions = BalloonTextOptions()) {
         val current = store.canvas.value ?: return
         val typed = options.content.isNotBlank()
-        val stroke = balloonStroke(style, speakers, center, if (typed) options.content else DEFAULT_TEXT, options) ?: return
+        val stroke = balloonStroke(style, speakers, center, if (typed) options.content else com.karapp.drawguidance.i18n.I18n.tr(DEFAULT_TEXT), options) ?: return
         store.commit(current.strokes + stroke)
         host.setMode(EditMode.SELECT)
         store.select(setOf(stroke.id))
@@ -278,7 +278,7 @@ class ComicController(
         val font = runCatching { TextFont.valueOf(preset.font) }.getOrDefault(TextFont.BANGERS)
         val shadow = preset.shadow.takeIf { it.length == 7 || !it.endsWith("00000000") }
         val spec = TextSpec(
-            content = preset.text, font = font, align = TextAlignKind.CENTER,
+            content = com.karapp.drawguidance.i18n.I18n.tr(preset.text), font = font, align = TextAlignKind.CENTER,
             outlineColorHex = preset.outline, outlineWidth = size * 0.07f,
             box = TextBox(effects = TextEffects(shadowHex = shadow, shadowDx = 0.07f, shadowDy = 0.08f, gradient = GradientSpec(preset.colors, 90f), caps = true, letterSpacing = 0.02f)),
         )

@@ -42,6 +42,9 @@ fun CanvasEditRoute(
     androidx.compose.foundation.layout.Box(timeModifier.then(androidx.compose.ui.Modifier.fillMaxSize())) {
     // v45 tablette düzenleyicinin alt pencereleri sürüklenebilir pencere (telefonda alt sayfa)
     val sheetWindow = com.karapp.drawguidance.ui.screens.canvasedit.components.rememberTabletWindow(com.karapp.drawguidance.ui.screens.canvasedit.components.TabletWindows.SHEET)
+    // v50 dikey ekranda alt pencereler çizim alanının altına yerleşir (kalıcı değil)
+    val dockedSheets = androidx.compose.runtime.remember { com.karapp.drawguidance.ui.screens.canvasedit.components.DockedSheetHost() }
+    androidx.compose.runtime.CompositionLocalProvider(com.karapp.drawguidance.ui.screens.canvasedit.components.LocalDockedSheets provides dockedSheets) {
     com.karapp.drawguidance.ui.screens.canvasedit.components.FloatingSheetsScope(sheetWindow) {
     PremiumScope(kind, onOpenSubscription) {
         CanvasEditScreen(
@@ -53,6 +56,7 @@ fun CanvasEditRoute(
             viewModel = vm,
             onOpenModel3d = onOpenModel3d,
         )
+    }
     }
     }
     }

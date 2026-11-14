@@ -291,13 +291,12 @@ class V42ComicPropsUiTest : V33EditorBase() {
         waitFor { exists("objects_sheet") }
         // v43 nesneler tek liste (manga/çizgi roman sekmesi yok)
         assertFalse(exists("obj_style_cizgi_roman"))
-        val idx = ComicThemeIndex.value
-        val pack = "polisiye"
-        val inPack = ComicAssets.props(ComicAssetKind.OBJECT, ComicStyle.COMIC, null, pack)
-        val outside = ComicAssets.catalog.objects.first { "cizgi_roman" in it.styles && !idx.has(ComicAssetKind.OBJECT, it.id, pack) }
-        assertTrue(inPack.isNotEmpty())
-        click("obj_theme_$pack")
-        val free = inPack.first { PremiumRules.propFeature(ComicAssetKind.OBJECT, it) == null }
+        // v50 nesnelerde tema paketi süzgeci yok; yalnız içerik kategorileri (bağlama uygun)
+        assertFalse(exists("obj_theme"))
+        val free = ComicAssets.props(ComicAssetKind.OBJECT, ComicStyle.COMIC, null).first { PremiumRules.propFeature(ComicAssetKind.OBJECT, it) == null }
+        val cat = free.category
+        val outside = ComicAssets.catalog.objects.first { "cizgi_roman" in it.styles && it.category != cat }
+        click("obj_cat_$cat")
         waitFor { exists("obj_item_${free.id}") }
         assertFalse(exists("obj_item_${outside.id}"))
         shot("v42-01-objects-sheet")

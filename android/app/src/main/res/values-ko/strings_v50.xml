@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- v50 düzenleyici, çeviri ve çizgi roman iyileştirmeleri -->
+<resources>
+    <string name="lines_krackle">에너지 크래클</string>
+    <string name="lines_impact">충격 별</string>
+    <string name="lines_surprise">놀람 선</string>
+    <string name="lines_electric">전기</string>
+    <string name="lines_benday">벤데이 도트</string>
+    <string name="lines_gloom">우울 세로선</string>
+    <string name="lines_sparkle">반짝이</string>
+    <string name="lines_crosshatch">크로스해칭</string>
+    <string name="lines_speed_dense">촘촘한 속도선</string>
+    <string name="v50_lines_style_comic">코믹</string>
+    <string name="v50_lines_style_manga">망가</string>
+    <string name="v50_lines_add">추가: %1$s</string>
+    <string name="v50_lines_reset">초기화</string>
+</resources>

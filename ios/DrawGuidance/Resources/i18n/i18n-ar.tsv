@@ -3097,3 +3097,257 @@ Alıştırma	تمرين
 Alıştırma (ileri)	تمرين (متقدم)
 Apple: Firebase'te Apple sağlayıcısı açık değil	Apple: موفّر Apple غير مفعّل في Firebase
 Bu e-posta adresi Google hesabıyla kayıtlı; Google ile giriş yapın	هذا البريد الإلكتروني مسجّل بحساب Google؛ سجّل الدخول باستخدام Google
+Fizik · Dinamik · Ders notu	فيزياء · ديناميكا · ملاحظات الدرس
+1. EYLEMSİZLİK YASASI	1. قانون القصور الذاتي
+Net kuvvet sıfırsa duran cisim durur, hareket eden cisim sabit hızla doğrusal hareketine devam eder.	إذا كانت القوة المحصلة صفرًا يبقى الجسم الساكن ساكنًا، ويستمر الجسم المتحرك في الحركة في خط مستقيم بسرعة ثابتة.
+2. TEMEL YASA	2. القانون الأساسي
+Net kuvvet, kütle ile ivmenin çarpımına eşittir. Kuvvet ile ivme aynı yöndedir.	القوة المحصلة تساوي حاصل ضرب الكتلة في التسارع. القوة والتسارع في الاتجاه نفسه.
+3. ETKİ–TEPKİ YASASI	3. قانون الفعل ورد الفعل
+Bir cisim ötekine kuvvet uygularsa öteki de ona eşit büyüklükte ve zıt yönde kuvvet uygular. Kuvvetler farklı cisimlere etki ettiği için birbirini yok etmez.	إذا أثّر جسم بقوة على جسم آخر، أثّر الآخر عليه بقوة مساوية في المقدار ومعاكسة في الاتجاه. ولأن القوتين تؤثران في جسمين مختلفين فلا تلغي إحداهما الأخرى.
+ANAHTAR SORULAR	أسئلة رئيسية
+Konu: Dinamik\nTarih: ____	الموضوع: الديناميكا\nالتاريخ: ____
+Cisim neden hareketini sürdürür?	لماذا يستمر الجسم في حركته؟
+F = m·a neyi anlatır? Birimler?	ماذا يصف F = m·a؟ وما الوحدات؟
+Sürtünme ivmeyi nasıl değiştirir?	كيف يغيّر الاحتكاك التسارع؟
+Etki ve tepki birbirini yok eder mi?	هل يلغي الفعل ورد الفعل أحدهما الآخر؟
+ÖZET	الخلاصة
+Kuvvet hareketi değil, hareketteki değişimi (ivmeyi) belirler: a = F_net / m. Kuvvetler her zaman çiftler hâlinde oluşur; serbest cisim diyagramında yalnız cisme etki edenler çizilir.	القوة لا تحدد الحركة بل التغير فيها (التسارع): a = F_net / m. تنشأ القوى دائمًا في أزواج، ولا يُرسم في مخطط الجسم الحر إلا ما يؤثر في الجسم.
+Deney Raporu: Basit Sarkacın Periyodu	تقرير تجربة: زمن دورة البندول البسيط
+Amaç: Periyodun ip uzunluğuna bağlılığını ölçmek.   Hipotez: T, √L ile artar; kütleye bağlı değildir.	الهدف: قياس اعتماد زمن الدورة على طول الخيط.   الفرضية: يزداد T مع √L ولا يعتمد على الكتلة.
+Ad: ______________   ·   Sınıf: ______   ·   Tarih: ________	الاسم: ______________   ·   الصف: ______   ·   التاريخ: ________
+MALZEMELER	الأدوات
+• Statif ve ip\n• 50 g ve 100 g kütle\n• Kronometre\n• Şerit metre	• حامل وخيط\n• كتلتان 50 غ و100 غ\n• ساعة إيقاف\n• شريط قياس
+YÖNTEM	الطريقة
+1. İpi 20 cm uzunluğa ayarla.\n2. Kütleyi 10°'den küçük açıyla bırak.\n3. 10 tam salınımın süresini ölç, 10'a böl.\n4. Ölçümü 20 cm artırarak 100 cm'ye kadar tekrarla.\n5. Kütleyi değiştirip bir ölçümü yinele.	1. اضبط طول الخيط على 20 سم.\n2. اترك الكتلة بزاوية أقل من 10°.\n3. قِس زمن 10 اهتزازات كاملة واقسمه على 10.\n4. كرّر القياس بزيادة 20 سم حتى 100 سم.\n5. غيّر الكتلة وأعد قياسًا واحدًا.
+VERİLER	البيانات
+Ölçülen periyotlar T = 2π√(L/g) ile uyumludur: uzunluk 4 katına çıkınca periyot 2 katına çıkar. Kütle değişince periyot değişmedi; hipotez doğrulandı.	تتوافق الأزمنة المقيسة مع T = 2π√(L/g): عندما يتضاعف الطول 4 مرات يتضاعف زمن الدورة مرتين. لم يتغير زمن الدورة بتغير الكتلة؛ تأكدت الفرضية.
+HATA KAYNAKLARI	مصادر الخطأ
+• Kronometreyi başlatma ve durdurma gecikmesi\n• Büyük açılarda yaklaşımın bozulması\n• Hava direnci	• التأخر في تشغيل ساعة الإيقاف وإيقافها\n• عدم صحة التقريب عند الزوايا الكبيرة\n• مقاومة الهواء
+İkinci Dereceden Denklemler	المعادلات التربيعية
+Çalışma kâğıdı   ·   Ad: ______________   ·   Tarih: ________	ورقة عمل   ·   الاسم: ______________   ·   التاريخ: ________
+Hedef: ax² + bx + c = 0 denklemini çarpanlara ayırarak ve diskriminantla çözmek.	الهدف: حل المعادلة ax² + bx + c = 0 بالتحليل إلى عوامل وباستخدام المميّز.
+FORMÜLLER	الصيغ
+Δ > 0: iki farklı kök   ·   Δ = 0: çakışık kök   ·   Δ < 0: gerçek kök yok	Δ > 0: جذران مختلفان   ·   Δ = 0: جذر مكرر   ·   Δ < 0: لا جذور حقيقية
+ÇÖZÜMLÜ ÖRNEK	مثال محلول
+Ç = { 1, 3 }	م.ح = { 1, 3 }
+Kökler, parabolün x eksenini kestiği noktalardır: x = 1 ve x = 3. Tepe noktası (2, −1).	الجذران هما نقطتا تقاطع القطع المكافئ مع محور x: ‏x = 1 و x = 3. الرأس (2, −1).
+ALIŞTIRMALAR	تمارين
+☐ x² − 5x + 6 = 0\n☐ 2x² + 3x − 2 = 0\n☐ x² + 6x + 9 = 0\n☐ x² + x + 1 = 0  (Δ < 0 ise?)	☐ x² − 5x + 6 = 0\n☐ 2x² + 3x − 2 = 0\n☐ x² + 6x + 9 = 0\n☐ x² + x + 1 = 0  (ماذا لو Δ < 0؟)
+Haftalık Ürün Toplantısı	اجتماع المنتج الأسبوعي
+Tarih: __.__.____   ·   Saat: 10.00–10.45   ·   Katılımcılar: Ayşe, Can, Ece, Mert	التاريخ: __.__.____   ·   الوقت: 10:00–10:45   ·   الحضور: Ayşe، Can، Ece، Mert
+Amaç: Sürüm takvimini kesinleştirmek ve geri bildirimleri önceliklendirmek.	الهدف: اعتماد جدول الإصدار وترتيب أولويات الملاحظات.
+GÜNDEM	جدول الأعمال
+1. Geçen haftanın değerlendirmesi\n2. Yeni sürüm takvimi\n3. Kullanıcı geri bildirimleri\n4. Riskler ve engeller	1. مراجعة الأسبوع الماضي\n2. جدول الإصدار الجديد\n3. ملاحظات المستخدمين\n4. المخاطر والعوائق
+NOTLAR	ملاحظات
+• Geri bildirimlerin çoğu arama hızıyla ilgili.\n• Ödeme ekranında iki hata bildirildi.\n• Test ortamı perşembeye hazır olacak.	• معظم الملاحظات تتعلق بسرعة البحث.\n• أُبلغ عن خطأين في شاشة الدفع.\n• ستكون بيئة الاختبار جاهزة يوم الخميس.
+KARARLAR	القرارات
+• Sürüm 20 Mart'ta mağazaya gönderilecek.\n• Arama iyileştirmesi bu sürüme alınacak.	• سيُرسل الإصدار إلى المتجر في 20 مارس.\n• سيُضاف تحسين البحث إلى هذا الإصدار.
+SÜRÜM TAKVİMİ	جدول الإصدار
+YAPILACAKLAR	المهام
+☐ Sürüm notlarını yaz — Ayşe · 14 Mart\n☐ Test planını güncelle — Mert · 15 Mart\n☐ Ödeme hatalarını düzelt — Can · 16 Mart\n☐ Anket sonuçlarını özetle — Ece · 17 Mart	☐ كتابة ملاحظات الإصدار — Ayşe · 14 مارس\n☐ تحديث خطة الاختبار — Mert · 15 مارس\n☐ إصلاح أخطاء الدفع — Can · 16 مارس\n☐ تلخيص نتائج الاستبيان — Ece · 17 مارس
+AÇIK SORULAR	أسئلة مفتوحة
+• Arama için ek sunucu gerekli mi?\n• Mağaza görselleri kimde?	• هل نحتاج إلى خادم إضافي للبحث؟\n• مع من صور المتجر؟
+SONRAKİ TOPLANTI	الاجتماع القادم
+Pazartesi 10.00 · Konu: test sonuçları	الاثنين 10:00 · الموضوع: نتائج الاختبار
+Fotosentez · Zihin Haritası	البناء الضوئي · خريطة ذهنية
+Biyoloji · Canlılarda enerji dönüşümleri	الأحياء · تحولات الطاقة في الكائنات الحية
+TEPKİME	التفاعل
+(ışık ve klorofil varlığında, kloroplastta)	(بوجود الضوء واليخضور، في البلاستيدة الخضراء)
+ANAHTAR KAVRAMLAR	مفاهيم أساسية
+• Klorofil: ışığı soğuran yeşil pigment\n• Kloroplast: fotosentezin yapıldığı organel\n• Stoma: gaz alışverişini sağlayan gözenek\n• ATP: hücrenin enerji taşıyıcısı	• اليخضور: الصبغة الخضراء التي تمتص الضوء\n• البلاستيدة الخضراء: العُضيّة التي يحدث فيها البناء الضوئي\n• الثغر: الفتحة التي يتم عبرها تبادل الغازات\n• ATP: ناقل الطاقة في الخلية
+Su Döngüsü	دورة الماء
+Fen bilimleri · Ders notu · Tarih: ________	العلوم · ملاحظات الدرس · التاريخ: ________
+• Buharlaşma: Güneş'in ısıttığı su buhar olup havaya yükselir.\n• Yoğuşma: Yükselen buhar soğuyup küçük damlacıklara dönüşür, bulutlar oluşur.\n• Yağış: Damlacıklar büyüyüp ağırlaşınca yağmur, kar ya da dolu olarak düşer.\n• Toplanma: Su derelerde, göllerde, denizlerde ve yer altında birikir.	• التبخر: يتحول الماء الذي تسخنه الشمس إلى بخار ويرتفع.\n• التكثف: يبرد البخار الصاعد ويتحول إلى قطيرات صغيرة فتتكوّن السحب.\n• الهطول: تكبر القطيرات وتثقل فتسقط مطرًا أو ثلجًا أو بَرَدًا.\n• التجمّع: يتجمع الماء في الجداول والبحيرات والبحار وتحت الأرض.
+Su, Güneş'ten aldığı enerjiyle sürekli yer değiştirir; miktarı değişmez, yalnız hâli (sıvı, gaz, katı) ve yeri değişir.	يتنقل الماء باستمرار بفضل طاقة الشمس؛ لا تتغير كميته، بل تتغير حالته (سائل، غاز، صلب) ومكانه فقط.
+Soru: Bulutlar neden yüksekte oluşur?	سؤال: لماذا تتكوّن السحب في الأعلى؟
+Bu haftanın yapılacakları	مهام هذا الأسبوع
+Tarih: __.__.____ – __.__.____	التاريخ: __.__.____ – __.__.____
+OKUL	المدرسة
+☐ Matematik ödevi\n☐ Fen deney raporu\n☐ Kitap okuma (her gün 30 dakika)\n☐ Yabancı dil kelime tekrarı	☐ واجب الرياضيات\n☐ تقرير تجربة العلوم\n☐ القراءة (30 دقيقة يوميًا)\n☐ مراجعة مفردات اللغة الأجنبية
+EV	المنزل
+☐ Odayı toplamak\n☐ Bitkileri sulamak\n☐ Çantayı hazırlamak	☐ ترتيب الغرفة\n☐ سقي النباتات\n☐ تجهيز الحقيبة
+KENDİM İÇİN	لنفسي
+☐ Spor ya da yürüyüş\n☐ Resim çizmek\n☐ Erken uyumak	☐ رياضة أو مشي\n☐ الرسم\n☐ النوم مبكرًا
+En önemli üç iş: ______________________	أهم ثلاث مهام: ______________________
+Haftalık Plan	الخطة الأسبوعية
+PAZARTESİ	الاثنين
+SALI	الثلاثاء
+ÇARŞAMBA	الأربعاء
+PERŞEMBE	الخميس
+CUMA	الجمعة
+CUMARTESİ	السبت
+PAZAR	الأحد
+oku	قراءة
+yaz	كتابة
+Müşteri	العميل
+ad	الاسم
+e-posta	البريد
+Sipariş	الطلب
+müşteri_id	customer_id
+tarih	التاريخ
+toplam	الإجمالي
+Sipariş kalemi	بند الطلب
+sipariş_id	order_id
+ürün_id	product_id
+adet	الكمية
+Ürün	المنتج
+fiyat	السعر
+verir	يقدّم
+Varlık	كيان
+eşit(o): Bool	equals(o): Bool
+arayüz»	interface»
+Depo	مستودع
+bul(id): T	find(id): T
+kaydet(t: T)	save(t: T)
+ad: String	name: String
+e-posta: String	email: String
+giriş(): Bool	login(): Bool
+KullanıcıDeposu	UserRepository
+bul(id): Kullanıcı	find(id): User
+sil(id)	delete(id)
+HATA	خطأ
+DESTEK	دعم
+Giriş sayfası	صفحة الدخول
+Arama filtresi	مرشح البحث
+Ödeme API	واجهة الدفع
+Bildirimler	الإشعارات
+Profil	الملف الشخصي
+Tema	السمة
+ETKİNLİK	نشاط
+Veriyi bul	العثور على البيانات
+Rapor kur	إنشاء تقرير
+Paylaş	مشاركة
+Güven	الثقة
+SONRA	لاحقًا
+Katalog arama	البحث في الفهرس
+Hazır şablon	قالب جاهز
+Bağlantı paylaş	مشاركة الرابط
+Satır izinleri	أذونات الصفوف
+Kayıtlı sorgular	الاستعلامات المحفوظة
+Grafik türleri	أنواع المخططات
+Zamanlanmış e-posta	بريد مجدول
+KENAR	الحافة
+statik	ثابت
+Çalışan	عامل
+YÖNETİLEN	مُدار
+RDS birincil	RDS أساسي
+RDS yedek	RDS نسخة
+KUYRUK	طابور
+PROJE	مشروع
+DOSYA	ملف
+Sunum	العرض
+Uygulama	التطبيق
+uygulama	تطبيق
+Etki alanı	النطاق
+iş kuralları	قواعد العمل
+Altyapı	البنية التحتية
+Topla	اجمع
+sinyaller	إشارات
+Araştır	ابحث
+kanıt	أدلة
+insan onaylar	موافقة بشرية
+Uygula	طبّق
+iş çıkar	ينجز العمل
+Ölç	قِس
+sonuçlar	النتائج
+Öğren	تعلّم
+yöntem güncellenir	تحديث الطريقة
+Ortak hafıza	ذاكرة مشتركة
+tek kayıt, her tur	سجل واحد لكل دورة
+db-istemci	db-client
+TOPLAMA	الجمع
+YAYIN	النشر
+Anket sistemi	نظام الاستبيان
+Eski uygulamalar	تطبيقات قديمة
+yönetim portalları	بوابات الإدارة
+Nüfus kaydı	سجل السكان
+dış kaynak	مصدر خارجي
+Ortak sürücü	محرك مشترك
+sürüm denetimi yok	بلا تحكم بالإصدارات
+Analist makineleri	أجهزة المحللين
+şirket içi	داخلي
+Eski portal	بوابة قديمة
+elle darboğaz	اختناق يدوي
+Web sitesi	الموقع
+statik sayfalar	صفحات ثابتة
+Bakanlıklar	الوزارات
+~6 kurum	~6 جهات
+KAYNAKLAR	المصادر
+ALIM	الاستيعاب
+DEPOLAMA	التخزين
+KOPYALA	نسخ
+Web formları	نماذج الويب
+zamanlayıcı	المجدول
+alım	استيعاب
+nesne deposu	مخزن الكائنات
+SORGU	استعلام
+Defterler	دفاتر
+panolar	لوحات
+HAM	خام
+ham-kova	raw-bucket
+Veri mühendisi	مهندس بيانات
+ANONİM	مجهول الهوية
+anonim-kova	anon-bucket
+HAZIRLIK	التجهيز
+hazırlık-kova	staging-bucket
+temiz	نظيف
+ağırlıklı	مرجّح
+Veri bilimci	عالم بيانات
+TOPLU	مجمّع
+toplu-kova	agg-bucket
+göstergeler	المؤشرات
+ARŞİV	الأرشيف
+arşiv-kova	archive-bucket
+soğuk katman	طبقة باردة
+TOPLA	اجمع
+DEPOLA	خزّن
+YAYINLA	انشر
+YÖN	إدارة
+Proje kurulumu	إعداد المشروع
+Erişim denetimi	التحكم في الوصول
+MÜH	هندسة
+Kaynak alımı	استيعاب المصدر
+Ham depo	مخزن خام
+Temizle	نظّف
+BİL	علوم
+Keşfet ve modelle	استكشف ونمذج
+Bulguları yayınla	انشر النتائج
+TÜK	مستهلك
+Sorgula	استعلم
+Veritabanları	قواعد البيانات
+dosya	ملف
+E-posta	البريد
+birleşik SQL	SQL موحّد
+madalyon depo	مخزن الميدالية
+defter	دفتر
+Masaüstü	سطح المكتب
+Raporlar	التقارير
+Sipariş API	واجهة الطلبات
+doğrudan gönderim	إرسال مباشر
+kuyruğa yazar	يكتب إلى الطابور
+doğrudan → kuyruk	مباشر ← طابور
+eklendi	أُضيف
+kaldırıldı	أُزيل
+Yalnız SELECT	SELECT فقط
+cam	زجاج
+Ana kart	اللوحة الأم
+işlemci	المعالج
+bellek	الذاكرة
+Kasa	الهيكل
+alüminyum	ألومنيوم
+Otopark	موقف السيارات
+1 kat	طابق واحد
+2 kat	طابقان
+4 kat	4 طوابق
+Yeni iş	مهمة جديدة
+E-POSTA	البريد
+arama	البحث
+profil	الملف
+Oku/Yaz	قراءة/كتابة
+Mar	مارس
+May	مايو
+TIK TAK	تك تك
+DUYGU	الشعور
+EYLEM	الإجراء
+SIKINTI	المعاناة
+ZAMAN KAYBI	مضيعة للوقت

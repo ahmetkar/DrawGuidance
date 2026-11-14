@@ -603,6 +603,15 @@ fun linesLabel(kind: ComicLinesKind): String = stringResource(
         ComicLinesKind.BEAMS -> R.string.lines_beams
         ComicLinesKind.MANGA_DENSE -> R.string.lines_manga_dense
         ComicLinesKind.ANIME_SOFT -> R.string.lines_anime_soft
+        ComicLinesKind.KRACKLE -> R.string.lines_krackle
+        ComicLinesKind.IMPACT -> R.string.lines_impact
+        ComicLinesKind.SURPRISE -> R.string.lines_surprise
+        ComicLinesKind.ELECTRIC -> R.string.lines_electric
+        ComicLinesKind.BENDAY -> R.string.lines_benday
+        ComicLinesKind.GLOOM -> R.string.lines_gloom
+        ComicLinesKind.SPARKLE -> R.string.lines_sparkle
+        ComicLinesKind.CROSSHATCH -> R.string.lines_crosshatch
+        ComicLinesKind.SPEED_DENSE -> R.string.lines_speed_dense
     },
 )
 

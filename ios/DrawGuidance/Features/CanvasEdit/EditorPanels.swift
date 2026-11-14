@@ -24,7 +24,7 @@ struct ElementsPanel: View {
                 ToolbarItem(placement: .confirmationAction) { Button(L("close")) { dismiss() } }
             }
         }
-        .presentationDetents([.medium, .large])
+        .dockedEditorSheet()
     }
 
     @ViewBuilder private func rowView(_ row: ElementRow) -> some View {
@@ -108,7 +108,7 @@ struct LayersPanel: View {
                 Button(L("apply_button")) { if let r = renaming { vm.layers.rename(r.id, newName) }; renaming = nil }
             }
         }
-        .presentationDetents([.medium, .large])
+        .dockedEditorSheet()
     }
 }
 
@@ -266,7 +266,7 @@ struct GuideSheet: View {
             .navigationTitle(L("add_guide"))
             .toolbar { ToolbarItem(placement: .confirmationAction) { Button(L("close")) { dismiss() } } }
         }
-        .presentationDetents([.medium, .large])
+        .dockedEditorSheet()
     }
 }
 
@@ -305,7 +305,7 @@ struct BackgroundSheet: View {
             .navigationBarTitleDisplayMode(.inline)
             .toolbar { ToolbarItem(placement: .confirmationAction) { Button(L("close")) { dismiss() } } }
         }
-        .presentationDetents([.medium, .large])
+        .dockedEditorSheet()
     }
 }
 
@@ -421,6 +421,7 @@ struct ComicInsertSheet: View {
             .navigationBarTitleDisplayMode(.inline)
             .toolbar { ToolbarItem(placement: .cancellationAction) { Button(L("close")) { dismiss() } } }
         }
+        .dockedEditorSheet()
         .sheet(isPresented: $premiumOpen) { PremiumRequiredSheet() }
     }
 
@@ -439,20 +440,11 @@ struct ComicInsertSheet: View {
         case .images:
             EmptyView()
         case .lines:
-            // v29 hız ve odak çizgileri; BURST'ten sonrakiler Premium (Android `PremiumRules.isAdvancedLines`)
-            ForEach(ComicLinesKind.allCases, id: \.self) { k in
-                let locked = k.ordinal > ComicLinesKind.BURST.ordinal && !sub.allows(.COMIC_EFFECTS, .COMIC)
-                Button {
-                    if locked { premiumOpen = true } else { vm.comic.insertLines(k); dismiss() }
-                } label: {
-                    HStack {
-                        Text(Self.linesTitle(k)).foregroundStyle(.primary)
-                        Spacer()
-                        if locked { Image(systemName: "crown.fill").foregroundStyle(.yellow) }
-                    }
-                }
-                .accessibilityIdentifier("lines_\(k.rawValue)")
-            }
+            // v50 çizgi roman / manga bölümleri; her tür kendi ayarlarıyla (ortak ayar yok). BURST'ten sonrakiler Premium
+            // (Android `PremiumRules.isAdvancedLines`).
+            LinesInsertSection(onInsert: { k, o in vm.comic.insertLines(k, o); dismiss() },
+                               locked: { k in k.ordinal > ComicLinesKind.BURST.ordinal && !sub.allows(.COMIC_EFFECTS, .COMIC) },
+                               onLocked: { premiumOpen = true })
         case .effects:
             ForEach(ComicEffects.all) { e in
                 Button(e.title) { vm.insertEffect(e, options: EffectOptions()); dismiss() }
@@ -463,6 +455,98 @@ struct ComicInsertSheet: View {
                     Text(p.text).font(.title3.weight(.heavy)).foregroundStyle(Color(hex: p.colors.first ?? "#000000") ?? .primary)
                 }
             }
+        }
+    }
+}
+
+/// v50 her odak çizgisi türünün kendi ayarları (pencere kapansa da uygulama açıkken hatırlanır; Android `LinesPresetMemory`).
+enum LinesPresetMemory {
+    nonisolated(unsafe) static var options: [ComicLinesKind: LinesOptions] = [:]
+    nonisolated(unsafe) static var activeKind: ComicLinesKind = .FOCUS
+    nonisolated(unsafe) static var style: ComicLinesStyle = .MANGA
+
+    static func defaultFor(_ k: ComicLinesKind) -> LinesOptions {
+        let d = ComicLines.defaults(k)
+        return LinesOptions(density: d.density, length: d.length, thickness: d.thickness)
+    }
+
+    static func get(_ k: ComicLinesKind) -> LinesOptions { options[k] ?? defaultFor(k) }
+}
+
+/// v50 çizgi ekleme bölümü: tarz (Çizgi roman / Manga), tür ve seçili türün kendi ayarları.
+struct LinesInsertSection: View {
+    let onInsert: (ComicLinesKind, LinesOptions) -> Void
+    let locked: (ComicLinesKind) -> Bool
+    let onLocked: () -> Void
+    @State private var style: ComicLinesStyle = LinesPresetMemory.style
+    @State private var kind: ComicLinesKind = LinesPresetMemory.activeKind
+    @State private var opts: LinesOptions = LinesPresetMemory.get(LinesPresetMemory.activeKind)
+
+    private static func title(_ k: ComicLinesKind) -> String { L("lines_" + k.rawValue.lowercased()) }
+
+    private func select(_ k: ComicLinesKind) {
+        LinesPresetMemory.options[kind] = opts
+        kind = k
+        LinesPresetMemory.activeKind = k
+        opts = LinesPresetMemory.get(k)
+    }
+
+    var body: some View {
+        Section(footer: Text(L("lines_hint"))) {
+            Picker("", selection: $style) {
+                Text(L("v50_lines_style_comic")).tag(ComicLinesStyle.COMIC)
+                Text(L("v50_lines_style_manga")).tag(ComicLinesStyle.MANGA)
+            }
+            .pickerStyle(.segmented)
+            .accessibilityIdentifier("lines_style")
+            .onChange(of: style) { _, s in
+                LinesPresetMemory.style = s
+                if ComicLines.style(kind) != s, let first = ComicLines.kinds(s).first { select(first) }
+            }
+            ForEach(ComicLines.kinds(style), id: \.self) { k in
+                Button { select(k) } label: {
+                    HStack {
+                        Text(Self.title(k)).foregroundStyle(.primary)
+                        Spacer()
+                        if locked(k) { Image(systemName: "crown.fill").foregroundStyle(.yellow) }
+                        if k == kind { Image(systemName: "checkmark").foregroundStyle(Color.accentColor) }
+                    }
+                }
+                .accessibilityIdentifier("lines_\(k.rawValue)")
+            }
+        }
+        Section(header: Text(Self.title(kind))) {
+            slider(L("lines_density_action"), $opts.density, ComicLines.MIN_DENSITY...ComicLines.MAX_DENSITY)
+            slider(L("lines_length"), $opts.length, ComicLines.MIN_LENGTH...ComicLines.MAX_LENGTH)
+            slider(L("lines_thickness"), $opts.thickness, ComicController.MIN_THICKNESS...ComicController.MAX_THICKNESS)
+            if ComicLines.usesFocus(kind) {
+                slider(L("lines_focus_x"), $opts.focusX, 0...1)
+                slider(L("lines_focus_y"), $opts.focusY, 0...1)
+            }
+            if ComicLines.usesAngle(kind) { slider(L("lines_angle"), $opts.angle, -180...180) }
+            Button {
+                LinesPresetMemory.options[kind] = opts
+                if locked(kind) { onLocked() } else { onInsert(kind, opts) }
+            } label: {
+                HStack {
+                    Text(L("v50_lines_add", Self.title(kind))).fontWeight(.semibold)
+                    if locked(kind) { Spacer(); Image(systemName: "crown.fill").foregroundStyle(.yellow) }
+                }
+            }
+            .accessibilityIdentifier("lines_add")
+            Button(L("v50_lines_reset")) {
+                opts = LinesPresetMemory.defaultFor(kind)
+                LinesPresetMemory.options[kind] = nil
+            }
+            .accessibilityIdentifier("lines_reset")
+        }
+        .onDisappear { LinesPresetMemory.options[kind] = opts }
+    }
+
+    private func slider(_ label: String, _ value: Binding<Float>, _ range: ClosedRange<Float>) -> some View {
+        VStack(alignment: .leading, spacing: 2) {
+            Text(label).font(.footnote).foregroundStyle(.secondary)
+            Slider(value: value, in: range)
         }
     }
 }

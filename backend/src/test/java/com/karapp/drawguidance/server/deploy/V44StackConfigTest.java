@@ -36,7 +36,7 @@ class V44StackConfigTest {
         assertEquals("/run/secrets/gcs.json", env.get("GCS_SERVICE_ACCOUNT_JSON"));
         assertEquals("/run/secrets/device_data_key", env.get("DEVICE_DATA_KEY_FILE"));
         assertFalse(env.containsKey("DEVICE_DATA_KEY"), "anahtar düz değer olarak verilmez");
-        assertEquals("ahmetkar8040@gmail.com", env.get("BILLING_EXEMPT_EMAILS"));
+        assertFalse(env.containsKey("BILLING_EXEMPT_EMAILS"), "v50 istisna hesabı kaldırıldı");
         // Parola, anahtar, webhook gibi değerler ortamda düz yazılmaz (yalnız *_FILE)
         for (String k : env.keySet()) {
             if (k.endsWith("_FILE")) assertTrue(String.valueOf(env.get(k)).startsWith("/run/secrets/"), k);
@@ -62,7 +62,7 @@ class V44StackConfigTest {
     void versionAndExemptConfig() throws Exception {
         String yml = Files.readString(Path.of("src/main/resources/application.yml"));
         assertTrue(yml.contains("version: 44.2.0"));
-        assertTrue(yml.contains("exempt-emails: ${BILLING_EXEMPT_EMAILS:"));
+        assertFalse(yml.contains("exempt-emails"), "v50 istisna hesabı kaldırıldı");
         String prod = Files.readString(Path.of("src/main/resources/application-prod.yml"));
         assertTrue(prod.contains("device-key: ${DEVICE_DATA_KEY}"), "üretimde anahtar zorunlu (öntanımlı yok)");
     }

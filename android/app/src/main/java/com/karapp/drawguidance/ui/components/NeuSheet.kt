@@ -14,6 +14,13 @@ import com.karapp.drawguidance.ui.theme.NeuTheme
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun NeuSheet(onDismiss: () -> Unit, content: @Composable ColumnScope.() -> Unit) {
+    // v50 dikey ekranda düzenleyicinin pencereleri çizim alanının altında küçük, kalıcı olmayan pencere (seçim menüsü
+    // de kullanılabilir; son dokunulan üstte)
+    val docked = com.karapp.drawguidance.ui.screens.canvasedit.components.dockedSheetHostOrNull()
+    if (docked != null) {
+        com.karapp.drawguidance.ui.screens.canvasedit.components.DockedSheet(docked, onDismiss, content)
+        return
+    }
     // v45 tablette düzenleyicinin pencereleri sürüklenebilir pencere olarak açılır (telefonda alt sayfa)
     val floating = com.karapp.drawguidance.ui.screens.canvasedit.components.LocalFloatingSheets.current
     if (floating != null) {

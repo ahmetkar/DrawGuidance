@@ -7,18 +7,18 @@ Kaynak dosya adları sahibin verdiği zip dosyalarındaki adlardır (karakter.zi
 LANGS = ["tr", "en", "ar", "ja", "ko", "ru", "zh"]
 
 THEMES = [
-    ("okul", ["Okul", "School", "المدرسة", "学校", "학교", "Школа", "校园"]),
-    ("gunluk", ["Günlük Hayat", "Everyday Life", "الحياة اليومية", "日常生活", "일상", "Повседневная жизнь", "日常生活"]),
-    ("meslek", ["Meslekler", "Professions", "المهن", "職業", "직업", "Профессии", "职业"]),
-    ("tarih", ["Tarih", "History", "التاريخ", "歴史", "역사", "История", "历史"]),
-    ("askeri", ["Askeri", "Military", "عسكري", "軍事", "군사", "Военные", "军事"]),
-    ("bilimkurgu", ["Bilim Kurgu", "Sci-Fi", "خيال علمي", "SF", "SF", "Фантастика", "科幻"]),
-    ("fantastik", ["Fantastik", "Fantasy", "فانتازيا", "ファンタジー", "판타지", "Фэнтези", "奇幻"]),
-    ("kahraman", ["Süper Kahraman", "Superhero", "بطل خارق", "スーパーヒーロー", "슈퍼히어로", "Супергерой", "超级英雄"]),
-    ("spor", ["Spor", "Sports", "رياضة", "スポーツ", "스포츠", "Спорт", "体育"]),
+    ("okul", ["Okul ve gençlik", "School & youth", "المدرسة والشباب", "学園・青春", "학교·청춘", "Школа и юность", "校园青春"]),
+    ("gunluk", ["Şehir ve ev", "City & home", "المدينة والمنزل", "街と家", "도시·집", "Город и дом", "城市与家"]),
+    ("meslek", ["Uzman karakterler", "Specialists", "شخصيات متخصصة", "専門家キャラ", "전문가 캐릭터", "Специалисты", "专业人士"]),
+    ("tarih", ["Tarihî dönem", "Historical era", "حقبة تاريخية", "歴史の時代", "역사 시대", "Историческая эпоха", "历史时代"]),
+    ("askeri", ["Savaş ve ordu", "War & army", "الحرب والجيش", "戦争・軍隊", "전쟁·군대", "Война и армия", "战争与军队"]),
+    ("bilimkurgu", ["Uzay ve gelecek", "Space & future", "الفضاء والمستقبل", "宇宙・未来", "우주·미래", "Космос и будущее", "太空与未来"]),
+    ("fantastik", ["Büyü ve fantastik", "Magic & fantasy", "السحر والفانتازيا", "魔法・ファンタジー", "마법·판타지", "Магия и фэнтези", "魔法与奇幻"]),
+    ("kahraman", ["Süper kahramanlar", "Superheroes", "أبطال خارقون", "スーパーヒーロー", "슈퍼히어로", "Супергерои", "超级英雄"]),
+    ("spor", ["Spor ve dövüş", "Sports & fighting", "الرياضة والقتال", "スポーツ・格闘", "스포츠·격투", "Спорт и бои", "运动与格斗"]),
     ("vahsibati", ["Vahşi Batı", "Wild West", "الغرب الأمريكي", "西部劇", "서부극", "Дикий Запад", "西部"]),
-    ("polisiye", ["Polisiye", "Crime", "بوليسي", "刑事・探偵", "범죄·탐정", "Детектив", "侦探"]),
-    ("steampunk", ["Steampunk", "Steampunk", "ستيمبانك", "スチームパンク", "스팀펑크", "Стимпанк", "蒸汽朋克"]),
+    ("polisiye", ["Suç ve dedektif", "Crime & detective", "الجريمة والتحقيق", "犯罪・探偵", "범죄·탐정", "Преступление и детектив", "犯罪与侦探"]),
+    ("steampunk", ["Buhar ve icat (steampunk)", "Steam & invention (steampunk)", "البخار والاختراع", "蒸気と発明（スチームパンク）", "증기·발명 (스팀펑크)", "Пар и изобретения (стимпанк)", "蒸汽与发明（蒸汽朋克）"]),
 ]
 
 # v40 karakter etiketleri (tr, en, ar, ja, ko, ru, zh): sahibin isteğiyle kişi adı yok; meslek, yaş ya da rol ve
@@ -295,7 +295,7 @@ BG_CATEGORIES = [
     ("sehir", ["Şehir", "City", "المدينة", "街", "도시", "Город", "城市"]),
     ("sokak", ["Sokak", "Street", "الشارع", "通り", "거리", "Улица", "街道"]),
     ("doga_park", ["Doğa/Park", "Nature/Park", "الطبيعة/الحديقة", "自然・公園", "자연/공원", "Природа/Парк", "自然/公园"]),
-    ("okul", ["Okul", "School", "المدرسة", "学校", "학교", "Школа", "学校"]),
+    ("okul", ["Okul ve gençlik", "School & youth", "المدرسة والشباب", "学園・青春", "학교·청춘", "Школа и юность", "校园青春"]),
     ("gece_yagmur", ["Gece/Yağmur", "Night/Rain", "الليل/المطر", "夜・雨", "밤/비", "Ночь/Дождь", "夜晚/雨天"]),
     ("kis", ["Kış", "Winter", "الشتاء", "冬", "겨울", "Зима", "冬天"]),
     ("yikim", ["Yıkım", "Ruins", "الدمار", "廃墟", "폐허", "Руины", "废墟"]),
@@ -433,8 +433,8 @@ BACKGROUNDS += [
 # --- v42 tema paketleri ---
 # Yeni temalar (v40'ın 12 temasına ek)
 THEMES += [
-    ("macera", ["Macera", "Adventure", "مغامرة", "冒険", "모험", "Приключения", "冒险"]),
-    ("kiyamet", ["Kıyamet Sonrası", "Post-Apocalyptic", "ما بعد الكارثة", "終末世界", "포스트 아포칼립스", "Постапокалипсис", "末日废土"]),
+    ("macera", ["Keşif ve macera", "Exploration & adventure", "الاستكشاف والمغامرة", "探検・冒険", "탐험·모험", "Исследования и приключения", "探险与冒险"]),
+    ("kiyamet", ["Kıyamet sonrası", "Post-apocalypse", "ما بعد نهاية العالم", "終末後", "종말 이후", "Постапокалипсис", "末日之后"]),
 ]
 
 # Karakterlerin ana temasına ek tema bağlantıları (çoka-çok)

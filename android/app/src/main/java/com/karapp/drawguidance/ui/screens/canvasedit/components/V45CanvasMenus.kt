@@ -164,6 +164,8 @@ fun SelectionMenu(
     /** v45 true iken Düzenle listesi açılır (iki parmakla basma: eski bağlam menüsünün işlemleri); açılınca [onEditOpened]. */
     openEdit: Boolean = false,
     onEditOpened: () -> Unit = {},
+    /** v50 menüye dokunuldu (dikey ekranda açık alt pencereyle çakışırsa menü üste gelir). */
+    onTouched: () -> Unit = {},
 ) {
     var editOpen by remember(resetKey) { mutableStateOf(false) }
     LaunchedEffect(openEdit, resetKey) {
@@ -180,7 +182,15 @@ fun SelectionMenu(
     Layout(
         modifier = modifier.fillMaxSize(),
         content = {
-            Column(horizontalAlignment = if (rtl) Alignment.Start else Alignment.End, verticalArrangement = Arrangement.spacedBy(6.dp)) {
+            Column(
+                Modifier.pointerInput(Unit) {
+                    awaitEachGesture {
+                        awaitFirstDown(requireUnconsumed = false, pass = androidx.compose.ui.input.pointer.PointerEventPass.Initial)
+                        onTouched()
+                    }
+                },
+                horizontalAlignment = if (rtl) Alignment.Start else Alignment.End, verticalArrangement = Arrangement.spacedBy(6.dp),
+            ) {
                 SelectionMenuRow(shown, tag)
                 if (editOpen && (editItems.isNotEmpty() || editExtra != null)) {
                     CanvasVerticalMenu(editItems, "${tag}_edit_list", stringResource(R.string.v45_selection_edit_menu), onPicked = { editOpen = false }, extra = editExtra)

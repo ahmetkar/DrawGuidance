@@ -3098,3 +3098,257 @@ Alıştırma	練習
 Alıştırma (ileri)	練習（上級）
 Apple: Firebase'te Apple sağlayıcısı açık değil	Apple: FirebaseでAppleプロバイダが有効になっていません
 Bu e-posta adresi Google hesabıyla kayıtlı; Google ile giriş yapın	このメールアドレスはGoogleアカウントで登録されています。Googleでログインしてください
+Fizik · Dinamik · Ders notu	物理 · 力学 · 授業ノート
+1. EYLEMSİZLİK YASASI	1. 慣性の法則
+Net kuvvet sıfırsa duran cisim durur, hareket eden cisim sabit hızla doğrusal hareketine devam eder.	合力がゼロなら、静止している物体は静止し続け、運動している物体は等速直線運動を続ける。
+2. TEMEL YASA	2. 運動方程式
+Net kuvvet, kütle ile ivmenin çarpımına eşittir. Kuvvet ile ivme aynı yöndedir.	合力は質量と加速度の積に等しい。力と加速度は同じ向きである。
+3. ETKİ–TEPKİ YASASI	3. 作用・反作用の法則
+Bir cisim ötekine kuvvet uygularsa öteki de ona eşit büyüklükte ve zıt yönde kuvvet uygular. Kuvvetler farklı cisimlere etki ettiği için birbirini yok etmez.	物体が別の物体に力を及ぼすと、相手も同じ大きさで逆向きの力を及ぼす。力は別々の物体にはたらくので打ち消し合わない。
+ANAHTAR SORULAR	キーとなる問い
+Konu: Dinamik\nTarih: ____	テーマ: 力学\n日付: ____
+Cisim neden hareketini sürdürür?	物体はなぜ運動を続けるのか？
+F = m·a neyi anlatır? Birimler?	F = m·a は何を表す？単位は？
+Sürtünme ivmeyi nasıl değiştirir?	摩擦は加速度をどう変えるか？
+Etki ve tepki birbirini yok eder mi?	作用と反作用は打ち消し合うか？
+ÖZET	まとめ
+Kuvvet hareketi değil, hareketteki değişimi (ivmeyi) belirler: a = F_net / m. Kuvvetler her zaman çiftler hâlinde oluşur; serbest cisim diyagramında yalnız cisme etki edenler çizilir.	力が決めるのは運動そのものではなく運動の変化（加速度）である: a = F_net / m。力は常に対で生じ、自由物体図には物体にはたらく力だけを描く。
+Deney Raporu: Basit Sarkacın Periyodu	実験レポート: 単振り子の周期
+Amaç: Periyodun ip uzunluğuna bağlılığını ölçmek.   Hipotez: T, √L ile artar; kütleye bağlı değildir.	目的: 周期が糸の長さにどう依存するかを測る。   仮説: T は √L とともに増え、質量には依存しない。
+Ad: ______________   ·   Sınıf: ______   ·   Tarih: ________	氏名: ______________   ·   クラス: ______   ·   日付: ________
+MALZEMELER	材料
+• Statif ve ip\n• 50 g ve 100 g kütle\n• Kronometre\n• Şerit metre	• スタンドと糸\n• 50 g と 100 g のおもり\n• ストップウォッチ\n• メジャー
+YÖNTEM	方法
+1. İpi 20 cm uzunluğa ayarla.\n2. Kütleyi 10°'den küçük açıyla bırak.\n3. 10 tam salınımın süresini ölç, 10'a böl.\n4. Ölçümü 20 cm artırarak 100 cm'ye kadar tekrarla.\n5. Kütleyi değiştirip bir ölçümü yinele.	1. 糸の長さを 20 cm にする。\n2. おもりを 10° 未満の角度で放す。\n3. 10 往復の時間を測り 10 で割る。\n4. 20 cm ずつ長くして 100 cm まで繰り返す。\n5. おもりを替えて 1 回測り直す。
+VERİLER	データ
+Ölçülen periyotlar T = 2π√(L/g) ile uyumludur: uzunluk 4 katına çıkınca periyot 2 katına çıkar. Kütle değişince periyot değişmedi; hipotez doğrulandı.	測定した周期は T = 2π√(L/g) と一致する。長さが 4 倍になると周期は 2 倍になる。質量を変えても周期は変わらず、仮説は確かめられた。
+HATA KAYNAKLARI	誤差の原因
+• Kronometreyi başlatma ve durdurma gecikmesi\n• Büyük açılarda yaklaşımın bozulması\n• Hava direnci	• ストップウォッチの開始・停止の遅れ\n• 大きな角度では近似が成り立たない\n• 空気抵抗
+İkinci Dereceden Denklemler	二次方程式
+Çalışma kâğıdı   ·   Ad: ______________   ·   Tarih: ________	ワークシート   ·   氏名: ______________   ·   日付: ________
+Hedef: ax² + bx + c = 0 denklemini çarpanlara ayırarak ve diskriminantla çözmek.	目標: ax² + bx + c = 0 を因数分解と判別式で解く。
+FORMÜLLER	公式
+Δ > 0: iki farklı kök   ·   Δ = 0: çakışık kök   ·   Δ < 0: gerçek kök yok	Δ > 0: 異なる 2 つの解   ·   Δ = 0: 重解   ·   Δ < 0: 実数解なし
+ÇÖZÜMLÜ ÖRNEK	解き方の例
+Ç = { 1, 3 }	解: { 1, 3 }
+Kökler, parabolün x eksenini kestiği noktalardır: x = 1 ve x = 3. Tepe noktası (2, −1).	解は放物線が x 軸と交わる点: x = 1 と x = 3。頂点は (2, −1)。
+ALIŞTIRMALAR	練習問題
+☐ x² − 5x + 6 = 0\n☐ 2x² + 3x − 2 = 0\n☐ x² + 6x + 9 = 0\n☐ x² + x + 1 = 0  (Δ < 0 ise?)	☐ x² − 5x + 6 = 0\n☐ 2x² + 3x − 2 = 0\n☐ x² + 6x + 9 = 0\n☐ x² + x + 1 = 0  （Δ < 0 なら？）
+Haftalık Ürün Toplantısı	週次プロダクト会議
+Tarih: __.__.____   ·   Saat: 10.00–10.45   ·   Katılımcılar: Ayşe, Can, Ece, Mert	日付: __.__.____   ·   時間: 10:00–10:45   ·   参加者: Ayşe、Can、Ece、Mert
+Amaç: Sürüm takvimini kesinleştirmek ve geri bildirimleri önceliklendirmek.	目的: リリース日程を確定し、フィードバックに優先順位をつける。
+GÜNDEM	議題
+1. Geçen haftanın değerlendirmesi\n2. Yeni sürüm takvimi\n3. Kullanıcı geri bildirimleri\n4. Riskler ve engeller	1. 先週の振り返り\n2. 新しいリリース日程\n3. ユーザーのフィードバック\n4. リスクと障害
+NOTLAR	メモ
+• Geri bildirimlerin çoğu arama hızıyla ilgili.\n• Ödeme ekranında iki hata bildirildi.\n• Test ortamı perşembeye hazır olacak.	• フィードバックの多くは検索速度について。\n• 支払い画面で 2 件の不具合が報告された。\n• テスト環境は木曜日までに準備できる。
+KARARLAR	決定事項
+• Sürüm 20 Mart'ta mağazaya gönderilecek.\n• Arama iyileştirmesi bu sürüme alınacak.	• リリースは 3 月 20 日にストアへ提出する。\n• 検索の改善はこのリリースに含める。
+SÜRÜM TAKVİMİ	リリース日程
+YAPILACAKLAR	やること
+☐ Sürüm notlarını yaz — Ayşe · 14 Mart\n☐ Test planını güncelle — Mert · 15 Mart\n☐ Ödeme hatalarını düzelt — Can · 16 Mart\n☐ Anket sonuçlarını özetle — Ece · 17 Mart	☐ リリースノートを書く — Ayşe · 3月14日\n☐ テスト計画を更新 — Mert · 3月15日\n☐ 支払いの不具合を修正 — Can · 3月16日\n☐ アンケート結果をまとめる — Ece · 3月17日
+AÇIK SORULAR	未解決の質問
+• Arama için ek sunucu gerekli mi?\n• Mağaza görselleri kimde?	• 検索用に追加のサーバーが必要か？\n• ストア用画像は誰が担当？
+SONRAKİ TOPLANTI	次回の会議
+Pazartesi 10.00 · Konu: test sonuçları	月曜 10:00 · 議題: テスト結果
+Fotosentez · Zihin Haritası	光合成 · マインドマップ
+Biyoloji · Canlılarda enerji dönüşümleri	生物 · 生物のエネルギー変換
+TEPKİME	反応式
+(ışık ve klorofil varlığında, kloroplastta)	（光とクロロフィルがあるとき、葉緑体で）
+ANAHTAR KAVRAMLAR	キーワード
+• Klorofil: ışığı soğuran yeşil pigment\n• Kloroplast: fotosentezin yapıldığı organel\n• Stoma: gaz alışverişini sağlayan gözenek\n• ATP: hücrenin enerji taşıyıcısı	• クロロフィル: 光を吸収する緑色の色素\n• 葉緑体: 光合成が行われる細胞小器官\n• 気孔: ガス交換を行う穴\n• ATP: 細胞のエネルギーの運び手
+Su Döngüsü	水の循環
+Fen bilimleri · Ders notu · Tarih: ________	理科 · 授業ノート · 日付: ________
+• Buharlaşma: Güneş'in ısıttığı su buhar olup havaya yükselir.\n• Yoğuşma: Yükselen buhar soğuyup küçük damlacıklara dönüşür, bulutlar oluşur.\n• Yağış: Damlacıklar büyüyüp ağırlaşınca yağmur, kar ya da dolu olarak düşer.\n• Toplanma: Su derelerde, göllerde, denizlerde ve yer altında birikir.	• 蒸発: 太陽に温められた水が水蒸気になって上昇する。\n• 凝結: 上昇した水蒸気が冷えて小さな水滴になり、雲ができる。\n• 降水: 水滴が大きく重くなり、雨・雪・ひょうとして降る。\n• 集水: 水は川・湖・海・地下にたまる。
+Su, Güneş'ten aldığı enerjiyle sürekli yer değiştirir; miktarı değişmez, yalnız hâli (sıvı, gaz, katı) ve yeri değişir.	水は太陽のエネルギーで絶えず移動する。量は変わらず、状態（液体・気体・固体）と場所だけが変わる。
+Soru: Bulutlar neden yüksekte oluşur?	問い: 雲はなぜ高いところにできるのか？
+Bu haftanın yapılacakları	今週のやること
+Tarih: __.__.____ – __.__.____	日付: __.__.____ – __.__.____
+OKUL	学校
+☐ Matematik ödevi\n☐ Fen deney raporu\n☐ Kitap okuma (her gün 30 dakika)\n☐ Yabancı dil kelime tekrarı	☐ 数学の宿題\n☐ 理科の実験レポート\n☐ 読書（毎日 30 分）\n☐ 外国語の単語の復習
+EV	家
+☐ Odayı toplamak\n☐ Bitkileri sulamak\n☐ Çantayı hazırlamak	☐ 部屋を片付ける\n☐ 植物に水をやる\n☐ かばんを準備する
+KENDİM İÇİN	自分のために
+☐ Spor ya da yürüyüş\n☐ Resim çizmek\n☐ Erken uyumak	☐ 運動か散歩\n☐ 絵を描く\n☐ 早く寝る
+En önemli üç iş: ______________________	最重要の 3 つ: ______________________
+Haftalık Plan	週間プラン
+PAZARTESİ	月曜日
+SALI	火曜日
+ÇARŞAMBA	水曜日
+PERŞEMBE	木曜日
+CUMA	金曜日
+CUMARTESİ	土曜日
+PAZAR	日曜日
+oku	読む
+yaz	書く
+Müşteri	顧客
+ad	名前
+e-posta	メール
+Sipariş	注文
+müşteri_id	customer_id
+tarih	日付
+toplam	合計
+Sipariş kalemi	注文明細
+sipariş_id	order_id
+ürün_id	product_id
+adet	数量
+Ürün	商品
+fiyat	価格
+verir	行う
+Varlık	エンティティ
+eşit(o): Bool	equals(o): Bool
+arayüz»	interface»
+Depo	リポジトリ
+bul(id): T	find(id): T
+kaydet(t: T)	save(t: T)
+ad: String	name: String
+e-posta: String	email: String
+giriş(): Bool	login(): Bool
+KullanıcıDeposu	UserRepository
+bul(id): Kullanıcı	find(id): User
+sil(id)	delete(id)
+HATA	バグ
+DESTEK	サポート
+Giriş sayfası	ログイン画面
+Arama filtresi	検索フィルター
+Ödeme API	決済API
+Bildirimler	通知
+Profil	プロフィール
+Tema	テーマ
+ETKİNLİK	アクティビティ
+Veriyi bul	データを探す
+Rapor kur	レポート作成
+Paylaş	共有
+Güven	信頼
+SONRA	後で
+Katalog arama	カタログ検索
+Hazır şablon	テンプレート
+Bağlantı paylaş	リンク共有
+Satır izinleri	行の権限
+Kayıtlı sorgular	保存済みクエリ
+Grafik türleri	グラフの種類
+Zamanlanmış e-posta	定期メール
+KENAR	エッジ
+statik	静的
+Çalışan	ワーカー
+YÖNETİLEN	マネージド
+RDS birincil	RDS プライマリ
+RDS yedek	RDS レプリカ
+KUYRUK	キュー
+PROJE	プロジェクト
+DOSYA	ファイル
+Sunum	プレゼンテーション
+Uygulama	アプリケーション
+uygulama	アプリ
+Etki alanı	ドメイン
+iş kuralları	業務ルール
+Altyapı	インフラ
+Topla	収集
+sinyaller	シグナル
+Araştır	調査
+kanıt	根拠
+insan onaylar	人が承認
+Uygula	実行
+iş çıkar	成果を出す
+Ölç	測定
+sonuçlar	結果
+Öğren	学習
+yöntem güncellenir	手法を更新
+Ortak hafıza	共有メモリ
+tek kayıt, her tur	1件の記録、毎周回
+db-istemci	db-client
+TOPLAMA	収集
+YAYIN	公開
+Anket sistemi	調査システム
+Eski uygulamalar	レガシーアプリ
+yönetim portalları	管理ポータル
+Nüfus kaydı	住民登録
+dış kaynak	外部ソース
+Ortak sürücü	共有ドライブ
+sürüm denetimi yok	バージョン管理なし
+Analist makineleri	アナリスト端末
+şirket içi	オンプレミス
+Eski portal	旧ポータル
+elle darboğaz	手作業のボトルネック
+Web sitesi	ウェブサイト
+statik sayfalar	静的ページ
+Bakanlıklar	省庁
+~6 kurum	約6機関
+KAYNAKLAR	ソース
+ALIM	取り込み
+DEPOLAMA	ストレージ
+KOPYALA	コピー
+Web formları	ウェブフォーム
+zamanlayıcı	スケジューラ
+alım	取り込み
+nesne deposu	オブジェクトストア
+SORGU	クエリ
+Defterler	ノートブック
+panolar	ダッシュボード
+HAM	生データ
+ham-kova	raw-bucket
+Veri mühendisi	データエンジニア
+ANONİM	匿名化
+anonim-kova	anon-bucket
+HAZIRLIK	準備
+hazırlık-kova	staging-bucket
+temiz	クリーン
+ağırlıklı	重み付き
+Veri bilimci	データサイエンティスト
+TOPLU	集計
+toplu-kova	agg-bucket
+göstergeler	指標
+ARŞİV	アーカイブ
+arşiv-kova	archive-bucket
+soğuk katman	コールド層
+TOPLA	収集
+DEPOLA	保存
+YAYINLA	公開
+YÖN	管理
+Proje kurulumu	プロジェクト設定
+Erişim denetimi	アクセス制御
+MÜH	エンジ
+Kaynak alımı	ソース取り込み
+Ham depo	生データ保存
+Temizle	クレンジング
+BİL	科学
+Keşfet ve modelle	探索とモデル化
+Bulguları yayınla	結果を公開
+TÜK	利用
+Sorgula	照会
+Veritabanları	データベース
+dosya	ファイル
+E-posta	メール
+birleşik SQL	統合SQL
+madalyon depo	メダリオンストア
+defter	ノートブック
+Masaüstü	デスクトップ
+Raporlar	レポート
+Sipariş API	注文API
+doğrudan gönderim	直接送信
+kuyruğa yazar	キューに書き込む
+doğrudan → kuyruk	直接 → キュー
+eklendi	追加
+kaldırıldı	削除
+Yalnız SELECT	SELECTのみ
+cam	ガラス
+Ana kart	メインボード
+işlemci	CPU
+bellek	メモリ
+Kasa	筐体
+alüminyum	アルミ
+Otopark	駐車場
+1 kat	1階分
+2 kat	2階分
+4 kat	4階分
+Yeni iş	新しいタスク
+E-POSTA	メール
+arama	検索
+profil	プロフィール
+Oku/Yaz	読み書き
+Mar	3月
+May	5月
+TIK TAK	チクタク
+DUYGU	感情
+EYLEM	行動
+SIKINTI	不満
+ZAMAN KAYBI	時間の無駄

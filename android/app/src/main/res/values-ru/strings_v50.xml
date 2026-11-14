@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- v50 düzenleyici, çeviri ve çizgi roman iyileştirmeleri -->
+<resources>
+    <string name="lines_krackle">Энергетический треск</string>
+    <string name="lines_impact">Звезда удара</string>
+    <string name="lines_surprise">Линии удивления</string>
+    <string name="lines_electric">Электричество</string>
+    <string name="lines_benday">Точки Бен-Дэй</string>
+    <string name="lines_gloom">Линии уныния</string>
+    <string name="lines_sparkle">Блёстки</string>
+    <string name="lines_crosshatch">Перекрёстная штриховка</string>
+    <string name="lines_speed_dense">Плотная скорость</string>
+    <string name="v50_lines_style_comic">Комикс</string>
+    <string name="v50_lines_style_manga">Манга</string>
+    <string name="v50_lines_add">Добавить: %1$s</string>
+    <string name="v50_lines_reset">Сбросить</string>
+</resources>

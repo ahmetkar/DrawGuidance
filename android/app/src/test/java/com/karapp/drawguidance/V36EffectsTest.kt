@@ -109,13 +109,17 @@ class V36EffectsTest : V33EditorBase() {
         openComic("Odak")
         openEffects()
         click("effects_tab_lines")
-        waitFor { exists("lines_sheet") && exists("lines_ZOOM") }
+        waitFor { exists("lines_sheet") }
+        click("lines_style_comic")
+        waitFor { exists("lines_ZOOM") }
+        // v50 tür önce seçilir; ayarlar yalnız o türün
+        click("lines_ZOOM")
         slide("lines_new_focus_x", 0.2f)
         slide("lines_new_thickness", 2f)
         compose.onNode(hasContentDescription("#E53935") and hasAnyAncestor(hasTestTag("lines_new_color"))).performScrollTo().performSemanticsAction(SemanticsActions.OnClick)
         compose.waitForIdle()
         shot("v36-effects-lines")
-        click("lines_ZOOM")
+        click("lines_add")
         waitFor { strokes().size > 20 }
         val zoom = strokes()
         val p = zoom.first().params!!.comicLines!!

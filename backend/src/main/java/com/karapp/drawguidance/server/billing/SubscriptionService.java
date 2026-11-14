@@ -84,7 +84,52 @@ public class SubscriptionService {
     // ---------------------------------------------------------------- okuma
 
     public SubscriptionView me(String uid) {
-        return view(uid, subs().find(Filters.eq("_id", uid)).first(), Instant.now());
+        Document s = subs().find(Filters.eq("_id", uid)).first();
+        Document fresh = refreshIfStale(uid, s, Instant.now());
+        return view(uid, fresh, Instant.now());
+    }
+
+    /** v50 Play'den okunmuş durum bu süreden eskiyse {@code /me} yeniden okur (kaçan iade/iptal bildirimine karşı). */
+    static final Duration REFRESH_AFTER = Duration.ofHours(12);
+
+    /**
+     * v50 hak veren (ya da yakın zamanda hak vermiş) aboneliğin Play kaydı {@link #REFRESH_AFTER} süresinden eskiyse
+     * Google Play'den yeniden okunur ve uygulanır. Play'e ulaşılamazsa kayıt olduğu gibi döner (en iyi çaba).
+     */
+    Document refreshIfStale(String uid, Document s, Instant now) {
+        if (s == null || !play.configured()) return s;
+        String token = s.getString("purchaseToken");
+        if (token == null) return s;
+        Instant fetched = instant(s.get("fetchedAt"));
+        if (fetched != null && fetched.plus(REFRESH_AFTER).isAfter(now)) return s;
+        Instant expiry = instant(s.get("expiryTime"));
+        boolean relevant = status(s).grantsAccess() || (expiry != null && expiry.plus(GRACE_LIMIT).isAfter(now));
+        if (!relevant) return s;
+        try {
+            PlaySubscription state = play.getSubscription(billing.packageName(), token);
+            if (state.obfuscatedAccountId() != null && !state.obfuscatedAccountId().equals(accountHash(uid))) {
+                log.warn("Yenilenen satın alma kayıtlı kullanıcıya ait değil; uygulanmadı");
+                return s;
+            }
+            Document plan = plans.planForProduct(state.productId(), state.basePlanId());
+            if (plan == null) return s;
+            apply(uid, token, state, plan.getString("_id"), null, SOURCE_VERIFY, null, null, now);
+            Document updated = subs().find(Filters.eq("_id", uid)).first();
+            return updated == null ? s : updated;
+        } catch (PlayApiException e) {
+            if (e.invalidToken()) {
+                // Play jetonu artık tanımıyor (ör. iade sonrası silinmiş): hak kapatılır
+                subs().updateOne(Filters.eq("_id", uid), Updates.combine(Updates.set("status", SubscriptionStatus.EXPIRED.name()),
+                        Updates.set("fetchedAt", Date.from(now)), Updates.set("updatedAt", Date.from(now))));
+                Document updated = subs().find(Filters.eq("_id", uid)).first();
+                return updated == null ? s : updated;
+            }
+            log.debug("Abonelik yenilenemedi: {}", e.getMessage());
+            return s;
+        } catch (RuntimeException e) {
+            log.debug("Abonelik yenilenemedi: {}", e.getMessage());
+            return s;
+        }
     }
 
     /** Hareket geçmişi (yeniden eskiye; ham Play anlık görüntüsü olmadan). */

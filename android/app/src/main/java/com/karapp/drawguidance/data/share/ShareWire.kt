@@ -12,19 +12,15 @@ import java.nio.ByteBuffer
  *   mesaj = [tür: 1 bayt][JSON uzunluğu: u32 BE][JSON (UTF-8)][ikili kuyruk]
  * İkili kuyruk, JSON başlığındaki uzunluklara göre bölünür (tuval içeriği, resimler).
  *
- * Taşıma:
- *  - TCP (aynı Wi-Fi, Android ↔ iOS): her mesaj [u32 BE uzunluk][mesaj] çerçevesiyle.
- *  - Nearby Connections (Android ↔ Android) ve MultipeerConnectivity (iOS ↔ iOS): mesaj, [ShareChunker] ile
- *    parçalara bölünür: [mesaj no: u32][parça sırası: u32][parça sayısı: u32][veri].
+ * Taşıma: aynı Wi-Fi ağı (Android ve iOS). Cihazlar Bonjour/DNS-SD ile kendiliğinden bulunur, bağlantı TCP'dir ve her
+ * mesaj [u32 BE uzunluk][mesaj] çerçevesiyle gider. [ShareChunker] mesaj tabanlı yollar (ileride) için parçalayıcıdır:
+ * [mesaj no: u32][parça sırası: u32][parça sayısı: u32][veri].
  *
  * Tuval paketi, hazır şablonların biçimiyle aynı alanları taşır (boyut, kâğıt, `background`/`guide` JSON'u,
  * içerik = ContentCodec baytları, resimler). Alıcı resimlere yeni kimlik verir (tuvaller arası çakışmasın).
  */
 object ShareWire {
     const val PROTOCOL = 1
-
-    /** Nearby Connections hizmet kimliği (yalnız bu uygulamayı kullanan cihazlar görünür). */
-    const val NEARBY_SERVICE_ID = "com.karapp.drawguidance.share"
 
     /** Aynı ağdaki (Wi-Fi) cihazlar için Bonjour/NSD hizmet türü (iOS ile ortak). */
     const val LAN_SERVICE_TYPE = "_dgshare._tcp."

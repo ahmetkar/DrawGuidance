@@ -73,7 +73,7 @@ class ShareManager(
     private val assets: CanvasAssetStore,
     private val images: ImagesRepository,
     transports: List<ShareTransport>,
-) : ShareTransport.Listener {
+) : ShareTransport.Listener, androidx.lifecycle.DefaultLifecycleObserver {
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
     private val transports = transports.associateBy { it.route }
     private val installLock = Mutex()
@@ -118,33 +118,67 @@ class ShareManager(
     }
 
     // ---- Görünürlük ve bağlantı ----
+    //
+    // Keşif kendiliğindendir: uygulama ön plandayken (ve "görünür ol" açıkken) ya da paylaşım sayfası açıkken cihaz
+    // aynı Wi-Fi'deki diğer cihazlarda görünür ve onları bulur. Bağlantı ayrıca istenmez: bir cihaza tuval/resim
+    // gönderilince ya da yayın başlatılınca bağlantı kendiliğinden kurulur, karşı taraf da kendiliğinden kabul eder
+    // (gelen her teklif ayarlara göre ayrıca onaylanır).
 
-    /** Paylaşım sayfası açıldı: görünür ol ve ara. [nearby]: Nearby izinleri verildiyse. */
-    fun start(nearby: Boolean) {
-        val name = settings.deviceName.value
-        transports[ShareRoute.LAN]?.start(name, settings.instanceId)
-        if (nearby) runCatching { transports[ShareRoute.NEARBY]?.start(name, settings.instanceId) }
-            .onFailure { onError(ShareRoute.NEARBY, it.message ?: "Nearby") }
-        _active.value = true
+    @Volatile private var foreground = false
+    @Volatile private var pages = 0
+
+    override fun onStart(owner: androidx.lifecycle.LifecycleOwner) { foreground = true; refresh() }
+    override fun onStop(owner: androidx.lifecycle.LifecycleOwner) { foreground = false; refresh() }
+
+    /** Uygulama açılışında süreç yaşam döngüsüne bağlanır (ana iş parçacığında). */
+    fun attachToProcess() {
+        androidx.lifecycle.ProcessLifecycleOwner.get().lifecycle.addObserver(this)
+        scope.launch { settings.discoverable.collect { refresh() } }
     }
 
-    /** Sayfa kapandı: görünürlük ve arama durur, kurulu bağlantılar sürer. */
-    fun stop() {
-        transports.values.forEach { runCatching { it.stop() } }
-        _active.value = false
-        _peers.update { list -> list.filter { it.state != PeerState.FOUND } }
+    /** Paylaşım sayfası açıldı / kapandı: sayfa açıkken "görünür ol" kapalı olsa da görünür olunur. */
+    fun pageOpened() { pages++; refresh() }
+    fun pageClosed() { pages = (pages - 1).coerceAtLeast(0); refresh() }
+
+    @Synchronized
+    private fun refresh() {
+        val want = pages > 0 || (foreground && settings.discoverable.value)
+        if (want == _active.value) return
+        if (want) {
+            val name = settings.deviceName.value
+            transports.values.forEach { t -> runCatching { t.start(name, settings.instanceId) }.onFailure { onError(t.route, it.message ?: "") } }
+            _active.value = true
+        } else {
+            transports.values.forEach { runCatching { it.stop() } }
+            _active.value = false
+            _peers.update { list -> list.filter { it.state != PeerState.FOUND } }
+        }
     }
 
     /** Ad değişince görünürlük yeni adla yeniden başlar. */
-    fun restartIfActive(nearby: Boolean) {
+    @Synchronized
+    fun restartIfActive() {
         if (!_active.value) return
-        stop(); start(nearby)
+        transports.values.forEach { runCatching { it.stop() } }
+        _active.value = false
+        refresh()
     }
 
-    fun connect(peer: SharePeer) {
-        setState(peer.key, PeerState.CONNECTING)
-        transports[peer.route]?.connect(peer.endpoint)
+    /** Bağlantı kurulunca yapılacak işler (cihaz anahtarı → işler). */
+    private val afterConnect = ConcurrentHashMap<String, MutableList<() -> Unit>>()
+
+    /** Cihaz bağlıysa [action] hemen; değilse bağlantı kendiliğinden kurulur ve kurulunca yapılır. */
+    private fun whenConnected(key: String, action: () -> Unit) {
+        val peer = _peers.value.firstOrNull { it.key == key } ?: return fail("Cihaz bulunamadı")
+        if (peer.state == PeerState.CONNECTED) { action(); return }
+        afterConnect.getOrPut(key) { java.util.Collections.synchronizedList(mutableListOf()) }.add(action)
+        if (peer.state != PeerState.CONNECTING) {
+            setState(key, PeerState.CONNECTING)
+            transports[peer.route]?.connect(peer.endpoint)
+        }
     }
+
+    fun connect(peer: SharePeer) = whenConnected(peer.key) {}
 
     fun disconnect(peer: SharePeer) {
         send(peer.key, ShareWire.encode(ShareWire.BYE, "{}"))
@@ -167,7 +201,7 @@ class ShareManager(
         val id = UUID.randomUUID().toString()
         outgoing[id] = Outgoing(peerKey, ShareWire.TYPE_CANVAS, canvas.name, canvas.localId, null)
         val offer = ShareOffer(id, ShareWire.TYPE_CANVAS, canvas.name, packages.canvasSize(canvas.localId), canvas.kind.name)
-        send(peerKey, ShareWire.encode(ShareWire.OFFER, ShareWire.text(offer)))
+        whenConnected(peerKey) { send(peerKey, ShareWire.encode(ShareWire.OFFER, ShareWire.text(offer))) }
         _status.value = ShareTransferStatus(peerName(peerKey), canvas.name, sending = true)
     }
 
@@ -175,7 +209,7 @@ class ShareManager(
         val id = UUID.randomUUID().toString()
         outgoing[id] = Outgoing(peerKey, ShareWire.TYPE_IMAGE, image.title, null, image)
         val offer = ShareOffer(id, ShareWire.TYPE_IMAGE, image.title, image.sizeBytes)
-        send(peerKey, ShareWire.encode(ShareWire.OFFER, ShareWire.text(offer)))
+        whenConnected(peerKey) { send(peerKey, ShareWire.encode(ShareWire.OFFER, ShareWire.text(offer))) }
         _status.value = ShareTransferStatus(peerName(peerKey), image.title, sending = true)
     }
 
@@ -185,7 +219,7 @@ class ShareManager(
         val id = UUID.randomUUID().toString()
         outgoing[id] = Outgoing(peerKey, ShareWire.TYPE_LIVE, canvas.name, canvas.localId, null)
         val offer = ShareOffer(id, ShareWire.TYPE_LIVE, canvas.name, packages.canvasSize(canvas.localId), canvas.kind.name)
-        send(peerKey, ShareWire.encode(ShareWire.OFFER, ShareWire.text(offer)))
+        whenConnected(peerKey) { send(peerKey, ShareWire.encode(ShareWire.OFFER, ShareWire.text(offer))) }
         _status.value = ShareTransferStatus(peerName(peerKey), canvas.name, sending = true)
     }
 
@@ -238,13 +272,16 @@ class ShareManager(
     }
 
     override fun onRequest(route: ShareRoute, endpoint: String, name: String, platform: String, code: String?) {
-        _request.value = ShareConnectionRequest(key(route, endpoint), name, platform, code)
+        // Bağlantı kendiliğinden kabul edilir; içerik ancak teklif onaylanınca alınır
+        setState(key(route, endpoint), PeerState.CONNECTING, name, platform)
+        transports[route]?.accept(endpoint)
     }
 
     override fun onConnected(route: ShareRoute, endpoint: String, name: String, platform: String) {
         val key = key(route, endpoint)
         setState(key, PeerState.CONNECTED, name, platform)
         send(key, ShareWire.encode(ShareWire.HELLO, ShareWire.text(ShareHello(name = settings.deviceName.value, platform = "android", app = BuildConfig.VERSION_NAME))))
+        afterConnect.remove(key)?.let { list -> synchronized(list) { list.toList() }.forEach { runCatching { it() } } }
     }
 
     override fun onDisconnected(route: ShareRoute, endpoint: String) {
@@ -255,6 +292,7 @@ class ShareManager(
             list.mapNotNull { p -> if (p.key != key) p else if (_active.value) p.copy(state = PeerState.FOUND) else null }
         }
         if (_request.value?.key == key) _request.value = null
+        if (afterConnect.remove(key) != null && !wasConnected) _events.tryEmit(ShareEvent.Failed(peer?.name ?: ""))
         if (_offer.value?.key == key) _offer.value = null
         if (_liveOut.value?.peerKey == key) { _liveOut.value = null; liveJob?.cancel(); liveJob = null }
         _liveIn.value?.takeIf { it.peerKey == key }?.let { _liveIn.value = it.copy(ended = true) }

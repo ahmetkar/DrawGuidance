@@ -1,7 +1,7 @@
 package com.karapp.drawguidance.data.share
 
-/** v51 bağlantı yolu: Nearby (Wi-Fi Direct / Bluetooth, Android ↔ Android) ya da aynı Wi-Fi ağı (Android ↔ iOS). */
-enum class ShareRoute { NEARBY, LAN }
+/** v51 bağlantı yolu: aynı Wi-Fi ağı (Android ve iOS; ileride başka yollar eklenebilir). */
+enum class ShareRoute { LAN }
 
 /**
  * v51 bir bağlantı yolunun ortak arayüzü. Uç noktalar yol içinde benzersiz bir anahtarla tanınır; mesajlar
@@ -13,7 +13,7 @@ interface ShareTransport {
     interface Listener {
         fun onFound(route: ShareRoute, endpoint: String, name: String, platform: String)
         fun onLost(route: ShareRoute, endpoint: String)
-        /** Karşı cihaz bağlanmak istiyor: [ShareTransport.accept] ya da [ShareTransport.reject] çağrılır. [code]: doğrulama kodu. */
+        /** Karşı cihaz bağlanmak istiyor: [ShareTransport.accept] ya da [ShareTransport.reject] çağrılır (paylaşım sayfası kendiliğinden kabul eder; gelen her teklif ayrıca onaylanır). */
         fun onRequest(route: ShareRoute, endpoint: String, name: String, platform: String, code: String?)
         fun onConnected(route: ShareRoute, endpoint: String, name: String, platform: String)
         fun onDisconnected(route: ShareRoute, endpoint: String)

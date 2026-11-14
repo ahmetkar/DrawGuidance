@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- v51 cihazlar arası tuval paylaşımı ve canlı yayın -->
+<!-- v51 cihazlar arası tuval paylaşımı ve canlı yayın (aynı Wi-Fi ağı) -->
 <resources>
     <string name="v51_share_title">设备间共享</string>
     <string name="v51_share_open">共享</string>
-    <string name="v51_share_settings_hint">通过 Wi-Fi 直连、蓝牙或同一 Wi-Fi 与附近设备共享画布和图片，并进行直播</string>
+    <string name="v51_share_settings_hint">与同一 Wi-Fi 网络中的设备（Android、iPhone、iPad）共享画布和图片，并进行直播</string>
     <string name="v51_share_open_page">打开共享页面</string>
     <string name="v51_share_this_device">本设备</string>
     <string name="v51_share_device_name">设备名称</string>
@@ -11,11 +11,9 @@
     <string name="v51_share_rename">重命名</string>
     <string name="v51_share_visible">可见 · 正在搜索附近设备</string>
     <string name="v51_share_off">不可见</string>
-    <string name="v51_share_nearby_title">附近设备</string>
-    <string name="v51_share_nearby_empty">使用本应用的附近设备会显示在这里。请在另一台设备上也打开共享页面。</string>
-    <string name="v51_share_route_nearby">Wi-Fi 直连 / 蓝牙</string>
+    <string name="v51_share_nearby_title">此网络中的设备</string>
+    <string name="v51_share_nearby_empty">同一 Wi-Fi 网络中使用本应用的设备会自动显示在这里。</string>
     <string name="v51_share_route_lan">同一 Wi-Fi 网络</string>
-    <string name="v51_share_connect">连接</string>
     <string name="v51_share_connecting">正在连接…</string>
     <string name="v51_share_connected">已连接</string>
     <string name="v51_share_disconnect">断开连接</string>
@@ -27,12 +25,6 @@
     <string name="v51_share_pick_image">选择要发送的图片</string>
     <string name="v51_share_no_canvases">还没有画布</string>
     <string name="v51_share_no_images">没有已保存的图片</string>
-    <string name="v51_share_permission_title">Wi-Fi 直连和蓝牙权限</string>
-    <string name="v51_share_permission_text">需要权限才能查找附近的 Android 设备并通过 Wi-Fi 直连或蓝牙连接。不授予权限时，只会显示同一 Wi-Fi 网络中的设备。</string>
-    <string name="v51_share_permission_allow">允许</string>
-    <string name="v51_share_request_title">连接请求</string>
-    <string name="v51_share_request_text">%1$s 想要连接到本设备。</string>
-    <string name="v51_share_request_code">验证码：%1$s（两台设备上应一致）</string>
     <string name="v51_share_accept">接受</string>
     <string name="v51_share_reject">拒绝</string>
     <string name="v51_share_offer_title">收到共享</string>
@@ -71,8 +63,10 @@
     <string name="v51_share_platform_ios">iPhone / iPad</string>
     <string name="v51_share_platform_android">Android</string>
     <string name="v51_share_error">连接警告：%1$s</string>
-    <string name="v51_share_how">Android 设备通过蓝牙互相发现，并通过 Wi-Fi 直连连接。要与 iPhone 或 iPad 共享，两台设备必须连接同一 Wi-Fi 网络。</string>
+    <string name="v51_share_how">两台设备必须连接同一 Wi-Fi 网络。应用打开时，设备会自动互相发现；发送或开始直播时会自动建立连接。</string>
     <string name="v51_share_save">保存</string>
     <string name="v51_share_folder_name">已共享</string>
     <string name="v51_share_shared_live_badge">来自直播 · %1$s</string>
+    <string name="v51_share_discoverable">应用打开时保持可见</string>
+    <string name="v51_share_discoverable_hint">同一 Wi-Fi 中的设备会自动找到你。关闭后，仅在共享页面打开时可见</string>
 </resources>

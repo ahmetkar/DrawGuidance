@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- v51 cihazlar arası tuval paylaşımı ve canlı yayın -->
+<!-- v51 cihazlar arası tuval paylaşımı ve canlı yayın (aynı Wi-Fi ağı) -->
 <resources>
     <string name="v51_share_title">기기 간 공유</string>
     <string name="v51_share_open">공유</string>
-    <string name="v51_share_settings_hint">근처 기기와 Wi-Fi Direct, 블루투스 또는 같은 Wi-Fi로 캔버스와 이미지를 공유하고 실시간 방송하세요</string>
+    <string name="v51_share_settings_hint">같은 Wi-Fi 네트워크의 기기(Android, iPhone, iPad)와 캔버스와 이미지를 공유하고 실시간 방송하세요</string>
     <string name="v51_share_open_page">공유 페이지 열기</string>
     <string name="v51_share_this_device">이 기기</string>
     <string name="v51_share_device_name">기기 이름</string>
@@ -11,11 +11,9 @@
     <string name="v51_share_rename">이름 변경</string>
     <string name="v51_share_visible">표시 중 · 근처 기기를 찾는 중</string>
     <string name="v51_share_off">표시 안 함</string>
-    <string name="v51_share_nearby_title">근처 기기</string>
-    <string name="v51_share_nearby_empty">앱을 사용하는 근처 기기가 여기에 표시됩니다. 상대 기기에서도 공유 페이지를 여세요.</string>
-    <string name="v51_share_route_nearby">Wi-Fi Direct / 블루투스</string>
+    <string name="v51_share_nearby_title">이 네트워크의 기기</string>
+    <string name="v51_share_nearby_empty">같은 Wi-Fi 네트워크에서 앱을 사용하는 기기가 여기에 자동으로 표시됩니다.</string>
     <string name="v51_share_route_lan">같은 Wi-Fi 네트워크</string>
-    <string name="v51_share_connect">연결</string>
     <string name="v51_share_connecting">연결 중…</string>
     <string name="v51_share_connected">연결됨</string>
     <string name="v51_share_disconnect">연결 끊기</string>
@@ -27,12 +25,6 @@
     <string name="v51_share_pick_image">보낼 이미지를 선택하세요</string>
     <string name="v51_share_no_canvases">아직 캔버스가 없습니다</string>
     <string name="v51_share_no_images">저장된 이미지가 없습니다</string>
-    <string name="v51_share_permission_title">Wi-Fi Direct 및 블루투스 권한</string>
-    <string name="v51_share_permission_text">근처 Android 기기를 찾고 Wi-Fi Direct 또는 블루투스로 연결하려면 권한이 필요합니다. 허용하지 않으면 같은 Wi-Fi 네트워크의 기기만 표시됩니다.</string>
-    <string name="v51_share_permission_allow">허용</string>
-    <string name="v51_share_request_title">연결 요청</string>
-    <string name="v51_share_request_text">%1$s 기기가 이 기기에 연결하려고 합니다.</string>
-    <string name="v51_share_request_code">확인 코드: %1$s (두 기기에서 같아야 합니다)</string>
     <string name="v51_share_accept">수락</string>
     <string name="v51_share_reject">거절</string>
     <string name="v51_share_offer_title">받은 공유</string>
@@ -71,8 +63,10 @@
     <string name="v51_share_platform_ios">iPhone / iPad</string>
     <string name="v51_share_platform_android">Android</string>
     <string name="v51_share_error">연결 경고: %1$s</string>
-    <string name="v51_share_how">Android 기기는 블루투스로 서로를 찾고 Wi-Fi Direct로 연결합니다. iPhone이나 iPad와 공유하려면 두 기기가 같은 Wi-Fi 네트워크에 있어야 합니다.</string>
+    <string name="v51_share_how">두 기기가 같은 Wi-Fi 네트워크에 있어야 합니다. 앱이 열려 있는 동안 기기가 서로를 자동으로 찾고, 보내기나 방송 시작 시 자동으로 연결됩니다.</string>
     <string name="v51_share_save">저장</string>
     <string name="v51_share_folder_name">공유됨</string>
     <string name="v51_share_shared_live_badge">실시간 방송에서 · %1$s</string>
+    <string name="v51_share_discoverable">앱이 열려 있는 동안 표시</string>
+    <string name="v51_share_discoverable_hint">같은 Wi-Fi의 기기가 자동으로 찾습니다. 끄면 공유 페이지가 열려 있을 때만 표시됩니다</string>
 </resources>

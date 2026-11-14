@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- v51 cihazlar arası tuval paylaşımı ve canlı yayın -->
+<!-- v51 cihazlar arası tuval paylaşımı ve canlı yayın (aynı Wi-Fi ağı) -->
 <resources>
     <string name="v51_share_title">デバイス間で共有</string>
     <string name="v51_share_open">共有</string>
-    <string name="v51_share_settings_hint">近くのデバイスと Wi-Fi Direct、Bluetooth、または同じ Wi-Fi でキャンバスや画像を共有し、ライブ配信できます</string>
+    <string name="v51_share_settings_hint">同じ Wi-Fi ネットワークのデバイス(Android、iPhone、iPad)とキャンバスや画像を共有し、ライブ配信できます</string>
     <string name="v51_share_open_page">共有ページを開く</string>
     <string name="v51_share_this_device">このデバイス</string>
     <string name="v51_share_device_name">デバイス名</string>
@@ -11,11 +11,9 @@
     <string name="v51_share_rename">名前を変更</string>
     <string name="v51_share_visible">表示中 · 近くのデバイスを検索しています</string>
     <string name="v51_share_off">非表示</string>
-    <string name="v51_share_nearby_title">近くのデバイス</string>
-    <string name="v51_share_nearby_empty">アプリを使っている近くのデバイスがここに表示されます。相手のデバイスでも共有ページを開いてください。</string>
-    <string name="v51_share_route_nearby">Wi-Fi Direct / Bluetooth</string>
+    <string name="v51_share_nearby_title">このネットワークのデバイス</string>
+    <string name="v51_share_nearby_empty">同じ Wi-Fi ネットワークでアプリを使っているデバイスがここに自動的に表示されます。</string>
     <string name="v51_share_route_lan">同じ Wi-Fi ネットワーク</string>
-    <string name="v51_share_connect">接続</string>
     <string name="v51_share_connecting">接続中…</string>
     <string name="v51_share_connected">接続済み</string>
     <string name="v51_share_disconnect">切断</string>
@@ -27,12 +25,6 @@
     <string name="v51_share_pick_image">送る画像を選択</string>
     <string name="v51_share_no_canvases">キャンバスはまだありません</string>
     <string name="v51_share_no_images">保存した画像はありません</string>
-    <string name="v51_share_permission_title">Wi-Fi Direct と Bluetooth の許可</string>
-    <string name="v51_share_permission_text">近くの Android デバイスを見つけて Wi-Fi Direct や Bluetooth で接続するには許可が必要です。許可しない場合は同じ Wi-Fi ネットワーク上のデバイスのみ表示されます。</string>
-    <string name="v51_share_permission_allow">許可</string>
-    <string name="v51_share_request_title">接続リクエスト</string>
-    <string name="v51_share_request_text">%1$s がこのデバイスに接続しようとしています。</string>
-    <string name="v51_share_request_code">確認コード: %1$s(両方のデバイスで一致する必要があります)</string>
     <string name="v51_share_accept">許可する</string>
     <string name="v51_share_reject">拒否</string>
     <string name="v51_share_offer_title">共有の受信</string>
@@ -71,8 +63,10 @@
     <string name="v51_share_platform_ios">iPhone / iPad</string>
     <string name="v51_share_platform_android">Android</string>
     <string name="v51_share_error">接続の警告: %1$s</string>
-    <string name="v51_share_how">Android デバイスは Bluetooth で互いを見つけ、Wi-Fi Direct で接続します。iPhone や iPad と共有するには、両方のデバイスが同じ Wi-Fi ネットワークにある必要があります。</string>
+    <string name="v51_share_how">2 台のデバイスが同じ Wi-Fi ネットワークにある必要があります。アプリを開いている間はデバイスが自動的に見つかり、送信や配信の開始時に自動で接続されます。</string>
     <string name="v51_share_save">保存</string>
     <string name="v51_share_folder_name">共有</string>
     <string name="v51_share_shared_live_badge">ライブ配信から · %1$s</string>
+    <string name="v51_share_discoverable">アプリを開いている間は表示する</string>
+    <string name="v51_share_discoverable_hint">同じ Wi-Fi のデバイスが自動的にあなたを見つけます。オフにすると共有ページを開いている間だけ表示されます</string>
 </resources>

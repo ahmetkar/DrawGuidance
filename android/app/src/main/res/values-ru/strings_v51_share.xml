@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- v51 cihazlar arası tuval paylaşımı ve canlı yayın -->
+<!-- v51 cihazlar arası tuval paylaşımı ve canlı yayın (aynı Wi-Fi ağı) -->
 <resources>
     <string name="v51_share_title">Обмен между устройствами</string>
     <string name="v51_share_open">Обмен</string>
-    <string name="v51_share_settings_hint">Делитесь холстами и изображениями с устройствами поблизости через Wi-Fi Direct, Bluetooth или одну сеть Wi-Fi и ведите трансляцию</string>
+    <string name="v51_share_settings_hint">Делитесь холстами и изображениями с устройствами в той же сети Wi-Fi (Android, iPhone, iPad) и ведите трансляцию</string>
     <string name="v51_share_open_page">Открыть страницу обмена</string>
     <string name="v51_share_this_device">Это устройство</string>
     <string name="v51_share_device_name">Имя устройства</string>
@@ -11,11 +11,9 @@
     <string name="v51_share_rename">Переименовать</string>
     <string name="v51_share_visible">Видимо · идёт поиск устройств поблизости</string>
     <string name="v51_share_off">Не видно</string>
-    <string name="v51_share_nearby_title">Устройства поблизости</string>
-    <string name="v51_share_nearby_empty">Здесь появятся устройства поблизости с этим приложением. Откройте страницу обмена и на другом устройстве.</string>
-    <string name="v51_share_route_nearby">Wi-Fi Direct / Bluetooth</string>
+    <string name="v51_share_nearby_title">Устройства в этой сети</string>
+    <string name="v51_share_nearby_empty">Устройства с этим приложением в той же сети Wi-Fi появляются здесь автоматически.</string>
     <string name="v51_share_route_lan">Та же сеть Wi-Fi</string>
-    <string name="v51_share_connect">Подключить</string>
     <string name="v51_share_connecting">Подключение…</string>
     <string name="v51_share_connected">Подключено</string>
     <string name="v51_share_disconnect">Отключить</string>
@@ -27,12 +25,6 @@
     <string name="v51_share_pick_image">Выберите изображение для отправки</string>
     <string name="v51_share_no_canvases">Холстов пока нет</string>
     <string name="v51_share_no_images">Нет сохранённых изображений</string>
-    <string name="v51_share_permission_title">Разрешение Wi-Fi Direct и Bluetooth</string>
-    <string name="v51_share_permission_text">Разрешение нужно, чтобы находить устройства Android поблизости и подключаться к ним через Wi-Fi Direct или Bluetooth. Без него видны только устройства в той же сети Wi-Fi.</string>
-    <string name="v51_share_permission_allow">Разрешить</string>
-    <string name="v51_share_request_title">Запрос на подключение</string>
-    <string name="v51_share_request_text">%1$s хочет подключиться к этому устройству.</string>
-    <string name="v51_share_request_code">Код проверки: %1$s (должен совпадать на обоих устройствах)</string>
     <string name="v51_share_accept">Принять</string>
     <string name="v51_share_reject">Отклонить</string>
     <string name="v51_share_offer_title">Входящий обмен</string>
@@ -71,8 +63,10 @@
     <string name="v51_share_platform_ios">iPhone / iPad</string>
     <string name="v51_share_platform_android">Android</string>
     <string name="v51_share_error">Предупреждение соединения: %1$s</string>
-    <string name="v51_share_how">Устройства Android находят друг друга по Bluetooth и соединяются через Wi-Fi Direct. Чтобы обмениваться с iPhone или iPad, оба устройства должны быть в одной сети Wi-Fi.</string>
+    <string name="v51_share_how">Оба устройства должны быть в одной сети Wi-Fi. Пока приложение открыто, устройства находят друг друга автоматически, а соединение устанавливается само при отправке или начале трансляции.</string>
     <string name="v51_share_save">Сохранить</string>
     <string name="v51_share_folder_name">Полученные</string>
     <string name="v51_share_shared_live_badge">Из трансляции · %1$s</string>
+    <string name="v51_share_discoverable">Быть видимым, пока приложение открыто</string>
+    <string name="v51_share_discoverable_hint">Устройства в той же сети Wi-Fi находят вас автоматически. Если выключено, вас видно только при открытой странице обмена</string>
 </resources>

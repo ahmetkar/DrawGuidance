@@ -1,10 +1,5 @@
 package com.karapp.drawguidance.ui.screens.share
 
-import android.Manifest
-import android.content.pm.PackageManager
-import android.os.Build
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -33,10 +28,9 @@ import androidx.compose.material.icons.filled.Image
 import androidx.compose.material.icons.filled.LinkOff
 import androidx.compose.material.icons.filled.PhoneAndroid
 import androidx.compose.material.icons.filled.PhoneIphone
-import androidx.compose.material.icons.filled.Send
+import androidx.compose.material.icons.automirrored.filled.Send
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Share
-import androidx.compose.material.icons.filled.Wifi
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
@@ -54,13 +48,11 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.core.content.ContextCompat
 import com.karapp.drawguidance.R
 import com.karapp.drawguidance.data.images.ImagesRepository
 import com.karapp.drawguidance.data.model.CanvasUi
@@ -68,7 +60,6 @@ import com.karapp.drawguidance.data.repository.CanvasRepository
 import com.karapp.drawguidance.data.share.PeerState
 import com.karapp.drawguidance.data.share.ShareManager
 import com.karapp.drawguidance.data.share.SharePeer
-import com.karapp.drawguidance.data.share.ShareRoute
 import com.karapp.drawguidance.data.share.ShareSettings
 import com.karapp.drawguidance.ui.components.NeuButton
 import com.karapp.drawguidance.ui.components.NeuIconButton
@@ -81,19 +72,6 @@ import com.karapp.drawguidance.ui.screens.settings.SettingSwitchRow
 import com.karapp.drawguidance.ui.screens.settings.SettingsCard
 import com.karapp.drawguidance.ui.theme.NeuTheme
 import org.koin.compose.koinInject
-
-/** v51 Nearby için gereken çalışma zamanı izinleri (Android sürümüne göre). */
-fun nearbyPermissions(): List<String> = when {
-    Build.VERSION.SDK_INT >= 33 -> listOf(
-        Manifest.permission.BLUETOOTH_SCAN, Manifest.permission.BLUETOOTH_ADVERTISE,
-        Manifest.permission.BLUETOOTH_CONNECT, Manifest.permission.NEARBY_WIFI_DEVICES,
-    )
-    Build.VERSION.SDK_INT >= 31 -> listOf(
-        Manifest.permission.BLUETOOTH_SCAN, Manifest.permission.BLUETOOTH_ADVERTISE,
-        Manifest.permission.BLUETOOTH_CONNECT, Manifest.permission.ACCESS_FINE_LOCATION,
-    )
-    else -> listOf(Manifest.permission.ACCESS_FINE_LOCATION)
-}
 
 private enum class Pick { CANVAS, IMAGE, LIVE }
 
@@ -112,18 +90,10 @@ fun ShareScreen(
     settings: ShareSettings = koinInject(),
 ) {
     val colors = NeuTheme.colors
-    val context = LocalContext.current
-    fun nearbyGranted() = nearbyPermissions().all { ContextCompat.checkSelfPermission(context, it) == PackageManager.PERMISSION_GRANTED }
-    var granted by remember { mutableStateOf(nearbyGranted()) }
-    val launcher = rememberLauncherForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) {
-        granted = nearbyGranted()
-        share.restartIfActive(granted)
-    }
-    // Sayfa açıkken görünür ol ve ara
+    // Sayfa açıkken (görünürlük ayarı kapalı olsa da) görünür ol ve ara
     DisposableEffect(Unit) {
-        share.start(granted)
-        if (!granted) runCatching { launcher.launch(nearbyPermissions().toTypedArray()) }
-        onDispose { share.stop() }
+        share.pageOpened()
+        onDispose { share.pageClosed() }
     }
     val peers by share.peers.collectAsState()
     val active by share.active.collectAsState()
@@ -158,10 +128,6 @@ fun ShareScreen(
             ) {
                 Text(name, translate = false, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold, modifier = Modifier.testTag("share_device_name"))
                 Text(stringResource(R.string.v51_share_how), style = MaterialTheme.typography.bodySmall, color = colors.contentMuted)
-                if (!granted) {
-                    Text(stringResource(R.string.v51_share_permission_text), style = MaterialTheme.typography.bodySmall, color = colors.danger)
-                    NeuButton(stringResource(R.string.v51_share_permission_allow), { runCatching { launcher.launch(nearbyPermissions().toTypedArray()) } }, Modifier.fillMaxWidth(), icon = Icons.Filled.Wifi)
-                }
                 error?.let { Text(stringResource(R.string.v51_share_error, it), style = MaterialTheme.typography.bodySmall, color = colors.contentMuted) }
             }
 
@@ -207,7 +173,6 @@ fun ShareScreen(
                 peers.sortedWith(compareBy({ it.state != PeerState.CONNECTED }, { it.name })).forEach { peer ->
                     PeerRow(
                         peer,
-                        onConnect = { share.connect(peer) },
                         onDisconnect = { share.disconnect(peer) },
                         onPick = { pick = it to peer },
                     )
@@ -222,7 +187,7 @@ fun ShareScreen(
     if (renaming) RenameDialog(name, onDismiss = { renaming = false }) {
         settings.setDeviceName(it)
         renaming = false
-        share.restartIfActive(granted)
+        share.restartIfActive()
     }
     pick?.let { (kind, peer) ->
         when (kind) {
@@ -266,7 +231,7 @@ private fun LiveCard(icon: androidx.compose.ui.graphics.vector.ImageVector, text
 }
 
 @Composable
-private fun PeerRow(peer: SharePeer, onConnect: () -> Unit, onDisconnect: () -> Unit, onPick: (Pick) -> Unit) {
+private fun PeerRow(peer: SharePeer, onDisconnect: () -> Unit, onPick: (Pick) -> Unit) {
     val colors = NeuTheme.colors
     val ios = peer.platform == "ios"
     NeuSurface(Modifier.fillMaxWidth().testTag("share_peer"), elevation = 4.dp, selected = peer.state == PeerState.CONNECTED) {
@@ -278,7 +243,7 @@ private fun PeerRow(peer: SharePeer, onConnect: () -> Unit, onDisconnect: () -> 
                 ) { Icon(if (ios) Icons.Filled.PhoneIphone else Icons.Filled.PhoneAndroid, null, tint = colors.accent) }
                 Column(Modifier.weight(1f)) {
                     Text(peer.name, translate = false, style = MaterialTheme.typography.titleSmall, maxLines = 1, overflow = TextOverflow.Ellipsis)
-                    val route = stringResource(if (peer.route == ShareRoute.NEARBY) R.string.v51_share_route_nearby else R.string.v51_share_route_lan)
+                    val route = stringResource(R.string.v51_share_route_lan)
                     val state = when (peer.state) {
                         PeerState.CONNECTED -> stringResource(R.string.v51_share_connected)
                         PeerState.CONNECTING -> stringResource(R.string.v51_share_connecting)
@@ -286,15 +251,16 @@ private fun PeerRow(peer: SharePeer, onConnect: () -> Unit, onDisconnect: () -> 
                     }
                     Text("$state · $route", style = MaterialTheme.typography.labelSmall, color = colors.contentMuted, maxLines = 1, overflow = TextOverflow.Ellipsis)
                 }
+                // Bağlantı istek üzerine kendiliğinden kurulur: düğmeler her zaman kullanılabilir
                 when (peer.state) {
-                    PeerState.FOUND -> NeuButton(stringResource(R.string.v51_share_connect), onConnect, Modifier.testTag("share_connect"), primary = true)
+                    PeerState.FOUND -> Unit
                     PeerState.CONNECTING -> CircularProgressIndicator(Modifier.size(22.dp), strokeWidth = 2.dp, color = colors.accent)
                     PeerState.CONNECTED -> NeuIconButton(Icons.Filled.LinkOff, stringResource(R.string.v51_share_disconnect), onDisconnect, size = 38.dp)
                 }
             }
-            if (peer.state == PeerState.CONNECTED) {
+            run {
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    NeuButton(stringResource(R.string.v51_share_send_canvas), { onPick(Pick.CANVAS) }, Modifier.weight(1f).testTag("share_send_canvas"), icon = Icons.Filled.Send)
+                    NeuButton(stringResource(R.string.v51_share_send_canvas), { onPick(Pick.CANVAS) }, Modifier.weight(1f).testTag("share_send_canvas"), icon = Icons.AutoMirrored.Filled.Send)
                     NeuButton(stringResource(R.string.v51_share_send_image), { onPick(Pick.IMAGE) }, Modifier.weight(1f).testTag("share_send_image"), icon = Icons.Filled.Image)
                 }
                 NeuButton(stringResource(R.string.v51_share_start_live), { onPick(Pick.LIVE) }, Modifier.fillMaxWidth().testTag("share_start_live"), primary = true, icon = Icons.Filled.Cast)
@@ -309,6 +275,7 @@ fun ShareSettingsCard(settings: ShareSettings = koinInject(), onOpenShare: (() -
     val ask by settings.askBeforeReceive.collectAsState()
     val folder by settings.receivedFolder.collectAsState()
     val smooth by settings.liveSmooth.collectAsState()
+    val visible by settings.discoverable.collectAsState()
     SettingsCard(
         if (onOpenShare != null) Icons.Filled.Share else Icons.Filled.Settings,
         stringResource(if (onOpenShare != null) R.string.v51_share_title else R.string.v51_share_settings_title),
@@ -316,7 +283,8 @@ fun ShareSettingsCard(settings: ShareSettings = koinInject(), onOpenShare: (() -
         subtitle = if (onOpenShare != null) stringResource(R.string.v51_share_settings_hint) else null,
     ) {
         if (onOpenShare != null) NeuButton(stringResource(R.string.v51_share_open_page), onOpenShare, Modifier.fillMaxWidth().testTag("settings_open_share"), primary = true, icon = Icons.Filled.Share)
-        SettingSwitchRow(stringResource(R.string.v51_share_ask), stringResource(R.string.v51_share_ask_hint), ask, settings::setAskBeforeReceive, divider = onOpenShare != null)
+        SettingSwitchRow(stringResource(R.string.v51_share_discoverable), stringResource(R.string.v51_share_discoverable_hint), visible, settings::setDiscoverable, divider = onOpenShare != null)
+        SettingSwitchRow(stringResource(R.string.v51_share_ask), stringResource(R.string.v51_share_ask_hint), ask, settings::setAskBeforeReceive)
         SettingSwitchRow(stringResource(R.string.v51_share_folder), stringResource(R.string.v51_share_folder_hint), folder, settings::setReceivedFolder)
         SettingSwitchRow(stringResource(R.string.v51_share_smooth), stringResource(R.string.v51_share_smooth_hint), smooth, settings::setLiveSmooth)
     }

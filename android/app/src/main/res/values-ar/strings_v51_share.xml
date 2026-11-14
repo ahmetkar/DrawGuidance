@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- v51 cihazlar arası tuval paylaşımı ve canlı yayın -->
+<!-- v51 cihazlar arası tuval paylaşımı ve canlı yayın (aynı Wi-Fi ağı) -->
 <resources>
     <string name="v51_share_title">المشاركة بين الأجهزة</string>
     <string name="v51_share_open">مشاركة</string>
-    <string name="v51_share_settings_hint">شارك اللوحات والصور مع الأجهزة القريبة عبر Wi-Fi Direct أو البلوتوث أو شبكة Wi-Fi نفسها، وابثّ مباشرةً</string>
+    <string name="v51_share_settings_hint">شارك اللوحات والصور مع الأجهزة على شبكة Wi-Fi نفسها (Android وiPhone وiPad) وابثّ مباشرةً</string>
     <string name="v51_share_open_page">افتح صفحة المشاركة</string>
     <string name="v51_share_this_device">هذا الجهاز</string>
     <string name="v51_share_device_name">اسم الجهاز</string>
@@ -11,11 +11,9 @@
     <string name="v51_share_rename">تغيير الاسم</string>
     <string name="v51_share_visible">مرئي · جارٍ البحث عن الأجهزة القريبة</string>
     <string name="v51_share_off">غير مرئي</string>
-    <string name="v51_share_nearby_title">الأجهزة القريبة</string>
-    <string name="v51_share_nearby_empty">تظهر هنا الأجهزة القريبة التي تستخدم التطبيق. افتح صفحة المشاركة على الجهاز الآخر أيضًا.</string>
-    <string name="v51_share_route_nearby">Wi-Fi Direct / بلوتوث</string>
+    <string name="v51_share_nearby_title">الأجهزة على هذه الشبكة</string>
+    <string name="v51_share_nearby_empty">تظهر هنا تلقائيًا الأجهزة التي تستخدم التطبيق على شبكة Wi-Fi نفسها.</string>
     <string name="v51_share_route_lan">شبكة Wi-Fi نفسها</string>
-    <string name="v51_share_connect">اتصال</string>
     <string name="v51_share_connecting">جارٍ الاتصال…</string>
     <string name="v51_share_connected">متصل</string>
     <string name="v51_share_disconnect">قطع الاتصال</string>
@@ -27,12 +25,6 @@
     <string name="v51_share_pick_image">اختر صورة لإرسالها</string>
     <string name="v51_share_no_canvases">لا توجد لوحات بعد</string>
     <string name="v51_share_no_images">لا توجد صور محفوظة</string>
-    <string name="v51_share_permission_title">إذن Wi-Fi Direct والبلوتوث</string>
-    <string name="v51_share_permission_text">يلزم إذن للعثور على أجهزة Android القريبة والاتصال بها عبر Wi-Fi Direct أو البلوتوث. بدونه تظهر فقط الأجهزة الموجودة على شبكة Wi-Fi نفسها.</string>
-    <string name="v51_share_permission_allow">سماح</string>
-    <string name="v51_share_request_title">طلب اتصال</string>
-    <string name="v51_share_request_text">يريد %1$s الاتصال بهذا الجهاز.</string>
-    <string name="v51_share_request_code">رمز التحقق: %1$s (يجب أن يتطابق على الجهازين)</string>
     <string name="v51_share_accept">قبول</string>
     <string name="v51_share_reject">رفض</string>
     <string name="v51_share_offer_title">مشاركة واردة</string>
@@ -71,8 +63,10 @@
     <string name="v51_share_platform_ios">iPhone / iPad</string>
     <string name="v51_share_platform_android">Android</string>
     <string name="v51_share_error">تحذير الاتصال: %1$s</string>
-    <string name="v51_share_how">تعثر أجهزة Android على بعضها عبر البلوتوث وتتصل عبر Wi-Fi Direct. للمشاركة مع iPhone أو iPad يجب أن يكون الجهازان على شبكة Wi-Fi نفسها.</string>
+    <string name="v51_share_how">يجب أن يكون الجهازان على شبكة Wi-Fi نفسها. أثناء فتح التطبيق تعثر الأجهزة على بعضها تلقائيًا، ويُنشأ الاتصال تلقائيًا عند الإرسال أو بدء البث.</string>
     <string name="v51_share_save">حفظ</string>
     <string name="v51_share_folder_name">المشتركة</string>
     <string name="v51_share_shared_live_badge">من بث مباشر · %1$s</string>
+    <string name="v51_share_discoverable">كن مرئيًا أثناء فتح التطبيق</string>
+    <string name="v51_share_discoverable_hint">تعثر عليك الأجهزة على شبكة Wi-Fi نفسها تلقائيًا. عند الإيقاف تكون مرئيًا فقط أثناء فتح صفحة المشاركة</string>
 </resources>

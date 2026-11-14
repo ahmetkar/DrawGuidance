@@ -138,6 +138,11 @@ open class DrawGuidanceApp : Application() {
                         androidx.lifecycle.ProcessLifecycleOwner.get().lifecycle.addObserver(foreground)
                     }
                 }
+                // v51 cihazlar arası paylaşım: uygulama açıkken aynı Wi-Fi'deki cihazlar kendiliğinden bulunur
+                if (autoSync) runCatching {
+                    val share = koin.get<com.karapp.drawguidance.data.share.ShareManager>()
+                    android.os.Handler(android.os.Looper.getMainLooper()).post { share.attachToProcess() }
+                }
             }.onFailure { com.karapp.drawguidance.diagnostics.AppLog.e("DrawGuidanceApp", "eşitleme başlatılamadı", it) }
             // v34 dil ayarı veritabanına yazılır (ilk açılışta algılanan dil)
             runCatching { kotlinx.coroutines.runBlocking { koin.get<com.karapp.drawguidance.data.settings.LanguageRepository>().ensureStored() } }

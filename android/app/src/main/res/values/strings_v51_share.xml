@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- v51 cihazlar arası tuval paylaşımı ve canlı yayın -->
+<!-- v51 cihazlar arası tuval paylaşımı ve canlı yayın (aynı Wi-Fi ağı) -->
 <resources>
     <string name="v51_share_title">Cihazlar arası paylaşım</string>
     <string name="v51_share_open">Paylaşım</string>
-    <string name="v51_share_settings_hint">Yakındaki cihazlarla Wi-Fi Direct, Bluetooth ya da aynı Wi-Fi üzerinden tuval ve resim paylaşın, canlı yayın yapın</string>
+    <string name="v51_share_settings_hint">Aynı Wi-Fi ağındaki cihazlarla (Android, iPhone, iPad) tuval ve resim paylaşın, canlı yayın yapın</string>
     <string name="v51_share_open_page">Paylaşım sayfasını aç</string>
     <string name="v51_share_this_device">Bu cihaz</string>
     <string name="v51_share_device_name">Cihaz adı</string>
@@ -11,11 +11,9 @@
     <string name="v51_share_rename">Adı değiştir</string>
     <string name="v51_share_visible">Görünür · yakındaki cihazlar aranıyor</string>
     <string name="v51_share_off">Görünür değil</string>
-    <string name="v51_share_nearby_title">Yakındaki cihazlar</string>
-    <string name="v51_share_nearby_empty">Uygulamayı kullanan yakındaki cihazlar burada görünür. Diğer cihazda da paylaşım sayfasını açın.</string>
-    <string name="v51_share_route_nearby">Wi-Fi Direct / Bluetooth</string>
+    <string name="v51_share_nearby_title">Aynı ağdaki cihazlar</string>
+    <string name="v51_share_nearby_empty">Aynı Wi-Fi ağında uygulamayı kullanan cihazlar burada kendiliğinden görünür.</string>
     <string name="v51_share_route_lan">Aynı Wi-Fi ağı</string>
-    <string name="v51_share_connect">Bağlan</string>
     <string name="v51_share_connecting">Bağlanıyor…</string>
     <string name="v51_share_connected">Bağlı</string>
     <string name="v51_share_disconnect">Bağlantıyı kes</string>
@@ -27,12 +25,6 @@
     <string name="v51_share_pick_image">Gönderilecek resmi seçin</string>
     <string name="v51_share_no_canvases">Henüz tuval yok</string>
     <string name="v51_share_no_images">Kaydedilmiş resim yok</string>
-    <string name="v51_share_permission_title">Wi-Fi Direct ve Bluetooth izni</string>
-    <string name="v51_share_permission_text">Yakındaki Android cihazları bulmak ve onlara Wi-Fi Direct ya da Bluetooth ile bağlanmak için izin gerekir. İzin vermezseniz yalnız aynı Wi-Fi ağındaki cihazlar görünür.</string>
-    <string name="v51_share_permission_allow">İzin ver</string>
-    <string name="v51_share_request_title">Bağlantı isteği</string>
-    <string name="v51_share_request_text">%1$s bu cihaza bağlanmak istiyor.</string>
-    <string name="v51_share_request_code">Doğrulama kodu: %1$s (iki cihazda aynı olmalı)</string>
     <string name="v51_share_accept">Kabul et</string>
     <string name="v51_share_reject">Reddet</string>
     <string name="v51_share_offer_title">Gelen paylaşım</string>
@@ -71,8 +63,10 @@
     <string name="v51_share_platform_ios">iPhone / iPad</string>
     <string name="v51_share_platform_android">Android</string>
     <string name="v51_share_error">Bağlantı uyarısı: %1$s</string>
-    <string name="v51_share_how">Android cihazlar birbirini Bluetooth ile bulur ve Wi-Fi Direct ile bağlanır. iPhone ya da iPad ile paylaşmak için iki cihaz aynı Wi-Fi ağında olmalı.</string>
+    <string name="v51_share_how">İki cihaz aynı Wi-Fi ağında olmalı. Uygulama açıkken cihazlar birbirini kendiliğinden bulur; gönder ya da yayın başlat dediğinizde bağlantı kendiliğinden kurulur.</string>
     <string name="v51_share_save">Kaydet</string>
     <string name="v51_share_folder_name">Paylaşılanlar</string>
     <string name="v51_share_shared_live_badge">Canlı yayından · %1$s</string>
+    <string name="v51_share_discoverable">Uygulama açıkken görünür ol</string>
+    <string name="v51_share_discoverable_hint">Aynı Wi-Fi\'deki cihazlar sizi kendiliğinden bulur. Kapalıysa yalnız paylaşım sayfası açıkken görünürsünüz</string>
 </resources>

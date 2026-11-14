@@ -20,7 +20,6 @@ import androidx.compose.material.icons.filled.Cast
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Inbox
-import androidx.compose.material.icons.filled.Link
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
@@ -59,13 +58,12 @@ import com.karapp.drawguidance.ui.theme.NeuTheme
 import org.koin.compose.koinInject
 
 /**
- * v51 uygulamanın her ekranında paylaşımın pencereleri: bağlantı isteği, gelen tuval/resim/yayın teklifi ve alınan
+ * v51 uygulamanın her ekranında paylaşımın pencereleri: gelen tuval/resim/yayın teklifi ve alınan
  * tuval bildirimi. Yayın kabul edilince alıcıda yayın tuvali, yayını başlatanda tuval düzenleyicide açılır.
  */
 @Composable
 fun ShareHost(onOpenCanvas: (String) -> Unit, onOpenLive: (String) -> Unit, share: ShareManager = koinInject()) {
     val context = LocalContext.current
-    val request by share.request.collectAsState()
     val offer by share.offer.collectAsState()
     var received by remember { mutableStateOf<ShareEvent.Received?>(null) }
     val colors = NeuTheme.colors
@@ -82,24 +80,6 @@ fun ShareHost(onOpenCanvas: (String) -> Unit, onOpenLive: (String) -> Unit, shar
                 is ShareEvent.Disconnected -> toast(context, context.getString(R.string.v51_share_disconnected, e.name))
             }
         }
-    }
-
-    request?.let { r ->
-        AlertDialog(
-            onDismissRequest = {},
-            containerColor = colors.background,
-            modifier = Modifier.testTag("share_request_dialog"),
-            icon = { Icon(Icons.Filled.Link, null, tint = colors.accent) },
-            title = { Text(stringResource(R.string.v51_share_request_title)) },
-            text = {
-                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                    Text(stringResource(R.string.v51_share_request_text, r.name), translate = false)
-                    r.code?.let { Text(stringResource(R.string.v51_share_request_code, it), fontWeight = FontWeight.SemiBold, translate = false) }
-                }
-            },
-            confirmButton = { TextButton(onClick = { share.answerRequest(true) }, modifier = Modifier.testTag("share_request_accept")) { Text(stringResource(R.string.v51_share_accept)) } },
-            dismissButton = { TextButton(onClick = { share.answerRequest(false) }) { Text(stringResource(R.string.v51_share_reject)) } },
-        )
     }
 
     offer?.let { o ->

@@ -231,14 +231,14 @@ fun appModule(apiBaseUrl: String) = module {
     single { com.karapp.drawguidance.content.shapes.ShapeModeModels(java.io.File(androidContext().filesDir, "shape_models")) }
     // v29 modlar arası aktarma (tuval → not/çizgi roman, 3B → tuval/çizgi roman)
     single { com.karapp.drawguidance.data.transfer.CanvasTransfer(get(), get()) }
-    // v51 cihazlar arası paylaşım (Nearby: Wi-Fi Direct/Bluetooth; aynı Wi-Fi: iOS ile) ve canlı tuval yayını
+    // v51 cihazlar arası paylaşım (aynı Wi-Fi ağı; Android ve iOS) ve canlı tuval yayını
     single { com.karapp.drawguidance.data.share.ShareSettings(androidContext()) }
     single { com.karapp.drawguidance.data.share.SharedCanvasRegistry(androidContext()) }
     single { com.karapp.drawguidance.data.share.SharePackages(get(), get(), get(), get()) { androidContext().getString(com.karapp.drawguidance.R.string.v51_share_folder_name) } }
     single {
         com.karapp.drawguidance.data.share.ShareManager(
             androidContext(), get(), get(), get(), get(), get(), get(),
-            listOf(com.karapp.drawguidance.data.share.NearbyTransport(androidContext()), com.karapp.drawguidance.data.share.LanTransport(androidContext())),
+            listOf(com.karapp.drawguidance.data.share.LanTransport(androidContext())),
         )
     }
     single { com.karapp.drawguidance.data.settings.DeveloperSettingsStore(androidContext()) }

@@ -10,7 +10,7 @@ import java.util.UUID
 
 /**
  * v51 paylaşım ayarları (Ayarlar → Bağlantı → Cihazlar arası paylaşım ve paylaşım sayfası):
- * diğer cihazlarda görünen ad, gelenleri sormadan alma, alınanları "Paylaşılanlar" klasörüne koyma ve
+ * diğer cihazlarda görünen ad, görünürlük (uygulama açıkken kendiliğinden keşif), gelenleri sormadan alma, alınanları "Paylaşılanlar" klasörüne koyma ve
  * yayının güncelleme sıklığı. [instanceId] bu kurulumun kalıcı kimliğidir (kendi cihazını listede görmemek için).
  */
 class ShareSettings(context: Context) {
@@ -29,6 +29,10 @@ class ShareSettings(context: Context) {
     /** Alınan tuvaller Tuvallerim'deki "Paylaşılanlar" klasörüne konsun. */
     val receivedFolder: StateFlow<Boolean> = _folder.asStateFlow()
 
+    private val _visible = MutableStateFlow(prefs.getBoolean(KEY_VISIBLE, true))
+    /** Uygulama açıkken aynı Wi-Fi'deki diğer cihazlarda görünür ol ve onları kendiliğinden bul. */
+    val discoverable: StateFlow<Boolean> = _visible.asStateFlow()
+
     private val _smooth = MutableStateFlow(prefs.getBoolean(KEY_SMOOTH, true))
     /** Yayın sık güncellensin (kapalıysa daha seyrek; yavaş Bluetooth bağlantısında önerilir). */
     val liveSmooth: StateFlow<Boolean> = _smooth.asStateFlow()
@@ -41,6 +45,7 @@ class ShareSettings(context: Context) {
 
     fun setAskBeforeReceive(on: Boolean) { _ask.value = on; prefs.edit().putBoolean(KEY_ASK, on).apply() }
     fun setReceivedFolder(on: Boolean) { _folder.value = on; prefs.edit().putBoolean(KEY_FOLDER, on).apply() }
+    fun setDiscoverable(on: Boolean) { _visible.value = on; prefs.edit().putBoolean(KEY_VISIBLE, on).apply() }
     fun setLiveSmooth(on: Boolean) { _smooth.value = on; prefs.edit().putBoolean(KEY_SMOOTH, on).apply() }
 
     /** "Paylaşılanlar" klasörünün kimliği (silinmişse yeniden oluşturulur). */
@@ -58,6 +63,7 @@ class ShareSettings(context: Context) {
         const val KEY_FOLDER = "received_folder"
         const val KEY_FOLDER_ID = "received_folder_id"
         const val KEY_SMOOTH = "live_smooth"
+        const val KEY_VISIBLE = "discoverable"
 
         fun defaultName(): String {
             val maker = Build.MANUFACTURER.orEmpty().replaceFirstChar { it.uppercase() }

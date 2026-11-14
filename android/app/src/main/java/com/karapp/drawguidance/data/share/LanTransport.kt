@@ -34,6 +34,8 @@ class LanTransport(context: Context) : ShareTransport {
     private var registration: NsdManager.RegistrationListener? = null
     private var discovery: NsdManager.DiscoveryListener? = null
     private var me = LanHello("", "Android", "android")
+    private val wifi = context.applicationContext.getSystemService(Context.WIFI_SERVICE) as? android.net.wifi.WifiManager
+    private var multicast: android.net.wifi.WifiManager.MulticastLock? = null
 
     private class Peer(val host: InetAddress, val port: Int, val name: String, val platform: String)
     private inner class Conn(val socket: Socket, val endpoint: String) {
@@ -64,6 +66,8 @@ class LanTransport(context: Context) : ShareTransport {
         me = LanHello(instanceId, name, "android")
         val ss = runCatching { ServerSocket(0) }.getOrElse { fail("Sunucu açılamadı", it); return }
         server = ss
+        // Bazı cihazlar çoklu yayın paketlerini kilitsiz süzer: keşif sürerken kilit tutulur
+        multicast = runCatching { wifi?.createMulticastLock("dg-share")?.apply { setReferenceCounted(false); acquire() } }.getOrNull()
         Thread({ acceptLoop(ss) }, "dg-share-lan").apply { isDaemon = true }.start()
         register(ss.localPort)
         discover()
@@ -165,6 +169,8 @@ class LanTransport(context: Context) : ShareTransport {
         discovery = null
         runCatching { server?.close() }
         server = null
+        runCatching { multicast?.release() }
+        multicast = null
         found.clear()
         serviceToEndpoint.clear()
         resolveQueue.clear()

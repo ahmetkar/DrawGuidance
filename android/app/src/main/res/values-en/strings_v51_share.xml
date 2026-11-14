@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- v51 cihazlar arası tuval paylaşımı ve canlı yayın -->
+<!-- v51 cihazlar arası tuval paylaşımı ve canlı yayın (aynı Wi-Fi ağı) -->
 <resources>
     <string name="v51_share_title">Share between devices</string>
     <string name="v51_share_open">Share</string>
-    <string name="v51_share_settings_hint">Share canvases and images with nearby devices over Wi-Fi Direct, Bluetooth or the same Wi-Fi, and broadcast live</string>
+    <string name="v51_share_settings_hint">Share canvases and images with devices on the same Wi-Fi network (Android, iPhone, iPad) and broadcast live</string>
     <string name="v51_share_open_page">Open the share page</string>
     <string name="v51_share_this_device">This device</string>
     <string name="v51_share_device_name">Device name</string>
@@ -11,11 +11,9 @@
     <string name="v51_share_rename">Rename</string>
     <string name="v51_share_visible">Visible · searching for nearby devices</string>
     <string name="v51_share_off">Not visible</string>
-    <string name="v51_share_nearby_title">Nearby devices</string>
-    <string name="v51_share_nearby_empty">Nearby devices using the app appear here. Open the share page on the other device too.</string>
-    <string name="v51_share_route_nearby">Wi-Fi Direct / Bluetooth</string>
+    <string name="v51_share_nearby_title">Devices on this network</string>
+    <string name="v51_share_nearby_empty">Devices on the same Wi-Fi network that use the app appear here automatically.</string>
     <string name="v51_share_route_lan">Same Wi-Fi network</string>
-    <string name="v51_share_connect">Connect</string>
     <string name="v51_share_connecting">Connecting…</string>
     <string name="v51_share_connected">Connected</string>
     <string name="v51_share_disconnect">Disconnect</string>
@@ -27,12 +25,6 @@
     <string name="v51_share_pick_image">Choose an image to send</string>
     <string name="v51_share_no_canvases">No canvases yet</string>
     <string name="v51_share_no_images">No saved images</string>
-    <string name="v51_share_permission_title">Wi-Fi Direct and Bluetooth permission</string>
-    <string name="v51_share_permission_text">Permission is needed to find nearby Android devices and connect to them over Wi-Fi Direct or Bluetooth. Without it, only devices on the same Wi-Fi network appear.</string>
-    <string name="v51_share_permission_allow">Allow</string>
-    <string name="v51_share_request_title">Connection request</string>
-    <string name="v51_share_request_text">%1$s wants to connect to this device.</string>
-    <string name="v51_share_request_code">Verification code: %1$s (must match on both devices)</string>
     <string name="v51_share_accept">Accept</string>
     <string name="v51_share_reject">Decline</string>
     <string name="v51_share_offer_title">Incoming share</string>
@@ -71,8 +63,10 @@
     <string name="v51_share_platform_ios">iPhone / iPad</string>
     <string name="v51_share_platform_android">Android</string>
     <string name="v51_share_error">Connection warning: %1$s</string>
-    <string name="v51_share_how">Android devices find each other over Bluetooth and connect over Wi-Fi Direct. To share with an iPhone or iPad, both devices must be on the same Wi-Fi network.</string>
+    <string name="v51_share_how">Both devices must be on the same Wi-Fi network. While the app is open, devices find each other automatically; the connection is made automatically when you send or start a broadcast.</string>
     <string name="v51_share_save">Save</string>
     <string name="v51_share_folder_name">Shared</string>
     <string name="v51_share_shared_live_badge">From a live broadcast · %1$s</string>
+    <string name="v51_share_discoverable">Be visible while the app is open</string>
+    <string name="v51_share_discoverable_hint">Devices on the same Wi-Fi find you automatically. When off, you are visible only while the share page is open</string>
 </resources>

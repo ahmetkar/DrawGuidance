@@ -2953,6 +2953,7 @@
 "v48_tut_three_b" = "Basit modda dikey ekranda üç menü var: Ekle, Çiz, Seç ve düzenle. Her menü tek satır; sığmazsa yana kaydırılır.";
 "v48_tut_three_t" = "Üç menü";
 "v48_tut_title" = "Yeni menüler";
+"v50_help_practice" = "Çizgi, elips, desen ve perspektif alıştırmaları: üzerinden çiz, kaybolan kılavuzla çiz ya da simetriyi tamamla; çizimin puanlanır.";
 "v50_lines_add" = "Ekle: %1$@";
 "v50_lines_reset" = "Sıfırla";
 "v50_lines_style_comic" = "Çizgi roman";

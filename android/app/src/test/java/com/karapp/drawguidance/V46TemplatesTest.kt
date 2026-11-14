@@ -184,7 +184,11 @@ class V46TemplateFilesTest {
         assertEquals(null, m.titleId)
         val p1 = CanvasTemplates.prepare(t.id, "Benim Hikâyem")!!
         assertTrue(p1.assets.isEmpty())
-        assertEquals(pages(t.id).flatten().map { it.text?.content }, ContentCodec.decodeDocument(p1.content).pages.flatten().map { it.text?.content })
+        // v50 kapaksız çizgi roman şablonuna örnek kapak eklenir (ilk sayfa); şablonun sayfaları kapaktan sonra gelir
+        val prepared = ContentCodec.decodeDocument(p1.content).pages
+        assertEquals(pages(t.id).size + 1, prepared.size)
+        assertTrue(prepared[0].any { it.text?.content == "Benim Hikâyem" })
+        assertEquals(pages(t.id).flatten().map { it.text?.content }, prepared.drop(1).flatten().map { it.text?.content })
         // Not şablonunda başlık değişmez (kapak yok)
         val n = CanvasTemplates.prepare("notes_cornell", "Fizik")!!
         assertEquals(ContentCodec.decodeDocument(File(ASSETS, CanvasTemplates.contentPath("notes_cornell")).readBytes()).pages.flatten().map { it.text?.content },
@@ -254,8 +258,9 @@ class V46TemplateFormTest : V32EditorBase() {
         assertEquals(CanvasKind.COMIC, c.kind)
         assertEquals(meta.width, c.width)
         assertEquals(meta.height, c.height)
-        assertEquals(CanvasTemplates.find("comic_blank_manga")!!.pages, c.pages.size)
-        assertEquals(meta.currentPage, c.currentPage)
+        // v50 örnek kapak sayfası eklenir; tuval kapaktan sonraki sayfada açılır
+        assertEquals(CanvasTemplates.find("comic_blank_manga")!!.pages + 1, c.pages.size)
+        assertEquals(meta.currentPage + 1, c.currentPage)
         // Resimler yeni tuvale yeni kimliklerle kaydedildi
         val ids = c.pages.flatten().mapNotNull { it.assetId }.toSet()
         assertEquals(meta.assets.size, ids.size)

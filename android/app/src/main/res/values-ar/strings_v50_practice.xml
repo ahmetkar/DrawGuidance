@@ -29,4 +29,5 @@
     <string name="v50_practice_retry">إعادة</string>
     <string name="v50_practice_level">%1$d / %2$d</string>
     <string name="v50_practice_progress">تم اجتياز %1$d من %2$d تمرين</string>
+    <string name="v50_help_practice">تمارين الخطوط والقطوع الناقصة والأنماط والمنظور: ارسم فوق الدليل أو مع دليل يتلاشى أو أكمل التناظر؛ يتم تقييم رسمك.</string>
 </resources>

@@ -1,5 +1,6 @@
 package com.karapp.drawguidance.ui.screens.canvasedit.components
 
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -41,7 +42,7 @@ fun HarmonizeSheet(
     val o = draft.options
     NeuSheet(onCancel) {
         Column(
-            Modifier.fillMaxWidth().testTag("harmonize_sheet").padding(horizontal = 22.dp).navigationBarsPadding().padding(bottom = 22.dp),
+            Modifier.fillMaxWidth().testTag("harmonize_sheet").verticalScroll(androidx.compose.foundation.rememberScrollState()).padding(horizontal = 22.dp).navigationBarsPadding().padding(bottom = 22.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
             Text(stringResource(R.string.v43_harmonize_title), style = MaterialTheme.typography.headlineSmall)
@@ -93,7 +94,7 @@ fun PlaceSheet(
     val h = draft.canvasHeight.coerceAtLeast(1f)
     NeuSheet(onCancel) {
         Column(
-            Modifier.fillMaxWidth().testTag("place_sheet").padding(horizontal = 22.dp).navigationBarsPadding().padding(bottom = 22.dp),
+            Modifier.fillMaxWidth().testTag("place_sheet").verticalScroll(androidx.compose.foundation.rememberScrollState()).padding(horizontal = 22.dp).navigationBarsPadding().padding(bottom = 22.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
             Text(stringResource(R.string.v43_place_title), style = MaterialTheme.typography.headlineSmall)

@@ -1,5 +1,6 @@
 package com.karapp.drawguidance.ui.screens.canvasedit.components
 
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -109,7 +110,7 @@ private fun BrushSizeSheet(sizePx: Float, title: String, onApply: (Float) -> Uni
     val valid = value != null && value in BrushTuning.MIN_SIZE..BrushTuning.MAX_SIZE
     NeuSheet(onDismiss) {
         Column(
-            Modifier.fillMaxWidth().padding(start = 20.dp, end = 20.dp, bottom = 24.dp).testTag("brush_size_sheet"),
+            Modifier.fillMaxWidth().padding(start = 20.dp, end = 20.dp, bottom = 24.dp).testTag("brush_size_sheet").verticalScroll(androidx.compose.foundation.rememberScrollState()),
             verticalArrangement = Arrangement.spacedBy(14.dp),
         ) {
             Text(title, style = MaterialTheme.typography.titleLarge)

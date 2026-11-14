@@ -53,7 +53,8 @@ abstract class V32EditorBase : V31EditorBase() {
 
     protected fun startGroup(id: String) {
         waitFor { offerShown() }
-        compose.onNodeWithTag("tutorial_group_$id").performClick()
+        // v50 dikey ekranda eğitim listesi küçük pencerede kaydırılır
+        compose.onNodeWithTag("tutorial_group_$id").clickInPopup()
         waitFor { calloutShown() }
     }
 
@@ -84,14 +85,14 @@ class V32OfferTest : V32EditorBase() {
         assertTrue(compose.onAllNodesWithText("Çizim moduna hoş geldin").fetchSemanticsNodes().isNotEmpty())
         listOf("art_basics", "art_add", "art_ai").forEach { assertTrue(it, exists("tutorial_group_$it")) }
         shot("v32-offer-art")
-        compose.onNodeWithTag("tutorial_later").performClick()
+        compose.onNodeWithTag("tutorial_later").clickInPopup()
         waitFor { !offerShown() }
         // ⋮ → Eğitim modu
         compose.onNodeWithContentDescription("Diğer seçenekler").performClick()
         waitFor { exists("tutorial_menu_item") }
         compose.onNodeWithTag("tutorial_menu_item").performClick()
         waitFor { offerShown() }
-        compose.onNodeWithTag("tutorial_later").performClick()
+        compose.onNodeWithTag("tutorial_later").clickInPopup()
         waitFor { !offerShown() }
     }
 }
@@ -166,7 +167,7 @@ class V32CancelTest : V32EditorBase() {
     fun cancelRestoresDrawingAndHistory() {
         createCanvasAndOpen("Benim")
         waitFor { offerShown() }
-        compose.onNodeWithTag("tutorial_later").performClick()
+        compose.onNodeWithTag("tutorial_later").clickInPopup()
         waitFor { !offerShown() }
         val size = canvasSize()
         jitteryLine(size.y * 0.5f, 2f)

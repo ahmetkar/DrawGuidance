@@ -1508,7 +1508,8 @@ fun CanvasEditScreen(
                     bottomInset = { maxOf(modeBarHeightPx, dockedSheets?.coveredBottomPx ?: 0) },
                     openEdit = contextEdit,
                     onEditOpened = { contextEdit = false },
-                    modifier = if (dockedSheets != null) Modifier.zIndex(dockedSheets.menuZ()) else Modifier,
+                    // Katman sırası yalnız pencere açıkken değişir (yoksa öneri balonları menünün üstünde kalır)
+                    modifier = if (dockedSheets != null && dockedSheets.open) Modifier.zIndex(dockedSheets.menuZ()) else Modifier,
                     onTouched = { dockedSheets?.menuTouched() },
                 )
             }

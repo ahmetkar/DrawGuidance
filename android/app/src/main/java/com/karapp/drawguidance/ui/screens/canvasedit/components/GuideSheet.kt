@@ -1,5 +1,6 @@
 package com.karapp.drawguidance.ui.screens.canvasedit.components
 
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -68,7 +69,7 @@ private fun <T> TypeSheet(
     val colors = NeuTheme.colors
     NeuSheet(onDismiss) {
         Column(
-            Modifier.fillMaxWidth().testTag("guide_type_sheet").padding(horizontal = 22.dp).navigationBarsPadding().padding(bottom = 22.dp),
+            Modifier.fillMaxWidth().testTag("guide_type_sheet").verticalScroll(androidx.compose.foundation.rememberScrollState()).padding(horizontal = 22.dp).navigationBarsPadding().padding(bottom = 22.dp),
             verticalArrangement = Arrangement.spacedBy(14.dp),
         ) {
             Text(title, style = MaterialTheme.typography.headlineSmall)

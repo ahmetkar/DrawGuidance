@@ -29,4 +29,5 @@
     <string name="v50_practice_retry">重试</string>
     <string name="v50_practice_level">%1$d / %2$d</string>
     <string name="v50_practice_progress">已通过 %1$d / %2$d 个练习</string>
+    <string name="v50_help_practice">线条、椭圆、图案和透视练习：描摹、跟随渐隐参考线绘制或补全对称；你的绘画会被评分。</string>
 </resources>

@@ -54,17 +54,18 @@ class V40EditorUiTest : V33EditorBase() {
     private fun stored() = runBlocking { repo().observeCanvases().first().single() }
 
     @Test
+    // v50 dikey ekranda pencereler küçük ve kaydırılır: pencere içindeki düğmeler anlam eylemiyle tıklanır
     fun pageSettingsSheetSavesWithTheCanvas() {
         open("Ders", CanvasKind.NOTES, pages = 2)
         more()
         waitFor { exists("page_settings_menu_item") }
         compose.onNodeWithTag("page_settings_menu_item").clickInPopup()
         waitFor { exists("page_settings_sheet") }
-        compose.onNodeWithTag("page_numbers_switch").performClick()
-        compose.onNodeWithTag("number_format_total").performClick()
+        compose.onNodeWithTag("page_numbers_switch").clickInPopup()
+        compose.onNodeWithTag("number_format_total").clickInPopup()
         compose.onNode(hasTestTag("header_text") and hasSetTextAction()).performTextInput("Fizik")
-        compose.onNodeWithTag("header_align_LEFT").performClick()
-        compose.onNodeWithTag("page_settings_done").performClick()
+        compose.onNodeWithTag("header_align_LEFT").clickInPopup()
+        compose.onNodeWithTag("page_settings_done").clickInPopup()
         waitFor { !exists("page_settings_sheet") }
         waitFor { stored().pageSettings.header == "Fizik" }
         val s = stored().pageSettings
@@ -95,10 +96,10 @@ class V40EditorUiTest : V33EditorBase() {
         // v42 başlıktaki Kaydet → CBZ sekmesi
         compose.onNodeWithTag("header_save").performClick()
         waitFor { exists("save_tab_cbz") }
-        compose.onNodeWithTag("save_tab_cbz").performClick()
+        compose.onNodeWithTag("save_tab_cbz").clickInPopup()
         waitFor { exists("cbz_options_sheet") }
         assertTrue(exists("save_location"))
-        compose.onNodeWithTag("cbz_save").performClick()
+        compose.onNodeWithTag("cbz_save").clickInPopup()
         waitForText("CBZ kaydedildi", substring = true)
         // Bildirimde dosyanın yeri (varsayılan belgeler klasörü, .cbz)
         waitForText(".cbz", substring = true)
@@ -138,9 +139,9 @@ class V40EditorUiTest : V33EditorBase() {
         waitFor { exists("image_save_options_dialog") }
         assertTrue(exists("save_location_default"))
         assertTrue(exists("save_location_pick"))
-        compose.onNodeWithTag("color_cmyk").performClick()
+        compose.onNodeWithTag("color_cmyk").clickInPopup()
         waitFor { exists("cmyk_format_TIFF") }
-        compose.onNodeWithTag("cmyk_format_TIFF").performClick()
+        compose.onNodeWithTag("cmyk_format_TIFF").clickInPopup()
         waitForText(".tif", substring = true)
         // Soft proof önizlemesi ve renk uyarısı
         waitFor { exists("cmyk_gamut") }

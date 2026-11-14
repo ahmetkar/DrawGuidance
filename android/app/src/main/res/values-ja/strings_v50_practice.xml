@@ -29,4 +29,5 @@
     <string name="v50_practice_retry">やり直す</string>
     <string name="v50_practice_level">%1$d / %2$d</string>
     <string name="v50_practice_progress">%1$d / %2$d 個の練習に合格</string>
+    <string name="v50_help_practice">線・楕円・模様・遠近法の練習：なぞる、消えるガイドで描く、対称を完成させる。描いた線が採点されます。</string>
 </resources>

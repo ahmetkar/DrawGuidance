@@ -1,5 +1,6 @@
 package com.karapp.drawguidance.ui.screens.canvasedit.components
 
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.filled.OpenWith
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -56,7 +57,7 @@ fun ColorPickSheet(
         Column(
             Modifier
                 .fillMaxWidth()
-                .testTag("color_pick_sheet")
+                .testTag("color_pick_sheet").verticalScroll(androidx.compose.foundation.rememberScrollState())
                 .padding(horizontal = 22.dp)
                 .navigationBarsPadding()
                 .padding(bottom = 22.dp),
@@ -107,7 +108,7 @@ fun PartColorSheet(
         Column(
             Modifier
                 .fillMaxWidth()
-                .testTag("part_color_sheet")
+                .testTag("part_color_sheet").verticalScroll(androidx.compose.foundation.rememberScrollState())
                 .padding(horizontal = 22.dp)
                 .navigationBarsPadding()
                 .padding(bottom = 22.dp),

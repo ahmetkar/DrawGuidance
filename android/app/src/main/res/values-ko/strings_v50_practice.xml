@@ -29,4 +29,5 @@
     <string name="v50_practice_retry">다시</string>
     <string name="v50_practice_level">%1$d / %2$d</string>
     <string name="v50_practice_progress">%1$d / %2$d개 연습 통과</string>
+    <string name="v50_help_practice">선, 타원, 패턴, 원근 연습: 따라 그리기, 사라지는 가이드로 그리기, 대칭 완성하기. 그림이 채점됩니다.</string>
 </resources>

@@ -14,6 +14,7 @@ import kotlin.math.max
  */
 internal fun TemplateScope.practiceTemplates() {
     for (shape in PracticeShapes.all) {
+        if (shape.id in SUGGEST_EXCLUDED) continue
         val paths = shape.paths(256f)
         val aspect = shape.aspect
         fun fit(p: P): P = if (aspect >= 1f) P(p.x, 0.5f + (p.y - 0.5f) / aspect) else P(0.5f + (p.x - 0.5f) * aspect, p.y)
@@ -35,6 +36,16 @@ internal fun TemplateScope.practiceTemplates() {
         )
     }
 }
+
+/**
+ * Öneride kullanılmayan temel alıştırmalar: düz çizgi, ışın, elips, spiral, dalga, ton skalası ve küre birkaç basit
+ * çizgiden oluşur; şablon olunca sıradan daire ve çizgilerin düzeltme önerisini (şekil, "hepsini düzelt") ele
+ * geçiriyordu. Alıştırma olarak yine sunulurlar.
+ */
+private val SUGGEST_EXCLUDED = setOf(
+    "practice.lines", "practice.radial", "practice.ellipses", "practice.spiral", "practice.waves", "practice.value_scale",
+    "practice.sphere",
+)
 
 /** Şablonda tutulan en çok çizgi (tarama gibi çok çizgili şekillerde en uzunları). */
 private const val MAX_STROKES = 12

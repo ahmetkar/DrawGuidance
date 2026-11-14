@@ -55,6 +55,7 @@ object ToolDescriptions {
         R.string.simple_paint_background to R.string.help_simple_paint_background,
         // v38 çocuk modunda çizim görevi
         R.string.kids_challenge to R.string.help_kids_challenge,
+        R.string.v50_practice to R.string.v50_help_practice,
         // v40 cetvel ve şekil kalıbı (basit menüde ayrı düğmeler)
         R.string.v40_ruler to R.string.v40_help_ruler,
         R.string.v40_template to R.string.v40_help_template,

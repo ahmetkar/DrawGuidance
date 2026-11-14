@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- v51 işlev eğitim grupları, yeni alıştırma türleri, puan parçaları ve ödüllü reklam -->
+<resources>
+    <string name="tut51_draw">Çizim araçları ve kaydetme</string>
+    <string name="tut51_draw_text">Fırça, boya, silgi, kalem, geri alma, katmanlar, arka plan ve kaydetme.</string>
+    <string name="tut51_edit">Ekleme, seçme ve düzenleme</string>
+    <string name="tut51_edit_text">Hazır şekil ve yazı ekle; seç, taşı, ölçekle, kopyala ve düzenle; mod menüsü.</string>
+    <string name="tut51_guides">Cetvel ve şekil kalıbı</string>
+    <string name="tut51_guides_text">Cetveli döndür ve boyutlandır, tür, birim ve ölçek seç, kenar boyunca ve kalıpla çiz.</string>
+    <string name="tut51_notes_write">Yazı, kalem ve sayfalar</string>
+    <string name="tut51_notes_write_text">Başlık yazısı, not kalemleri, fosforlu kalem, sayfa kaydırıcı, sayfa ayarları ve PDF.</string>
+    <string name="tut51_notes_add">Formül, diyagram ve şekiller</string>
+    <string name="tut51_notes_add_text">Ekle menüsü, formül, diyagram, ok ve şekiller, paneller, formülle çizilen ve element şekilleri.</string>
+    <string name="tut51_select_guides">Seçme, taşıma ve cetvel</string>
+    <string name="tut51_select_guides_text">Mod menüsü, Özellikler, Taşı ve Genişlet, basılı tutup taşıma ve cetvelle çizim.</string>
+    <string name="tut51_comic_pages">Paneller, şablonlar ve sayfalar</string>
+    <string name="tut51_comic_pages_text">Panel şablonu, mürekkep kalemi, hız çizgileri, kapak, sayfa numarası, PDF ve CBZ.</string>
+    <string name="tut51_comic_cast">Karakter, mekân, balon ve efekt</string>
+    <string name="tut51_comic_cast_text">Hazır karakterler, mekân arka planları, konuşma balonu, anlatı kutusu ve efekt yazısı.</string>
+    <string name="tut51_simple_draw">Çizim ve boyama</string>
+    <string name="tut51_simple_draw_text">Fırça, şekiller, boya ve Özellikler; üst menünün iki parçası.</string>
+    <string name="tut51_simple_edit">Seçme, yazı ve arka plan</string>
+    <string name="tut51_simple_edit_text">Üç menü, seç ve taşı, dikdörtgen seçim, yazı kutusu, damlalık, arka plan ve kaydetme.</string>
+    <string name="tut51_simple_guides">Cetvel, kalıp ve resimden çizim</string>
+    <string name="tut51_simple_guides_text">Cetvel ve şekil kalıbı; resmi vektörleştirip kalıp yapma ve kalıpla çizme.</string>
+    <string name="tut51_kids_more">Cetvel, kalıp ve görevler</string>
+    <string name="tut51_kids_more_text">Boyacık cetveli, resmi taşımayı, çizim görevini ve kalıpla çizmeyi gösterir.</string>
+    <string name="v51_practice_kind_copy">Bakarak çiz</string>
+    <string name="v51_practice_intro_copy">Köşedeki örneğe bakarak şekli kesikli çerçeveye çiz. Yer ve boy serbest; oranlar önemli.</string>
+    <string name="v51_practice_kind_timed">Süreli çizim</string>
+    <string name="v51_practice_intro_timed">Kılavuzun üstünden süre bitmeden çiz. Süre ilk çizgide başlar; erken bitirmek hız puanı kazandırır.</string>
+    <string name="v51_practice_group_observe">Gözlem çizimi</string>
+    <string name="v51_practice_group_figures">İnsan ve portre</string>
+    <string name="v51_practice_time_up">Süre doldu</string>
+    <string name="v51_practice_points">puan</string>
+    <string name="v51_practice_record">Yeni rekor!</string>
+    <string name="v51_practice_accuracy">İsabet</string>
+    <string name="v51_practice_coverage">Kapsama</string>
+    <string name="v51_practice_smoothness">Akıcılık</string>
+    <string name="v51_practice_speed">Hız</string>
+    <string name="v51_practice_reward_title">Reklamla aç</string>
+    <string name="v51_practice_reward_body">Kısa bir ödüllü reklam izleyerek bu alıştırmayı kalıcı olarak açabilirsin. Premium üyelerde bütün alıştırmalar açıktır.</string>
+    <string name="v51_practice_reward_failed">Reklam şu an yüklenemedi. İnternet bağlantını kontrol edip biraz sonra yeniden dene.</string>
+    <string name="v51_practice_reward_watch">Reklamı izle</string>
+    <string name="v51_practice_reward_later">Daha sonra</string>
+    <string name="v51_practice_reward_badge">Reklamla açılır</string>
+</resources>

@@ -151,6 +151,12 @@ fun DrawGuidanceNavGraph(
                     onBack = { navController.popBackStack() },
                     onOpenModel3d = { modelId, strokeId -> navController.navigate(Routes.modelEdit(modelId, localId, strokeId)) },
                     onOpenSubscription = { navController.navigate(Routes.SUBSCRIPTION) },
+                    // v51 yeni alıştırma yeni tuvalde: eski düzenleyici yığından çıkar
+                    onOpenCanvas = { id ->
+                        navController.navigate(Routes.canvasEdit(id)) {
+                            popUpTo(backStackEntry.destination.id) { inclusive = true }
+                        }
+                    },
                 )
             }
         }

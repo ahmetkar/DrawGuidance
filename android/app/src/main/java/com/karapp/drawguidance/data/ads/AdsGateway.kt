@@ -6,7 +6,8 @@ import android.content.Context
 /**
  * v39 reklamların uygulamadaki arayüzü (Google Mobile Ads ve UMP biçiminde). Gerçek uygulama [AdMobGateway];
  * testlerde ve reklamsız derlemede [NoOpAdsGateway] (Koin'de tek satırla değişir: bkz. di/AppModule.kt).
- * Uygulama yalnız geçiş reklamı (interstitial) kullanır: açılışta ve tuval kapatıldıktan sonra.
+ * Geçiş reklamı (interstitial) açılışta ve tuval kapatıldıktan sonra; v51 ödüllü reklam (rewarded) yalnız kullanıcı
+ * isteyince (kilitli alıştırmayı açmak için).
  */
 interface AdsGateway {
     /** Bu derlemede reklam kütüphanesi var mı. */
@@ -35,6 +36,12 @@ interface AdsGateway {
 
     /** InterstitialAd.show: [onFinished] reklam gösterildiyse true (kapatılınca), gösterilemediyse false. */
     fun showInterstitial(activity: Activity, onFinished: (shown: Boolean) -> Unit)
+
+    /** v51 RewardedAd.load (ödüllü reklam: bazı alıştırmaları açar). [onResult] yüklendi mi. */
+    fun loadRewarded(context: Context, adUnitId: String, onResult: (loaded: Boolean) -> Unit) = onResult(false)
+
+    /** v51 RewardedAd.show: [onFinished] ödül kazanıldıysa true (reklam kapatılınca). */
+    fun showRewarded(activity: Activity, onFinished: (earned: Boolean) -> Unit) = onFinished(false)
 }
 
 /** v39 reklamsız uygulama (testler, kütüphanesiz derleme): hiçbir reklam yüklenmez ya da gösterilmez. */

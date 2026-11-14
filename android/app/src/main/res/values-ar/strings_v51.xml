@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- v51 işlev eğitim grupları, yeni alıştırma türleri, puan parçaları ve ödüllü reklam -->
+<resources>
+    <string name="tut51_draw">أدوات الرسم والحفظ</string>
+    <string name="tut51_draw_text">الفرشاة والتعبئة والممحاة والقلم والتراجع والطبقات والخلفية والحفظ.</string>
+    <string name="tut51_edit">الإضافة والتحديد والتحرير</string>
+    <string name="tut51_edit_text">أضف الأشكال والنصوص؛ حدّد وانقل وغيّر الحجم وانسخ وحرّر؛ قائمة الأوضاع.</string>
+    <string name="tut51_guides">المسطرة وقالب الأشكال</string>
+    <string name="tut51_guides_text">دوّر المسطرة وغيّر حجمها، واختر النوع والوحدة والمقياس، وارسم على حافتها وبالقالب.</string>
+    <string name="tut51_notes_write">النص والأقلام والصفحات</string>
+    <string name="tut51_notes_write_text">العناوين وأقلام الملاحظات وقلم التمييز وشريط الصفحات وإعدادات الصفحة وPDF.</string>
+    <string name="tut51_notes_add">الصيغ والمخططات والأشكال</string>
+    <string name="tut51_notes_add_text">قائمة الإضافة والصيغ والمخططات والأسهم والأشكال واللوحات والأشكال المرسومة بالصيغ وأشكال العناصر.</string>
+    <string name="tut51_select_guides">التحديد والنقل والمسطرة</string>
+    <string name="tut51_select_guides_text">قائمة الأوضاع والخصائص والنقل والتوسيع والضغط المطوّل للنقل والرسم بالمسطرة.</string>
+    <string name="tut51_comic_pages">اللوحات والقوالب والصفحات</string>
+    <string name="tut51_comic_pages_text">قوالب اللوحات وقلم الحبر وخطوط السرعة والغلاف وأرقام الصفحات وPDF وCBZ.</string>
+    <string name="tut51_comic_cast">الشخصيات والأماكن والفقاعات والمؤثرات</string>
+    <string name="tut51_comic_cast_text">شخصيات جاهزة وخلفيات أماكن وفقاعات كلام ومربعات سرد ونصوص مؤثرات.</string>
+    <string name="tut51_simple_draw">الرسم والتلوين</string>
+    <string name="tut51_simple_draw_text">الفرشاة والأشكال والطلاء والخصائص؛ جزءا القائمة العلوية.</string>
+    <string name="tut51_simple_edit">التحديد والنص والخلفية</string>
+    <string name="tut51_simple_edit_text">القوائم الثلاث والتحديد والنقل والتحديد المستطيل ومربع النص والقطارة والخلفية والحفظ.</string>
+    <string name="tut51_simple_guides">المسطرة والقالب والرسم من صورة</string>
+    <string name="tut51_simple_guides_text">المسطرة وقالب الأشكال؛ حوّل الصورة إلى متجه ثم إلى قالب وارسم به.</string>
+    <string name="tut51_kids_more">المسطرة والقوالب والتحديات</string>
+    <string name="tut51_kids_more_text">تعرض الشخصية المسطرة ونقل الصورة وتحديات الرسم والرسم بالقالب.</string>
+    <string name="v51_practice_kind_copy">ارسم بالنظر</string>
+    <string name="v51_practice_intro_copy">انظر إلى المثال في الزاوية وارسم الشكل داخل الإطار المتقطع. الموضع والحجم حرّان؛ النِّسب هي المهمة.</string>
+    <string name="v51_practice_kind_timed">رسم بوقت محدد</string>
+    <string name="v51_practice_intro_timed">تتبّع الدليل قبل انتهاء الوقت. يبدأ المؤقت مع أول خط؛ الإنهاء المبكر يمنح نقاط السرعة.</string>
+    <string name="v51_practice_group_observe">الرسم بالملاحظة</string>
+    <string name="v51_practice_group_figures">الأشخاص والبورتريه</string>
+    <string name="v51_practice_time_up">انتهى الوقت</string>
+    <string name="v51_practice_points">نقطة</string>
+    <string name="v51_practice_record">رقم قياسي جديد!</string>
+    <string name="v51_practice_accuracy">الدقة</string>
+    <string name="v51_practice_coverage">التغطية</string>
+    <string name="v51_practice_smoothness">السلاسة</string>
+    <string name="v51_practice_speed">السرعة</string>
+    <string name="v51_practice_reward_title">افتح بإعلان</string>
+    <string name="v51_practice_reward_body">شاهد إعلانًا قصيرًا بمكافأة لفتح هذا التمرين نهائيًا. جميع التمارين مفتوحة لمشتركي Premium.</string>
+    <string name="v51_practice_reward_failed">تعذّر تحميل الإعلان الآن. تحقّق من الاتصال وحاول مجددًا بعد قليل.</string>
+    <string name="v51_practice_reward_watch">شاهد الإعلان</string>
+    <string name="v51_practice_reward_later">لاحقًا</string>
+    <string name="v51_practice_reward_badge">يُفتح بإعلان</string>
+</resources>

@@ -15,6 +15,17 @@ class PracticePrefs(context: Context) {
     private val _best = MutableStateFlow(parse(prefs.getString(KEY_BEST, null)))
     val best: StateFlow<Map<String, Int>> = _best.asStateFlow()
 
+    private val _unlocked = MutableStateFlow(prefs.getStringSet(KEY_UNLOCKED, emptySet()).orEmpty().toSet())
+    /** v51 ödüllü reklam izlenerek açılan alıştırmalar (kimlik). */
+    val unlocked: StateFlow<Set<String>> = _unlocked.asStateFlow()
+
+    /** v51 alıştırma kalıcı olarak açılır (ödüllü reklam izlendi). */
+    fun unlock(id: String) {
+        val next = _unlocked.value + id
+        _unlocked.value = next
+        prefs.edit().putStringSet(KEY_UNLOCKED, next).apply()
+    }
+
     /** Puan yazılır (en iyisi kalır); en iyi puan döner. */
     fun record(id: String, score: Int): Int {
         val now = _best.value
@@ -27,6 +38,7 @@ class PracticePrefs(context: Context) {
 
     companion object {
         private const val KEY_BEST = "best"
+        private const val KEY_UNLOCKED = "unlocked_v51"
 
         fun parse(raw: String?): Map<String, Int> = raw.orEmpty().split(',').mapNotNull { part ->
             val i = part.lastIndexOf(':')

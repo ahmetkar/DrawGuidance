@@ -11,8 +11,12 @@ struct CanvasEditScreen: View {
     @State private var sheet: EditorSheet?
     @Environment(\.dismiss) private var dismiss
 
-    init(canvasLocalId: String) {
+    /// v51 başka bir tuvale geç (yeni alıştırma yeni tuvalde; bkz. [CanvasEditHost]).
+    var onSwitchCanvas: (String) -> Void = { _ in }
+
+    init(canvasLocalId: String, onSwitchCanvas: @escaping (String) -> Void = { _ in }) {
         _vm = StateObject(wrappedValue: EditorViewModel(canvasLocalId: canvasLocalId, deps: .shared))
+        self.onSwitchCanvas = onSwitchCanvas
     }
 
     var body: some View {
@@ -66,8 +70,11 @@ struct CanvasEditScreen: View {
             }
         }
         .onChange(of: vm.loaded) { _, loaded in
-            if loaded, let kind = vm.store.canvas?.kind { vm.tutorial.maybeOffer(kind) }
+            guard loaded, let c = vm.store.canvas else { return }
+            // v51 önceki tuvalden yeni alıştırmayla gelindiyse alıştırma hemen açılır (eğitim önerisi yerine)
+            if let i = PracticeHandoff.take(c.localId) { vm.practice.open(i) } else { vm.tutorial.maybeOffer(c.kind) }
         }
+        .onChange(of: vm.switchToCanvas) { _, id in if let id { onSwitchCanvas(id) } }
         .modifier(TutorialOfferPresenter(vm: vm, ctl: vm.tutorial))
         .navigationBarBackButtonHidden(true)
         .toolbar(.hidden, for: .navigationBar)
@@ -284,4 +291,15 @@ private struct TutorialOfferHost: View {
 enum EditorSheet: String, Identifiable {
     case elements, layers, save, guide, background
     var id: String { rawValue }
+}
+
+/// v51 düzenleyicinin kabı: alıştırma yeni tuvalde açılınca aynı gezinme yerinde yeni tuvalin düzenleyicisine geçer
+/// (eski ekran kapanırken kaydeder).
+struct CanvasEditHost: View {
+    @State var canvasLocalId: String
+
+    var body: some View {
+        CanvasEditScreen(canvasLocalId: canvasLocalId) { canvasLocalId = $0 }
+            .id(canvasLocalId)
+    }
 }

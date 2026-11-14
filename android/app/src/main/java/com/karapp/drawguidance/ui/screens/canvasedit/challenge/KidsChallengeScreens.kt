@@ -316,7 +316,7 @@ internal fun ChallengeProgressSheet(
     val levels = ChallengeLevels.all
     val ink = kidInk()
     var lockedNote by remember { mutableStateOf<Int?>(null) }
-    NeuSheet(onDismiss) {
+    NeuSheet(onDismiss, full = true) {
         Column(
             Modifier
                 .fillMaxWidth()

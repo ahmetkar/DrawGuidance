@@ -1,5 +1,6 @@
 package com.karapp.drawguidance.ui.screens.canvasedit.tutorial
 
+import com.karapp.drawguidance.ui.components.sheetBodyHeight
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.infiniteRepeatable
@@ -406,9 +407,9 @@ fun TutorialOfferSheet(
     onDismiss: () -> Unit,
 ) {
     val colors = NeuTheme.colors
-    NeuSheet(onDismiss) {
+    NeuSheet(onDismiss, full = true) {
         Column(
-            Modifier.fillMaxWidth().navigationBarsPadding().heightIn(max = 680.dp).verticalScroll(rememberScrollState())
+            Modifier.fillMaxWidth().navigationBarsPadding().sheetBodyHeight(680.dp).verticalScroll(rememberScrollState())
                 .padding(start = 20.dp, end = 20.dp, bottom = 20.dp).testTag("tutorial_offer"),
             verticalArrangement = Arrangement.spacedBy(14.dp),
         ) {

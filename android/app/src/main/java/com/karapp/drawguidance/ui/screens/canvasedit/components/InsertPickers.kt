@@ -1,5 +1,6 @@
 package com.karapp.drawguidance.ui.screens.canvasedit.components
 
+import com.karapp.drawguidance.ui.components.sheetBodyHeight
 import androidx.compose.ui.layout.onSizeChanged
 
 import androidx.compose.foundation.BorderStroke
@@ -145,13 +146,13 @@ fun FormulaPickerModal(
         listOf(FormulaCatalog.categories.first().copy(id = "simple", title = stringResource(R.string.formula_cat_simple), templates = only.mapNotNull { all[it] }))
     }
     var category by rememberSaveable { mutableStateOf(categories.firstOrNull()?.id ?: "") }
-    NeuSheet(onDismiss) {
+    NeuSheet(onDismiss, full = true) {
         BoxWithConstraints(Modifier.fillMaxWidth().navigationBarsPadding().testTag("formula_picker")) {
             val columns = (maxWidth / 170.dp).toInt().coerceIn(2, 5)
             val shown = categories.firstOrNull { it.id == category } ?: categories.first()
             LazyVerticalGrid(
                 columns = GridCells.Fixed(columns),
-                modifier = Modifier.fillMaxWidth().heightIn(max = 640.dp),
+                modifier = Modifier.fillMaxWidth().sheetBodyHeight(640.dp),
                 contentPadding = PaddingValues(start = 20.dp, end = 20.dp, bottom = 20.dp),
                 horizontalArrangement = Arrangement.spacedBy(10.dp),
                 verticalArrangement = Arrangement.spacedBy(10.dp),

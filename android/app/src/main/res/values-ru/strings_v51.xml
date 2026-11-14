@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- v51 işlev eğitim grupları, yeni alıştırma türleri, puan parçaları ve ödüllü reklam -->
+<resources>
+    <string name="tut51_draw">Инструменты рисования и сохранение</string>
+    <string name="tut51_draw_text">Кисть, заливка, ластик, перо, отмена, слои, фон и сохранение.</string>
+    <string name="tut51_edit">Добавление, выбор и правка</string>
+    <string name="tut51_edit_text">Добавляйте фигуры и текст; выбирайте, перемещайте, масштабируйте, копируйте и правьте; меню режимов.</string>
+    <string name="tut51_guides">Линейка и трафарет фигур</string>
+    <string name="tut51_guides_text">Поворачивайте и меняйте размер линейки, выбирайте тип, единицы и масштаб, рисуйте вдоль края и по трафарету.</string>
+    <string name="tut51_notes_write">Текст, ручки и страницы</string>
+    <string name="tut51_notes_write_text">Заголовки, ручки для заметок, маркер, прокрутка страниц, настройки страницы и PDF.</string>
+    <string name="tut51_notes_add">Формулы, диаграммы и фигуры</string>
+    <string name="tut51_notes_add_text">Меню «Добавить», формулы, диаграммы, стрелки и фигуры, панели, фигуры по формуле и элементы.</string>
+    <string name="tut51_select_guides">Выбор, перемещение и линейка</string>
+    <string name="tut51_select_guides_text">Меню режимов, «Свойства», «Переместить» и «Расширить», перемещение долгим нажатием и рисование по линейке.</string>
+    <string name="tut51_comic_pages">Панели, шаблоны и страницы</string>
+    <string name="tut51_comic_pages_text">Шаблоны панелей, тушь, линии скорости, обложка, нумерация, PDF и CBZ.</string>
+    <string name="tut51_comic_cast">Персонажи, места, баллоны и эффекты</string>
+    <string name="tut51_comic_cast_text">Готовые персонажи, фоны мест, речевые баллоны, подписи и звуковые эффекты.</string>
+    <string name="tut51_simple_draw">Рисование и раскраска</string>
+    <string name="tut51_simple_draw_text">Кисть, фигуры, краска и «Свойства»; две части верхнего меню.</string>
+    <string name="tut51_simple_edit">Выбор, текст и фон</string>
+    <string name="tut51_simple_edit_text">Три меню, выбор и перемещение, прямоугольное выделение, текстовое поле, пипетка, фон и сохранение.</string>
+    <string name="tut51_simple_guides">Линейка, трафарет и рисунок по картинке</string>
+    <string name="tut51_simple_guides_text">Линейка и трафарет; векторизуйте картинку, сделайте из неё трафарет и рисуйте по нему.</string>
+    <string name="tut51_kids_more">Линейка, трафареты и задания</string>
+    <string name="tut51_kids_more_text">Талисман покажет линейку, перемещение рисунка, задания и рисование по трафарету.</string>
+    <string name="v51_practice_kind_copy">Рисуй с натуры</string>
+    <string name="v51_practice_intro_copy">Смотрите на образец в углу и рисуйте фигуру в пунктирной рамке. Место и размер свободны, важны пропорции.</string>
+    <string name="v51_practice_kind_timed">Рисование на время</string>
+    <string name="v51_practice_intro_timed">Обведите контур, пока не вышло время. Таймер стартует с первой линии; быстрое завершение даёт очки за скорость.</string>
+    <string name="v51_practice_group_observe">Рисунок с натуры</string>
+    <string name="v51_practice_group_figures">Фигура и портрет</string>
+    <string name="v51_practice_time_up">Время вышло</string>
+    <string name="v51_practice_points">баллов</string>
+    <string name="v51_practice_record">Новый рекорд!</string>
+    <string name="v51_practice_accuracy">Точность</string>
+    <string name="v51_practice_coverage">Полнота</string>
+    <string name="v51_practice_smoothness">Плавность</string>
+    <string name="v51_practice_speed">Скорость</string>
+    <string name="v51_practice_reward_title">Открыть за рекламу</string>
+    <string name="v51_practice_reward_body">Посмотрите короткую рекламу с наградой, чтобы навсегда открыть это упражнение. Для Premium открыты все упражнения.</string>
+    <string name="v51_practice_reward_failed">Сейчас не удалось загрузить рекламу. Проверьте подключение и повторите попытку позже.</string>
+    <string name="v51_practice_reward_watch">Смотреть рекламу</string>
+    <string name="v51_practice_reward_later">Позже</string>
+    <string name="v51_practice_reward_badge">Открывается за рекламу</string>
+</resources>

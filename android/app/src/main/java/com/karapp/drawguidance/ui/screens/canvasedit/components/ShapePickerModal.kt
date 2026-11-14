@@ -1,5 +1,6 @@
 package com.karapp.drawguidance.ui.screens.canvasedit.components
 
+import com.karapp.drawguidance.ui.components.sheetBodyHeight
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.BoxWithConstraints
@@ -129,12 +130,12 @@ fun ShapePickerModal(
         }
     }
     val shown = base
-    NeuSheet(onDismiss) {
+    NeuSheet(onDismiss, full = true) {
         BoxWithConstraints(Modifier.fillMaxWidth().navigationBarsPadding().testTag("shape_picker")) {
             val columns = (maxWidth / 96.dp).toInt().coerceIn(3, 8)
             // Kaydırılan sütun (tembel ızgara değil): kategori başlıkları ve tüm kutular hemen erişilebilir
             Column(
-                Modifier.fillMaxWidth().heightIn(max = 620.dp).verticalScroll(rememberScrollState()).testTag("shape_grid")
+                Modifier.fillMaxWidth().sheetBodyHeight(620.dp).verticalScroll(rememberScrollState()).testTag("shape_grid")
                     .padding(start = 20.dp, end = 20.dp, bottom = 20.dp),
                 verticalArrangement = Arrangement.spacedBy(10.dp),
             ) {

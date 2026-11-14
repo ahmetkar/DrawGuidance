@@ -82,7 +82,7 @@ fun DiagramPickerModal(
     only: List<DiagramKind>? = null,
 ) {
     val colors = NeuTheme.colors
-    NeuSheet(onDismiss) {
+    NeuSheet(onDismiss, full = true) {
         BoxWithConstraints(Modifier.fillMaxWidth().navigationBarsPadding()) {
             val columns = (maxWidth / 130.dp).toInt().coerceIn(2, 4)
             Column(

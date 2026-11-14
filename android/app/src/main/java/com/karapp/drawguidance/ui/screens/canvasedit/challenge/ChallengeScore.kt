@@ -63,21 +63,44 @@ object ChallengeScore {
      * v50 [outline] verilen yakınlık sınırlarıyla ([nearRatio], [farRatio]: hedef köşegenine oran). Yetişkin
      * alıştırmaları çocuk görevinden daha dar sınırlar kullanır.
      */
-    fun outline(drawn: List<List<Offset>>, target: List<List<Offset>>, nearRatio: Float, farRatio: Float): Int {
-        val tBox = bounds(target) ?: return 0
+    fun outline(drawn: List<List<Offset>>, target: List<List<Offset>>, nearRatio: Float, farRatio: Float): Int =
+        outlineParts(drawn, target, nearRatio, farRatio).score
+
+    /**
+     * v51 çizgi puanı ve parçaları: [OutlineParts.precision] isabet (çizimin hedefe yakın kısmı), [OutlineParts.recall]
+     * kapsama (hedefin çizilen kısmı), [OutlineParts.score] F1 (karalama cezası ve kutu uydurmasıyla). [alignedFactor]
+     * kutusu uydurulan çizimin çarpanı (Bakarak çiz alıştırmasında 1: yer ve boy serbest).
+     */
+    fun outlineParts(
+        drawn: List<List<Offset>>, target: List<List<Offset>>, nearRatio: Float, farRatio: Float, alignedFactor: Float = ALIGNED,
+    ): OutlineParts {
+        val tBox = bounds(target) ?: return OutlineParts.ZERO
         val diag = hypot(tBox.width, tBox.height).coerceAtLeast(1f)
         val step = diag / SAMPLES
         val t = resample(target, step)
         val d = resample(drawn, step)
-        if (t.isEmpty() || d.size < 2) return 0
+        if (t.isEmpty() || d.size < 2) return OutlineParts.ZERO
         val near = diag * nearRatio
         val far = diag * farRatio
         val lenT = length(target).coerceAtLeast(1f)
         val lenD = length(drawn)
-        val inPlace = f1(d, t, near, far) * excess(lenD / lenT)
+        val (p0, r0) = pr(d, t, near, far)
+        val inPlace = f1(p0, r0) * excess(lenD / lenT)
+        var best = OutlineParts(percent(inPlace), percent(p0), percent(r0))
         val dBox = bounds(drawn)
-        val aligned = dBox?.let { align(d, it, tBox) }?.let { (pts, s) -> f1(pts, t, near, far) * excess(lenD * s / lenT) * ALIGNED } ?: 0f
-        return percent(max(inPlace, aligned))
+        dBox?.let { align(d, it, tBox) }?.let { (pts, s) ->
+            val (p1, r1) = pr(pts, t, near, far)
+            val aligned = f1(p1, r1) * excess(lenD * s / lenT) * alignedFactor
+            if (aligned > inPlace) best = OutlineParts(percent(aligned), percent(p1 * alignedFactor), percent(r1 * alignedFactor))
+        }
+        return best
+    }
+
+    /** v51 çizgi puanının parçaları (0–100). */
+    data class OutlineParts(val score: Int, val precision: Int, val recall: Int) {
+        companion object {
+            val ZERO = OutlineParts(0, 0, 0)
+        }
     }
 
     /** Boyanacak yerlerin puanı ([checks]: beklenen renk → görünen renk; null boyanmamış). */
@@ -122,11 +145,20 @@ object ChallengeScore {
     }
 
     private fun f1(d: List<Offset>, t: List<Offset>, near: Float, far: Float): Float {
+        val (precision, recall) = pr(d, t, near, far)
+        return f1(precision, recall)
+    }
+
+    private fun f1(precision: Float, recall: Float): Float =
+        if (precision + recall <= 0f) 0f else 2f * precision * recall / (precision + recall)
+
+    /** İsabet ve kapsama (0..1). */
+    private fun pr(d: List<Offset>, t: List<Offset>, near: Float, far: Float): Pair<Float, Float> {
         val tGrid = PointGrid(t, far)
         val dGrid = PointGrid(d, far)
         val precision = d.map { credit(tGrid.nearest(it), near, far) }.average().toFloat()
         val recall = t.map { credit(dGrid.nearest(it), near, far) }.average().toFloat()
-        return if (precision + recall <= 0f) 0f else 2f * precision * recall / (precision + recall)
+        return precision to recall
     }
 
     private fun credit(d: Float, near: Float, far: Float): Float = when {

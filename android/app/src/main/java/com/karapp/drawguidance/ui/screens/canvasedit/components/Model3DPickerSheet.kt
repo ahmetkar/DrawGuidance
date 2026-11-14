@@ -1,5 +1,6 @@
 package com.karapp.drawguidance.ui.screens.canvasedit.components
 
+import com.karapp.drawguidance.ui.components.sheetBodyHeight
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
@@ -73,12 +74,12 @@ fun Model3DPickerSheet(
             if (key.startsWith(MY)) onInsert(key.removePrefix(MY)) else onInsertCatalog?.invoke(key.removePrefix(CAT))
         }
     }
-    NeuSheet(onDismiss) {
+    NeuSheet(onDismiss, full = true) {
         BoxWithConstraints(Modifier.fillMaxWidth().navigationBarsPadding().testTag("model3d_picker")) {
             val columns = (maxWidth / 130.dp).toInt().coerceIn(2, 6)
             Column(Modifier.fillMaxWidth()) {
                 Column(
-                    Modifier.fillMaxWidth().heightIn(max = 540.dp).verticalScroll(rememberScrollState()).padding(start = 20.dp, end = 20.dp, bottom = 12.dp),
+                    Modifier.fillMaxWidth().sheetBodyHeight(540.dp).verticalScroll(rememberScrollState()).padding(start = 20.dp, end = 20.dp, bottom = 12.dp),
                     verticalArrangement = Arrangement.spacedBy(12.dp),
                 ) {
                     Text(stringResource(R.string.model3d_add_title), style = MaterialTheme.typography.titleLarge)

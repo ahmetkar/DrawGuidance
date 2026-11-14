@@ -198,7 +198,7 @@ struct NotesPanelsSheet: View {
             .navigationTitle(L("v45_panels_title"))
             .navigationBarTitleDisplayMode(.inline)
         }
-        .dockedEditorSheet()
+        .fullEditorSheet()
     }
 }
 

@@ -70,6 +70,9 @@ android {
             // v39 gerçek AdMob uygulama ve geçiş reklamı kimlikleri (yalnız yayın derlemesinde)
             manifestPlaceholders["admobAppId"] = "ca-app-pub-4962587185426397~4108507569"
             buildConfigField("String", "ADMOB_INTERSTITIAL_ID", "\"ca-app-pub-4962587185426397/2112899614\"")
+            // v51 ödüllü reklam birimi (alıştırma açma). Gerçek birim AdMob'da oluşturulunca -PdgRewardedId=... ile ya da
+            // gradle.properties'teki dgRewardedId ile verilir; verilmezse Google'ın deneme birimi kullanılır.
+            buildConfigField("String", "ADMOB_REWARDED_ID", "\"" + (project.findProperty("dgRewardedId") as String? ?: "ca-app-pub-3940256099942544/5224354917") + "\"")
             // v40 R8: kod küçültme/karartma ve kullanılmayan kaynakların atılması (kurallar: proguard-rules.pro)
             // v45 DEX kod iyileştirmesi açık (proguard-android-optimize.txt: satır içine alma, sınıf birleştirme, enum
             // açma, ölü kod atma). v40–v44'teki proguard-android.txt iyileştirmeyi zaten kapatıyordu (-dontoptimize);
@@ -88,6 +91,7 @@ android {
             // v39 hata ayıklamada Google'ın deneme kimlikleri (gerçek reklam isteği yapılmaz)
             manifestPlaceholders["admobAppId"] = "ca-app-pub-3940256099942544~3347511713"
             buildConfigField("String", "ADMOB_INTERSTITIAL_ID", "\"ca-app-pub-3940256099942544/1033173712\"")
+            buildConfigField("String", "ADMOB_REWARDED_ID", "\"ca-app-pub-3940256099942544/5224354917\"")
             isMinifyEnabled = false
             signingConfig = signingConfigs.getByName("debug")
         }

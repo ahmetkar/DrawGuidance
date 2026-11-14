@@ -24,8 +24,11 @@ fun CanvasEditRoute(
     onBack: () -> Unit,
     onOpenModel3d: (modelId: String?, strokeId: String?) -> Unit,
     onOpenSubscription: () -> Unit,
+    /** v51 başka bir tuvale geç (yeni alıştırma yeni tuvalde). */
+    onOpenCanvas: (localId: String) -> Unit = {},
 ) {
     val vm: CanvasEditViewModel = koinViewModel(parameters = { parametersOf(canvasLocalId) })
+    androidx.compose.runtime.LaunchedEffect(vm) { vm.openCanvas.collect { onOpenCanvas(it) } }
     val canvas by vm.canvas.collectAsState()
     val kind = canvas?.kind ?: CanvasKind.ART
     // v44 çocuk kilidinde yalnız çocuk tuvalleri açılır

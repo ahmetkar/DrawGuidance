@@ -7,6 +7,11 @@ on:
   pull_request:
     paths: ["ios/**", ".github/workflows/ios.yml"]
   workflow_dispatch:
+    inputs:
+      ui_only:
+        description: "Yalnız arayüz testleri (Release derleme, .ipa, tanı ve birim testleri atlanır)"
+        type: boolean
+        default: false
 
 concurrency:
   group: ios-${{ github.ref }}
@@ -59,6 +64,7 @@ jobs:
           xcrun simctl list devices | grep "$ID"
 
       - name: Cihaz için Release derleme (imzasız)
+        if: ${{ !inputs.ui_only }}
         run: |
           mkdir -p build
           xcodebuild build -project DrawGuidance.xcodeproj -scheme DrawGuidance \
@@ -70,6 +76,7 @@ jobs:
           tail -5 build/release.log
 
       - name: .ipa paketle
+        if: ${{ !inputs.ui_only }}
         run: |
           APP=build/dd/Build/Products/Release-iphoneos/DrawGuidance.app
           test -d "$APP"
@@ -80,13 +87,14 @@ jobs:
           echo "Sembol kontrolü (ilk 20):"; nm -U "$APP/DrawGuidance" | head -20 || true
 
       - name: .ipa yükle (testlerden önce)
+        if: ${{ !inputs.ui_only }}
         uses: actions/upload-artifact@v4
         with:
           name: ios-ipa
           path: ios/build/*.ipa
 
       - name: Açılış tanısı (simülatör, ekran görüntüsü ve ana iş parçacığı örneği)
-        if: success()
+        if: success() && !inputs.ui_only
         continue-on-error: true
         run: |
           mkdir -p build/diag
@@ -132,7 +140,11 @@ jobs:
           xcodebuild test -project DrawGuidance.xcodeproj -scheme DrawGuidance \
             -destination "id=${{ steps.sim.outputs.udid }}" \
             -resultBundlePath build/TestResults.xcresult \
+            ${{ inputs.ui_only && '-only-testing:DrawGuidanceUITests' || '' }} \
             CODE_SIGNING_ALLOWED=NO DG_GOOGLE_URL_SCHEME="$DG_GOOGLE_URL_SCHEME" | tee build/test.log | grep -E "Test Case|error:|\*\* TEST" || true
+          # Yapıt yüklenemezse de görülsün: test hatasındaki erişilebilirlik ağacı ve 3B çizim günlüğü
+          sed -n '/DGTREE ----/,/DGTREE ----/p' build/test.log | cut -c1-220 | head -1500 || true
+          grep "DG3D" build/test.log | head -40 || true
           grep -q "\*\* TEST SUCCEEDED \*\*" build/test.log
 
       - uses: actions/upload-artifact@v4

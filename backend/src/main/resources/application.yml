@@ -112,6 +112,21 @@ drawguidance:
       currency: TRY
       price-display: 100 TL
       period: P1M
+    # v50 App Store abonelikleri (StoreKit 2). Anahtar verilmezse /subscriptions/verify-apple 503 billing_not_configured.
+    # App Store Connect → Kullanıcılar ve Erişim → Entegrasyonlar → Uygulama İçi Satın Alma: Issuer ID, Key ID ve
+    # SubscriptionKey_XXXX.p8 (sır: sunucuda dosya olarak, depoya konmaz). Ayrıntılar: docs/v50-app-store-abonelik.md
+    apple:
+      bundle-id: ${APPLE_BUNDLE_ID:com.karapp.drawguidance}
+      # App Store Connect → Uygulama Bilgileri → Apple ID (sayı). Üretim satın almalarının imza doğrulaması için zorunlu
+      app-apple-id: ${APPLE_APP_APPLE_ID:}
+      issuer-id: ${APPLE_IAP_ISSUER_ID:}
+      key-id: ${APPLE_IAP_KEY_ID:}
+      private-key-file: ${APPLE_IAP_PRIVATE_KEY_FILE:}
+      product-ids: ${APPLE_PREMIUM_PRODUCT_IDS:com.karapp.drawguidance.premium.monthly}
+      # App Review ve TestFlight Sandbox kullanır: üretimde de açık kalmalı
+      allow-sandbox: ${APPLE_ALLOW_SANDBOX:true}
+      online-checks: ${APPLE_ONLINE_CHECKS:true}
+      require-account-token: ${APPLE_REQUIRE_ACCOUNT_TOKEN:false}
   # v40 herkese açık web sitesi (Next.js, Vercel): CORS ve form uçları (hesap silme talebi, destek mesajı)
   web:
     # /api/v1/** için izinli kökenler, virgülle ayrılmış (üretim sitesi: https://drawguidance.ahmetkar.com)

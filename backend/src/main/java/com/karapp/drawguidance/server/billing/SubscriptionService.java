@@ -1,5 +1,8 @@
 package com.karapp.drawguidance.server.billing;
 
+import com.karapp.drawguidance.server.billing.apple.AppStoreApi;
+import com.karapp.drawguidance.server.billing.apple.AppStoreApiException;
+import com.karapp.drawguidance.server.billing.apple.AppleStates;
 import com.karapp.drawguidance.server.billing.play.GooglePlayApi;
 import com.karapp.drawguidance.server.billing.play.PlayApiException;
 import com.karapp.drawguidance.server.billing.play.PlaySubscription;
@@ -59,12 +62,15 @@ public class SubscriptionService {
     private final MongoTemplate mongo;
     private final PlanService plans;
     private final GooglePlayApi play;
+    /** v50 App Store (yalnız {@code /me} tazelemesi için; doğrulama {@link AppleSubscriptionService}'te). */
+    private final AppStoreApi apple;
     private final DrawGuidanceProperties.Billing billing;
 
-    public SubscriptionService(MongoTemplate mongo, PlanService plans, GooglePlayApi play, DrawGuidanceProperties props) {
+    public SubscriptionService(MongoTemplate mongo, PlanService plans, GooglePlayApi play, AppStoreApi apple, DrawGuidanceProperties props) {
         this.mongo = mongo;
         this.plans = plans;
         this.play = play;
+        this.apple = apple;
         this.billing = props.billing();
     }
 
@@ -97,7 +103,7 @@ public class SubscriptionService {
      * Google Play'den yeniden okunur ve uygulanır. Play'e ulaşılamazsa kayıt olduğu gibi döner (en iyi çaba).
      */
     Document refreshIfStale(String uid, Document s, Instant now) {
-        if (s == null || !play.configured()) return s;
+        if (s == null) return s;
         String token = s.getString("purchaseToken");
         if (token == null) return s;
         Instant fetched = instant(s.get("fetchedAt"));
@@ -105,6 +111,9 @@ public class SubscriptionService {
         Instant expiry = instant(s.get("expiryTime"));
         boolean relevant = status(s).grantsAccess() || (expiry != null && expiry.plus(GRACE_LIMIT).isAfter(now));
         if (!relevant) return s;
+        // v50 App Store aboneliği Play'e değil App Store Server API'ye sorulur
+        if (AppleStates.isAppleToken(token)) return refreshApple(uid, s, token, now);
+        if (!play.configured()) return s;
         try {
             PlaySubscription state = play.getSubscription(billing.packageName(), token);
             if (state.obfuscatedAccountId() != null && !state.obfuscatedAccountId().equals(accountHash(uid))) {
@@ -128,6 +137,37 @@ public class SubscriptionService {
             return s;
         } catch (RuntimeException e) {
             log.debug("Abonelik yenilenemedi: {}", e.getMessage());
+            return s;
+        }
+    }
+
+    /** v50 {@link #refreshIfStale}'in App Store karşılığı (en iyi çaba; hata olursa kayıt olduğu gibi döner). */
+    private Document refreshApple(String uid, Document s, String token, Instant now) {
+        if (!apple.configured()) return s;
+        try {
+            AppStoreApi.AppleStatus st = apple.subscriptionStatus(AppleStates.originalTransactionId(token), Boolean.TRUE.equals(s.getBoolean("testPurchase")));
+            java.util.UUID account = st.transaction().appAccountToken();
+            if (account != null && !account.equals(AppleStates.appAccountToken(uid))) {
+                log.warn("Yenilenen App Store aboneliği kayıtlı kullanıcıya ait değil; uygulanmadı");
+                return s;
+            }
+            Document plan = plans.planForAppleProduct(st.transaction().productId());
+            String planId = plan != null ? plan.getString("_id") : s.getString("planId");
+            apply(uid, token, AppleStates.toState(st, null, now), planId, null, SOURCE_VERIFY, null, null, now);
+            Document updated = subs().find(Filters.eq("_id", uid)).first();
+            return updated == null ? s : updated;
+        } catch (AppStoreApiException e) {
+            if (e.invalid()) {
+                // App Store aboneliği artık tanımıyor: hak kapatılır
+                subs().updateOne(Filters.eq("_id", uid), Updates.combine(Updates.set("status", SubscriptionStatus.EXPIRED.name()),
+                        Updates.set("fetchedAt", Date.from(now)), Updates.set("updatedAt", Date.from(now))));
+                Document updated = subs().find(Filters.eq("_id", uid)).first();
+                return updated == null ? s : updated;
+            }
+            log.debug("App Store aboneliği yenilenemedi: {}", e.getMessage());
+            return s;
+        } catch (RuntimeException e) {
+            log.debug("App Store aboneliği yenilenemedi: {}", e.getMessage());
             return s;
         }
     }
@@ -158,7 +198,7 @@ public class SubscriptionService {
         if (s == null) {
             PlanService.Features f = plans.features(Plans.FREE);
             return new SubscriptionView(Plans.FREE, null, false, null, null, null, null, null, null, null, f.keys(), f.limits(), hash, null,
-                    null, null, null);
+                    null, null, null, null, AppleStates.appAccountToken(uid).toString());
         }
         SubscriptionStatus status = status(s);
         Instant expiry = instant(s.get("expiryTime"));
@@ -170,7 +210,8 @@ public class SubscriptionService {
         return new SubscriptionView(planId, shown.name(), active, s.getString("productId"), s.getString("basePlanId"),
                 instant(s.get("startTime")), expiry, s.getBoolean("autoRenewing"), s.getBoolean("acknowledged"), s.getString("orderId"),
                 f.keys(), f.limits(), hash, instant(s.get("updatedAt")),
-                instant(s.get("cancelTime")), s.getString("cancelReason"), instant(s.get("autoResumeTime")));
+                instant(s.get("cancelTime")), s.getString("cancelReason"), instant(s.get("autoResumeTime")),
+                AppleStates.storeOf(s.getString("purchaseToken")), AppleStates.appAccountToken(uid).toString());
     }
 
     static boolean entitled(SubscriptionStatus status, Instant expiry, Instant now) {
@@ -269,7 +310,7 @@ public class SubscriptionService {
         return NotificationResult.APPLIED;
     }
 
-    private String ownerOf(String token, String linked) {
+    String ownerOf(String token, String linked) {
         Document d = subs().find(Filters.eq("purchaseToken", token)).first();
         if (d == null && linked != null) d = subs().find(Filters.eq("purchaseToken", linked)).first();
         if (d != null) return d.getString("_id");
@@ -320,6 +361,8 @@ public class SubscriptionService {
                 Updates.set("basePlanId", s.basePlanId()),
                 Updates.set("offerId", s.offerId()),
                 Updates.set("purchaseToken", token),
+                // v50 aboneliğin mağazası: GOOGLE_PLAY ya da APP_STORE
+                Updates.set("store", AppleStates.storeOf(token)),
                 Updates.set("linkedPurchaseToken", s.linkedPurchaseToken()),
                 Updates.set("orderId", s.latestOrderId()),
                 Updates.set("startTime", date(s.startTime())),

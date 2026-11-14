@@ -146,6 +146,11 @@ services:
       GCS_BUCKET: dgpackets
       GCS_SERVICE_ACCOUNT_JSON: /run/secrets/gcs.json
       DEVICE_DATA_KEY_FILE: /run/secrets/device_data_key
+      # v50 App Store abonelikleri: kimlikler gizli değil (dağıtım kabuğundan), .p8 anahtarı Docker sırrı
+      APPLE_APP_APPLE_ID: ${APPLE_APP_APPLE_ID:-}
+      APPLE_IAP_ISSUER_ID: ${APPLE_IAP_ISSUER_ID:-}
+      APPLE_IAP_KEY_ID: ${APPLE_IAP_KEY_ID:-}
+      APPLE_IAP_PRIVATE_KEY_FILE: /run/secrets/apple_iap.p8
     secrets:
       - { source: mongo_app_password, target: mongo_app_password, uid: "10001", gid: "10001", mode: 0400 }
       - { source: play_service_account, target: play.json, uid: "10001", gid: "10001", mode: 0400 }
@@ -153,6 +158,7 @@ services:
       - { source: ip_hash_salt, target: ip_hash_salt, uid: "10001", gid: "10001", mode: 0400 }
       - { source: gcs_service_account, target: gcs.json, uid: "10001", gid: "10001", mode: 0400 }
       - { source: device_data_key, target: device_data_key, uid: "10001", gid: "10001", mode: 0400 }
+      - { source: apple_iap_key, target: apple_iap.p8, uid: "10001", gid: "10001", mode: 0400 }
     networks: [edge, backend]
     # Salt okunur kök dosya sistemi; yazılabilir tek yer /tmp (Tomcat geçici dosyaları)
     read_only: true
@@ -337,6 +343,8 @@ secrets:
   # v43 Cloud Storage hizmet hesabı (dgpackets) ve cihaz bilgisi anahtarı
   gcs_service_account: { external: true }
   device_data_key: { external: true }
+  # v50 App Store Server API anahtarı (SubscriptionKey_XXXX.p8)
+  apple_iap_key: { external: true }
 
 # Swarm config'leri değiştirilemez: dosya değişince CONFIG_VERSION artırılır (yeni ad)
 configs:

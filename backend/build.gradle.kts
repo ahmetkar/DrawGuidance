@@ -28,6 +28,9 @@ dependencies {
     // MongoDB kablo sıkıştırması (zstd, snappy; zlib sürücüde yerleşik)
     implementation("com.github.luben:zstd-jni:1.5.7-24")
     implementation("org.xerial.snappy:snappy-java:1.1.10.12")
+    // v50 App Store abonelikleri: Apple'ın resmi kütüphanesi (App Store Server API istemcisi, JWS imza zinciri
+    // doğrulaması, Server Notifications V2 modelleri)
+    implementation("com.apple.itunes.storekit:app-store-server-library:5.2.0")
 
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("org.springframework.boot:spring-boot-testcontainers")

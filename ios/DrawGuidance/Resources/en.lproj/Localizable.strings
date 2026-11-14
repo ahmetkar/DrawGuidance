@@ -23,3 +23,11 @@
 "ios.settings.title" = "Settings";
 "ios.privacy.options" = "Privacy options";
 "ios.version" = "Version";
+"ios.sub.manage_play" = "Manage subscription on Google Play";
+"ios.sub.from_play" = "This subscription was bought on Android with Google Play; cancel or change payment there.";
+"ios.sub.linked" = "Premium is linked to your account and also works on Android.";
+"ios.sub.other_account" = "This App Store subscription is linked to another account. Sign in with that account.";
+"ios.sub.cross_platform" = "Sign in to use Premium on Android with the same account; Premium bought on Android also works here.";
+"ios.sub.legal" = "Premium is a monthly auto-renewing subscription. Payment is charged to your Apple Account and renews automatically unless canceled at least 24 hours before the end of the period. Manage or cancel it in your App Store account settings.";
+"ios.sub.terms" = "Terms of Use (EULA)";
+"ios.sub.privacy" = "Privacy Policy";

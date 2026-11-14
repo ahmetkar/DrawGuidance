@@ -1,5 +1,6 @@
 package com.karapp.drawguidance.server.web;
 
+import com.karapp.drawguidance.server.billing.AppleController;
 import com.karapp.drawguidance.server.billing.RtdnController;
 import com.karapp.drawguidance.server.billing.SubscriptionController;
 import com.karapp.drawguidance.server.common.ApiError;
@@ -21,9 +22,11 @@ import java.util.Set;
  *
  * <ul>
  *   <li><b>IP başına</b> bütün {@code /api/v1/**} istekleri (öntanımlı dakikada 600). Pub/Sub itme ucu
- *       ({@code /api/v1/billing/rtdn}) sayılmaz: Google'ın paylaşılan adreslerinden gelir, OIDC jetonuyla korunur.</li>
+ *       ({@code /api/v1/billing/rtdn}) sayılmaz: Google'ın paylaşılan adreslerinden gelir, OIDC jetonuyla korunur. v50 App
+ *       Store bildirim ucu da sayılmaz (Apple'ın adreslerinden gelir, JWS imzasıyla korunur).</li>
  *   <li><b>Kullanıcı (Firebase uid) başına</b> yazma istekleri ({@code POST/PUT/PATCH/DELETE}; öntanımlı saatte 120)
- *       ve ayrıca abonelik doğrulaması ({@code POST /api/v1/subscriptions/verify}, her biri Google Play API çağrısı;
+ *       ve ayrıca abonelik doğrulaması ({@code POST /api/v1/subscriptions/verify} ve v50 {@code /verify-apple}, her biri
+ *       mağaza API çağrısı;
  *       öntanımlı saatte 30).</li>
  *   <li>Aşılırsa 429 {@code rate_limited} ve {@code Retry-After}. İstemci adresi {@link PublicForms#clientIp} ile
  *       (güvenilen vekil arkasında gerçek istemci).</li>
@@ -53,12 +56,12 @@ public class ApiRateLimitInterceptor implements HandlerInterceptor {
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
         String path = request.getRequestURI().substring(request.getContextPath().length());
-        if (path.equals(RtdnController.PATH) || "OPTIONS".equals(request.getMethod())) return true;
+        if (path.equals(RtdnController.PATH) || path.equals(AppleController.NOTIFICATIONS_PATH) || "OPTIONS".equals(request.getMethod())) return true;
         if (!allowed(perIp.acquire("ip:" + forms.clientIp(request)), response)) return false;
         String uid = uid();
         if (uid == null || !WRITE_METHODS.contains(request.getMethod())) return true;
         if (!allowed(writes.acquire("w:" + uid), response)) return false;
-        return !path.equals(VERIFY) || allowed(verifies.acquire("v:" + uid), response);
+        return !(path.equals(VERIFY) || path.equals(AppleController.VERIFY_PATH)) || allowed(verifies.acquire("v:" + uid), response);
     }
 
     private static String uid() {

@@ -2,6 +2,7 @@ package com.karapp.drawguidance.server.security;
 
 import com.karapp.drawguidance.server.account.DeletionRequestController;
 import com.karapp.drawguidance.server.billing.PlanController;
+import com.karapp.drawguidance.server.billing.AppleController;
 import com.karapp.drawguidance.server.billing.RtdnController;
 import com.karapp.drawguidance.server.billing.SubscriptionController;
 import com.karapp.drawguidance.server.challenge.ChallengeController;
@@ -57,7 +58,8 @@ import java.time.Duration;
  *   <li>Jeton zorunlu: {@code /api/v1/users/**} (jeton yok/geçersiz → 401; anahtarlar alınamazsa → 503); v39
  *       {@code /api/v1/subscriptions/**} ve {@code /api/v1/challenge/**} de aynı.</li>
  *   <li>v39 herkese açık: {@code GET /api/v1/plans}; {@code POST /api/v1/billing/rtdn} (Pub/Sub; Firebase jetonu
- *       okunmaz, ayarlıysa Pub/Sub OIDC jetonunu uç kendisi denetler).</li>
+ *       okunmaz, ayarlıysa Pub/Sub OIDC jetonunu uç kendisi denetler); v50 {@code POST /api/v1/billing/apple-notifications}
+ *       (App Store; Apple'ın JWS imzasını uç kendisi doğrular).</li>
  *   <li>v40 herkese açık (web sitesinin formları, jeton okunmaz): {@code POST /api/v1/account/deletion-requests} ve
  *       {@code POST /api/v1/support/messages}. İstek sınırını uçlar kendisi uygular.</li>
  *   <li>v43 jeton zorunlu: {@code /api/v1/devices/**} (cihaz kaydı) ve {@code /api/v1/inbox/**} (teslimatlar).</li>
@@ -133,6 +135,8 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, AppVersionController.PATH, SyncPermitController.PATH).permitAll()
                         .requestMatchers(HttpMethod.GET, PlanController.PATH).permitAll()
                         .requestMatchers(HttpMethod.POST, RtdnController.PATH).permitAll()
+                        // v50 App Store Server Notifications V2 (kimlik Apple'ın JWS imzasıyla doğrulanır)
+                        .requestMatchers(HttpMethod.POST, AppleController.NOTIFICATIONS_PATH).permitAll()
                         .requestMatchers(HttpMethod.POST, DeletionRequestController.PATH, SupportMessageController.PATH).permitAll()
                         .requestMatchers(USERS, USERS + "/**").authenticated()
                         .requestMatchers(SubscriptionController.PATH + "/**", ChallengeController.PATH + "/**").authenticated()

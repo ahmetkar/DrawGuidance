@@ -1,6 +1,7 @@
 package com.karapp.drawguidance.server.billing;
 
 import com.karapp.drawguidance.server.common.Stores;
+import com.karapp.drawguidance.server.billing.apple.AppleBillingProperties;
 import com.karapp.drawguidance.server.config.DrawGuidanceProperties;
 import com.karapp.drawguidance.server.config.StartupTask;
 import com.mongodb.client.MongoCollection;
@@ -25,11 +26,13 @@ import java.util.List;
 public class PlanSeeder extends StartupTask {
     private final MongoTemplate mongo;
     private final DrawGuidanceProperties.Premium premium;
+    private final List<String> appleProductIds;
 
-    public PlanSeeder(MongoTemplate mongo, DrawGuidanceProperties props) {
+    public PlanSeeder(MongoTemplate mongo, DrawGuidanceProperties props, AppleBillingProperties apple) {
         super("plan tohumlaması", Duration.ofSeconds(15));
         this.mongo = mongo;
         this.premium = props.billing().premium();
+        this.appleProductIds = apple.productIds();
     }
 
     @Override
@@ -39,12 +42,14 @@ public class PlanSeeder extends StartupTask {
     public List<Document> plans() {
         Document free = new Document("_id", Plans.FREE).append("name", "Ücretsiz")
                 .append("description", "Temel çizim, not ve çizgi roman araçları; reklamlı")
-                .append("productId", null).append("basePlanId", null)
+                .append("productId", null).append("basePlanId", null).append("appleProductIds", List.of())
                 .append("price", new Document("amountMicros", 0L).append("currency", premium.currency()).append("display", "0 TL"))
                 .append("period", null).append("active", true).append("sort", 0);
         Document paid = new Document("_id", Plans.PREMIUM).append("name", "Premium")
                 .append("description", "Gelişmiş resim, şekil, diyagram, çizgi roman ve 3B önerileri; reklamsız")
                 .append("productId", premium.productId()).append("basePlanId", premium.basePlanId())
+                // v50 App Store ürünleri (aynı Premium hakları)
+                .append("appleProductIds", appleProductIds)
                 .append("price", new Document("amountMicros", premium.priceMicros()).append("currency", premium.currency())
                         .append("display", premium.priceDisplay()))
                 .append("period", premium.period()).append("active", true).append("sort", 1);
@@ -75,6 +80,7 @@ public class PlanSeeder extends StartupTask {
             }
             features.deleteMany(Filters.and(Filters.eq("planId", id), Filters.nin("_id", ids)));
         }
-        log.info("Planlar hazır: premium = {}/{} ({} özellik)", premium.productId(), premium.basePlanId(), Plans.FEATURE_KEYS.size());
+        log.info("Planlar hazır: premium = {}/{} + App Store {} ({} özellik)", premium.productId(), premium.basePlanId(), appleProductIds,
+                Plans.FEATURE_KEYS.size());
     }
 }

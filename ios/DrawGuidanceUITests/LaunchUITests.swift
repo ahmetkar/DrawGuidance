@@ -246,6 +246,9 @@ final class LaunchUITests: XCTestCase {
         }
         app.buttons["simple_tool_panels"].tap()
         let cornell = app.buttons["notes_panels_cornell"]
+        // Yarım pencerede liste kısa: Cornell aşağıda kalırsa liste kaydırılır
+        let list = app.collectionViews.containing(.button, identifier: "notes_panels_two_cols").firstMatch
+        if list.waitForExistence(timeout: 5) { for _ in 0..<4 where !cornell.exists { list.swipeUp() } }
         XCTAssertTrue(cornell.waitForExistence(timeout: 5))
         cornell.tap()
         XCTAssertTrue(app.buttons["simple_tool_undo"].isEnabled)

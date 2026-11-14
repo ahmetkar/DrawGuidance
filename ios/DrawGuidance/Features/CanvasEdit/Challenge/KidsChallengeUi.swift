@@ -235,6 +235,7 @@ struct KidsChallengeLayer: View {
                 }
             }
         }
+        .accessibilityElement(children: .contain)
         .accessibilityIdentifier("challenge_layer")
         .onAppear {
             if let id = vm.store.canvas?.localId, let level = ChallengeLaunch.take(id) { ctl.open(level) }

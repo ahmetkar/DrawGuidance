@@ -68,9 +68,7 @@ struct CanvasEditScreen: View {
         .onChange(of: vm.loaded) { _, loaded in
             if loaded, let kind = vm.store.canvas?.kind { vm.tutorial.maybeOffer(kind) }
         }
-        .sheet(isPresented: Binding(get: { vm.tutorial.offer }, set: { if !$0 { vm.tutorial.closeOffer() } })) {
-            TutorialOfferHost(vm: vm, ctl: vm.tutorial)
-        }
+        .modifier(TutorialOfferPresenter(vm: vm, ctl: vm.tutorial))
         .navigationBarBackButtonHidden(true)
         .toolbar(.hidden, for: .navigationBar)
         .onAppear { if actions == nil { actions = vm.makeCanvasActions(ui) } }
@@ -255,6 +253,19 @@ private struct SuggestionLayer: View {
             } else {
                 SuggestionsHost(vm: vm, hw: hw)
             }
+        }
+    }
+}
+
+/// Eğitim seçimi penceresi. Ekran yalnız `vm`'i izler; `tutorial.offer` değişince yenilensin diye denetleyici burada
+/// ayrıca izlenir (yoksa "Eğitim modu" düğmesi pencereyi açmıyordu).
+private struct TutorialOfferPresenter: ViewModifier {
+    @ObservedObject var vm: EditorViewModel
+    @ObservedObject var ctl: TutorialController
+
+    func body(content: Content) -> some View {
+        content.sheet(isPresented: Binding(get: { ctl.offer }, set: { if !$0 { ctl.closeOffer() } })) {
+            TutorialOfferHost(vm: vm, ctl: ctl)
         }
     }
 }

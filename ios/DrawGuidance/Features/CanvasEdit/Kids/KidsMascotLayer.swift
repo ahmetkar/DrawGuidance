@@ -61,6 +61,7 @@ struct KidsMascotLayer: View {
                 }
                 MascotRoundButton(icon: "checkmark", description: L("kids_mascot_apply"), id: "mascot_apply", kind: .PRIMARY) { said.apply() }
             }
+            .accessibilityElement(children: .contain)
             .accessibilityIdentifier("kids_mascot_suggest")
         } else if challengeOn {
             EmptyView()

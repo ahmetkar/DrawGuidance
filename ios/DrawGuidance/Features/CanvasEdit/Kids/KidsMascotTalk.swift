@@ -172,6 +172,7 @@ struct MascotBalloon<Buttons: View>: View {
         .shadow(color: .black.opacity(0.15), radius: 6, y: 2)
         .contentShape(Rectangle())
         .onTapGesture { typing.skip() }
+        .accessibilityElement(children: .contain)
         .accessibilityIdentifier("kids_mascot_balloon")
     }
 }

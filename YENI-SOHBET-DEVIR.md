@@ -1,5 +1,7 @@
 # DrawGuidance — yeni sohbet için devir belgesi (v49 sonrası)
 
+> **v50 (2026-11-14): önce `v50-devir-notu.md`yi okuyun.** v50 Android + iOS + sunucu tek dalda (GitHub `ahmetkar/DrawGuidance`, `ios/v49-port`); iOS sürümü, alıştırmalar, Google/Apple giriş, StoreKit 2, istisna hesabının kaldırılması. Sunucu güncelleme: `backend/docs/v50-sunucu-guncelleme.md`.
+
 _2026-11-02 (v49; v48/v47/v46 bölümleri önceki günler). Bu belge, hafızası olmayan yeni bir Claude sohbetinin projeyi kaldığı yerden sürdürebilmesi için yazıldı. **Önce `v49-durum.md`'yi, sonra `v48-durum.md`'yi, sonra `v47-durum.md`'yi, sonra `v46-durum.md`'yi, sonra `v45-devir-notu.md` ve `v45-durum.md`'yi**, sonra bu belgeyi, sonra `v44-durum.md` (claude.ai projesinde `claude/v44-durum.md`), `backend/docs/v44-yayin-rehberi.md`, `v43-durum.md`, `backend/docs/v43-dagitim.md`, `v42-durum.md`, `belgeler/v41-durum.md`, `belgeler/v40-devir-notu.md` ve `v38-durum.md` dosyalarını okuyun. v49 güvenlik/backend için ayrıca `v49-backend-gcs-rehberi.md` ve `v49-dptshell-guvenlik-rehberi.md`._
 
 **v49 özeti:** versionCode **49** (versionName **1.7.0**), Room **v23** (değişmedi), sunucu değişmedi (44.0.0). Üç istek + güvenlik:

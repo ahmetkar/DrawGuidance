@@ -31,7 +31,8 @@ class V50PracticeShapesTest {
     @Test
     fun templatesOnlyInArtModes() {
         val practice = ShapeTemplates.modeOnly.filter { it.key.startsWith(ModeCatalog.PRACTICE_PREFIX) }
-        assertEquals(23, practice.size)
+        // 7 temel alıştırma (çizgi, ışın, elips, spiral, dalga, ton skalası, küre) öneri şablonu değil
+        assertEquals(23 - 7, practice.size)
         for (t in practice) {
             assertTrue(t.solid!!.startsWith("lib.practice."))
             assertTrue(ModeCatalog.allows(ShapeMode.ART, t.key, t.category))

@@ -1,5 +1,6 @@
 package com.karapp.drawguidance.content
 
+import com.karapp.drawguidance.content.comic.ComicLine
 import com.karapp.drawguidance.content.comic.ComicLines
 import com.karapp.drawguidance.content.comic.ComicLinesKind
 import com.karapp.drawguidance.content.model3d.Model3D
@@ -25,7 +26,10 @@ class V29ContentTest {
             val sparse = ComicLines.generate(kind, 0f, 0f, 600f, 400f, seed = 3, density = 0.5f)
             val normal = ComicLines.generate(kind, 0f, 0f, 600f, 400f, seed = 3, density = 1f)
             val dense = ComicLines.generate(kind, 0f, 0f, 600f, 400f, seed = 3, density = 2.5f)
-            assertTrue("$kind: ${sparse.size} < ${normal.size} < ${dense.size}", sparse.size < normal.size && normal.size < dense.size)
+            // Darbe yıldızı hep iki kenardır; sıklık uç sayısını değiştirir (nokta sayısı)
+            fun amount(ls: List<ComicLine>) = if (kind == ComicLinesKind.IMPACT) ls.sumOf { it.xs.size } else ls.size
+            val (a, b2, c) = Triple(amount(sparse), amount(normal), amount(dense))
+            assertTrue("$kind: $a < $b2 < $c", a < b2 && b2 < c)
             // Aynı tohum ve sıklıkla aynı çizgiler (sıklık değişip geri dönünce aynı görünüm)
             val again = ComicLines.generate(kind, 0f, 0f, 600f, 400f, seed = 3, density = 1f)
             assertEquals(normal.size, again.size)

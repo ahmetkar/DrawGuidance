@@ -7,12 +7,16 @@ final class ViewportState: ObservableObject {
     static let MIN_ZOOM: Float = 0.25
     static let MAX_ZOOM: Float = 12
 
-    @Published private(set) var scale: Float = 1
-    @Published private(set) var offset = P(0, 0)
-    @Published private(set) var settledScale: Float = 1
-    @Published private(set) var settledOffset = P(0, 0)
-    @Published private(set) var fitScale: Float = 1
-    @Published private(set) var viewSize: (w: Float, h: Float) = (0, 0)
+    // Yalnız değer değişince yayınlanır: düzen sırasında (updateUIView) aynı değer yeniden yazılınca görünüm yeniden
+    // çizilip yine düzen çağrılıyordu (sonsuz güncelleme döngüsü, ana iş parçacığı sürekli meşgul).
+    private(set) var scale: Float = 1 { willSet { if newValue != scale { objectWillChange.send() } } }
+    private(set) var offset = P(0, 0) { willSet { if newValue != offset { objectWillChange.send() } } }
+    private(set) var settledScale: Float = 1 { willSet { if newValue != settledScale { objectWillChange.send() } } }
+    private(set) var settledOffset = P(0, 0) { willSet { if newValue != settledOffset { objectWillChange.send() } } }
+    private(set) var fitScale: Float = 1 { willSet { if newValue != fitScale { objectWillChange.send() } } }
+    private(set) var viewSize: (w: Float, h: Float) = (0, 0) {
+        willSet { if newValue.w != viewSize.w || newValue.h != viewSize.h { objectWillChange.send() } }
+    }
 
     private var canvasWidth = 1
     private var canvasHeight = 1

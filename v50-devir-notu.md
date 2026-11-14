@@ -9,7 +9,7 @@ _2026-11-14. Hafızası olmayan yeni bir Claude sohbeti için. Önce bunu, sonra
 - **Kaynak:** GitHub `github.com/ahmetkar/DrawGuidance` (**public**), dal **`ios/v49-port`**: Android, iOS, sunucu ve
   araçlar tek dalda. `android-v49` dalı v49'un sır içermeyen kopyasıdır (taban). `main` yalnız README.
 - **PC:** `C:\Users\ahmet\Documents\DrawGuidance` asıl kopya. v50 değişen dosyaları zip ile açıldı (eskiler
-  `_eski_v49\v50-oncesi\`), ardından ek düzeltmeler zip'i (`DrawGuidance-v50-ek-duzeltmeler.zip`, 25 dosya). PC'de
+  `_eski_v49\v50-oncesi\`), ardından ek düzeltmeler zip'i (`DrawGuidance-v50-ek-duzeltmeler.zip`), ardından iOS düzeltme zip'i (`DrawGuidance-v50-ios-duzeltme.zip`). PC'de
   yeni `ios\` klasörü var.
 - **Teslimler** (`/mnt/project-files/drawguidance/v50/` ve sohbette): `DrawGuidance-v50.apk` ve `.aab` (yükleme
   anahtarıyla imzalı, R8 + freeRASP), `DrawGuidance-v50-mapping.txt.gz`, Device Farm için imzasız
@@ -73,6 +73,15 @@ _2026-11-14. Hafızası olmayan yeni bir Claude sohbeti için. Önce bunu, sonra
   (önceden menü öneri balonlarının üstüne çıkıyordu). Kaydırılmayan 6 pencere (renk, fırça boyutu, kılavuz, sahne)
   `verticalScroll` aldı, çünkü yerleşik pencere çizim alanının en çok %46'sı.
 - Testler: küçük pencerede ekran dışında kalan düğmeler `clickInPopup()` (anlam eylemi) ile tıklanır.
+- **iOS düzenleyici donması (kritik):** `ViewportState`'in `@Published` alanları `EditorCanvas.updateUIView` →
+  `layoutViewport()` içinde her düzende aynı değerle yeniden yayınlanıyordu; SwiftUI sonsuz güncelleme döngüsüne
+  giriyor, tuval hiç açılmıyordu. Artık alanlar yalnız değer değişince `objectWillChange` gönderir. Kural: SwiftUI
+  `updateUIView`/düzen içinde yayınlanan değer yalnız değişince yayınlanmalı.
+- iOS tanı: DEBUG derlemede `-dgOpenNew <TÜR>` açılış argümanı doğrudan yeni tuval açar (`HomeView.swift`); CI bununla
+  düzenleyici ekran görüntüleri alır (`diag/editor-*.png`). `ShapeTests` şablon sayıları 766/5362.
+- iOS testleri (ce3db5a): birim 180/180. Arayüz testleri 3/8; kalan 5'i (çocuk görevi düğmesi ekran dışında, maskot,
+  3B görünüm, eğitim grubu, basit not menüsü) test betiğinin güncel arayüzü bulamamasından. 3B düzenleyicide küp
+  simülatörde çizilmiyor; gerçek cihazda bakılmalı.
 - Android birim testleri: v49'da geçen her sınıf v50'de de geçiyor. Kalan başarısızlıklar ortamdan kaynaklanıyor
   (Robolectric SDK 21/24/29 jar'ları, yerel sunucu, temel paketler) ve v49'da da başarısız. Bulutta çalıştırmak için
   init betiği `robolectric.dependency.repo.url` ve `maxParallelForks=1` ayarlar.

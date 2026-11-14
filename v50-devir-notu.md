@@ -9,7 +9,8 @@ _2026-11-14. Hafızası olmayan yeni bir Claude sohbeti için. Önce bunu, sonra
 - **Kaynak:** GitHub `github.com/ahmetkar/DrawGuidance` (**public**), dal **`ios/v49-port`**: Android, iOS, sunucu ve
   araçlar tek dalda. `android-v49` dalı v49'un sır içermeyen kopyasıdır (taban). `main` yalnız README.
 - **PC:** `C:\Users\ahmet\Documents\DrawGuidance` asıl kopya. v50 değişen dosyaları zip ile açıldı (eskiler
-  `_eski_v49\v50-oncesi\`). PC'de yeni `ios\` klasörü var.
+  `_eski_v49\v50-oncesi\`), ardından ek düzeltmeler zip'i (`DrawGuidance-v50-ek-duzeltmeler.zip`, 25 dosya). PC'de
+  yeni `ios\` klasörü var.
 - **Teslimler** (`/mnt/project-files/drawguidance/v50/` ve sohbette): `DrawGuidance-v50.apk` ve `.aab` (yükleme
   anahtarıyla imzalı, R8 + freeRASP), `DrawGuidance-v50-mapping.txt.gz`, Device Farm için imzasız
   `DrawGuidance-v50-ios-unsigned.ipa`.
@@ -63,6 +64,18 @@ _2026-11-14. Hafızası olmayan yeni bir Claude sohbeti için. Önce bunu, sonra
   Çıktılar `ios-build` adlı yapıtta. Tam koşu yaklaşık 1,5 saat sürer.
 - **Linux'ta Swift denetimi:** SwiftUI ve CoreGraphics derlenmez; yalnız saf Swift çekirdeği denetlenebilir. Gerçek
   derleme için CI kullanılır.
+
+## Son düzeltmeler (birleştirmeden sonra)
+
+- Temel alıştırma şekilleri (`practice.lines/radial/ellipses/spiral/waves/value_scale/sphere`) şekil önerisinden
+  çıkarıldı (`TemplatesPractice.kt` `SUGGEST_EXCLUDED`): sıradan çizgi ve daire düzeltmelerini ele geçiriyorlardı.
+- Dikey ekran yerleşik pencereleri (`DockedSheets.kt`): seçim menüsünün `zIndex`'i yalnız pencere açıkken uygulanır
+  (önceden menü öneri balonlarının üstüne çıkıyordu). Kaydırılmayan 6 pencere (renk, fırça boyutu, kılavuz, sahne)
+  `verticalScroll` aldı, çünkü yerleşik pencere çizim alanının en çok %46'sı.
+- Testler: küçük pencerede ekran dışında kalan düğmeler `clickInPopup()` (anlam eylemi) ile tıklanır.
+- Android birim testleri: v49'da geçen her sınıf v50'de de geçiyor. Kalan başarısızlıklar ortamdan kaynaklanıyor
+  (Robolectric SDK 21/24/29 jar'ları, yerel sunucu, temel paketler) ve v49'da da başarısız. Bulutta çalıştırmak için
+  init betiği `robolectric.dependency.repo.url` ve `maxParallelForks=1` ayarlar.
 
 ## Bilinen durumlar ve sonraki işler
 

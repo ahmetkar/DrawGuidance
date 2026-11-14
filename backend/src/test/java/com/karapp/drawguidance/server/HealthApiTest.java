@@ -20,7 +20,7 @@ class HealthApiTest extends ApiContextTest {
         assertEquals(200, r.status());
         JsonNode h = r.json();
         assertEquals("ok", h.get("status").asText());
-        assertEquals("44.2.0", h.get("version").asText());
+        assertEquals("50.0.0", h.get("version").asText());
         assertEquals("drawguidance", h.get("service").asText());
         assertEquals("up", h.get("database").asText());
         assertEquals("REPLICA_SET", h.get("topology").asText());

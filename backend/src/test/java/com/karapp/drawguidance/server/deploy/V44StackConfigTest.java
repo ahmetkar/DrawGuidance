@@ -61,7 +61,7 @@ class V44StackConfigTest {
     @Test
     void versionAndExemptConfig() throws Exception {
         String yml = Files.readString(Path.of("src/main/resources/application.yml"));
-        assertTrue(yml.contains("version: 44.2.0"));
+        assertTrue(yml.contains("version: 50.0.0"));
         assertFalse(yml.contains("exempt-emails"), "v50 istisna hesabı kaldırıldı");
         String prod = Files.readString(Path.of("src/main/resources/application-prod.yml"));
         assertTrue(prod.contains("device-key: ${DEVICE_DATA_KEY}"), "üretimde anahtar zorunlu (öntanımlı yok)");

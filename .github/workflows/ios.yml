@@ -79,6 +79,12 @@ jobs:
           ls -la build/*.ipa
           echo "Sembol kontrolü (ilk 20):"; nm -U "$APP/DrawGuidance" | head -20 || true
 
+      - name: .ipa yükle (testlerden önce)
+        uses: actions/upload-artifact@v4
+        with:
+          name: ios-ipa
+          path: ios/build/*.ipa
+
       - name: Açılış tanısı (simülatör, ekran görüntüsü ve ana iş parçacığı örneği)
         if: success()
         continue-on-error: true

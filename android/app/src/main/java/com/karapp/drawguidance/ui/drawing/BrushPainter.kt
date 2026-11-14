@@ -35,15 +35,21 @@ object BrushPainter {
         /** v20 fırça görünüm ayarları ve kalem yönü. */
         params: com.karapp.drawguidance.data.model.BrushParams? = null,
         orients: FloatArray? = null,
+        rolls: FloatArray? = null,
+        barrels: FloatArray? = null,
     ) {
         if (count <= 0 || type == BrushType.IMAGE || type == BrushType.TEXT) return
         val stream = StrokeStream.create(type, color, sizePx, opacity, seed, flow, strength, params = params)
-        stream.setPoints(xs, ys, count, pressures, tilts, orients)
+        stream.setPoints(xs, ys, count, pressures, tilts, orients, rolls, barrels)
         stream.drawStatic(canvas)
     }
 
     /** Kalem dinamikleri: nokta başına basınç, eğim ve (v20) yön; kalemle çizilmemişse null'lar. */
-    class Dynamics(val pressures: FloatArray?, val tilts: FloatArray?, val orients: FloatArray?) {
+    class Dynamics(
+        val pressures: FloatArray?, val tilts: FloatArray?, val orients: FloatArray?,
+        /** v51 gövde dönüşü ve gövde basıncı. */
+        val rolls: FloatArray? = null, val barrels: FloatArray? = null,
+    ) {
         operator fun component1() = pressures
         operator fun component2() = tilts
         operator fun component3() = orients
@@ -55,7 +61,9 @@ object BrushPainter {
         val p = if (points.any { it.pressure != 1f }) FloatArray(points.size) { points[it].pressure } else null
         val t = if (points.any { it.tilt != 0f }) FloatArray(points.size) { points[it].tilt } else null
         val o = if (points.any { it.orient != 0f }) FloatArray(points.size) { points[it].orient } else null
-        return Dynamics(p, t, o)
+        val r = if (points.any { it.roll != 0f }) FloatArray(points.size) { points[it].roll } else null
+        val b = if (points.any { it.barrel != 0f }) FloatArray(points.size) { points[it].barrel } else null
+        return Dynamics(p, t, o, r, b)
     }
 
     /** Ham noktalardan (kalem/pastel için eğrilerle yumuşatılmış) yol. */

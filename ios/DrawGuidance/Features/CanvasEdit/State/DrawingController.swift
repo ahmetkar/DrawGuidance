@@ -21,6 +21,8 @@ final class DrawingController {
             return
         }
         let b = brush()
+        // v51 klon/onarma: kaynak seçimi iz eklemez; bekleyen kaynak bu izin ayarına yazılır
+        if !penEraser && b.consumeCloneStroke(points[0]) { return }
         var settings = b.settings
         if penEraser && settings.brushType != .ERASER {
             settings.brushType = .ERASER; settings.sizePx = b.eraserSize(); settings.opacity = 1; settings.flow = 1; settings.strength = 1
@@ -113,7 +115,8 @@ final class DrawingController {
     func compactPoints(_ points: [StrokePoint]) -> [StrokePoint] {
         let q = points.map { p in
             StrokePoint(ContentCodec.quantize(p.x), ContentCodec.quantize(p.y), pressure: ContentCodec.quantizeUnit(p.pressure),
-                        tilt: ContentCodec.quantizeUnit(p.tilt), orient: p.orient == 0 ? 0 : max(ContentCodec.quantizeUnit(p.orient), 1.0 / 255))
+                        tilt: ContentCodec.quantizeUnit(p.tilt), orient: p.orient == 0 ? 0 : max(ContentCodec.quantizeUnit(p.orient), 1.0 / 255),
+                        roll: p.roll == 0 ? 0 : max(ContentCodec.quantizeUnit(p.roll), 1.0 / 255), barrel: ContentCodec.quantizeUnit(p.barrel))
         }
         if q.count <= 2 { return q }
         var out = [q[0]]

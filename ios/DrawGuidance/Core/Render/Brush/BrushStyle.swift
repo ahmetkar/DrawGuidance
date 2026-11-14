@@ -1,7 +1,7 @@
 import Foundation
 
 /// Fırçanın izi nasıl ürettiği (Android `BrushEngine`).
-enum BrushEngine { case PATH, TAPERED_PATH, RIBBON, BRISTLE, DABS, SOFT_DABS, STAMP_SHAPE, PATTERN, SCATTER, HALFTONE, TUBE, PAINT, SURFACE, TRAIL, IMAGE }
+enum BrushEngine { case PATH, TAPERED_PATH, RIBBON, BRISTLE, DABS, SOFT_DABS, STAMP_SHAPE, PATTERN, SCATTER, HALFTONE, TUBE, PAINT, SURFACE, TRAIL, RASTER, IMAGE }
 enum TextureKind: String { case PASTEL_GRAIN, CHARCOAL_GRAIN, SPONGE, CANVAS_WEAVE }
 enum TrailKind { case INK, DRIP }
 enum SurfaceKind: String { case CARPET, WALLPAPER, WOOD_PAINT, SKIN, FUR, PLANT, WOOD, IRON, METAL }
@@ -101,6 +101,12 @@ extension BrushType {
         case .TEXTURE_WOOD: return surfaceStyle(.WOOD)
         case .TEXTURE_IRON: return surfaceStyle(.IRON)
         case .TEXTURE_METAL: return surfaceStyle(.METAL)
+        // v51 boya ve yardımcı fırçalar: piksel motoru (canlı önizlemede yumuşak damga)
+        case .ACRYLIC: return BrushStyle(widthFactor: 1.4, alphaFactor: 1, textured: true, engine: .RASTER, spacing: 0.08, hardness: 0.8)
+        case .OIL_PAINT: return BrushStyle(widthFactor: 1.6, alphaFactor: 1, textured: true, engine: .RASTER, spacing: 0.06, hardness: 0.7)
+        case .CLOUD_SMOKE: return BrushStyle(widthFactor: 2.6, alphaFactor: 0.85, textured: true, engine: .RASTER, spacing: 0.12, hardness: 0)
+        case .FX_BLUR, .FX_SHARPEN, .FX_DODGE, .FX_BURN, .FX_SPONGE, .FX_CLONE, .FX_HEAL, .FX_MIXER:
+            return BrushStyle(widthFactor: 1.6, alphaFactor: 1, textured: true, engine: .RASTER, spacing: 0.1, hardness: 0.3)
         case .ERASER: return BrushStyle(widthFactor: 2, alphaFactor: 1, blendMode: .clear)
         case .IMAGE, .TEXT, .SHAPE, .DIAGRAM, .FORMULA:
             return BrushStyle(widthFactor: 0, alphaFactor: 1, cap: .butt, join: .miter, smooth: false, engine: .IMAGE)
@@ -145,6 +151,12 @@ extension BrushType {
         case .PAINT_TRAIL: return 18
         case .PATTERN_CARPET, .PATTERN_WALLPAPER, .PATTERN_WOODPAINT: return 36
         case .TEXTURE_SKIN, .TEXTURE_FUR, .TEXTURE_PLANT, .TEXTURE_WOOD, .TEXTURE_IRON, .TEXTURE_METAL: return 36
+        case .ACRYLIC: return 22
+        case .OIL_PAINT: return 26
+        case .CLOUD_SMOKE: return 48
+        case .FX_BLUR, .FX_SHARPEN, .FX_DODGE, .FX_BURN, .FX_SPONGE: return 40
+        case .FX_CLONE, .FX_HEAL: return 30
+        case .FX_MIXER: return 32
         case .ERASER: return 30
         case .IMAGE: return 1
         case .SHAPE, .DIAGRAM: return 4
@@ -157,7 +169,7 @@ extension BrushType {
     var defaultSpacing: Float? {
         let st = style
         switch st.engine {
-        case .DABS, .SOFT_DABS, .STAMP_SHAPE, .HALFTONE, .SURFACE, .TRAIL: return st.spacing
+        case .DABS, .SOFT_DABS, .STAMP_SHAPE, .HALFTONE, .SURFACE, .TRAIL, .RASTER: return st.spacing
         case .SCATTER: return 0.45
         case .PATTERN:
             switch st.pattern {
@@ -180,6 +192,10 @@ extension BrushType {
         let st = style
         let widen = BrushDynamics.of(self).with(params).maxWidth
         var r = st.widthFactor * 0.5 * st.reach * widen * 1.15
+        // v51 boyut aralığı ve piksel motorunun yumuşak kenar payı
+        let tipMax = min(max(params?.tip?.maxSize ?? 1, 0.1), 3)
+        if tipMax > 1 { r *= tipMax }
+        if st.engine == .RASTER { r *= 1 + 0.6 * (RasterBrush.effectiveTip(self, params).softness ?? 0) }
         if self == .DRIP_TRAIL { r += st.widthFactor * DRIP_MAX_LENGTH * widen }
         if self == .BRUSH_3D {
             let tube = params?.tube ?? TubeParams()
@@ -197,6 +213,8 @@ func pressureAlpha(_ strength: Float) -> Float { 0.35 + 0.65 * min(max(strength,
 /// Fırça seçicideki kategoriler (Android `BrushCategory`).
 enum BrushCategory: String, CaseIterable {
     case FINE_ART, BROAD, HARD, SOFT, SHAPE, TRAIL, PATTERN, TEXTURE, LIVING, MATERIAL, HALFTONE, EFFECTS
+    /// v51 boya ve yardımcı fırçalar.
+    case PAINT, HELPER
     case NOTE_WRITING, NOTE_MARKING, NOTE_EFFECTS
 
     var brushes: [BrushType] {
@@ -213,6 +231,8 @@ enum BrushCategory: String, CaseIterable {
         case .MATERIAL: return [.TEXTURE_WOOD, .TEXTURE_IRON, .TEXTURE_METAL]
         case .HALFTONE: return [.HALFTONE_DOTS, .HALFTONE_LINES]
         case .EFFECTS: return [.DOT_PEN, .BRUSH_3D]
+        case .PAINT: return [.ACRYLIC, .OIL_PAINT, .CLOUD_SMOKE]
+        case .HELPER: return [.FX_BLUR, .FX_SHARPEN, .FX_DODGE, .FX_BURN, .FX_SPONGE, .FX_CLONE, .FX_HEAL, .FX_MIXER]
         case .NOTE_WRITING: return [.NOTE_PENCIL, .NOTE_BALLPOINT, .NOTE_FOUNTAIN, .NOTE_GEL, .NOTE_FINELINER]
         case .NOTE_MARKING: return [.NOTE_FELT, .NOTE_HIGHLIGHTER]
         case .NOTE_EFFECTS: return [.DOT_PEN, .BRUSH_3D]
@@ -238,7 +258,14 @@ enum BrushCategory: String, CaseIterable {
     }
 
     /// Android metin kaynağının adı.
-    var titleKey: String { self == .NOTE_EFFECTS ? "brush_cat_effects" : "brush_cat_" + rawValue.lowercased() }
+    var titleKey: String {
+        switch self {
+        case .NOTE_EFFECTS: return "brush_cat_effects"
+        case .PAINT: return "v51_cat_paint"
+        case .HELPER: return "v51_cat_helper"
+        default: return "brush_cat_" + rawValue.lowercased()
+        }
+    }
 }
 
 /// Tuval türünün fırça seçicisindeki fırçalar.
@@ -300,8 +327,10 @@ struct BrushDynamics {
         case .PENCIL, .NOTE_PENCIL: return PENCIL
         case .CHARCOAL, .PASTEL: return GRAPHITE
         case .SOFT_ROUND, .AIRBRUSH, .HARD_ROUND, .TEXTURE_SPONGE, .TEXTURE_CANVAS, .PATTERN_CARPET, .PATTERN_WALLPAPER,
-             .PATTERN_WOODPAINT, .TEXTURE_SKIN, .TEXTURE_FUR, .TEXTURE_PLANT, .TEXTURE_WOOD, .TEXTURE_IRON, .TEXTURE_METAL:
+             .PATTERN_WOODPAINT, .TEXTURE_SKIN, .TEXTURE_FUR, .TEXTURE_PLANT, .TEXTURE_WOOD, .TEXTURE_IRON, .TEXTURE_METAL,
+             .CLOUD_SMOKE, .FX_BLUR, .FX_SHARPEN, .FX_DODGE, .FX_BURN, .FX_SPONGE, .FX_CLONE, .FX_HEAL, .FX_MIXER:
             return SOFT
+        case .ACRYLIC, .OIL_PAINT: return MARKER
         case .PAINT_TRAIL, .MARKER, .NOTE_FELT, .FLAT_BRUSH: return MARKER
         case .HIGHLIGHTER, .NOTE_HIGHLIGHTER: return HIGHLIGHT
         default: return PEN
@@ -373,6 +402,17 @@ extension BrushType {
         switch self {
         case .FLAT_BRUSH: return "brush_flat"
         case .BRUSH_3D: return "brush_3d"
+        case .ACRYLIC: return "v51_brush_acrylic"
+        case .OIL_PAINT: return "v51_brush_oil"
+        case .CLOUD_SMOKE: return "v51_brush_cloud"
+        case .FX_BLUR: return "v51_brush_blur"
+        case .FX_SHARPEN: return "v51_brush_sharpen"
+        case .FX_DODGE: return "v51_brush_dodge"
+        case .FX_BURN: return "v51_brush_burn"
+        case .FX_SPONGE: return "v51_brush_sponge"
+        case .FX_CLONE: return "v51_brush_clone"
+        case .FX_HEAL: return "v51_brush_heal"
+        case .FX_MIXER: return "v51_brush_mixer"
         default: return "brush_" + rawValue.lowercased()
         }
     }

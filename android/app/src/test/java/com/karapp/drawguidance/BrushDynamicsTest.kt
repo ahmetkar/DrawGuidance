@@ -7,6 +7,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.karapp.drawguidance.data.images.ImageExporter
 import com.karapp.drawguidance.data.model.BrushType
 import com.karapp.drawguidance.data.model.isObject
+import com.karapp.drawguidance.data.model.isHelper
 import com.karapp.drawguidance.data.model.CanvasUi
 import com.karapp.drawguidance.data.model.canvasOf
 import com.karapp.drawguidance.data.model.Stroke
@@ -88,8 +89,8 @@ class BrushDynamicsTest {
         }
         assertEquals(drawable.toSet(), (PickerBrushTypes + com.karapp.drawguidance.ui.drawing.NoteBrushTypes).toSet())
         assertFalse(BrushType.ERASER in PickerBrushTypes)
-        // v21: İzler, Canlı dokuları ve Malzeme dokuları kategorileri eklendi
-        assertEquals(12, BrushCategory.forKind(com.karapp.drawguidance.data.model.CanvasKind.ART).size)
+        // v21: İzler, Canlı dokuları ve Malzeme dokuları kategorileri eklendi; v51: Boya ve Yardımcı fırçalar
+        assertEquals(14, BrushCategory.forKind(com.karapp.drawguidance.data.model.CanvasKind.ART).size)
         assertEquals(3, BrushCategory.forKind(com.karapp.drawguidance.data.model.CanvasKind.NOTES).size)
         assertEquals(9, com.karapp.drawguidance.ui.drawing.NoteBrushTypes.size)
         val shared = setOf(BrushType.DOT_PEN, BrushType.BRUSH_3D)
@@ -99,7 +100,8 @@ class BrushDynamicsTest {
     }
 
     @Test fun everyPickerBrushPaintsAndLooksDifferentFromTheOthers() {
-        val signatures = PickerBrushTypes.associateWith { type ->
+        // v51 yardımcı fırçalar boş kâğıda iz bırakmaz (alttaki içeriği işler; V51RasterBrushTest)
+        val signatures = PickerBrushTypes.filter { !it.isHelper }.associateWith { type ->
             val bitmap = render(type)
             assertTrue("$type iz bırakmalı", coverage(bitmap) > 150)
             signature(bitmap)

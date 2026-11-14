@@ -19,21 +19,24 @@ enum BrushPainter {
 
     static func paint(_ ctx: CGContext, xs: [Float], ys: [Float], color: UInt32, type: BrushType, sizePx: Float, opacity: Float,
                       seed: Int32, flow: Float, strength: Float, pressures: [Float]? = nil, tilts: [Float]? = nil,
-                      params: BrushParams? = nil, orients: [Float]? = nil) {
+                      params: BrushParams? = nil, orients: [Float]? = nil, rolls: [Float]? = nil, barrels: [Float]? = nil) {
         let n = min(xs.count, ys.count)
         if n <= 0 || type == .IMAGE || type == .TEXT { return }
         let s = StaticBrush(type: type, color: color, sizePx: sizePx, opacity: opacity, seed: seed, flow: flow, strength: strength,
-                            params: params, xs: xs, ys: ys, count: n, pp: pressures, pt: tilts, po: orients)
+                            params: params, xs: xs, ys: ys, count: n, pp: pressures, pt: tilts, po: orients, pr: rolls, pb: barrels)
         s.drawStatic(ctx)
     }
 
-    /// Kalem dinamikleri: nokta başına basınç, eğim ve yön; kalemle çizilmemişse nil.
-    static func dynamicsOf(_ points: [StrokePoint]) -> (pressures: [Float]?, tilts: [Float]?, orients: [Float]?) {
-        if !points.contains(where: { $0.pressure != 1 || $0.tilt != 0 || $0.orient != 0 }) { return (nil, nil, nil) }
+    /// Kalem dinamikleri: nokta başına basınç, eğim, yön ve (v51) gövde dönüşü/basıncı; kalemle çizilmemişse nil.
+    static func dynamicsOf(_ points: [StrokePoint])
+        -> (pressures: [Float]?, tilts: [Float]?, orients: [Float]?, rolls: [Float]?, barrels: [Float]?) {
+        if !points.contains(where: { $0.hasDynamics }) { return (nil, nil, nil, nil, nil) }
         let p = points.contains { $0.pressure != 1 } ? points.map(\.pressure) : nil
         let t = points.contains { $0.tilt != 0 } ? points.map(\.tilt) : nil
         let o = points.contains { $0.orient != 0 } ? points.map(\.orient) : nil
-        return (p, t, o)
+        let r = points.contains { $0.roll != 0 } ? points.map(\.roll) : nil
+        let b = points.contains { $0.barrel != 0 } ? points.map(\.barrel) : nil
+        return (p, t, o, r, b)
     }
 
     /// Ham noktalardan (yumuşatılmış) yol.
@@ -136,7 +139,12 @@ final class StaticBrush {
     let px: [Float], py: [Float]
     let count: Int
     let pp: [Float]?, pt: [Float]?, po: [Float]?
-    var hasDynamics: Bool { pp != nil || pt != nil }
+    /// v51 gövde dönüşü ve gövde basıncı (yoksa nil).
+    let pr: [Float]?, pb: [Float]?
+    /// v51 kalem/hareket dinamikleri ve boyut aralığı (ayar yoksa nil).
+    let penModel: PenModel?
+    private lazy var penData = PenModel.PointData(px, py, count, pp, pt, po, pr, pb, width: width)
+    var hasDynamics: Bool { pp != nil || pt != nil || penModel != nil }
 
     private let extrude: Depth3D?
     let extrudeLength: Float
@@ -144,7 +152,8 @@ final class StaticBrush {
     var hasExtrusion: Bool { extrudeLength > 0.5 }
 
     init(type: BrushType, color: UInt32, sizePx: Float, opacity: Float, seed: Int32, flow: Float, strength: Float,
-         params: BrushParams?, xs: [Float], ys: [Float], count: Int, pp: [Float]?, pt: [Float]?, po: [Float]?) {
+         params: BrushParams?, xs: [Float], ys: [Float], count: Int, pp: [Float]?, pt: [Float]?, po: [Float]?,
+         pr: [Float]? = nil, pb: [Float]? = nil) {
         self.type = type; self.color = color; self.opacity = opacity; self.seed = seed; self.strength = strength
         self.params = params
         style = type.style
@@ -156,7 +165,8 @@ final class StaticBrush {
         opaqueColor = color | 0xFF00_0000
         dynamics = BrushDynamics.of(type).with(params)
         px = xs; py = ys; self.count = count
-        self.pp = pp; self.pt = pt; self.po = po
+        self.pp = pp; self.pt = pt; self.po = po; self.pr = pr; self.pb = pb
+        penModel = PenModel.of(params)
         if let d = params?.depth3d, d.depth > 0.01, type != .ERASER, type.style.engine != .TUBE { extrude = d } else { extrude = nil }
         extrudeLength = Iso3D.extrudeLength(extrude, width)
         extrudeDir = extrude.map { Iso3D.extrudeVector($0) }
@@ -176,8 +186,20 @@ final class StaticBrush {
         return i == 0 ? a[0] : (a[i - 1] + a[i]) * 0.5
     }
 
-    func wf(_ raw: Int) -> Float { hasDynamics ? dynamics.width(dynAt(pp, raw, 1), dynAt(pt, raw, 0)) : 1 }
-    func af(_ raw: Int) -> Float { hasDynamics ? dynamics.alpha(dynAt(pp, raw, 1), dynAt(pt, raw, 0)) : 1 }
+    func wf(_ raw: Int) -> Float {
+        guard hasDynamics else { return 1 }
+        let pressure: Float = penModel?.overridesPressure == true ? 1 : dynAt(pp, raw, 1)
+        let base = dynamics.width(pressure, dynAt(pt, raw, 0))
+        guard let pm = penModel else { return base }
+        return pm.size(base, penData, min(max(raw, 0), max(0, count - 1)))
+    }
+
+    func af(_ raw: Int) -> Float {
+        guard hasDynamics else { return 1 }
+        let base = dynamics.alpha(dynAt(pp, raw, 1), dynAt(pt, raw, 0))
+        guard let pm = penModel else { return base }
+        return base * pm.alpha(penData, min(max(raw, 0), max(0, count - 1)))
+    }
 
     func orientAt(_ raw: Int) -> Float? {
         guard let a = po, count > 0 else { return nil }
@@ -188,7 +210,8 @@ final class StaticBrush {
     var engine: BrushEngine {
         let fullEraser = isEraser && flowA >= 0.99 && opacity >= 0.99
         if isEraser { return fullEraser ? .PATH : .DABS }
-        return style.engine
+        // v51 piksel motorlu fırçalar burada (canlı çizim, kapsama) yumuşak damgalarla çizilir; asıl hâli `RasterStrokes`
+        return style.engine == .RASTER ? .SOFT_DABS : style.engine
     }
 
     var compositeAlpha: Float {

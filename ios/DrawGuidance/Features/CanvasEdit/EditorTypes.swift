@@ -11,6 +11,33 @@ struct BrushTuning: Codable, Equatable {
     var tiltThreshold: Float = 0
     var nibFollow = false
     var tube = TubeParams()
+    /// v51 uç biçimi ve boya ayarları (nil alan: fırçanın varsayılanı), kalem dinamikleri, yardımcı fırça ayarları.
+    var tip = TipParams()
+    var pen = PenDynamics()
+    var fx = FxParams()
+
+    init() {}
+
+    private enum CodingKeys: String, CodingKey {
+        case spacing, speed, stabilizer, stabilizerStrength, tiltWidth, tiltLight, tiltThreshold, nibFollow, tube, tip, pen, fx
+    }
+
+    /// Eski kayıtlarda olmayan alanlar varsayılanla okunur (kayıtlı ayarlar kaybolmasın).
+    init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        spacing = try c.decodeIfPresent(Float.self, forKey: .spacing)
+        speed = try c.decodeIfPresent(Float.self, forKey: .speed) ?? 1
+        stabilizer = try c.decodeIfPresent(Bool.self, forKey: .stabilizer) ?? false
+        stabilizerStrength = try c.decodeIfPresent(Float.self, forKey: .stabilizerStrength) ?? 0.5
+        tiltWidth = try c.decodeIfPresent(Float.self, forKey: .tiltWidth)
+        tiltLight = try c.decodeIfPresent(Float.self, forKey: .tiltLight)
+        tiltThreshold = try c.decodeIfPresent(Float.self, forKey: .tiltThreshold) ?? 0
+        nibFollow = try c.decodeIfPresent(Bool.self, forKey: .nibFollow) ?? false
+        tube = (try? c.decodeIfPresent(TubeParams.self, forKey: .tube)) ?? TubeParams()
+        tip = (try? c.decodeIfPresent(TipParams.self, forKey: .tip)) ?? TipParams()
+        pen = (try? c.decodeIfPresent(PenDynamics.self, forKey: .pen)) ?? PenDynamics()
+        fx = (try? c.decodeIfPresent(FxParams.self, forKey: .fx)) ?? FxParams()
+    }
 
     static let MIN_SIZE: Float = 1
     static let MAX_SIZE: Float = 380
@@ -24,8 +51,13 @@ struct BrushTuning: Codable, Equatable {
         let th = tiltThreshold.coerceIn(0, 80)
         let nib = nibFollow && type.hasFlatNib
         let t: TubeParams? = (type == .BRUSH_3D && tube != TubeParams()) ? tube : nil
-        if sp == nil && tw == nil && tl == nil && th <= 0 && !nib && t == nil { return nil }
-        return BrushParams(spacing: sp, tiltWidth: tw, tiltLight: tl, tiltThreshold: th, nibFollow: nib, tube: t)
+        // v51 boyut aralığı her fırçada; uç ve boya ayarları piksel motorlu fırçalarda
+        var sizeOnly = TipParams(); sizeOnly.minSize = tip.minSize; sizeOnly.maxSize = tip.maxSize
+        let tp = (type.isRaster ? tip : sizeOnly).orNil
+        let pd = pen.orNil
+        let fp: FxParams? = (type.isHelper && fx != FxParams()) ? fx : nil
+        if sp == nil && tw == nil && tl == nil && th <= 0 && !nib && t == nil && tp == nil && pd == nil && fp == nil { return nil }
+        return BrushParams(spacing: sp, tiltWidth: tw, tiltLight: tl, tiltThreshold: th, nibFollow: nib, tube: t, tip: tp, pen: pd, fx: fp)
     }
 }
 

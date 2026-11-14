@@ -120,6 +120,8 @@ internal suspend fun AwaitPointerEventScope.penStroke(
         }
         ctx.tilt = if (useTilt && raw != null && idx >= 0) Stylus.tiltOf(raw, idx, history) else 0f
         ctx.orient = if (useTilt && raw != null && idx >= 0) Stylus.orientOf(raw, idx, history) else 0f
+        // v51 gövde basıncı: yan tuş silgi olarak kullanılmıyorsa basılı yan tuş
+        ctx.barrel = if (penOn && !Stylus.sideButtonErases.value && raw != null && Stylus.sideButton(raw)) 1f else 0f
     }
 
     // Düşük gecikme: kesinleşen parçalar ön tampona da (önceki çizginin bekleyen temizliği hemen yapılır)

@@ -1945,6 +1945,9 @@ fun CanvasEditScreen(
                             onRemoveColor = viewModel::removeSavedColor,
                             onTuning = viewModel::updateBrushTuning,
                             onResetTuning = viewModel::resetBrushTuning,
+                            cloneSourcePicking = viewModel.cloneSourcePicking.collectAsState().value,
+                            cloneSourcePending = viewModel.cloneSource.collectAsState().value != null,
+                            onPickCloneSource = viewModel::pickCloneSource,
                             onEyedropper = {
                                 viewModel.closePanel()
                                 viewModel.toggleCanvasPick(com.karapp.drawguidance.ui.screens.canvasedit.components.CanvasPick.EYEDROPPER)

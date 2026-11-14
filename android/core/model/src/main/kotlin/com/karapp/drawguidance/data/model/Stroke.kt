@@ -64,6 +64,19 @@ enum class BrushType {
     TEXTURE_WOOD,
     TEXTURE_IRON,
     TEXTURE_METAL,
+    // v51 boya fırçaları (piksel tabanlı motor: alttaki boyayla karışır, kalınlık/ıslaklık)
+    ACRYLIC,
+    OIL_PAINT,
+    CLOUD_SMOKE,
+    // v51 yardımcı fırçalar (alttaki çizimi işler: bulanıklaştır, keskinleştir, aç, koyulaştır, sünger, klon, onar, karıştır)
+    FX_BLUR,
+    FX_SHARPEN,
+    FX_DODGE,
+    FX_BURN,
+    FX_SPONGE,
+    FX_CLONE,
+    FX_HEAL,
+    FX_MIXER,
     // Araçlar
     ERASER,
     /** Vektör şekil: noktalar alt yolların uç uca eklenmiş noktalarıdır; yapısı ve biçimi [Stroke.shape]. */
@@ -77,6 +90,21 @@ enum class BrushType {
     /** Formül: noktalar kutunun 4 köşesidir (yazı gibi); kaynak ve düzenlenebilir alanlar [Stroke.formula]. */
     FORMULA,
 }
+
+/**
+ * v51 piksel tabanlı (raster) fırçalar: iz, altındaki aynı katman içeriğiyle birlikte piksel olarak hesaplanır
+ * (ui/drawing/RasterBrush.kt). Boya fırçaları alttaki boyayla karışır; yardımcı fırçalar alttaki çizimi işler.
+ */
+val BrushType.isRaster: Boolean
+    get() = this == BrushType.ACRYLIC || this == BrushType.OIL_PAINT || this == BrushType.CLOUD_SMOKE || isHelper
+
+/** v51 yardımcı fırçalar (renk bırakmaz ya da alttaki rengi işler). */
+val BrushType.isHelper: Boolean
+    get() = this == BrushType.FX_BLUR || this == BrushType.FX_SHARPEN || this == BrushType.FX_DODGE || this == BrushType.FX_BURN ||
+        this == BrushType.FX_SPONGE || this == BrushType.FX_CLONE || this == BrushType.FX_HEAL || this == BrushType.FX_MIXER
+
+/** v51 alttaki çizimi okuyan raster fırçalar (karışım, süzgeç, klon): çizim listesindeki bağlamla çizilmeli. */
+val BrushType.readsBelow: Boolean get() = isRaster
 
 /** Noktaları 4 köşeli bir kutu olan (fırça izi olmayan) elemanlar: resim, yazı ve diyagram. */
 val BrushType.isQuad: Boolean
@@ -449,9 +477,16 @@ data class StrokePoint(
      * yöne dönebilsin diye.
      */
     @EncodeDefault(EncodeDefault.Mode.NEVER) val orient: Float = 0f,
+    /** v51 kalemin kendi ekseni etrafındaki dönüşü (gövde dönüşü; 0..1 → 0..360°; 0: bilinmiyor). */
+    @EncodeDefault(EncodeDefault.Mode.NEVER) val roll: Float = 0f,
+    /** v51 gövde basıncı (yan tuş / sıkma; 0..1). */
+    @EncodeDefault(EncodeDefault.Mode.NEVER) val barrel: Float = 0f,
 ) {
     /** Basınç, eğim ya da yön taşıyor mu (kalemle çizilmiş). */
-    val hasDynamics: Boolean get() = pressure != 1f || tilt != 0f || orient != 0f
+    val hasDynamics: Boolean get() = pressure != 1f || tilt != 0f || orient != 0f || roll != 0f || barrel != 0f
+
+    /** v51 gövde dönüşü ya da gövde basıncı taşıyor mu. */
+    val hasBarrel: Boolean get() = roll != 0f || barrel != 0f
 
     /** Aynı basınç ve eğimle başka bir yer (taşıma, döndürme, ölçekleme). */
     fun at(x: Float, y: Float): StrokePoint = copy(x = x, y = y)
@@ -605,6 +640,91 @@ data class BrushParams(
     @EncodeDefault(EncodeDefault.Mode.NEVER) val depth3d: Depth3D? = null,
     /** v29 çizgi roman hız/odak çizgisi grubunun üretim bilgisi (sıklığı sonradan değiştirilebilsin). */
     @EncodeDefault(EncodeDefault.Mode.NEVER) val comicLines: ComicLinesParams? = null,
+    /** v51 uç biçimi ve boya ayarları (boyut aralığı, sertlik, açı, uç şekli, yoğunluk, ıslaklık…); null: varsayılan. */
+    @EncodeDefault(EncodeDefault.Mode.NEVER) val tip: TipParams? = null,
+    /** v51 kalem ve hareket dinamikleri (basınç, eğim, yön, hız, mesafe, zaman, gövde); null: varsayılan. */
+    @EncodeDefault(EncodeDefault.Mode.NEVER) val pen: PenDynamics? = null,
+    /** v51 yardımcı fırça ayarları (kip, klon kaynağı). */
+    @EncodeDefault(EncodeDefault.Mode.NEVER) val fx: FxParams? = null,
+)
+
+/** v51 fırça ucu şekilleri. */
+@Serializable
+enum class TipShape { ROUND, SQUARE, FLAT, CHISEL, BRISTLE, SPONGE, SPLATTER, CLOUD }
+
+/**
+ * v51 fırça ucu ve boya ayarları. Her alan null ise fırçanın kendi varsayılanı kullanılır (bkz. ui/drawing/RasterBrush
+ * `RasterDefaults`). Oranlar 0..1, açı derece.
+ *
+ * Boyut ve şekil: [minSize] (en hafif dokunuşta boyutun oranı), [maxSize] (en güçlü dokunuşta, 1..3), [hardness],
+ * [softness] (kenar yumuşatma payı), [aspect] (uç yüksekliği/genişliği), [angle], [rotation] (rastgele dönüş),
+ * [roundness] (köşe yuvarlaklığı), [shape], [edge] (kenar keskinliği).
+ * Boya ve yoğunluk: [density], [buildUp] (opaklık sınırını aşarak birikme), [wetness], [paintAmount] (fırçadaki boya
+ * miktarı; azaldıkça iz kurur), [thickness] (kabartma), [colorAmount] (fırça rengi oranı), [smudge] (alttaki rengi
+ * sürükleme), [blend] (alttaki renkle karışma).
+ */
+@OptIn(ExperimentalSerializationApi::class)
+@Serializable
+data class TipParams(
+    @EncodeDefault(EncodeDefault.Mode.NEVER) val minSize: Float? = null,
+    @EncodeDefault(EncodeDefault.Mode.NEVER) val maxSize: Float? = null,
+    @EncodeDefault(EncodeDefault.Mode.NEVER) val hardness: Float? = null,
+    @EncodeDefault(EncodeDefault.Mode.NEVER) val softness: Float? = null,
+    @EncodeDefault(EncodeDefault.Mode.NEVER) val aspect: Float? = null,
+    @EncodeDefault(EncodeDefault.Mode.NEVER) val angle: Float? = null,
+    @EncodeDefault(EncodeDefault.Mode.NEVER) val rotation: Float? = null,
+    @EncodeDefault(EncodeDefault.Mode.NEVER) val roundness: Float? = null,
+    @EncodeDefault(EncodeDefault.Mode.NEVER) val shape: TipShape? = null,
+    @EncodeDefault(EncodeDefault.Mode.NEVER) val edge: Float? = null,
+    @EncodeDefault(EncodeDefault.Mode.NEVER) val density: Float? = null,
+    @EncodeDefault(EncodeDefault.Mode.NEVER) val buildUp: Float? = null,
+    @EncodeDefault(EncodeDefault.Mode.NEVER) val wetness: Float? = null,
+    @EncodeDefault(EncodeDefault.Mode.NEVER) val paintAmount: Float? = null,
+    @EncodeDefault(EncodeDefault.Mode.NEVER) val thickness: Float? = null,
+    @EncodeDefault(EncodeDefault.Mode.NEVER) val colorAmount: Float? = null,
+    @EncodeDefault(EncodeDefault.Mode.NEVER) val smudge: Float? = null,
+    @EncodeDefault(EncodeDefault.Mode.NEVER) val blend: Float? = null,
+) {
+    /** Hiçbir alan ayarlanmamışsa null. */
+    fun orNull(): TipParams? = if (this == TipParams()) null else this
+}
+
+/**
+ * v51 kalem ve hareket dinamikleri: her kaynak fırçanın boyutunu (ve bazıları opaklığını ya da uç açısını) etkiler.
+ * null: fırçanın varsayılanı. [pressure] basıncın boyuta etkisi (0..1), [pressureOpacity] opaklığa etkisi, [tiltX]/[tiltY]
+ * eğimin yatay/dikey bileşeni (−1..1), [tiltDirection] ucun kalemin yöneldiği yöne dönmesi (0..1), [rotation] ucun gövde
+ * dönüşünü izlemesi (0..1), [velocity] hızın boyuta etkisi (−1..1; eksi: hızlı çizgi incelir), [direction] ucun çizgi
+ * yönüne dönmesi (0..1), [distance] çizgi uzadıkça incelme (0..1), [time] süre geçtikçe solma (0..1), [barrel] gövde
+ * basıncının boyuta etkisi (−1..1).
+ */
+@OptIn(ExperimentalSerializationApi::class)
+@Serializable
+data class PenDynamics(
+    @EncodeDefault(EncodeDefault.Mode.NEVER) val pressure: Float? = null,
+    @EncodeDefault(EncodeDefault.Mode.NEVER) val pressureOpacity: Float? = null,
+    @EncodeDefault(EncodeDefault.Mode.NEVER) val tiltX: Float? = null,
+    @EncodeDefault(EncodeDefault.Mode.NEVER) val tiltY: Float? = null,
+    @EncodeDefault(EncodeDefault.Mode.NEVER) val tiltDirection: Float? = null,
+    @EncodeDefault(EncodeDefault.Mode.NEVER) val rotation: Float? = null,
+    @EncodeDefault(EncodeDefault.Mode.NEVER) val velocity: Float? = null,
+    @EncodeDefault(EncodeDefault.Mode.NEVER) val direction: Float? = null,
+    @EncodeDefault(EncodeDefault.Mode.NEVER) val distance: Float? = null,
+    @EncodeDefault(EncodeDefault.Mode.NEVER) val time: Float? = null,
+    @EncodeDefault(EncodeDefault.Mode.NEVER) val barrel: Float? = null,
+) {
+    fun orNull(): PenDynamics? = if (this == PenDynamics()) null else this
+}
+
+/**
+ * v51 yardımcı fırça ayarları: [mode] (sünger: 0 soldur, 1 doyur; açma/koyulaştırma: 0 gölgeler, 1 orta tonlar,
+ * 2 parlak tonlar), klon/onarma kaynağının hedefe göre kayması ([srcDx], [srcDy]; tuval birimi; null: otomatik).
+ */
+@OptIn(ExperimentalSerializationApi::class)
+@Serializable
+data class FxParams(
+    @EncodeDefault(EncodeDefault.Mode.NEVER) val mode: Int = 0,
+    @EncodeDefault(EncodeDefault.Mode.NEVER) val srcDx: Float? = null,
+    @EncodeDefault(EncodeDefault.Mode.NEVER) val srcDy: Float? = null,
 )
 
 /**

@@ -3,6 +3,14 @@ package com.karapp.drawguidance.ui.components
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ShowChart
 import androidx.compose.material.icons.filled.Air
+import androidx.compose.material.icons.filled.Cloud
+import androidx.compose.material.icons.filled.Details
+import androidx.compose.material.icons.filled.LightMode
+import androidx.compose.material.icons.filled.DarkMode
+import androidx.compose.material.icons.filled.InvertColors
+import androidx.compose.material.icons.filled.ContentCopy
+import androidx.compose.material.icons.filled.Healing
+import androidx.compose.material.icons.filled.Colorize
 import androidx.compose.material.icons.filled.BlurCircular
 import androidx.compose.material.icons.filled.BlurLinear
 import androidx.compose.material.icons.filled.BlurOn
@@ -163,6 +171,18 @@ object BrushIcons {
         BrushType.TEXTURE_WOOD -> Icons.Filled.Forest
         BrushType.TEXTURE_IRON -> Icons.Filled.Anchor
         BrushType.TEXTURE_METAL -> Icons.Filled.Hardware
+        // v51
+        BrushType.ACRYLIC -> Icons.Filled.FormatPaint
+        BrushType.OIL_PAINT -> Icons.Filled.Brush
+        BrushType.CLOUD_SMOKE -> Icons.Filled.Cloud
+        BrushType.FX_BLUR -> Icons.Filled.BlurOn
+        BrushType.FX_SHARPEN -> Icons.Filled.Details
+        BrushType.FX_DODGE -> Icons.Filled.LightMode
+        BrushType.FX_BURN -> Icons.Filled.DarkMode
+        BrushType.FX_SPONGE -> Icons.Filled.InvertColors
+        BrushType.FX_CLONE -> Icons.Filled.ContentCopy
+        BrushType.FX_HEAL -> Icons.Filled.Healing
+        BrushType.FX_MIXER -> Icons.Filled.Colorize
     }
 }
 
@@ -219,6 +239,17 @@ fun brushLabel(type: BrushType): String = stringResource(
         BrushType.TEXTURE_WOOD -> R.string.brush_texture_wood
         BrushType.TEXTURE_IRON -> R.string.brush_texture_iron
         BrushType.TEXTURE_METAL -> R.string.brush_texture_metal
+        BrushType.ACRYLIC -> R.string.v51_brush_acrylic
+        BrushType.OIL_PAINT -> R.string.v51_brush_oil
+        BrushType.CLOUD_SMOKE -> R.string.v51_brush_cloud
+        BrushType.FX_BLUR -> R.string.v51_brush_blur
+        BrushType.FX_SHARPEN -> R.string.v51_brush_sharpen
+        BrushType.FX_DODGE -> R.string.v51_brush_dodge
+        BrushType.FX_BURN -> R.string.v51_brush_burn
+        BrushType.FX_SPONGE -> R.string.v51_brush_sponge
+        BrushType.FX_CLONE -> R.string.v51_brush_clone
+        BrushType.FX_HEAL -> R.string.v51_brush_heal
+        BrushType.FX_MIXER -> R.string.v51_brush_mixer
     },
 )
 
@@ -239,5 +270,7 @@ fun brushCategoryLabel(category: BrushCategory): String = stringResource(
         BrushCategory.NOTE_WRITING -> R.string.brush_cat_note_writing
         BrushCategory.NOTE_MARKING -> R.string.brush_cat_note_marking
         BrushCategory.EFFECTS, BrushCategory.NOTE_EFFECTS -> R.string.brush_cat_effects
+        BrushCategory.PAINT -> R.string.v51_cat_paint
+        BrushCategory.HELPER -> R.string.v51_cat_helper
     },
 )

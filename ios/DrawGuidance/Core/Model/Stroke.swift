@@ -30,6 +30,10 @@ enum BrushType: String, KotlinEnum {
     case PATTERN_CARPET, PATTERN_WALLPAPER, PATTERN_WOODPAINT
     // v21 dokular
     case TEXTURE_SKIN, TEXTURE_FUR, TEXTURE_PLANT, TEXTURE_WOOD, TEXTURE_IRON, TEXTURE_METAL
+    // v51 boya fırçaları (piksel motoru)
+    case ACRYLIC, OIL_PAINT, CLOUD_SMOKE
+    // v51 yardımcı fırçalar
+    case FX_BLUR, FX_SHARPEN, FX_DODGE, FX_BURN, FX_SPONGE, FX_CLONE, FX_HEAL, FX_MIXER
     // Araçlar
     case ERASER
     /// Vektör şekil: noktalar alt yolların uç uca eklenmiş noktalarıdır; yapısı `Stroke.shape`.
@@ -53,6 +57,17 @@ enum BrushType: String, KotlinEnum {
 
     /// Silginin etkilediği çizimler.
     var isErasable: Bool { !isObject && self != .ERASER }
+
+    /// v51 piksel tabanlı fırçalar (alttaki aynı katman içeriğiyle birlikte hesaplanır; `RasterBrush`).
+    var isRaster: Bool { self == .ACRYLIC || self == .OIL_PAINT || self == .CLOUD_SMOKE || isHelper }
+
+    /// v51 yardımcı fırçalar.
+    var isHelper: Bool {
+        switch self {
+        case .FX_BLUR, .FX_SHARPEN, .FX_DODGE, .FX_BURN, .FX_SPONGE, .FX_CLONE, .FX_HEAL, .FX_MIXER: return true
+        default: return false
+        }
+    }
 }
 
 enum FontGroup: String, CaseIterable { case SANS, SERIF, HAND, DISPLAY, MONO, COMIC }
@@ -485,12 +500,16 @@ struct StrokePoint: Codable, Equatable {
     var pressure: Float = 1
     var tilt: Float = 0
     var orient: Float = 0
+    /// v51 gövde dönüşü (0..1 → 0..360°; 0: bilinmiyor) ve gövde basıncı (0..1).
+    var roll: Float = 0
+    var barrel: Float = 0
 
-    init(_ x: Float, _ y: Float, pressure: Float = 1, tilt: Float = 0, orient: Float = 0) {
-        self.x = x; self.y = y; self.pressure = pressure; self.tilt = tilt; self.orient = orient
+    init(_ x: Float, _ y: Float, pressure: Float = 1, tilt: Float = 0, orient: Float = 0, roll: Float = 0, barrel: Float = 0) {
+        self.x = x; self.y = y; self.pressure = pressure; self.tilt = tilt; self.orient = orient; self.roll = roll; self.barrel = barrel
     }
 
-    var hasDynamics: Bool { pressure != 1 || tilt != 0 || orient != 0 }
+    var hasDynamics: Bool { pressure != 1 || tilt != 0 || orient != 0 || roll != 0 || barrel != 0 }
+    var hasBarrel: Bool { roll != 0 || barrel != 0 }
 
     func at(_ x: Float, _ y: Float) -> StrokePoint {
         var p = self
@@ -502,12 +521,14 @@ struct StrokePoint: Codable, Equatable {
         let c = try decoder.container(keyedBy: AnyKey.self)
         x = try c.req("x"); y = try c.req("y")
         pressure = c.v("pressure", 1); tilt = c.v("tilt", 0); orient = c.v("orient", 0)
+        roll = c.v("roll", 0); barrel = c.v("barrel", 0)
     }
 
     func encode(to encoder: Encoder) throws {
         var c = encoder.container(keyedBy: AnyKey.self)
         try c.r(x, "x"); try c.r(y, "y")
         try c.e(pressure, "pressure", 1); try c.e(tilt, "tilt", 0); try c.e(orient, "orient", 0)
+        try c.e(roll, "roll", 0); try c.e(barrel, "barrel", 0)
     }
 }
 
@@ -656,11 +677,17 @@ struct BrushParams: Codable, Equatable {
     var tube: TubeParams? = nil
     var depth3d: Depth3D? = nil
     var comicLines: ComicLinesParams? = nil
+    /// v51 uç ve boya ayarları, kalem dinamikleri, yardımcı fırça ayarları.
+    var tip: TipParams? = nil
+    var pen: PenDynamics? = nil
+    var fx: FxParams? = nil
 
     init(spacing: Float? = nil, tiltWidth: Float? = nil, tiltLight: Float? = nil, tiltThreshold: Float = 0,
-         nibFollow: Bool = false, tube: TubeParams? = nil, depth3d: Depth3D? = nil, comicLines: ComicLinesParams? = nil) {
+         nibFollow: Bool = false, tube: TubeParams? = nil, depth3d: Depth3D? = nil, comicLines: ComicLinesParams? = nil,
+         tip: TipParams? = nil, pen: PenDynamics? = nil, fx: FxParams? = nil) {
         self.spacing = spacing; self.tiltWidth = tiltWidth; self.tiltLight = tiltLight; self.tiltThreshold = tiltThreshold
         self.nibFollow = nibFollow; self.tube = tube; self.depth3d = depth3d; self.comicLines = comicLines
+        self.tip = tip; self.pen = pen; self.fx = fx
     }
 
     init(from decoder: Decoder) throws {
@@ -668,6 +695,7 @@ struct BrushParams: Codable, Equatable {
         spacing = c.o("spacing"); tiltWidth = c.o("tiltWidth"); tiltLight = c.o("tiltLight")
         tiltThreshold = c.v("tiltThreshold", 0); nibFollow = c.v("nibFollow", false); tube = c.o("tube")
         depth3d = c.o("depth3d"); comicLines = c.o("comicLines")
+        tip = c.o("tip"); pen = c.o("pen"); fx = c.o("fx")
     }
 
     func encode(to encoder: Encoder) throws {
@@ -675,6 +703,91 @@ struct BrushParams: Codable, Equatable {
         try c.o(spacing, "spacing"); try c.o(tiltWidth, "tiltWidth"); try c.o(tiltLight, "tiltLight")
         try c.e(tiltThreshold, "tiltThreshold", 0); try c.e(nibFollow, "nibFollow", false); try c.o(tube, "tube")
         try c.o(depth3d, "depth3d"); try c.o(comicLines, "comicLines")
+        try c.o(tip, "tip"); try c.o(pen, "pen"); try c.o(fx, "fx")
+    }
+}
+
+/// v51 fırça ucu şekilleri.
+enum TipShape: String, KotlinEnum {
+    case ROUND, SQUARE, FLAT, CHISEL, BRISTLE, SPONGE, SPLATTER, CLOUD
+    static var fallback: TipShape { .ROUND }
+}
+
+/// v51 uç ve boya ayarları (Android `TipParams`); nil alan fırçanın varsayılanı.
+struct TipParams: Codable, Equatable {
+    var minSize: Float? = nil, maxSize: Float? = nil, hardness: Float? = nil, softness: Float? = nil
+    var aspect: Float? = nil, angle: Float? = nil, rotation: Float? = nil, roundness: Float? = nil
+    var shape: TipShape? = nil, edge: Float? = nil
+    var density: Float? = nil, buildUp: Float? = nil, wetness: Float? = nil, paintAmount: Float? = nil
+    var thickness: Float? = nil, colorAmount: Float? = nil, smudge: Float? = nil, blend: Float? = nil
+
+    static let floatKeys: [(String, WritableKeyPath<TipParams, Float?>)] = [
+        ("minSize", \.minSize), ("maxSize", \.maxSize), ("hardness", \.hardness), ("softness", \.softness),
+        ("aspect", \.aspect), ("angle", \.angle), ("rotation", \.rotation), ("roundness", \.roundness), ("edge", \.edge),
+        ("density", \.density), ("buildUp", \.buildUp), ("wetness", \.wetness), ("paintAmount", \.paintAmount),
+        ("thickness", \.thickness), ("colorAmount", \.colorAmount), ("smudge", \.smudge), ("blend", \.blend),
+    ]
+
+    init() {}
+
+    init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: AnyKey.self)
+        for (k, kp) in Self.floatKeys { self[keyPath: kp] = c.o(k) }
+        shape = c.o("shape")
+    }
+
+    func encode(to encoder: Encoder) throws {
+        var c = encoder.container(keyedBy: AnyKey.self)
+        for (k, kp) in Self.floatKeys { try c.o(self[keyPath: kp], k) }
+        try c.o(shape, "shape")
+    }
+
+    var orNil: TipParams? { self == TipParams() ? nil : self }
+}
+
+/// v51 kalem ve hareket dinamikleri (Android `PenDynamics`).
+struct PenDynamics: Codable, Equatable {
+    var pressure: Float? = nil, pressureOpacity: Float? = nil, tiltX: Float? = nil, tiltY: Float? = nil
+    var tiltDirection: Float? = nil, rotation: Float? = nil, velocity: Float? = nil, direction: Float? = nil
+    var distance: Float? = nil, time: Float? = nil, barrel: Float? = nil
+
+    static let keys: [(String, WritableKeyPath<PenDynamics, Float?>)] = [
+        ("pressure", \.pressure), ("pressureOpacity", \.pressureOpacity), ("tiltX", \.tiltX), ("tiltY", \.tiltY),
+        ("tiltDirection", \.tiltDirection), ("rotation", \.rotation), ("velocity", \.velocity), ("direction", \.direction),
+        ("distance", \.distance), ("time", \.time), ("barrel", \.barrel),
+    ]
+
+    init() {}
+
+    init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: AnyKey.self)
+        for (k, kp) in Self.keys { self[keyPath: kp] = c.o(k) }
+    }
+
+    func encode(to encoder: Encoder) throws {
+        var c = encoder.container(keyedBy: AnyKey.self)
+        for (k, kp) in Self.keys { try c.o(self[keyPath: kp], k) }
+    }
+
+    var orNil: PenDynamics? { self == PenDynamics() ? nil : self }
+}
+
+/// v51 yardımcı fırça ayarları (Android `FxParams`).
+struct FxParams: Codable, Equatable {
+    var mode: Int = 0
+    var srcDx: Float? = nil
+    var srcDy: Float? = nil
+
+    init(mode: Int = 0, srcDx: Float? = nil, srcDy: Float? = nil) { self.mode = mode; self.srcDx = srcDx; self.srcDy = srcDy }
+
+    init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: AnyKey.self)
+        mode = c.v("mode", 0); srcDx = c.o("srcDx"); srcDy = c.o("srcDy")
+    }
+
+    func encode(to encoder: Encoder) throws {
+        var c = encoder.container(keyedBy: AnyKey.self)
+        try c.e(mode, "mode", 0); try c.o(srcDx, "srcDx"); try c.o(srcDy, "srcDy")
     }
 }
 

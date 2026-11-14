@@ -86,10 +86,10 @@ class LiveStrokeLayer {
      * Tuval koordinatında yeni nokta; kesinleşen kısım karolara yazılır. v18: kalemle çizerken [pressure] (0..1) ve
      * [tilt] (0 = dik, 1 = yatık) da verilir.
      */
-    fun add(x: Float, y: Float, pressure: Float = 1f, tilt: Float = 0f, orient: Float = 0f) {
+    fun add(x: Float, y: Float, pressure: Float = 1f, tilt: Float = 0f, orient: Float = 0f, roll: Float = 0f, barrel: Float = 0f) {
         val s = stream ?: return
         if (finished) return
-        s.add(x, y, pressure, tilt, orient)
+        s.add(x, y, pressure, tilt, orient, roll, barrel)
         s.takeFinal(minBatch)?.let(::paint)
     }
 
@@ -117,7 +117,8 @@ class LiveStrokeLayer {
         val s = stream ?: return emptyList()
         val xs = s.pointsX(); val ys = s.pointsY()
         val ps = s.pointsPressure(); val ts = s.pointsTilt(); val os = s.pointsOrient()
-        return List(s.count) { StrokePoint(xs[it], ys[it], ps?.get(it) ?: 1f, ts?.get(it) ?: 0f, os?.get(it) ?: 0f) }
+        val rs = s.pointsRoll(); val bs = s.pointsBarrel()
+        return List(s.count) { StrokePoint(xs[it], ys[it], ps?.get(it) ?: 1f, ts?.get(it) ?: 0f, os?.get(it) ?: 0f, rs?.get(it) ?: 0f, bs?.get(it) ?: 0f) }
     }
 
     /** Karoları havuza bırakır (bir sonraki çizimde yeniden kullanılır). */

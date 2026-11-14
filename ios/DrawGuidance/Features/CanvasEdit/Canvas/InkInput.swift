@@ -185,8 +185,8 @@ final class LiveStroke {
         self.strength = strength; self.params = params; points = []; finished = false; version += 1
     }
 
-    func add(_ x: Float, _ y: Float, _ pressure: Float, _ tilt: Float, _ orient: Float) {
-        points.append(StrokePoint(x, y, pressure: pressure, tilt: tilt, orient: orient))
+    func add(_ x: Float, _ y: Float, _ pressure: Float, _ tilt: Float, _ orient: Float, roll: Float = 0, barrel: Float = 0) {
+        points.append(StrokePoint(x, y, pressure: pressure, tilt: tilt, orient: orient, roll: roll, barrel: barrel))
         version += 1
     }
 

@@ -27,6 +27,7 @@ import com.karapp.drawguidance.data.images.CanvasImageCache
 import com.karapp.drawguidance.data.model.BrushType
 import com.karapp.drawguidance.data.model.Stroke
 import com.karapp.drawguidance.data.model.isObject
+import com.karapp.drawguidance.data.model.isRaster
 import com.karapp.drawguidance.ui.common.hexToColor
 import kotlin.math.cos
 import kotlin.math.hypot
@@ -82,6 +83,16 @@ object StrokeRenderer {
         }
         val n = stroke.points.size
         if (n == 0) return
+        // v51 piksel tabanlı fırça: bağlamsız çizim (önizleme, bekleyen çizim); listede bağlamıyla çizilir
+        if (stroke.brushType.isRaster) {
+            drawIntoCanvas { c ->
+                val save = c.nativeCanvas.save()
+                if (offset != Offset.Zero) c.nativeCanvas.translate(offset.x, offset.y)
+                RasterStrokes.draw(c.nativeCanvas, stroke, null)
+                c.nativeCanvas.restoreToCount(save)
+            }
+            return
+        }
         // Bitmiş fırça izi bir kez kaydedilip (Picture) sonraki çizimlerde yalnızca oynatılır: yakınlaştırma,
         // kaydırma ya da geri alma sonrası yeniden çizimde fırça motoru (örnekleme, damgalar) tekrar çalışmaz
         if (offset == Offset.Zero && pictureCacheEnabled) {
@@ -97,11 +108,13 @@ object StrokeRenderer {
             xs[i] = stroke.points[i].x + offset.x
             ys[i] = stroke.points[i].y + offset.y
         }
-        val (ps, ts, os) = BrushPainter.dynamicsOf(stroke.points)
+        val dyn = BrushPainter.dynamicsOf(stroke.points)
+        val (ps, ts, os) = dyn
         drawIntoCanvas {
             BrushPainter.paint(
                 it.nativeCanvas, xs, ys, n, hexToColor(stroke.colorHex).toArgb(), stroke.brushType,
                 stroke.sizePx, stroke.opacity, stroke.id.hashCode(), stroke.flow, stroke.strength, ps, ts, stroke.params, os,
+                dyn.rolls, dyn.barrels,
             )
         }
     }
@@ -148,10 +161,12 @@ object StrokeRenderer {
         val ys = FloatArray(n) { stroke.points[it].y }
         val picture = android.graphics.Picture()
         val canvas = picture.beginRecording(w, h)
-        val (ps, ts, os) = BrushPainter.dynamicsOf(stroke.points)
+        val dyn = BrushPainter.dynamicsOf(stroke.points)
+        val (ps, ts, os) = dyn
         BrushPainter.paint(
             canvas, xs, ys, n, hexToColor(stroke.colorHex).toArgb(), stroke.brushType,
             stroke.sizePx, stroke.opacity, stroke.id.hashCode(), stroke.flow, stroke.strength, ps, ts, stroke.params, os,
+            dyn.rolls, dyn.barrels,
         )
         picture.endRecording()
         val entry = StrokePicture(stroke, bounds.left, bounds.top, picture)
@@ -186,7 +201,7 @@ object StrokeRenderer {
      * Silgi yoksa ara katman açılmaz (çoğu çizim).
      */
     fun DrawScope.drawStrokeList(strokes: List<Stroke>, checkpoint: () -> Unit = {}) {
-        if (strokes.none { it.brushType == BrushType.ERASER }) {
+        if (strokes.none { it.brushType == BrushType.ERASER || it.brushType.isRaster }) {
             strokes.forEach { checkpoint(); drawStroke(it) }
             return
         }
@@ -210,11 +225,34 @@ object StrokeRenderer {
             val runHasInk = (i until j).any { strokes[it].brushType != BrushType.ERASER }
             if (runHasInk) {
                 drawIntoCanvas { it.saveLayer(layerBounds, Paint()) }
-                for (m in i until j) { checkpoint(); drawStroke(strokes[m]) }
+                for (m in i until j) { checkpoint(); drawInRun(strokes, m, layer) }
                 laterErasers.forEach { checkpoint(); drawStroke(it) }
                 drawIntoCanvas { it.restore() }
             }
             i = j
+        }
+    }
+
+    /**
+     * v51 katman ara katmanındaki bir çizim: piksel tabanlı fırça izi, aynı katmanda kendisinden önce çizilenleri
+     * (nesneler dahil) okuyarak çizilir; diğerleri her zamanki gibi.
+     */
+    private fun DrawScope.drawInRun(strokes: List<Stroke>, m: Int, layer: String) {
+        val s = strokes[m]
+        if (!s.brushType.isRaster) { drawStroke(s); return }
+        val context = ArrayList<Stroke>(m)
+        for (q in 0 until m) { val o = strokes[q]; if ((o.layerId ?: "") == layer && !o.hidden) context += o }
+        drawIntoCanvas { c ->
+            val clip = s.clip
+            val save = c.nativeCanvas.save()
+            if (clip != null && clip.size == 4) {
+                val path = android.graphics.Path().apply {
+                    moveTo(clip[0].x, clip[0].y); for (i in 1 until 4) lineTo(clip[i].x, clip[i].y); close()
+                }
+                c.nativeCanvas.clipPath(path)
+            }
+            RasterStrokes.draw(c.nativeCanvas, s, context)
+            c.nativeCanvas.restoreToCount(save)
         }
     }
 

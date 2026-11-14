@@ -17,6 +17,9 @@ enum ContentCodec {
     private static let VERSION_V7: UInt8 = 7
     private static let VERSION_V8: UInt8 = 8
     private static let VERSION_V9: UInt8 = 9
+    /// v51 yeni fırça türleri ya da gövde dinamiği (Android `VERSION_V10`).
+    private static let VERSION_V10: UInt8 = 10
+    private static let EXT2_BARREL = 16
     private static let EXT2_TEXTBOX = 1
     private static let EXT2_MODEL = 2
     private static let EXT2_HIDDEN = 4
@@ -58,6 +61,10 @@ enum ContentCodec {
         .PATTERN_CARPET: 41, .PATTERN_WALLPAPER: 42, .PATTERN_WOODPAINT: 43,
         .TEXTURE_SKIN: 44, .TEXTURE_FUR: 45, .TEXTURE_PLANT: 46,
         .TEXTURE_WOOD: 47, .TEXTURE_IRON: 48, .TEXTURE_METAL: 49,
+        // v51
+        .ACRYLIC: 50, .OIL_PAINT: 51, .CLOUD_SMOKE: 52,
+        .FX_BLUR: 53, .FX_SHARPEN: 54, .FX_DODGE: 55, .FX_BURN: 56,
+        .FX_SPONGE: 57, .FX_CLONE: 58, .FX_HEAL: 59, .FX_MIXER: 60,
     ]
     private static let fontCodes: [TextFont: Int] = [
         .SANS: 0, .SERIF: 1, .MONO: 2, .CONDENSED: 3, .HANDWRITING: 4, .CASUAL: 5,
@@ -128,7 +135,8 @@ enum ContentCodec {
         let v6 = pages.contains { $0.contains { $0.params != nil || hasOrient($0) } }
         let v7 = pages.contains { $0.contains { $0.space != nil } }
         let v9 = pages.contains { $0.contains(where: needsV9) }
-        let version: UInt8 = v9 ? VERSION_V9 : v8 ? VERSION_V8 : v7 ? VERSION_V7 : v6 ? VERSION_V6 : dynamics ? VERSION_V5 : VERSION_V4
+        let v10 = pages.contains { $0.contains(where: needsV10) }
+        let version: UInt8 = v10 ? VERSION_V10 : v9 ? VERSION_V9 : v8 ? VERSION_V8 : v7 ? VERSION_V7 : v6 ? VERSION_V6 : dynamics ? VERSION_V5 : VERSION_V4
         var out = Data([MAGIC_0, MAGIC_1, version])
         out.append(deflate(raw.data))
         return out
@@ -147,7 +155,7 @@ enum ContentCodec {
             return Document(pages: [LegacyJson.decodeStrokes(String(decoding: bytes, as: UTF8.self))], layers: [Layer.Default])
         }
         let version = bytes[2]
-        guard (VERSION...VERSION_V9).contains(version) else {
+        guard (VERSION...VERSION_V10).contains(version) else {
             throw CodecError(description: "Desteklenmeyen içerik sürümü: \(version)")
         }
         let body = try inflate(Data(bytes[3...]))
@@ -176,8 +184,12 @@ enum ContentCodec {
 
     // MARK: Çizim
 
+    private static func needsV10(_ s: Stroke) -> Bool {
+        (typeCodes[s.brushType] ?? 0) >= 50 || s.points.contains { $0.hasBarrel }
+    }
+
     private static func needsV8(_ s: Stroke) -> Bool {
-        s.hidden || s.model != nil || (s.brushType == .TEXT && (s.text?.box != nil || s.text?.path != nil))
+        needsV10(s) || s.hidden || s.model != nil || (s.brushType == .TEXT && (s.text?.box != nil || s.text?.path != nil))
     }
 
     private static func needsV9(_ s: Stroke) -> Bool { s.brushType == .TEXT && s.text?.path != nil }
@@ -219,10 +231,16 @@ enum ContentCodec {
             if s.model != nil { ext2 |= EXT2_MODEL }
             if s.hidden { ext2 |= EXT2_HIDDEN }
             if textPath != nil { ext2 |= EXT2_TEXTPATH }
+            let barrel = s.points.contains { $0.hasBarrel }
+            if barrel { ext2 |= EXT2_BARREL }
             w.byte(ext2)
             if let box { w.string(json(box)) }
             if let m = s.model { w.string(m.modelId); w.string(m.dataAssetId) }
             if let textPath { w.string(json(textPath)) }
+            if barrel {
+                for p in s.points { w.byte(unitByte(p.roll)) }
+                for p in s.points { w.byte(unitByte(p.barrel)) }
+            }
         }
     }
 
@@ -369,6 +387,13 @@ enum ContentCodec {
             if ext2 & EXT2_TEXTPATH != 0 {
                 let path = fromJson(TextPathSpec.self, try r.string())
                 if let path, out.text != nil { out.text!.path = path }
+            }
+            if ext2 & EXT2_BARREL != 0 {
+                let n = out.points.count
+                var roll = [Float](), barrel = [Float]()
+                for _ in 0..<n { roll.append(Float(try r.byte()) / 255) }
+                for _ in 0..<n { barrel.append(Float(try r.byte()) / 255) }
+                for i in 0..<n { out.points[i].roll = roll[i]; out.points[i].barrel = barrel[i] }
             }
         }
         if let paragraph, out.text != nil { out.text!.paragraph = paragraph }

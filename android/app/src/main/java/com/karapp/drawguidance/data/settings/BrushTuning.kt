@@ -3,6 +3,11 @@ package com.karapp.drawguidance.data.settings
 import com.karapp.drawguidance.data.model.BrushParams
 import com.karapp.drawguidance.data.model.BrushType
 import com.karapp.drawguidance.data.model.TubeParams
+import com.karapp.drawguidance.data.model.TipParams
+import com.karapp.drawguidance.data.model.PenDynamics
+import com.karapp.drawguidance.data.model.FxParams
+import com.karapp.drawguidance.data.model.isHelper
+import com.karapp.drawguidance.data.model.isRaster
 import com.karapp.drawguidance.ui.drawing.defaultSpacing
 import com.karapp.drawguidance.ui.drawing.defaultTiltLight
 import com.karapp.drawguidance.ui.drawing.defaultTiltWidth
@@ -33,6 +38,12 @@ data class BrushTuning(
     val nibFollow: Boolean = false,
     /** 3B fırça ayarları. */
     val tube: TubeParams = TubeParams(),
+    /** v51 uç biçimi ve boya ayarları (null alan: fırçanın varsayılanı). */
+    val tip: TipParams = TipParams(),
+    /** v51 kalem ve hareket dinamikleri. */
+    val pen: PenDynamics = PenDynamics(),
+    /** v51 yardımcı fırça ayarları (kip, klon kaynağı). */
+    val fx: FxParams = FxParams(),
 ) {
     /** Etkin sabitleme gücü (kapalıysa 0). */
     val stabilizeAmount: Float get() = if (stabilizer) stabilizerStrength.coerceIn(0.05f, 1f) else 0f
@@ -45,8 +56,12 @@ data class BrushTuning(
         val th = tiltThreshold.coerceIn(0f, 80f)
         val nib = nibFollow && type.hasFlatNib
         val t = tube.takeIf { type == BrushType.BRUSH_3D && it != TubeParams() }
-        if (sp == null && tw == null && tl == null && th <= 0f && !nib && t == null) return null
-        return BrushParams(spacing = sp, tiltWidth = tw, tiltLight = tl, tiltThreshold = th, nibFollow = nib, tube = t)
+        // v51 boyut aralığı her fırçada; uç ve boya ayarları piksel motorlu fırçalarda
+        val tp = (if (type.isRaster) tip else TipParams(minSize = tip.minSize, maxSize = tip.maxSize)).orNull()
+        val pd = pen.orNull()
+        val fp = fx.takeIf { type.isHelper && it != FxParams() }
+        if (sp == null && tw == null && tl == null && th <= 0f && !nib && t == null && tp == null && pd == null && fp == null) return null
+        return BrushParams(spacing = sp, tiltWidth = tw, tiltLight = tl, tiltThreshold = th, nibFollow = nib, tube = t, tip = tp, pen = pd, fx = fp)
     }
 
     companion object {

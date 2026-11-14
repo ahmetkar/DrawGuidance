@@ -23,3 +23,11 @@
 "ios.settings.title" = "Ayarlar";
 "ios.privacy.options" = "Gizlilik seçenekleri";
 "ios.version" = "Sürüm";
+"ios.sub.manage_play" = "Aboneliği Google Play'de yönet";
+"ios.sub.from_play" = "Bu abonelik Android'de Google Play ile alındı; iptal ve ödeme Google Play'den yönetilir.";
+"ios.sub.linked" = "Premium hesabına bağlandı; aynı hesapla Android'de de geçerli.";
+"ios.sub.other_account" = "Bu App Store aboneliği başka bir hesaba bağlı. O hesapla giriş yap.";
+"ios.sub.cross_platform" = "Giriş yaparsan Premium aynı hesapla Android'de de geçerli olur; Android'de alınan Premium burada da açılır.";
+"ios.sub.legal" = "Premium aylık otomatik yenilenen bir aboneliktir. Ödeme Apple Kimliği hesabından alınır; dönem bitmeden en az 24 saat önce iptal edilmezse kendiliğinden yenilenir. Aboneliği App Store hesap ayarlarından yönetebilir ve iptal edebilirsin.";
+"ios.sub.terms" = "Kullanım Koşulları (EULA)";
+"ios.sub.privacy" = "Gizlilik Politikası";

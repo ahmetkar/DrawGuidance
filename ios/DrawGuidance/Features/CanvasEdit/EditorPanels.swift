@@ -24,7 +24,7 @@ struct ElementsPanel: View {
                 ToolbarItem(placement: .confirmationAction) { Button(L("close")) { dismiss() } }
             }
         }
-        .presentationDetents([.medium, .large])
+        .dockedEditorSheet()
     }
 
     @ViewBuilder private func rowView(_ row: ElementRow) -> some View {
@@ -108,7 +108,7 @@ struct LayersPanel: View {
                 Button(L("apply_button")) { if let r = renaming { vm.layers.rename(r.id, newName) }; renaming = nil }
             }
         }
-        .presentationDetents([.medium, .large])
+        .dockedEditorSheet()
     }
 }
 
@@ -266,7 +266,7 @@ struct GuideSheet: View {
             .navigationTitle(L("add_guide"))
             .toolbar { ToolbarItem(placement: .confirmationAction) { Button(L("close")) { dismiss() } } }
         }
-        .presentationDetents([.medium, .large])
+        .dockedEditorSheet()
     }
 }
 
@@ -305,7 +305,7 @@ struct BackgroundSheet: View {
             .navigationBarTitleDisplayMode(.inline)
             .toolbar { ToolbarItem(placement: .confirmationAction) { Button(L("close")) { dismiss() } } }
         }
-        .presentationDetents([.medium, .large])
+        .dockedEditorSheet()
     }
 }
 
@@ -421,6 +421,7 @@ struct ComicInsertSheet: View {
             .navigationBarTitleDisplayMode(.inline)
             .toolbar { ToolbarItem(placement: .cancellationAction) { Button(L("close")) { dismiss() } } }
         }
+        .dockedEditorSheet()
         .sheet(isPresented: $premiumOpen) { PremiumRequiredSheet() }
     }
 
@@ -459,11 +460,10 @@ struct ComicInsertSheet: View {
 }
 
 /// v50 her odak çizgisi türünün kendi ayarları (pencere kapansa da uygulama açıkken hatırlanır; Android `LinesPresetMemory`).
-@MainActor
 enum LinesPresetMemory {
-    static var options: [ComicLinesKind: LinesOptions] = [:]
-    static var activeKind: ComicLinesKind = .FOCUS
-    static var style: ComicLinesStyle = .MANGA
+    nonisolated(unsafe) static var options: [ComicLinesKind: LinesOptions] = [:]
+    nonisolated(unsafe) static var activeKind: ComicLinesKind = .FOCUS
+    nonisolated(unsafe) static var style: ComicLinesStyle = .MANGA
 
     static func defaultFor(_ k: ComicLinesKind) -> LinesOptions {
         let d = ComicLines.defaults(k)

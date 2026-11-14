@@ -141,7 +141,7 @@ struct CharactersSheet: View {
             .navigationBarTitleDisplayMode(.inline)
             .toolbar { ToolbarItem(placement: .cancellationAction) { Button(L("close")) { dismiss() } } }
         }
-        .presentationDetents([.medium, .large])
+        .dockedEditorSheet()
         .accessibilityIdentifier("characters_sheet")
         .sheet(isPresented: $premiumOpen) { PremiumRequiredSheet() }
     }
@@ -249,7 +249,7 @@ struct LocationBackgroundsSheet: View {
             .navigationBarTitleDisplayMode(.inline)
             .toolbar { ToolbarItem(placement: .cancellationAction) { Button(L("close")) { dismiss() } } }
         }
-        .presentationDetents([.medium, .large])
+        .dockedEditorSheet()
         .accessibilityIdentifier("locations_sheet")
         .sheet(isPresented: $premiumOpen) { PremiumRequiredSheet() }
     }
@@ -322,7 +322,7 @@ struct ComicObjectsSheet: View {
             .navigationBarTitleDisplayMode(.inline)
             .toolbar { ToolbarItem(placement: .cancellationAction) { Button(L("close")) { dismiss() } } }
         }
-        .presentationDetents([.medium, .large])
+        .dockedEditorSheet()
         .accessibilityIdentifier("objects_sheet")
     }
 }

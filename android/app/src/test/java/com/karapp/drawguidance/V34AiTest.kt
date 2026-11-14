@@ -46,7 +46,7 @@ class V34AiTest {
     @Test
     fun simpleKindsGetMoreSuggestions() {
         assertEquals(8, SimpleSuggest.maxTemplates(CanvasKind.KIDS))
-        assertEquals(8, SimpleSuggest.maxTemplates(CanvasKind.SIMPLE_NOTES))
+        assertEquals(8, SimpleSuggest.maxTemplates(CanvasKind.NOTES))
         assertEquals(4, SimpleSuggest.maxTemplates(CanvasKind.ART))
         assertEquals(86, SimpleSuggest.catalogIds(CanvasKind.KIDS).size)
         assertEquals(ShapeLibrary.forAudience(Audience.KIDS).sumOf { it.shapes.size }, SimpleSuggest.catalogIds(CanvasKind.KIDS).size)
@@ -69,7 +69,7 @@ class V34AiTest {
     @Test
     fun simpleNotesSuggestsGeometry() {
         val tri = listOf(ink("t", listOf(100f to 100f, 100f to 300f, 300f to 300f, 100f to 100f)))
-        val fixes = SimpleSuggest.vectorFixes(CanvasKind.SIMPLE_NOTES, tri)
+        val fixes = SimpleSuggest.vectorFixes(CanvasKind.NOTES, tri)
         assertTrue(fixes.map { it.solid }.toString(), fixes.any { it.solid == "RIGHT_TRIANGLE" })
     }
 }

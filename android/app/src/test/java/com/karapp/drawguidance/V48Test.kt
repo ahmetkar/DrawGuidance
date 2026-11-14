@@ -153,7 +153,7 @@ class V48PortraitTest : V47MenuBase() {
         assertFalse(node("simple_tool_expand").config.contains(SemanticsProperties.Disabled))
         shot("v48-simple-three-menus")
         closeCanvas()
-        openNext("Basit not üç menü", CanvasKind.SIMPLE_NOTES)
+        openNext("Basit not üç menü", CanvasKind.NOTES)
         waitFor { exists("simple_menu_add") }
         assertFalse(exists("simple_tool_free_select"))
         assertTrue(ids("simple_menu_add").containsAll(listOf("text", "formula", "diagram")))

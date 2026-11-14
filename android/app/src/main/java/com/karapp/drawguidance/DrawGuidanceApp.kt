@@ -71,6 +71,8 @@ open class DrawGuidanceApp : Application() {
         // v18: tablet kalemi algılama ve kalem ayarları
         runCatching { com.karapp.drawguidance.platform.Stylus.init(this) }
         com.karapp.drawguidance.ui.drawing.FontRegistry.init(this)
+        // v51 not almanın geçici resim tuvalleri (tuval listelerinde gizlenir; liste ilk açılmadan bilinmeli)
+        runCatching { com.karapp.drawguidance.data.notes.TempCanvases.init(this) }
         // v27 hazır 3B şekil küçük resimleri diskte saklanır (pencere her oturumda yeniden çizmesin)
         com.karapp.drawguidance.ui.screens.model3d.CatalogThumbs.dir = java.io.File(cacheDir, "catalog3d_thumbs")
         val koin = startKoin {
@@ -99,6 +101,8 @@ open class DrawGuidanceApp : Application() {
             }
             // v37 önbellek sınırı aşıldıysa en eski önbellek dosyaları silinir
             runCatching { koin.get<com.karapp.drawguidance.data.settings.StorageManager>().trimCache() }
+            // v51 not almadan açılıp yarıda kalmış (12 saatten eski) geçici resim tuvalleri silinir
+            runCatching { koin.get<com.karapp.drawguidance.data.notes.TempImageEditor>().cleanup(olderThanMs = 12L * 3600_000L) }
             // v33 sunucudan daha önce inen (yerleşikten yeni) katalog; olay tablosu ve günlük katalog eşitlemesi
             runCatching {
                 val syncer = koin.get<com.karapp.drawguidance.data.catalog.CatalogSyncer>()

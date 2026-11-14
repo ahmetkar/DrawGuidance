@@ -428,7 +428,7 @@ internal object TutorialV40 {
 
     val simpleNotes: TutorialGroup by lazy {
         TutorialGroup(
-            id = "simple_notes_intro", kind = CanvasKind.SIMPLE_NOTES, title = R.string.tut40_simple_notes, summary = R.string.tut40_simple_notes_text,
+            id = "simple_notes_intro", kind = CanvasKind.NOTES, title = R.string.tut40_simple_notes, summary = R.string.tut40_simple_notes_text,
             icon = Icons.Filled.EditNote, ai = false,
             steps = listOf(
                 TutorialStep(TutorialAnchor.simple("text"), R.string.tut40_sn_text, R.string.tut40_sn_text_text) {

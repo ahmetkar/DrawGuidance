@@ -117,3 +117,16 @@ Asla yazdırılmaz ve depoya konmaz. Hepsi PC'de `yayin-anahtari\`:
 - `GoogleService-Info.plist`
 
 GitHub sırrı: `GOOGLE_SERVICE_INFO_PLIST_B64`.
+
+## v51: tek not alma modu (dal `claude/project-thread-806elg`)
+
+- Gelişmiş ve basit not alma birleşti: tek tür `NOTES`, artık **Basit çizim** altında (`CanvasKind.Simple = SIMPLE_ART, NOTES, KIDS`;
+  `Advanced = ART, COMIC`). Eski `SIMPLE_NOTES` kayıtları okunurken `CanvasKind.parse` ile `NOTES` olur (Android Room
+  dönüşümü, iOS `CanvasKind.init(from:)`); enum girdisi uyumluluk için duruyor. Eski basit not şablonları not almada.
+- Not almada yok: damlalık, kılavuz aracı, vektör (düğüm/çizgi) düzenleme, resim vektörleştirme. Eski notlardaki kılavuz
+  silinmez; Düzenle menüsünde "Eski kılavuz çizgilerini kaldır" var.
+- Notta resmi düzenlemek: resim geçici bir `SIMPLE_ART` tuvaline kopyalanır (Android `data/notes/TempImageEdit.kt`, iOS
+  `Data/Notes/TempImageEdit.swift`). Orada otomatik kayıt kapalı; Kaydet resmi nota aktarır (oran değiştiyse çerçeve
+  eni ve merkezi korunur) ve geçici tuvali siler. Kaydetmeden çıkılırsa silinir. Geçici tuvaller listelerde görünmez;
+  yarım kalanlar notu açınca ya da 12 saat sonra uygulama açılışında temizlenir.
+- Sürüm numarası değişmedi (birleştirme 51 / 1.9.0 yapacak).

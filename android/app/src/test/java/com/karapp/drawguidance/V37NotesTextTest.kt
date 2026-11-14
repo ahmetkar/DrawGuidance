@@ -80,7 +80,7 @@ class V37NotesTextTest : V33EditorBase() {
 
     @Test
     fun simpleNotesRowStartsWithTextDiagramFormula() {
-        open("Basit not menü", CanvasKind.SIMPLE_NOTES)
+        open("Basit not menü", CanvasKind.NOTES)
         waitFor { exists("simple_tool_text") }
         val order = listOf("text", "diagram", "formula", "brush", "eraser").map { left("simple_tool_$it") }
         assertEquals("yazı, diyagram, formül, fırça, silgi", order.sorted(), order)

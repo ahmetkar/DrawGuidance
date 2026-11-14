@@ -175,7 +175,8 @@ fun ParamControls(viewModel: CanvasEditViewModel, selected: Stroke?, modifier: M
                     }
                 }
             }
-            NeuButton(
+            // v51 not almada vektör (nokta/çizgi) düzenleme yok
+            if (viewModel.canvas.collectAsState().value?.kind?.isNotes != true) NeuButton(
                 stringResource(R.string.v45_vector_edit), { ctl.clearError(); viewModel.selectShapeTool(ShapeTool.NODES) },
                 Modifier.testTag("param_vector_edit"), icon = Icons.Filled.ScatterPlot,
             )

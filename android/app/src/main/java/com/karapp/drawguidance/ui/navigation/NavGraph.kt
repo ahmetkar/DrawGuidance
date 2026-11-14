@@ -151,6 +151,8 @@ fun DrawGuidanceNavGraph(
                     onBack = { navController.popBackStack() },
                     onOpenModel3d = { modelId, strokeId -> navController.navigate(Routes.modelEdit(modelId, localId, strokeId)) },
                     onOpenSubscription = { navController.navigate(Routes.SUBSCRIPTION) },
+                    // v51 notta resim düzenleme: geçici basit resim tuvali (kaydedince ya da çıkınca nota dönülür)
+                    onOpenCanvas = { id -> navController.navigate(Routes.canvasEdit(id)) },
                 )
             }
         }

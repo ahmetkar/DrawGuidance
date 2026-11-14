@@ -184,7 +184,7 @@
     <string name="canvas_kind_art">イラスト</string>
     <string name="canvas_kind_art_hint">すべてのアートブラシ · 風景と人物の図形</string>
     <string name="canvas_kind_notes">学習 / ノート</string>
-    <string name="canvas_kind_notes_hint">ノート用ペン · 数学・幾何の図形</string>
+    <string name="canvas_kind_notes_hint">1つのメニュー · ノート用ペン · すべての図形・ダイアグラム・数式 · ページ</string>
     <string name="canvas_kind_badge_notes">ノート</string>
     <string name="brush_note_pencil">鉛筆</string>
     <string name="brush_note_ballpoint">ボールペン</string>

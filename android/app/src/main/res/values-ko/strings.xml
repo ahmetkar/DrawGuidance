@@ -184,7 +184,7 @@
     <string name="canvas_kind_art">그림</string>
     <string name="canvas_kind_art_hint">모든 아트 브러시 · 풍경·인물 도형</string>
     <string name="canvas_kind_notes">학습 / 노트</string>
-    <string name="canvas_kind_notes_hint">노트용 펜 · 수학·기하 도형</string>
+    <string name="canvas_kind_notes_hint">하나의 메뉴 · 노트 펜 · 모든 도형, 다이어그램, 수식 · 페이지</string>
     <string name="canvas_kind_badge_notes">노트</string>
     <string name="brush_note_pencil">흑연 연필</string>
     <string name="brush_note_ballpoint">볼펜</string>

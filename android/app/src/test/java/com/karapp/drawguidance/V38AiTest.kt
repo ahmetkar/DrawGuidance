@@ -302,7 +302,7 @@ class V38AiUiTest : V37KidsBase() {
 
     @Test
     fun everyModeSuggestsLinesForTwoStrokesOnly() {
-        for ((i, kind) in listOf(CanvasKind.COMIC, CanvasKind.SIMPLE_ART, CanvasKind.SIMPLE_NOTES).withIndex()) {
+        for ((i, kind) in listOf(CanvasKind.COMIC, CanvasKind.SIMPLE_ART, CanvasKind.NOTES).withIndex()) {
             if (i > 0) {
                 compose.onNodeWithContentDescription("Geri").performClick()
                 waitFor { !exists("drawing_canvas") }

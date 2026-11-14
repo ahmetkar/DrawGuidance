@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- v51 tek not alma modu (gelişmiş ve basit not alma birleşti) ve geçici tuvalde resim düzenleme -->
+<resources>
+    <string name="v51_notes_remove_old_guides">古いガイド線を削除</string>
+    <string name="v51_temp_image_name">画像の編集（一時）</string>
+    <string name="v51_temp_image_hint">一時キャンバスで編集しています。保存をタップすると画像がノートに戻り、このキャンバスは削除されます。保存せずに戻ると変更は破棄されます。</string>
+    <string name="v51_temp_image_saved">画像をノートに戻しました</string>
+    <string name="v51_temp_image_failed">画像を編集用に開けませんでした</string>
+    <string name="v51_temp_image_save">保存してノートに戻す</string>
+</resources>

@@ -24,6 +24,8 @@ fun CanvasEditRoute(
     onBack: () -> Unit,
     onOpenModel3d: (modelId: String?, strokeId: String?) -> Unit,
     onOpenSubscription: () -> Unit,
+    /** v51 notta resim düzenleme: geçici basit resim tuvali açılır. */
+    onOpenCanvas: (String) -> Unit = {},
 ) {
     val vm: CanvasEditViewModel = koinViewModel(parameters = { parametersOf(canvasLocalId) })
     val canvas by vm.canvas.collectAsState()
@@ -37,6 +39,31 @@ fun CanvasEditRoute(
     }
     val ads = koinInject<AdsCoordinator>()
     val context = LocalContext.current
+    // v51 notta resim düzenleme: geçici tuval açılır (açılamazsa bildirilir)
+    val tempRequest by vm.tempCanvasRequest.collectAsState()
+    androidx.compose.runtime.LaunchedEffect(tempRequest) {
+        val id = tempRequest ?: return@LaunchedEffect
+        vm.consumeTempCanvasRequest()
+        if (id.isEmpty()) vm.emit(com.karapp.drawguidance.ui.screens.canvasedit.EditEvent.Message(context.getString(com.karapp.drawguidance.R.string.v51_temp_image_failed)))
+        else onOpenCanvas(id)
+    }
+    // v51 geçici resim tuvali: Kaydet'le (resim nota aktarılır) ya da çıkışta (değişiklikler atılır) kapanır; reklam yok
+    val temp = vm.isTempImageEdit
+    val popped = androidx.compose.runtime.remember { booleanArrayOf(false) }
+    val leave: () -> Unit = {
+        if (temp) {
+            if (!popped[0]) { popped[0] = true; vm.closeTempImage(); onBack() }
+        } else {
+            context.findActivity()?.let { ads.onCanvasClosed(it, canvas?.kind) }
+            onBack()
+        }
+    }
+    if (temp) {
+        val closed by vm.tempClosed.collectAsState()
+        androidx.compose.runtime.LaunchedEffect(closed) { if (closed) leave() }
+        val hint = androidx.compose.ui.res.stringResource(com.karapp.drawguidance.R.string.v51_temp_image_hint)
+        androidx.compose.runtime.LaunchedEffect(Unit) { vm.emit(com.karapp.drawguidance.ui.screens.canvasedit.EditEvent.Message(hint)) }
+    }
     // v40 tuvalde geçirilen etkin süre (Ana sayfa: en çok vakit geçirdiklerin)
     val timeModifier = rememberEditTimeModifier(canvasLocalId)
     androidx.compose.foundation.layout.Box(timeModifier.then(androidx.compose.ui.Modifier.fillMaxSize())) {
@@ -49,10 +76,7 @@ fun CanvasEditRoute(
     PremiumScope(kind, onOpenSubscription) {
         CanvasEditScreen(
             canvasLocalId = canvasLocalId,
-            onBack = {
-                context.findActivity()?.let { ads.onCanvasClosed(it, canvas?.kind) }
-                onBack()
-            },
+            onBack = leave,
             viewModel = vm,
             onOpenModel3d = onOpenModel3d,
         )

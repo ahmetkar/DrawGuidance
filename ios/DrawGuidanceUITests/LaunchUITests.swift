@@ -15,7 +15,7 @@ final class LaunchUITests: XCTestCase {
 
     /// Ana sayfadan yeni tuval: grup (basit / gelişmiş) açılır, tür seçilir, formda Oluştur.
     private func createCanvas(_ app: XCUIApplication, _ kind: String) {
-        let simple = ["SIMPLE_ART", "SIMPLE_NOTES", "KIDS"].contains(kind)
+        let simple = ["SIMPLE_ART", "NOTES", "KIDS"].contains(kind)
         let group = app.buttons[simple ? "home_new_simple" : "home_new_advanced"]
         XCTAssertTrue(group.waitForExistence(timeout: 10))
         group.tap()
@@ -61,7 +61,8 @@ final class LaunchUITests: XCTestCase {
         app.launch()
         createCanvas(app, "NOTES")
 
-        let tool = app.descendants(matching: .any)["add_shape"].firstMatch
+        // v51 not alma basit çizim altında: şekil düğmesi basit menüde
+        let tool = app.descendants(matching: .any)["simple_tool_shape"].firstMatch
         XCTAssertTrue(tool.waitForExistence(timeout: 10))
         tool.tap()
         // Fen kategorisine geçilip ilk hazır şekil seçilir
@@ -240,7 +241,7 @@ final class LaunchUITests: XCTestCase {
         let app = XCUIApplication()
         app.launchArguments += ["-AppleLanguages", "(tr)", "-uiTesting"]
         app.launch()
-        createCanvas(app, "SIMPLE_NOTES")
+        createCanvas(app, "NOTES")
         for tag in ["simple_menu_add", "simple_menu_draw", "simple_menu_edit"] {
             XCTAssertTrue(app.descendants(matching: .any)[tag].firstMatch.waitForExistence(timeout: 10), tag)
         }

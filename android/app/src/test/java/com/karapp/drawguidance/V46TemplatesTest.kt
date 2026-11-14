@@ -68,8 +68,9 @@ class V46TemplateFilesTest {
         // v48 çizgi romanda üç boş şablon (çizgi roman, manga, webtoon; v47 hikâyeleri kaldırıldı), not almada beş,
         // basit not almada üç şablon
         assertEquals(listOf("comic_blank_pages", "comic_blank_manga", "comic_blank_webtoon"), CanvasTemplates.forKind(CanvasKind.COMIC).map { it.id })
-        assertEquals(5, CanvasTemplates.forKind(CanvasKind.NOTES).size)
-        assertEquals(listOf("simple_lesson", "simple_todo", "simple_week"), CanvasTemplates.forKind(CanvasKind.SIMPLE_NOTES).map { it.id })
+        // v51 not alma tek mod: eski basit not şablonları da not almada (toplam sekiz)
+        assertEquals(8, CanvasTemplates.forKind(CanvasKind.NOTES).size)
+        assertTrue(CanvasTemplates.forKind(CanvasKind.NOTES).map { it.id }.containsAll(listOf("simple_lesson", "simple_todo", "simple_week")))
         assertEquals(11, all.size)
         for (old in OLD_COMIC) {
             assertEquals(old, null, CanvasTemplates.find(old))
@@ -234,11 +235,8 @@ class V46TemplateFormTest : V32EditorBase() {
         assertFalse(exists("template_card_comic_blank_pages"))
         // Kart adları dilde
         assertTrue(compose.onAllNodes(hasText("Cornell ders notu")).fetchSemanticsNodes().isNotEmpty())
-        // v47 basit not almada üç şablon
-        chooseKind(CanvasKind.SIMPLE_NOTES)
+        // v51 eski basit not şablonları da not alma formunda
         waitFor { exists("template_card_simple_lesson") }
-        for (t in CanvasTemplates.forKind(CanvasKind.SIMPLE_NOTES)) assertTrue(t.id, exists("template_card_${t.id}"))
-        assertFalse(exists("template_card_notes_cornell"))
         shot("v46-template-form")
     }
 

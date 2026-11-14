@@ -184,7 +184,7 @@
     <string name="canvas_kind_art">绘画</string>
     <string name="canvas_kind_art_hint">全部美术画笔 · 风景和人像形状</string>
     <string name="canvas_kind_notes">学习 / 笔记</string>
-    <string name="canvas_kind_notes_hint">笔记用笔 · 数学和几何形状</string>
+    <string name="canvas_kind_notes_hint">单一菜单 · 笔记笔 · 全部形状、图表和公式 · 多页</string>
     <string name="canvas_kind_badge_notes">笔记</string>
     <string name="brush_note_pencil">普通铅笔</string>
     <string name="brush_note_ballpoint">圆珠笔</string>

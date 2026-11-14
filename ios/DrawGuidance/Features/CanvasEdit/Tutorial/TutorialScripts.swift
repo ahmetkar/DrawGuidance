@@ -11,7 +11,8 @@ enum TutorialScripts {
         switch kind {
         // v40/v46/v48 her gelişmiş türde sürümün yenilikleri ayrı grupta
         case .ART: return [artBasics, artAdd, artAi, TutorialV40.art, TutorialV46.art, TutorialV48.advanced(kind), TutorialV50.advanced(kind)]
-        case .NOTES: return [notesWrite, notesFormula, notesAi, TutorialV40.notes, TutorialV46.notes, TutorialV48.advanced(kind)]
+        // v51 tek not alma modu basit çizimde: basit notun tek menülü eğitimleri
+        case .NOTES: return [TutorialV40.simpleNotes, TutorialV46.simpleNotes, TutorialV48.simple(kind)]
         case .COMIC: return [comicPanels, comicText, comicAi, TutorialV40.comic, TutorialV46.comic, TutorialV48.advanced(kind), TutorialV50.advanced(kind)]
         // v40 basit resim ve basit notta kısa, sade dilli tanıtım
         case .SIMPLE_ART: return [TutorialV40.simpleArt, TutorialV46.simpleArt, TutorialV48.simple(kind), TutorialV50.simpleArt]
@@ -29,7 +30,7 @@ enum TutorialScripts {
         switch kind {
         // v50 çizim modlarında "Resimden çizim" (vektörleştirme ve kalıpla çizme), not türlerinde v48 menüleri
         case .ART, .COMIC: return TutorialV50.advanced(kind)
-        case .NOTES: return TutorialV48.advanced(kind)
+        case .NOTES: return TutorialV48.simple(kind)
         case .SIMPLE_ART: return TutorialV50.simpleArt
         case .SIMPLE_NOTES: return TutorialV48.simple(kind)
         case .KIDS: return TutorialV50.kids

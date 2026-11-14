@@ -243,7 +243,7 @@ class V33ToolHelpCoverageTest : V33EditorBase() {
     fun simpleKindsButtonsHaveDescriptions() {
         val seen = LinkedHashSet<String>()
         waitForText("Henüz bir tuvaliniz yok", substring = true)
-        listOf(CanvasKind.SIMPLE_NOTES, CanvasKind.KIDS).forEachIndexed { i, kind ->
+        listOf(CanvasKind.NOTES, CanvasKind.KIDS).forEachIndexed { i, kind ->
             val name = "Basit $i"
             kotlinx.coroutines.runBlocking {
                 org.koin.core.context.GlobalContext.get().get<com.karapp.drawguidance.data.repository.CanvasRepository>()

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- v51 tek not alma modu (gelişmiş ve basit not alma birleşti) ve geçici tuvalde resim düzenleme -->
+<resources>
+    <string name="v51_notes_remove_old_guides">Удалить старые направляющие</string>
+    <string name="v51_temp_image_name">Редактирование изображения (временно)</string>
+    <string name="v51_temp_image_hint">Вы редактируете на временном холсте. Нажмите «Сохранить», чтобы вернуть изображение в заметку и удалить этот холст; выход без сохранения отменяет изменения.</string>
+    <string name="v51_temp_image_saved">Изображение возвращено в заметку</string>
+    <string name="v51_temp_image_failed">Не удалось открыть изображение для редактирования</string>
+    <string name="v51_temp_image_save">Сохранить в заметку</string>
+</resources>

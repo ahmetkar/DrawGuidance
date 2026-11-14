@@ -184,7 +184,7 @@
     <string name="canvas_kind_art">Рисунок</string>
     <string name="canvas_kind_art_hint">Все художественные кисти · фигуры для пейзажей и портретов</string>
     <string name="canvas_kind_notes">Учёба / Заметки</string>
-    <string name="canvas_kind_notes_hint">Ручки для заметок · фигуры по математике и геометрии</string>
+    <string name="canvas_kind_notes_hint">Одно меню · ручки для заметок · все фигуры, диаграммы и формулы · страницы</string>
     <string name="canvas_kind_badge_notes">Заметка</string>
     <string name="brush_note_pencil">Простой карандаш</string>
     <string name="brush_note_ballpoint">Шариковая ручка</string>

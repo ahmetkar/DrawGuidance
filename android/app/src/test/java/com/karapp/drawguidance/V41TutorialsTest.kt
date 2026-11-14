@@ -69,7 +69,7 @@ class V41TutorialsTest : V32EditorBase() {
     @Test fun notesWhatsNew() = playGroup(CanvasKind.NOTES, "notes_v40", "v41-tut-notes")
     @Test fun comicWhatsNew() = playGroup(CanvasKind.COMIC, "comic_v40", "v41-tut-comic")
     @Test fun simpleArtIntro() = playGroup(CanvasKind.SIMPLE_ART, "simple_art_intro", "v41-tut-simple-art")
-    @Test fun simpleNotesIntro() = playGroup(CanvasKind.SIMPLE_NOTES, "simple_notes_intro", "v41-tut-simple-notes")
+    @Test fun simpleNotesIntro() = playGroup(CanvasKind.NOTES, "simple_notes_intro", "v41-tut-simple-notes")
     @Test fun kidsWhatsNew() = playGroup(CanvasKind.KIDS, "kids_v40", "v41-tut-kids")
 
     /** Her türün eğitim listesinde yenilikler grubu var; çizgi romanda hazır arka planlar Mekân arka planı düğmesinde. */

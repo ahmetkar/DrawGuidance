@@ -75,11 +75,14 @@ struct ParamControlsBar: View {
                         .buttonStyle(.bordered)
                         .accessibilityIdentifier("param_formula")
                         ForEach(model.defs, id: \.key) { d in defControl(d, values) }
-                        Button { params.clearError(); shapes.selectTool(.NODES) } label: {
-                            Label(L("v45_vector_edit"), systemImage: "scope")
+                        // v51 not almada vektör düzenleme yok
+                        if store.canvas?.kind.isNotes != true {
+                            Button { params.clearError(); shapes.selectTool(.NODES) } label: {
+                                Label(L("v45_vector_edit"), systemImage: "scope")
+                            }
+                            .buttonStyle(.bordered)
+                            .accessibilityIdentifier("param_vector_edit")
                         }
-                        .buttonStyle(.bordered)
-                        .accessibilityIdentifier("param_vector_edit")
                     }
                     .padding(.horizontal, 12)
                 }

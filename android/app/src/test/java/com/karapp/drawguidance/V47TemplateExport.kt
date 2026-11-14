@@ -82,7 +82,7 @@ class V47TemplateExport : TemplateExportBase() {
     /** Ders notu: su döngüsü (başlık, kavramlar, döngü diyagramı, özet). */
     @Test
     fun simpleLesson() {
-        open("Su Döngüsü", CanvasKind.SIMPLE_NOTES, 1240, 1754, pages = 1, cover = false, background = BackgroundSpec(patternId = "note.ruled_college"))
+        open("Su Döngüsü", CanvasKind.NOTES, 1240, 1754, pages = 1, cover = false, background = BackgroundSpec(patternId = "note.ruled_college"))
         page(0)
         val m = 150f  // kenar çizgisinin sağında
         val w = 1240f - m - 80f
@@ -103,13 +103,13 @@ class V47TemplateExport : TemplateExportBase() {
         val sum = text("Su, Güneş'ten aldığı enerjiyle sürekli yer değiştirir; miktarı değişmez, yalnız hâli (sıvı, gaz, katı) ve yeri değişir.", m, h3.bottom() + 12f, 28f, INK, width = w)
         val q = text("Soru: Bulutlar neden yüksekte oluşur?", m, sum.bottom() + 24f, 30f, RED, TextFont.CAVEAT, width = w)
         add(title, sub, h1, keys, h2, cycle, h3, sum, q)
-        export("simple_lesson", CanvasKind.SIMPLE_NOTES, landing = 0, coverPage = 0)
+        export("simple_lesson", CanvasKind.NOTES, landing = 0, coverPage = 0)
     }
 
     /** Yapılacaklar listesi: okul, ev, kişisel (işaretlenebilir). */
     @Test
     fun simpleTodo() {
-        open("Yapılacaklar", CanvasKind.SIMPLE_NOTES, 1240, 1754, pages = 1, cover = false, background = BackgroundSpec(patternId = "note.dots"))
+        open("Yapılacaklar", CanvasKind.NOTES, 1240, 1754, pages = 1, cover = false, background = BackgroundSpec(patternId = "note.dots"))
         page(0)
         val m = 90f
         val w = 1240f - 2 * m
@@ -123,13 +123,13 @@ class V47TemplateExport : TemplateExportBase() {
         val l3 = text("Spor ya da yürüyüş\nResim çizmek\nErken uyumak", m, h3.bottom() + 14f, 30f, INK, width = w, paragraph = TextParagraph.CHECKLIST)
         val note = text("En önemli üç iş: ______________________", m, l3.bottom() + 50f, 30f, MUTED, TextFont.CAVEAT, width = w)
         add(title, sub, h1, l1, h2, l2, h3, l3, note)
-        export("simple_todo", CanvasKind.SIMPLE_NOTES, landing = 0, coverPage = 0)
+        export("simple_todo", CanvasKind.NOTES, landing = 0, coverPage = 0)
     }
 
     /** Haftalık plan: yedi gün ve notlar (renkli kutular). */
     @Test
     fun simpleWeek() {
-        open("Haftalık Plan", CanvasKind.SIMPLE_NOTES, 1240, 1754, pages = 1, cover = false)
+        open("Haftalık Plan", CanvasKind.NOTES, 1240, 1754, pages = 1, cover = false)
         page(0)
         val m = 70f
         val title = text("Haftalık Plan", m, 60f, 54f, INK, TextFont.POPPINS, bold = true, width = 1240f - 2 * m)
@@ -148,6 +148,6 @@ class V47TemplateExport : TemplateExportBase() {
             items += heading(d, x + 22f, y + 18f, color = if (i == 7) MUTED else ACCENT, size = 30f)
         }
         add(items.filterNotNull())
-        export("simple_week", CanvasKind.SIMPLE_NOTES, landing = 0, coverPage = 0)
+        export("simple_week", CanvasKind.NOTES, landing = 0, coverPage = 0)
     }
 }

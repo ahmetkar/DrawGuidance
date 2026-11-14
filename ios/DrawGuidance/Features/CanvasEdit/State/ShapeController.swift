@@ -161,7 +161,12 @@ final class ShapeController: ObservableObject {
 
     // MARK: Şekil düzenleme modu
 
+    /// v51 not almada vektör (nokta ve çizgi) düzenleme yok: yalnız değerler, grafik ve alan boyama.
+    private var vectorEditAllowed: Bool { store.canvas?.kind.isNotes != true }
+    private func isVectorTool(_ t: ShapeTool) -> Bool { t.nodeFamily || t == .LINES }
+
     func selectTool(_ value: ShapeTool) {
+        if !vectorEditAllowed && isVectorTool(value) { return }
         tool = value
         let v = vector
         setSelection(VectorSelection(nodes: value == .NODES || value == .ADD_NODE ? v.nodes : [], edge: value == .LINES ? v.edge : nil))
@@ -170,9 +175,13 @@ final class ShapeController: ObservableObject {
     func editSelected() {
         guard let s = store.selectedStroke({ $0.shape != nil }) else { return }
         paramShapes.clearError()
-        if let spec = s.shape, GraphShapes.isGraph(spec.kind) && spec.graph != nil { tool = .GRAPH }
-        else if paramShapes.model(s) != nil { tool = .PARAMS }
-        else { tool = .NODES }
+        let next: ShapeTool
+        if let spec = s.shape, GraphShapes.isGraph(spec.kind) && spec.graph != nil { next = .GRAPH }
+        else if paramShapes.model(s) != nil { next = .PARAMS }
+        else { next = .NODES }
+        // v51 not almada düz şekiller vektör düzenlemeye açılmaz (değerli şekiller ve grafikler açılır)
+        if !vectorEditAllowed && isVectorTool(next) { return }
+        tool = next
         setSelection(VectorSelection(), s)
         host.startAction(.SHAPE_EDIT, target: [s.id])
     }

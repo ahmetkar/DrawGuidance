@@ -101,7 +101,7 @@ class V42SaveTest : V33EditorBase() {
 
     @Test
     fun simpleNotesAlsoUseTheUnifiedWindow() {
-        open("Basit not", CanvasKind.SIMPLE_NOTES)
+        open("Basit not", CanvasKind.NOTES)
         compose.onNodeWithTag("header_save").performClick()
         waitFor { exists("pdf_options_sheet") }
         assertTrue(exists("unified_save_header"))

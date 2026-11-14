@@ -565,6 +565,7 @@ fun CanvasEditScreen(
                 is EditEvent.TutorialFinished -> context.getString(R.string.tut_finished, context.getString(event.title))
                 is EditEvent.PageLimit -> context.getString(R.string.page_limit_reached, event.max)
                 EditEvent.PaintMiss -> context.getString(R.string.paint_miss)
+                EditEvent.TempImageApplied -> context.getString(R.string.v51_temp_image_saved)
             }
             // Yeni bildirim eskisini beklemeden onun yerine geçer
             snackbar.currentSnackbarData?.dismiss()
@@ -967,7 +968,7 @@ fun CanvasEditScreen(
             ))
         }
         // v35 basit notta formül (bütün katalog) ve diyagram şeklin hemen ardında; arka plan her basit türde görünür yerde
-        if (kind == com.karapp.drawguidance.data.model.CanvasKind.SIMPLE_NOTES) {
+        if (kind.isNotes) {
             add(com.karapp.drawguidance.ui.screens.canvasedit.components.SimpleTool("formula", Icons.Filled.Functions, simpleTexts.formula, mode == EditMode.FORMULA, viewModel::openFormulaPicker))
             add(com.karapp.drawguidance.ui.screens.canvasedit.components.SimpleTool("diagram", Icons.Filled.AccountTree, simpleTexts.diagram, mode == EditMode.DIAGRAM || mode == EditMode.DIAGRAM_EDIT, viewModel::openDiagramPicker))
             // v45 inmiş not paketlerinin şekilleri/diyagram resimleri basit notta da (gelişmiş not almadaki gibi; paket varsa)
@@ -1007,12 +1008,13 @@ fun CanvasEditScreen(
             add(com.karapp.drawguidance.ui.screens.canvasedit.components.SimpleTool("rect_select", com.karapp.drawguidance.ui.screens.canvasedit.components.V44Icons.RectSelect, rectSelectSimpleLabel, canvasPick == com.karapp.drawguidance.ui.screens.canvasedit.components.CanvasPick.RECT_SELECT, { viewModel.toggleCanvasPick(com.karapp.drawguidance.ui.screens.canvasedit.components.CanvasPick.RECT_SELECT) }))
 // v48 basit resim ve basit notta serbest seçim (kement) yok; dikdörtgen seçim kaldı
         }
-        add(com.karapp.drawguidance.ui.screens.canvasedit.components.SimpleTool("eyedropper", Icons.Filled.Colorize, eyedropperLabel, canvasPick == com.karapp.drawguidance.ui.screens.canvasedit.components.CanvasPick.EYEDROPPER, { viewModel.toggleCanvasPick(com.karapp.drawguidance.ui.screens.canvasedit.components.CanvasPick.EYEDROPPER) }))
+        // v51 not almada damlalık yok
+        if (!kind.isNotes) add(com.karapp.drawguidance.ui.screens.canvasedit.components.SimpleTool("eyedropper", Icons.Filled.Colorize, eyedropperLabel, canvasPick == com.karapp.drawguidance.ui.screens.canvasedit.components.CanvasPick.EYEDROPPER, { viewModel.toggleCanvasPick(com.karapp.drawguidance.ui.screens.canvasedit.components.CanvasPick.EYEDROPPER) }))
         // v40 cetvel ve şekil kalıbı ayrı düğmeler (dokununca açılır, yeniden dokununca kapanır)
         add(com.karapp.drawguidance.ui.screens.canvasedit.components.SimpleTool("ruler", Icons.Filled.Straighten, rulerToolLabel, rulerSession == com.karapp.drawguidance.ui.screens.canvasedit.ruler.GuideSession.RULER, rulerActions.toggleRuler))
         add(com.karapp.drawguidance.ui.screens.canvasedit.components.SimpleTool("template", com.karapp.drawguidance.ui.screens.canvasedit.components.V44Icons.Template, templateToolLabel, rulerSession == com.karapp.drawguidance.ui.screens.canvasedit.ruler.GuideSession.TEMPLATE || rulerSession == com.karapp.drawguidance.ui.screens.canvasedit.ruler.GuideSession.TEMPLATE_PICK, rulerActions.toggleTemplate))
         // v37 basit çizimde (basit not dışında) çizim alanını genişletme: kenarlar sürüklenir; yeniden dokununca çizime dönülür
-        if (kind != com.karapp.drawguidance.data.model.CanvasKind.SIMPLE_NOTES) {
+        if (!kind.isNotes) {
             // v48 Genişlet yalnız tuval seçiliyken (eleman seçili değilken) etkin
             add(com.karapp.drawguidance.ui.screens.canvasedit.components.SimpleTool("expand", Icons.Filled.AspectRatio, simpleTexts.expand, mode == EditMode.EXPAND, {
                 viewModel.chooseMode(if (mode == EditMode.EXPAND) EditMode.DRAW else EditMode.EXPAND)
@@ -1945,10 +1947,11 @@ fun CanvasEditScreen(
                             onRemoveColor = viewModel::removeSavedColor,
                             onTuning = viewModel::updateBrushTuning,
                             onResetTuning = viewModel::resetBrushTuning,
-                            onEyedropper = {
+                            // v51 not almada damlalık yok
+                            onEyedropper = if (kind.isNotes) null else ({
                                 viewModel.closePanel()
                                 viewModel.toggleCanvasPick(com.karapp.drawguidance.ui.screens.canvasedit.components.CanvasPick.EYEDROPPER)
-                            },
+                            }),
                             // v33 çocuklar için sade fırça paneli
                             kids = kids,
                             textSection = textSection,

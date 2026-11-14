@@ -113,6 +113,8 @@ final class ImageEditController: ObservableObject {
 
     func editSelected() {
         guard store.selection.count == 1, let image = store.selectedStroke({ $0.brushType == .IMAGE }) else { return }
+        // v51 not almada resim geçici basit resim tuvalinde düzenlenir (burada vektörleştirme yok)
+        if host.editImageElsewhere(image) { return }
         host.startAction(.IMAGE_EDIT, target: [image.id])
     }
 
@@ -121,6 +123,8 @@ final class ImageEditController: ObservableObject {
     func cancelTrace() { job?.cancel(); job = nil; tracing = false }
 
     func vectorize(_ options: EdgeOptions, lineWidth: Float, keepImage: Bool) {
+        // v51 not almada resim vektörleştirme yok
+        if store.canvas?.kind.isNotes == true { return }
         guard let image = selected, image.points.count >= 4, let bitmap = CanvasImageCache.get(image.assetId) else { return }
         cancelTrace()
         tracing = true

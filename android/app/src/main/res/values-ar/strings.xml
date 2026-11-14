@@ -184,7 +184,7 @@
     <string name="canvas_kind_art">رسم</string>
     <string name="canvas_kind_art_hint">جميع فرش الرسم · أشكال المناظر الطبيعية والوجوه</string>
     <string name="canvas_kind_notes">دراسة / ملاحظات</string>
-    <string name="canvas_kind_notes_hint">أقلام الملاحظات · أشكال الرياضيات والهندسة</string>
+    <string name="canvas_kind_notes_hint">قائمة واحدة · أقلام الملاحظات · كل الأشكال والمخططات والصيغ · صفحات</string>
     <string name="canvas_kind_badge_notes">ملاحظة</string>
     <string name="brush_note_pencil">قلم رصاص</string>
     <string name="brush_note_ballpoint">قلم حبر جاف</string>

@@ -15,7 +15,10 @@ enum class CanvasSizeTemplate(val label: String, val width: Int, val height: Int
 /**
  * Tuval türü: fırça ve şekil kataloğunu belirler.
  * - [ART] resim: tüm sanat fırçaları; manzara/portre için geometrik ve özel şekiller.
- * - [NOTES] çalışma/not alma: yazı kalemleri; matematik ve geometri şekilleri.
+ * - [NOTES] not alma (v51: tek not alma modu, basit çizim grubunda): yazı kalemleri; matematik ve geometri şekilleri.
+ *   v51'de gelişmiş not alma ve basit not alma birleşti: basit çizimin tek üst menüsü, gelişmiş not almanın bütün
+ *   katalogları; damlalık, kılavuz çizgileri, vektör (nokta/çizgi) düzenleme ve resim vektörleştirme yok. Resim düzenleme
+ *   geçici bir basit resim tuvalinde yapılır (bkz. TempImageEdit).
  * - v33 basit çizim türleri ([SIMPLE_ART], [SIMPLE_NOTES], [KIDS]): tek üst menü, sınırlı katalog (10'ar şekil,
  *   diyagram, formül ve 3B şekil; 3 fırça kategorisi). Çizim kuralları [base] türününkidir.
  */
@@ -29,7 +32,10 @@ enum class CanvasKind {
     COMIC,
     /** v33 basit resim çizimi (basit çizim). */
     SIMPLE_ART,
-    /** v33 basit not alma (basit çizim; sayfalı). */
+    /**
+     * v33 basit not alma. v51'den beri YALNIZ ESKİ KAYITLARIN ADI: [parse] onu [NOTES]'a çevirir, yeni tuval bu türle
+     * oluşturulmaz (eski sürümlerin ve sunucunun gönderdiği değerler için tutulur).
+     */
     SIMPLE_NOTES,
     /** v33 çocuklar için çizim (basit çizim): 50 çocuk şekli, kolay boyama, sade ayarlar. */
     KIDS;
@@ -44,8 +50,8 @@ enum class CanvasKind {
     /** Birden çok sayfası olabilir (not, basit not ve çizgi roman). */
     val paged: Boolean get() = this == NOTES || this == COMIC || this == SIMPLE_NOTES
 
-    /** v33 basit çizim türü (tek üst menü, sınırlı katalog). */
-    val simple: Boolean get() = this == SIMPLE_ART || this == SIMPLE_NOTES || this == KIDS
+    /** v33 basit çizim türü (tek üst menü, sınırlı katalog). v51 not alma da basit çizim grubunda (tek üst menü). */
+    val simple: Boolean get() = this == SIMPLE_ART || this == SIMPLE_NOTES || this == NOTES || this == KIDS
 
     /** v33 not alma ailesi (not alma ve basit not alma). */
     val isNotes: Boolean get() = base == NOTES
@@ -78,13 +84,23 @@ enum class CanvasKind {
     }
 
     companion object {
-        fun parse(value: String?): CanvasKind = entries.firstOrNull { it.name == value } ?: ART
+        /** v51 eski basit not alma kayıtları ("SIMPLE_NOTES") tek not alma moduna ([NOTES]) taşınır. */
+        fun parse(value: String?): CanvasKind = when (value) {
+            LEGACY_SIMPLE_NOTES -> NOTES
+            else -> entries.firstOrNull { it.name == value } ?: ART
+        }
 
-        /** v33 basit çizim alt modları. */
-        val Simple: List<CanvasKind> = listOf(SIMPLE_ART, SIMPLE_NOTES, KIDS)
+        /** v51 eski basit not alma türünün kayıtlardaki adı. */
+        const val LEGACY_SIMPLE_NOTES = "SIMPLE_NOTES"
 
-        /** v33 gelişmiş çizim alt modları (3B şekil oluşturma ayrı: 3B düzenleyicide açılır). */
-        val Advanced: List<CanvasKind> = listOf(ART, NOTES, COMIC)
+        /** v33 basit çizim alt modları. v51 tek not alma modu basit çizimde. */
+        val Simple: List<CanvasKind> = listOf(SIMPLE_ART, NOTES, KIDS)
+
+        /** v33 gelişmiş çizim alt modları (3B şekil oluşturma ayrı: 3B düzenleyicide açılır). v51 not alma basit çizimde. */
+        val Advanced: List<CanvasKind> = listOf(ART, COMIC)
+
+        /** v51 kullanıcıya sunulan türler (eski basit not alma yok). */
+        val Selectable: List<CanvasKind> = Advanced + Simple
     }
 }
 

@@ -101,7 +101,7 @@ class V40ExportTest {
         assertEquals(3, Regex("/ColorSpace /DeviceCMYK").findAll(text).count())
         assertTrue(text.trimEnd().endsWith("%%EOF"))
         // PDF penceresinden de (not alma / çizgi roman) CMYK seçilebilir; varsayılan yerde (belgeler klasörü)
-        val notes = exporter.exportPdf(canvas(2, CanvasKind.SIMPLE_NOTES), PdfOptions("not", cmyk = CmykOptions(), pageNumbers = true))
+        val notes = exporter.exportPdf(canvas(2, CanvasKind.NOTES), PdfOptions("not", cmyk = CmykOptions(), pageNumbers = true))
         assertTrue(notes.location, notes.location.endsWith("not.pdf"))
         assertTrue(String(bytesOf(notes.uri), Charsets.ISO_8859_1).contains("/Count 2"))
         assertEquals(File(Uri.parse(notes.uri).path!!).length(), notes.sizeBytes)

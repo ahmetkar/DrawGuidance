@@ -78,7 +78,7 @@ class V40EditorUiTest : V33EditorBase() {
 
     @Test
     fun simpleNotesHasPdfAndComicHasCbz() {
-        open("Basit", CanvasKind.SIMPLE_NOTES)
+        open("Basit", CanvasKind.NOTES)
         more()
         waitFor { exists("page_settings_menu_item") }
         // v42 PDF ⋮ menüsünde değil, Kaydet penceresinde

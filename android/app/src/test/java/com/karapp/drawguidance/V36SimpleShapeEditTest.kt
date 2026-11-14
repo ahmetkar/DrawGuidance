@@ -168,7 +168,7 @@ class V36SimpleShapeEditTest : V33EditorBase() {
 
     @Test
     fun simpleNotesHaveNoShapeEditButton() {
-        openKind("Basit not", CanvasKind.SIMPLE_NOTES)
+        openKind("Basit not", CanvasKind.NOTES)
         assertFalse(exists("simple_tool_shape_edit"))
     }
 }

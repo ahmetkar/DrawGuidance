@@ -453,7 +453,7 @@ class V45ToolGroupsTest : V45EditorBase() {
 
     @Test
     fun simpleMenusGroupedByFour() {
-        for (kind in listOf(CanvasKind.SIMPLE_ART, CanvasKind.SIMPLE_NOTES, CanvasKind.KIDS)) {
+        for (kind in listOf(CanvasKind.SIMPLE_ART, CanvasKind.NOTES, CanvasKind.KIDS)) {
             if (kind != CanvasKind.SIMPLE_ART) {
                 compose.runOnIdle { compose.activity.onBackPressedDispatcher.onBackPressed() }
                 waitFor { !exists("drawing_canvas") }
@@ -1000,10 +1000,10 @@ class V45SharedFeaturesTest : V45EditorBase() {
         compose.waitForIdle()
         compose.runOnIdle { compose.activity.onBackPressedDispatcher.onBackPressed() }
         waitFor { !exists("drawing_canvas") }
-        runBlocking { repo().createCanvas("Basit panel", 1000, 1000, "#FFFFFF", aiEnabled = false, kind = CanvasKind.SIMPLE_NOTES) }
+        runBlocking { repo().createCanvas("Basit panel", 1000, 1000, "#FFFFFF", aiEnabled = false, kind = CanvasKind.NOTES) }
         waitForText("Basit panel")
         compose.onAllNodes(hasText("Basit panel"))[0].performClick()
-        waitFor { exists("simple_tool_row") && vm().canvas.value?.kind == CanvasKind.SIMPLE_NOTES }
+        waitFor { exists("simple_tool_row") && vm().canvas.value?.kind == CanvasKind.NOTES }
         val simple = rowButtons("simple_tool_row").map(::name)
         assertTrue("$simple", "Panel ekle" in simple)
         assertGrouped("simple_tool_row")

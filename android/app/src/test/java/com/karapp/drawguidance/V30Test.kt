@@ -319,7 +319,7 @@ class V30HomeTest : V30EditorBase() {
         assertTrue("Ana sayfa en solda", home.left < canvases.left)
 
         // Kısayoldan not tuvali (v33: Gelişmiş çizim → Not alma)
-        compose.onNodeWithTag("home_new_advanced").performScrollTo().performClick()
+        compose.onNodeWithTag("home_new_simple").performScrollTo().performClick()
         waitFor { exists("new_kind_NOTES") }
         compose.onNodeWithTag("new_kind_NOTES").performScrollTo().performClick()
         waitForText("Yeni Tuval Oluştur")

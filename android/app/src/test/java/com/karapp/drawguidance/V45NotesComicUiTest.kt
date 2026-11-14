@@ -310,7 +310,7 @@ class V45NotesPanelsUiTest : V45NotesComicUiBase() {
 
     @Test
     fun simpleNotesTopMenuHasPanelButtonAndUniqueIcon() {
-        open("Panel basit", CanvasKind.SIMPLE_NOTES)
+        open("Panel basit", CanvasKind.NOTES)
         waitFor { exists("simple_tool_panels") }
         assertEquals("Panel ekle", contentDescription("simple_tool_panels"))
         // Diyagramın ardında (not modunda yazı, diyagram, formül başta)
@@ -353,7 +353,7 @@ class V45NotesPanelsUiTest : V45NotesComicUiBase() {
 
     @Test
     fun simpleNotesSelectMoveDeleteAndReload() {
-        open("Panel basit taşı", CanvasKind.SIMPLE_NOTES)
+        open("Panel basit taşı", CanvasKind.NOTES)
         compose.onNodeWithTag("simple_tool_panels").performScrollTo().performClick()
         pickLayout("two_rows")
         waitFor { panels().size == 2 }
@@ -447,7 +447,7 @@ class V45SimpleNotesShapesUiTest : V45NotesComicUiBase() {
 
     @Test
     fun graphIsAddedFromSimplePickerAndEditedWithGraphToolAndFormula() {
-        open("Basit grafik", CanvasKind.SIMPLE_NOTES)
+        open("Basit grafik", CanvasKind.NOTES)
         val g = addShape("Fonksiyon grafiği")
         assertEquals(ShapeRegistryIds.FUNCTION, g.shape!!.kind)
         assertNotNull("grafik verisiyle", g.shape!!.graph)
@@ -471,7 +471,7 @@ class V45SimpleNotesShapesUiTest : V45NotesComicUiBase() {
 
     @Test
     fun scienceShapeIsAddedFromSimplePickerAndEditedWithParamsAndVectorEdit() {
-        open("Basit fen", CanvasKind.SIMPLE_NOTES)
+        open("Basit fen", CanvasKind.NOTES)
         val s = addShape("Eğik atış")
         assertEquals("lib.sci.phys.projectile", s.shape!!.kind)
         assertNotNull(com.karapp.drawguidance.ui.drawing.ShapeRegistry.paramModel(s.shape!!.kind))
@@ -496,7 +496,7 @@ class V45SimpleNotesShapesUiTest : V45NotesComicUiBase() {
 
     @Test
     fun formulaIsAddedFromSimpleMenuAndEdited() {
-        open("Basit formül", CanvasKind.SIMPLE_NOTES)
+        open("Basit formül", CanvasKind.NOTES)
         compose.onNodeWithTag("simple_tool_formula").performScrollTo().performClick()
         waitFor { exists("formula_picker") }
         // Gelişmiş not almadaki bütün kategoriler; "Türev tanımı" seçilir

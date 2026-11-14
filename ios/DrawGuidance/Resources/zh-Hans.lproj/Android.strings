@@ -347,7 +347,7 @@
 "canvas_kind_kids_hint" = "86 个儿童形状 · 卡通角色 · 点按即可涂色";
 "canvas_kind_label" = "画布类型";
 "canvas_kind_notes" = "学习 / 笔记";
-"canvas_kind_notes_hint" = "笔记用笔 · 数学和几何形状";
+"canvas_kind_notes_hint" = "单一菜单 · 笔记笔 · 全部形状、图表和公式 · 多页";
 "canvas_kind_simple_art" = "简易绘画";
 "canvas_kind_simple_art_hint" = "单一菜单 · 3 个画笔组 · 42 个形状（基础、自然、物品）";
 "canvas_kind_simple_notes" = "简易笔记";
@@ -3006,6 +3006,12 @@
 "v50_tut_types_t" = "三种类型，精细调节";
 "v50_tut_vec_b" = "选中图片，在\"编辑\"中点按\"自动矢量化\"。图片边缘会变成可编辑节点的矢量线条。";
 "v50_tut_vec_t" = "矢量化图片";
+"v51_notes_remove_old_guides" = "移除旧的参考线";
+"v51_temp_image_failed" = "无法打开图片进行编辑";
+"v51_temp_image_hint" = "你正在临时画布上编辑。点按保存会把图片放回笔记并删除此画布；不保存就离开会放弃更改。";
+"v51_temp_image_name" = "图片编辑（临时）";
+"v51_temp_image_save" = "保存到笔记";
+"v51_temp_image_saved" = "图片已放回笔记";
 "vector_cut" = "切断";
 "vector_delete" = "删除";
 "vector_edit_open" = "编辑矢量";

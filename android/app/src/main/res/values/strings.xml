@@ -200,7 +200,7 @@
     <string name="canvas_kind_art">Resim</string>
     <string name="canvas_kind_art_hint">Tüm sanat fırçaları · manzara ve portre şekilleri</string>
     <string name="canvas_kind_notes">Çalışma / Not</string>
-    <string name="canvas_kind_notes_hint">Not kalemleri · matematik ve geometri şekilleri</string>
+    <string name="canvas_kind_notes_hint">Tek menü · not kalemleri · bütün şekiller, diyagramlar ve formüller · sayfalar</string>
     <string name="canvas_kind_badge_notes">Not</string>
     <string name="brush_note_pencil">Kurşun Kalem</string>
     <string name="brush_note_ballpoint">Tükenmez Kalem</string>

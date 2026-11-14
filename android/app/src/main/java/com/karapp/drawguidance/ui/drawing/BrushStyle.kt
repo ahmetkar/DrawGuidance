@@ -305,8 +305,9 @@ val NoteBrushTypes: List<BrushType> = BrushCategory.forKind(CanvasKind.NOTES).fl
 
 /** Tuval türünün fırça seçicisindeki fırçalar. */
 fun pickerBrushTypes(kind: CanvasKind): List<BrushType> = when {
-    kind.simple -> BrushCategory.forKind(kind).flatMap { it.brushes }
+    // v51 not alma (basit çizimde) gelişmiş not almanın bütün kalemleriyle
     kind.isNotes -> NoteBrushTypes
+    kind.simple -> BrushCategory.forKind(kind).flatMap { it.brushes }
     else -> PickerBrushTypes
 }
 

@@ -46,6 +46,11 @@ interface EditorHost {
     fun inserted(ids: Set<String>)
     /** Fırçayla yeni bir iz çizildi (el yazısı önerisi için). */
     fun onInk(stroke: com.karapp.drawguidance.data.model.Stroke) {}
+    /**
+     * v51 resim bu tuvalde değil başka yerde düzenlenecekse (not alma: geçici basit resim tuvali) true döner ve
+     * düzenleme orada açılır; false ise resim bu tuvalin resim düzenleme modunda açılır.
+     */
+    fun editImageElsewhere(image: com.karapp.drawguidance.data.model.Stroke): Boolean = false
     val scope: CoroutineScope
     fun emit(event: EditEvent)
 }

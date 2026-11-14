@@ -36,13 +36,13 @@ object SimpleCatalog {
     )
 
     /** v45 basit not almada diyagram kataloğunun tamamı (gelişmiş not almadaki gibi: null = süzgeç yok). */
-    fun diagrams(kind: CanvasKind): List<DiagramKind>? = if (kind.simple && kind != CanvasKind.SIMPLE_NOTES) diagrams else null
+    fun diagrams(kind: CanvasKind): List<DiagramKind>? = if (kind.simple && !kind.isNotes) diagrams else null
 
     /**
      * v35 basit not almada formül kataloğunun tamamı kategorileriyle (gelişmiş not almadaki gibi: null = süzgeç yok);
      * öteki basit türlerde formül aracı yok, liste eski 10 temel formül.
      */
-    fun formulas(kind: CanvasKind): List<String>? = if (kind.simple && kind != CanvasKind.SIMPLE_NOTES) formulas else null
+    fun formulas(kind: CanvasKind): List<String>? = if (kind.simple && !kind.isNotes) formulas else null
 
     /** v45 basit not almada 3B şekillerin tamamı (gelişmiş not almadaki gibi); öteki basit türlerde 10 hazır 3B şekil. */
     fun models3d(kind: CanvasKind): List<String>? = when {

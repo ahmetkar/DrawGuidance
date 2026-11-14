@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- v51 tek not alma modu (gelişmiş ve basit not alma birleşti) ve geçici tuvalde resim düzenleme -->
+<resources>
+    <string name="v51_notes_remove_old_guides">이전 안내선 제거</string>
+    <string name="v51_temp_image_name">이미지 편집(임시)</string>
+    <string name="v51_temp_image_hint">임시 캔버스에서 편집 중입니다. 저장을 누르면 이미지가 노트로 돌아가고 이 캔버스는 삭제됩니다. 저장하지 않고 나가면 변경 사항이 취소됩니다.</string>
+    <string name="v51_temp_image_saved">이미지를 노트로 옮겼습니다</string>
+    <string name="v51_temp_image_failed">이미지를 편집용으로 열 수 없습니다</string>
+    <string name="v51_temp_image_save">저장하고 노트로 보내기</string>
+</resources>

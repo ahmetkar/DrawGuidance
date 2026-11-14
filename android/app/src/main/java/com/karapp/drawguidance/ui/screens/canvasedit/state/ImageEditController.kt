@@ -49,6 +49,8 @@ class ImageEditController(
 
     fun editSelected() {
         val image = store.selectedStroke { it.brushType == BrushType.IMAGE }?.takeIf { store.selection.size == 1 } ?: return
+        // v51 not almada resim geçici basit resim tuvalinde düzenlenir (burada vektörleştirme yok)
+        if (host.editImageElsewhere(image)) return
         host.startAction(EditMode.IMAGE_EDIT, setOf(image.id))
     }
 
@@ -70,6 +72,8 @@ class ImageEditController(
      * alınabilir), true ise resmin üstüne eklenir. Sonuç seçili olarak Taşı'ya geçer.
      */
     fun vectorize(options: EdgeOptions, lineWidth: Float, keepImage: Boolean) {
+        // v51 not almada resim vektörleştirme yok
+        if (store.canvas.value?.kind?.isNotes == true) return
         val image = selected.value ?: return
         val bitmap = CanvasImageCache.get(image.assetId)?.asAndroidBitmap() ?: return
         if (image.points.size < 4) return

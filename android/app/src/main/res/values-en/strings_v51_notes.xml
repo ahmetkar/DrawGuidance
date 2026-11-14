@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- v51 tek not alma modu (gelişmiş ve basit not alma birleşti) ve geçici tuvalde resim düzenleme -->
+<resources>
+    <string name="v51_notes_remove_old_guides">Remove old guide lines</string>
+    <string name="v51_temp_image_name">Image editing (temporary)</string>
+    <string name="v51_temp_image_hint">You are editing on a temporary canvas. Tap Save to put the image back into your note and delete this canvas; leaving without saving discards the changes.</string>
+    <string name="v51_temp_image_saved">Image added back to your note</string>
+    <string name="v51_temp_image_failed">Could not open the image for editing</string>
+    <string name="v51_temp_image_save">Save to note</string>
+</resources>

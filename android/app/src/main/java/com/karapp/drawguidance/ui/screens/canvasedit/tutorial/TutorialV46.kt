@@ -328,7 +328,7 @@ internal object TutorialV46 {
 
     val simpleNotes: TutorialGroup by lazy {
         TutorialGroup(
-            id = "simple_notes_v46", kind = CanvasKind.SIMPLE_NOTES, title = R.string.v46_tut_simple, summary = R.string.v46_tut_simple_notes_text,
+            id = "simple_notes_v46", kind = CanvasKind.NOTES, title = R.string.v46_tut_simple, summary = R.string.v46_tut_simple_notes_text,
             icon = Icons.Filled.NewReleases, ai = false,
             steps = listOf(
                 TutorialStep(TutorialAnchor.simple("panels"), R.string.v46_tut_panels, R.string.v46_tut_panels_text) {

@@ -480,7 +480,7 @@ class V40RulerUiTest : V33EditorBase() {
 
     @Test
     fun simpleModesHaveSeparateButtonsAndBottomBar() {
-        listOf(CanvasKind.SIMPLE_ART, CanvasKind.SIMPLE_NOTES, CanvasKind.KIDS).forEachIndexed { i, kind ->
+        listOf(CanvasKind.SIMPLE_ART, CanvasKind.NOTES, CanvasKind.KIDS).forEachIndexed { i, kind ->
             open("Ayrı $i", kind, first = i == 0)
             waitFor { exists("simple_tool_ruler") && exists("simple_tool_template") }
             assertFalse("seçim kutusu yok", exists("ruler_chooser"))

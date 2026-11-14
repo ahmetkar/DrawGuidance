@@ -347,7 +347,7 @@
 "canvas_kind_kids_hint" = "86 çocuk şekli · çizgi film karakterleri · dokununca boyama";
 "canvas_kind_label" = "Tuval Türü";
 "canvas_kind_notes" = "Çalışma / Not";
-"canvas_kind_notes_hint" = "Not kalemleri · matematik ve geometri şekilleri";
+"canvas_kind_notes_hint" = "Tek menü · not kalemleri · bütün şekiller, diyagramlar ve formüller · sayfalar";
 "canvas_kind_simple_art" = "Basit resim";
 "canvas_kind_simple_art_hint" = "Tek menü · 3 fırça grubu · 42 şekil (temel, doğa, eşyalar)";
 "canvas_kind_simple_notes" = "Basit not alma";
@@ -3006,6 +3006,12 @@
 "v50_tut_types_t" = "Üç tür, ince ayar";
 "v50_tut_vec_b" = "Resmi seçip Düzenle'de \"Otomatik vektörleştir\"e dokun. Resmin kenarları, noktaları düzenlenebilen vektör çizgilere dönüşür.";
 "v50_tut_vec_t" = "Resmi vektörleştir";
+"v51_notes_remove_old_guides" = "Eski kılavuz çizgilerini kaldır";
+"v51_temp_image_failed" = "Resim düzenlemeye açılamadı";
+"v51_temp_image_hint" = "Geçici tuvalde düzenliyorsun. Kaydet'e dokununca resim nota aktarılır ve bu tuval silinir; kaydetmeden çıkarsan değişiklikler atılır.";
+"v51_temp_image_name" = "Resim düzenleme (geçici)";
+"v51_temp_image_save" = "Kaydet ve nota aktar";
+"v51_temp_image_saved" = "Resim nota aktarıldı";
 "vector_cut" = "Kes";
 "vector_delete" = "Sil";
 "vector_edit_open" = "Vektör düzenle";

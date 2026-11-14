@@ -146,7 +146,7 @@ class V47PortraitMenuTest : V47MenuBase() {
 
     @Test
     fun simpleMenuAlwaysTwoRowsWithPanelButtons() {
-        openKind("Basit iki satır", CanvasKind.SIMPLE_NOTES)
+        openKind("Basit iki satır", CanvasKind.NOTES)
         waitFor { exists("simple_tool_row") }
         // v48 basit modun dikey ekranında üç menü (ekle, çiz, seç ve düzenle)
         for (m in listOf("simple_menu_add", "simple_menu_draw", "simple_menu_edit")) assertTrue(m, exists(m))

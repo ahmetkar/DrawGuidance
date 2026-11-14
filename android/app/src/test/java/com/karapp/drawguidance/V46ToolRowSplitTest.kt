@@ -168,7 +168,7 @@ class V46LandscapeSplitTest : V46SplitBase() {
     @Test
     fun simpleMenuSingleRowInLandscape() {
         // v47 basit modlarda yatayda tek satır (v48 gruplama yok)
-        openKind("Yatay basit", CanvasKind.SIMPLE_NOTES)
+        openKind("Yatay basit", CanvasKind.NOTES)
         waitFor { exists("simple_tool_row") }
         assertTrue(part("simple_tool_row_2") == null)
         assertGrouped("simple_tool_row")
@@ -214,10 +214,11 @@ class V46TutorialsTest : V32EditorBase() {
     @Test fun whatsNewIsV48Everywhere() {
         val s = com.karapp.drawguidance.ui.screens.canvasedit.tutorial.TutorialScripts
         // v48 eğitim sürümü: yenilikler artık yeni menü sistemini tanıtır
+        // v51 not alma tek mod (basit çizim altında): yenilikler basit menüler
         // v50 eğitim sürümü: çizim modlarında yenilikler "Resimden çizim", not türlerinde v48 menüleri
         assertEquals(50, s.VERSION)
-        for ((kind, id) in listOf(CanvasKind.ART to "v50_trace_art", CanvasKind.NOTES to "v48_advanced_notes", CanvasKind.COMIC to "v50_trace_comic",
-            CanvasKind.SIMPLE_ART to "v50_trace_simple_art", CanvasKind.SIMPLE_NOTES to "v48_simple_simple_notes", CanvasKind.KIDS to "v50_trace_kids")) {
+        for ((kind, id) in listOf(CanvasKind.ART to "v50_trace_art", CanvasKind.COMIC to "v50_trace_comic",
+            CanvasKind.SIMPLE_ART to "v50_trace_simple_art", CanvasKind.NOTES to "v48_simple_notes", CanvasKind.KIDS to "v50_trace_kids")) {
             assertEquals(id, s.whatsNew(kind)!!.id)
             assertTrue(s.groups(kind).any { it.id == id })
         }
@@ -255,7 +256,7 @@ class V46TutorialsTest : V32EditorBase() {
 
     @Test fun simpleArt() = play(CanvasKind.SIMPLE_ART, "simple_art_v46") { s -> assertTrue(s.any { it.shape?.kind == "HOUSE" }) }
 
-    @Test fun simpleNotes() = play(CanvasKind.SIMPLE_NOTES, "simple_notes_v46") { s ->
+    @Test fun simpleNotes() = play(CanvasKind.NOTES, "simple_notes_v46") { s ->
         val lever = s.first { it.shape?.kind == "lib.sci.phys.lever" }
         assertEquals("90", lever.shape!!.params!!["P"])
         assertEquals("3", lever.shape!!.params!!["b"])

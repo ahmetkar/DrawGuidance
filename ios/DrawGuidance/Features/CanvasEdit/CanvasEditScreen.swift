@@ -72,7 +72,16 @@ struct CanvasEditScreen: View {
         .navigationBarBackButtonHidden(true)
         .toolbar(.hidden, for: .navigationBar)
         .onAppear { if actions == nil { actions = vm.makeCanvasActions(ui) } }
-        .onDisappear { vm.close(); AdsCoordinator.shared.onCanvasClosed(vm.store.canvas?.kind) }
+        .onDisappear {
+            let temp = vm.isTempImageEdit
+            vm.close()
+            if !temp { AdsCoordinator.shared.onCanvasClosed(vm.store.canvas?.kind) }
+        }
+        // v51 notta resim düzenleme: geçici basit resim tuvali tam ekran açılır; kapanınca resim nota aktarılmış olur
+        .fullScreenCover(item: $vm.tempEditRequest) { doc in
+            NavigationStack { CanvasEditScreen(canvasLocalId: doc.id) }
+        }
+        .modifier(TempImageEditCloser(vm: vm))
         .sheet(isPresented: $brushPickerOpen) { brushPicker }
         .sheet(item: $sheet) { s in
             switch s {
@@ -168,6 +177,13 @@ private struct EditorTopBar: View {
                     .accessibilityIdentifier("editor_back")
                 Text(store.canvas?.name ?? "").font(.headline).lineLimit(1)
                 Spacer()
+                if vm.isTempImageEdit {
+                    // v51 geçici resim tuvali: Kaydet resmi nota aktarır ve tuvali siler
+                    Button { vm.commitTempImage() } label: { Label(L("v51_temp_image_save"), systemImage: "checkmark.circle.fill") }
+                        .font(.subheadline.weight(.semibold))
+                        .buttonStyle(.borderedProminent)
+                        .accessibilityIdentifier("temp_image_save")
+                }
                 if !vm.tutorial.groups(store.canvas?.kind ?? .ART).isEmpty {
                     Button { vm.tutorial.openOffer() } label: { Image(systemName: "graduationcap") }
                         .accessibilityLabel(L("tut_menu")).accessibilityIdentifier("tutorial_menu").tutorialAnchor(TutorialAnchor.MORE)
@@ -284,4 +300,20 @@ private struct TutorialOfferHost: View {
 enum EditorSheet: String, Identifiable {
     case elements, layers, save, guide, background
     var id: String { rawValue }
+}
+
+/// v51 geçici resim tuvali: kaydedilince (resim nota aktarılır) ya da bırakılınca ekran kapanır; açılışta ne olduğu söylenir.
+private struct TempImageEditCloser: ViewModifier {
+    @ObservedObject var vm: EditorViewModel
+    @Environment(\.dismiss) private var dismiss
+
+    func body(content: Content) -> some View {
+        if vm.isTempImageEdit {
+            content
+                .onChange(of: vm.tempClosed) { _, closed in if closed { dismiss() } }
+                .onAppear { vm.emit(.message(L("v51_temp_image_hint"))) }
+        } else {
+            content
+        }
+    }
 }

@@ -215,7 +215,7 @@ class V40HoldToMoveTest : V33EditorBase() {
     @Test fun notes() = holdMovesElement(CanvasKind.NOTES)
     @Test fun comic() = holdMovesElement(CanvasKind.COMIC)
     @Test fun simpleArt() = holdMovesElement(CanvasKind.SIMPLE_ART)
-    @Test fun simpleNotes() = holdMovesElement(CanvasKind.SIMPLE_NOTES)
+    @Test fun simpleNotes() = holdMovesElement(CanvasKind.NOTES)
     @Test fun kids() = holdMovesElement(CanvasKind.KIDS)
 
     @Test
@@ -311,7 +311,7 @@ class V40SimpleEditorTest : V33EditorBase() {
 
     @Test
     fun simpleNotesKeepsItsRow() {
-        open("Basit not", CanvasKind.SIMPLE_NOTES)
+        open("Basit not", CanvasKind.NOTES)
         waitFor { exists("simple_tool_select") }
         assertFalse(exists("simple_tool_move"))
     }

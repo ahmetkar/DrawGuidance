@@ -737,10 +737,10 @@ class V45SimpleNotesCatalogTest {
 
     @Test
     fun simpleNotesHasNoCatalogFilters() {
-        assertNull(SimpleCatalog.diagrams(CanvasKind.SIMPLE_NOTES))
-        assertNull(SimpleCatalog.formulas(CanvasKind.SIMPLE_NOTES))
-        assertNull(SimpleCatalog.models3d(CanvasKind.SIMPLE_NOTES))
-        assertEquals(SimpleCatalog.diagrams(CanvasKind.NOTES), SimpleCatalog.diagrams(CanvasKind.SIMPLE_NOTES))
+        assertNull(SimpleCatalog.diagrams(CanvasKind.NOTES))
+        assertNull(SimpleCatalog.formulas(CanvasKind.NOTES))
+        assertNull(SimpleCatalog.models3d(CanvasKind.NOTES))
+        assertEquals(SimpleCatalog.diagrams(CanvasKind.NOTES), SimpleCatalog.diagrams(CanvasKind.NOTES))
         // Öteki basit türler eskisi gibi süzgeçli
         assertEquals(10, SimpleCatalog.diagrams(CanvasKind.SIMPLE_ART)!!.size)
         assertEquals(10, SimpleCatalog.diagrams(CanvasKind.KIDS)!!.size)

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- v51 tek not alma modu (gelişmiş ve basit not alma birleşti) ve geçici tuvalde resim düzenleme -->
+<resources>
+    <string name="v51_notes_remove_old_guides">移除旧的参考线</string>
+    <string name="v51_temp_image_name">图片编辑（临时）</string>
+    <string name="v51_temp_image_hint">你正在临时画布上编辑。点按保存会把图片放回笔记并删除此画布；不保存就离开会放弃更改。</string>
+    <string name="v51_temp_image_saved">图片已放回笔记</string>
+    <string name="v51_temp_image_failed">无法打开图片进行编辑</string>
+    <string name="v51_temp_image_save">保存到笔记</string>
+</resources>

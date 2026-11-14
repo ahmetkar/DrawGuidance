@@ -24,6 +24,8 @@ class CanvasRepository(
     private val decoded = java.util.concurrent.ConcurrentHashMap<String, Pair<Pair<Long, Int>, ContentCodec.Document>>()
 
     fun observeCanvases(): Flow<List<CanvasUi>> = dao.observeAll()
+        // v51 not almanın geçici resim düzenleme tuvalleri listelerde görünmez
+        .map { list -> if (com.karapp.drawguidance.data.notes.TempCanvases.isEmpty()) list else list.filterNot { com.karapp.drawguidance.data.notes.TempCanvases.isTemp(it.localId) } }
         .map { list ->
             val ids = list.mapTo(HashSet()) { it.localId }
             decoded.keys.retainAll(ids)
@@ -53,6 +55,8 @@ class CanvasRepository(
          * ve tuval kapaktan sonraki ilk sayfada açılır. null: kapaksız (eski davranış).
          */
         cover: List<Stroke>? = null,
+        /** v51 verilirse tuvalin kimliği (geçici resim düzenleme tuvali önce kaydedilip sonra oluşturulur). */
+        localId: String? = null,
     ): CanvasUi {
         val now = System.currentTimeMillis()
         // v33 başlangıç sayfa sayısı tuval türünün sınırını aşmaz (v45 kapak da sayfa sayılır)
@@ -63,7 +67,7 @@ class CanvasRepository(
             else -> ContentCodec.encodePages(List(pages) { emptyList() })
         }
         val entity = CanvasEntity(
-            localId = UUID.randomUUID().toString(),
+            localId = localId ?: UUID.randomUUID().toString(),
             name = name,
             width = width,
             height = height,

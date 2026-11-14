@@ -287,7 +287,7 @@ enum TutorialV46 {
     // MARK: - Basit not
 
     static let simpleNotes = TutorialGroup(
-        id: "simple_notes_v46", kind: .SIMPLE_NOTES, title: "v46_tut_simple", summary: "v46_tut_simple_notes_text", icon: "star.circle", ai: false,
+        id: "simple_notes_v46", kind: .NOTES, title: "v46_tut_simple", summary: "v46_tut_simple_notes_text", icon: "star.circle", ai: false,
         steps: [
             TutorialStep(TutorialAnchor.simple("panels"), "v46_tut_panels", "v46_tut_panels_text") { d in
                 await d.tapAnchor(TutorialAnchor.simple("panels"))

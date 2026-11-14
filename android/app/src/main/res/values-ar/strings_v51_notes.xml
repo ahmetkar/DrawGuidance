@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- v51 tek not alma modu (gelişmiş ve basit not alma birleşti) ve geçici tuvalde resim düzenleme -->
+<resources>
+    <string name="v51_notes_remove_old_guides">إزالة خطوط الإرشاد القديمة</string>
+    <string name="v51_temp_image_name">تحرير الصورة (مؤقت)</string>
+    <string name="v51_temp_image_hint">أنت تحرر على لوحة مؤقتة. اضغط حفظ لإعادة الصورة إلى ملاحظتك وحذف هذه اللوحة؛ الخروج دون حفظ يلغي التغييرات.</string>
+    <string name="v51_temp_image_saved">أُعيدت الصورة إلى الملاحظة</string>
+    <string name="v51_temp_image_failed">تعذر فتح الصورة للتحرير</string>
+    <string name="v51_temp_image_save">حفظ في الملاحظة</string>
+</resources>

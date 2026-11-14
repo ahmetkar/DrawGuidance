@@ -218,7 +218,13 @@ class ShapeController(
     /** Eski API: bağla aracı kalktı (her zaman null). */
     val connectFrom: StateFlow<Offset?> = MutableStateFlow<Offset?>(null).asStateFlow()
 
+    /** v51 not almada vektör (nokta ve çizgi) düzenleme yok: yalnız değerler, grafik ve alan boyama araçları. */
+    private val vectorEditAllowed: Boolean get() = store.canvas.value?.kind?.isNotes != true
+
+    private fun isVectorTool(tool: ShapeTool): Boolean = tool.nodeFamily || tool == ShapeTool.LINES
+
     fun selectTool(value: ShapeTool) {
+        if (!vectorEditAllowed && isVectorTool(value)) return
         _tool.value = value
         // Çizgi çizme her araç değişiminde baştan başlar; çizgi seçimi yalnız Çizgiler aracında, nokta seçimi nokta araçlarında
         val v = _vector.value
@@ -240,11 +246,14 @@ class ShapeController(
     fun editSelected() {
         val shape = store.selectedStroke { it.shape != null } ?: return
         paramShapes.clearError()
-        _tool.value = when {
+        val tool = when {
             shape.shape?.let { com.karapp.drawguidance.ui.drawing.ShapeRegistry.isGraph(it.kind) && it.graph != null } == true -> ShapeTool.GRAPH
             paramShapes.model(shape) != null -> ShapeTool.PARAMS
             else -> ShapeTool.NODES
         }
+        // v51 not almada düz şekiller vektör düzenlemeye açılmaz (değerli şekiller ve grafikler açılır)
+        if (!vectorEditAllowed && isVectorTool(tool)) return
+        _tool.value = tool
         setSelection(VectorSelection(), shape)
         // Düzenlenirken yalnızca bu şekil seçili (önceki seçim kalkar); bitince İncele moduna geçilir
         host.startAction(EditMode.SHAPE_EDIT, setOf(shape.id))

@@ -4,6 +4,9 @@ import Foundation
 /// v43 tuval üstü seçme araçları (Android `CanvasPick`).
 enum CanvasPick { case NONE, EYEDROPPER, RECT_SELECT, LASSO_SELECT }
 
+/// v51 notta açılan geçici resim tuvali (tam ekran pencere öğesi).
+struct TempEditDoc: Identifiable, Equatable { let id: String }
+
 /// Birleşik kaydetme penceresinin sekmeleri.
 enum SaveTab { case IMAGE, PDF, CBZ }
 
@@ -36,6 +39,15 @@ final class EditorViewModel: ObservableObject, EditorHost {
     @Published private(set) var saveTab: SaveTab?
     @Published private(set) var lastAddItem: String?
     @Published private(set) var loaded = false
+    /// v51 bu tuval nottaki bir resmin geçici düzenleme tuvali mi (otomatik kayıt kapalı; Kaydet resmi nota aktarır).
+    let tempSession: TempCanvases.Session?
+    var isTempImageEdit: Bool { tempSession != nil }
+    /// v51 geçici tuval kaydedildi ya da bırakıldı: ekran kapanır.
+    @Published private(set) var tempClosed = false
+    /// v51 notta açılacak geçici resim tuvali.
+    @Published var tempEditRequest: TempEditDoc?
+    private var tempFinished = false
+    private var appliedTempResults = Set<String>()
     /// Ekranın gösterdiği bildirimler.
     let events = PassthroughSubject<EditEvent, Never>()
 
@@ -114,6 +126,7 @@ final class EditorViewModel: ObservableObject, EditorHost {
         self.canvasLocalId = canvasLocalId
         self.deps = deps
         canvasPrefs = deps.prefs.canvas(canvasLocalId)
+        tempSession = TempCanvases.session(canvasLocalId)
         lastAddItem = canvasPrefs.lastAddItem
         store = EditorStore(saveQueue: deps.canvases.saveQueue, canvasLocalId: canvasLocalId)
         build()
@@ -171,8 +184,14 @@ final class EditorViewModel: ObservableObject, EditorHost {
             commit: { [unowned self] region, points, size, color in shapes.commitBrush(region, points, sizePx: size, colorHex: color) })
         deps.shapeDb.warmUp()
         brush = BrushController(store, self, palette: deps.palette, onDrawingWidth: { [unowned self] in shapes.setDrawingWidth($0) }, prefs: canvasPrefs)
-        store.autosave = prefs.autosave
-        prefs.$autosave.sink { [weak self] in self?.store.autosave = $0 }.store(in: &bag)
+        if tempSession != nil {
+            // v51 geçici resim tuvalinde otomatik kayıt hep kapalı
+            store.autosave = false
+            TempCanvases.setActive(canvasLocalId, true)
+        } else {
+            store.autosave = prefs.autosave
+            prefs.$autosave.sink { [weak self] in self?.store.autosave = $0 }.store(in: &bag)
+        }
         store.$selectedIds.sink { [weak self] ids in
             guard let self else { return }
             formulas.onSelectionChanged(ids)
@@ -191,10 +210,12 @@ final class EditorViewModel: ObservableObject, EditorHost {
         let repo = deps.canvases
         await Task.detached { [queue = repo.saveQueue] in queue.flushNow() }.value
         guard var c = repo.getCanvas(canvasLocalId) else { store.load(nil); loaded = true; return }
-        deps.recent.opened(canvasLocalId)
+        if tempSession == nil { deps.recent.opened(canvasLocalId) }
         deps.assets.ensureLoaded(c)
+        // v51 geçici tuvalden gelip henüz nota aktarılmamış resimler de korunur
         deps.assets.prune(canvasLocalId, c.pages.flatMap { $0 },
-                          keep: Set([c.background.assetId].compactMap { $0 } + c.pageBackgrounds.compactMap { $0?.spec?.assetId }))
+                          keep: Set([c.background.assetId].compactMap { $0 } + c.pageBackgrounds.compactMap { $0?.spec?.assetId }
+                                    + TempCanvases.pendingAssetIds(canvasLocalId)))
         brush.adaptTo(c.kind)
         modeTemplates?.warm()
         brush.restore(c.kind, canvasPrefs.lastBrush.flatMap(BrushType.init(rawValue:)), canvasPrefs.lastColor)
@@ -213,11 +234,67 @@ final class EditorViewModel: ObservableObject, EditorHost {
         store.load(c)
         store.indexNow()
         loaded = true
+        // v51 notta: geçici tuvalde düzenlenen resimler nota aktarılır, açık kalmamış geçici tuvaller silinir
+        if c.kind.isNotes && tempSession == nil {
+            TempCanvases.results.sink { [weak self] r in
+                guard let self, r.sourceId == canvasLocalId else { return }
+                applyTempResult(r)
+            }.store(in: &bag)
+            TempCanvases.pending(for: canvasLocalId).forEach { applyTempResult($0) }
+            TempImageEditor.cleanup(sourceId: canvasLocalId, deps: deps)
+        }
         await drawing.cleanOnOpen(c)
+    }
+
+    /// v51 notta seçili resim geçici basit resim tuvalinde düzenlenir (not almada resim düzenleme araçları yok).
+    func editImageElsewhere(_ image: Stroke) -> Bool {
+        guard let c = store.canvas, c.kind.isNotes, tempSession == nil else { return false }
+        texts.commitOpenDraft()
+        store.saveNow()
+        if let id = TempImageEditor.start(sourceId: canvasLocalId, image: image, deps: deps) {
+            tempEditRequest = TempEditDoc(id: id)
+        } else {
+            emit(.message(L("v51_temp_image_failed")))
+        }
+        return true
+    }
+
+    /// v51 geçici tuvalde düzenlenen resim nottaki resmin yerine geçer (tek geri alma adımı).
+    private func applyTempResult(_ r: TempCanvases.Result) {
+        guard appliedTempResults.insert(r.tempId).inserted, var c = store.canvas else { return }
+        guard let page = c.pages.firstIndex(where: { $0.contains { $0.id == r.strokeId } }) else { TempCanvases.consumed(r); return }
+        if page != c.currentPage {
+            store.showPage(page)
+            guard let shown = store.canvas else { return }
+            c = shown
+        }
+        if !CanvasImageCache.contains(r.assetId), let data = deps.assets.bytes(r.assetId), let img = CanvasImageCache.decode(data) {
+            CanvasImageCache.put(r.assetId, img)
+        }
+        store.commit(c.strokes.map { $0.id == r.strokeId ? TempImageGeometry.replace($0, r) : $0 })
+        TempCanvases.consumed(r)
+        emit(.message(L("v51_temp_image_saved")))
+    }
+
+    /// v51 geçici tuvali kaydeder: resim nota aktarılır, geçici tuval silinir, ekran kapanır.
+    func commitTempImage() {
+        guard tempSession != nil, !tempFinished, let c = store.canvas else { return }
+        texts.commitOpenDraft()
+        tempFinished = true
+        TempImageEditor.commit(canvasLocalId, canvas: store.canvas ?? c, deps: deps)
+        tempClosed = true
     }
 
     /// Ekran kapanırken: bekleyen kayıt yazılır, eğitim yarıda kaldıysa geri alınır.
     func close() {
+        // v51 geçici resim tuvali kaydedilmeden kapanırsa silinir (hiç yazılmaz)
+        if tempSession != nil {
+            imageEdit.cancelTrace()
+            if !tempFinished { tempFinished = true; TempImageEditor.discard(canvasLocalId, deps: deps) }
+            TempCanvases.setActive(canvasLocalId, false)
+            tempClosed = true
+            return
+        }
         imageEdit.cancelTrace()
         texts.commitOpenDraft()
         store.saveNow()
@@ -292,7 +369,7 @@ final class EditorViewModel: ObservableObject, EditorHost {
 
     /// v37 basit çizimde kağıdın kenarına basılı tutunca genişletme modu.
     func holdPaperEdge() -> Bool {
-        guard let kind = store.canvas?.kind, kind.simple, kind != .SIMPLE_NOTES else { return false }
+        guard let kind = store.canvas?.kind, kind.simple, !kind.isNotes else { return false }
         chooseMode(.EXPAND)
         return true
     }
@@ -704,12 +781,15 @@ final class EditorViewModel: ObservableObject, EditorHost {
     }
 
     func saveNow() {
+        // v51 geçici resim tuvalinde Kaydet resmi nota aktarır
+        if tempSession != nil { commitTempImage(); return }
         texts.commitOpenDraft()
         store.saveNow()
         emit(.saved)
     }
 
     func saveBeforeLeaving() {
+        if tempSession != nil { return }
         texts.commitOpenDraft()
         store.saveNow()
     }

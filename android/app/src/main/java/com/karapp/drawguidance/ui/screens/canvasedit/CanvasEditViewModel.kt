@@ -278,6 +278,8 @@ sealed interface EditEvent {
     data object LayerLocked : EditEvent
     /** Kaydedildi (otomatik kayıt kapalıyken Kaydet). */
     data object Saved : EditEvent
+    /** v51 geçici tuvalde düzenlenen resim nota aktarıldı. */
+    data object TempImageApplied : EditEvent
     /** v17 Alan boya: dokunulan yer çizgilerle çevrili kapalı bir alan değil. */
     data object RegionOpen : EditEvent
     /** v17: seçili çizim için düzeltme bulunamadı. */
@@ -351,10 +353,28 @@ class CanvasEditViewModel(
     private val recent: com.karapp.drawguidance.data.settings.RecentCanvasStore? = null,
     /** v32 eğitim modu: ilk girişte öneri ve tamamlanan araç grupları. */
     private val tutorialPrefs: com.karapp.drawguidance.data.settings.TutorialPrefs? = null,
+    /** v51 not almada resim düzenleme: geçici basit resim tuvali. */
+    private val tempImages: com.karapp.drawguidance.data.notes.TempImageEditor? = null,
 ) : ViewModel(), EditorHost {
 
     /** v29 bu tuvalin kendi son ayarları (renk, fırça, yazı biçimi, şekil dolgusu, Ekle menüsü). */
     private val canvasPrefs = prefs.canvas(canvasLocalId)
+
+    // --- v51 geçici resim düzenleme tuvali (not almadan açılır; otomatik kayıt kapalı, Kaydet nota aktarır) ---
+
+    private val tempSession = com.karapp.drawguidance.data.notes.TempCanvases.session(canvasLocalId)
+    /** Bu tuval nottaki bir resmin geçici düzenleme tuvali mi. */
+    val isTempImageEdit: Boolean get() = tempSession != null
+    private val tempAutosaveOff: StateFlow<Boolean> = MutableStateFlow(false).asStateFlow()
+    private var tempFinished = false
+    private val _tempClosed = MutableStateFlow(false)
+    /** Geçici tuval kaydedildi ya da bırakıldı: düzenleyici kapanır. */
+    val tempClosed: StateFlow<Boolean> = _tempClosed.asStateFlow()
+    private val _tempCanvasRequest = MutableStateFlow<String?>(null)
+    /** Notta açılacak geçici resim tuvali ("": açılamadı). */
+    val tempCanvasRequest: StateFlow<String?> = _tempCanvasRequest.asStateFlow()
+    fun consumeTempCanvasRequest() { _tempCanvasRequest.value = null }
+    private val appliedTempResults = HashSet<String>()
 
     // --- Mod, panel ve olaylar ---
 
@@ -469,9 +489,15 @@ class CanvasEditViewModel(
         // v21: şekil veritabanı arka planda hazırlanır (ilk açılışta şablonlar yazılır)
         shapeDb?.warmUp()
         brush = BrushController(store, this, paletteStore, shapes::setDrawingWidth, canvasPrefs)
-        store.autosave = prefs.autosave.value
-        viewModelScope.launch {
-            prefs.autosave.collect { store.autosave = it }
+        if (tempSession != null) {
+            // v51 geçici resim tuvalinde otomatik kayıt hep kapalı (Kaydet düzenlenen resmi nota aktarır)
+            store.autosave = false
+            com.karapp.drawguidance.data.notes.TempCanvases.setActive(canvasLocalId, true)
+        } else {
+            store.autosave = prefs.autosave.value
+            viewModelScope.launch {
+                prefs.autosave.collect { store.autosave = it }
+            }
         }
         // Düzenlenen formül seçimden çıkınca formül üstündeki yazı alanı kapanır
         viewModelScope.launch {
@@ -483,10 +509,15 @@ class CanvasEditViewModel(
             withContext(Dispatchers.Default) { saveQueue.awaitIdle() }
             val loaded = repository.getCanvas(canvasLocalId)
             if (loaded != null) {
-                runCatching { recent?.opened(canvasLocalId) }
+                if (tempSession == null) runCatching { recent?.opened(canvasLocalId) }
                 assetStore.ensureLoaded(loaded)
-                // Önceki oturumlarda silinmiş resimlerin verisi yer kaplamasın (arka plan resmi korunur)
-                assetStore.prune(canvasLocalId, loaded.pages.flatten(), listOfNotNull(loaded.background.assetId) + loaded.pageBackgrounds.mapNotNull { it?.spec?.assetId })
+                // Önceki oturumlarda silinmiş resimlerin verisi yer kaplamasın (arka plan resmi korunur; v51 geçici
+                // tuvalden gelip henüz nota aktarılmamış resimler de korunur)
+                assetStore.prune(
+                    canvasLocalId, loaded.pages.flatten(),
+                    listOfNotNull(loaded.background.assetId) + loaded.pageBackgrounds.mapNotNull { it?.spec?.assetId } +
+                        com.karapp.drawguidance.data.notes.TempCanvases.pendingAssetIds(canvasLocalId),
+                )
                 brush.adaptTo(loaded.kind)
                 // v29 bu tuvalin modunun tahmin modeli arka planda hazırlanır
                 (modeTemplates as? com.karapp.drawguidance.data.repository.ModeTemplateSource)?.warm()
@@ -516,10 +547,72 @@ class CanvasEditViewModel(
             // v32 bu türe ilk girişte eğitim önerilir
             fitted?.let { tutorialOrNull?.maybeOffer(it.kind) }
             if (fitted != null) drawing.cleanOnOpen(fitted)
+            // v51 notta: geçici tuvalde düzenlenen resimler nota aktarılır, açık kalmamış geçici tuvaller silinir
+            if (fitted != null && fitted.kind.isNotes && tempSession == null && tempImages != null) {
+                viewModelScope.launch {
+                    com.karapp.drawguidance.data.notes.TempCanvases.resultFlow.collect { if (it.sourceId == canvasLocalId) applyTempResult(it) }
+                }
+                com.karapp.drawguidance.data.notes.TempCanvases.pendingFor(canvasLocalId).forEach { applyTempResult(it) }
+                tempImages.cleanup(sourceId = canvasLocalId)
+            }
         }
     }
 
+    /** v51 notta seçili resim geçici basit resim tuvalinde düzenlenir (not almada resim düzenleme araçları yok). */
+    override fun editImageElsewhere(image: Stroke): Boolean {
+        val c = store.canvas.value ?: return false
+        val editor = tempImages ?: return false
+        if (!c.kind.isNotes || tempSession != null) return false
+        viewModelScope.launch {
+            // Not önce yazılır (düzenleyiciye dönülünce eski içerik yüklenmesin)
+            if (store.autosave) saveQueue.flushNow()
+            _tempCanvasRequest.value = editor.start(canvasLocalId, image) ?: ""
+        }
+        return true
+    }
+
+    /** v51 geçici tuvalde düzenlenen resim nottaki resmin yerine geçer (tek geri alma adımı). */
+    private fun applyTempResult(result: com.karapp.drawguidance.data.notes.TempCanvases.Result) {
+        if (!appliedTempResults.add(result.tempId)) return
+        viewModelScope.launch {
+            var c = store.canvas.value ?: return@launch
+            val page = c.pages.indexOfFirst { p -> p.any { it.id == result.strokeId } }
+            if (page < 0) {
+                com.karapp.drawguidance.data.notes.TempCanvases.consumed(result)
+                return@launch
+            }
+            if (page != c.currentPage) {
+                store.showPage(page)
+                c = store.canvas.value ?: return@launch
+            }
+            assetStore.ensureLoaded(emptyList(), listOf(result.assetId))
+            store.commit(c.strokes.map { if (it.id == result.strokeId) com.karapp.drawguidance.data.notes.TempImageGeometry.replace(it, result) else it })
+            com.karapp.drawguidance.data.notes.TempCanvases.consumed(result)
+            emit(EditEvent.TempImageApplied)
+        }
+    }
+
+    /** v51 geçici tuvali kaydeder: resim nota aktarılır, geçici tuval silinir, düzenleyici kapanır. */
+    private fun commitTempImage() {
+        val c = store.canvas.value ?: return
+        if (tempFinished) return
+        tempFinished = true
+        tempImages?.commit(canvasLocalId, c)
+        _tempClosed.value = true
+    }
+
+    /** v51 geçici tuvalden çıkılıyor: kaydedilmediyse geçici tuval silinir. */
+    fun closeTempImage() {
+        if (tempSession == null) return
+        if (!tempFinished) {
+            tempFinished = true
+            tempImages?.discard(canvasLocalId)
+        }
+        _tempClosed.value = true
+    }
+
     override fun onCleared() {
+        if (tempSession != null) com.karapp.drawguidance.data.notes.TempCanvases.setActive(canvasLocalId, false)
         // v32 eğitim yarıda kaldıysa tuval eğitimden önceki haline döner (eğitim hiç kaydedilmez)
         if (tutorial.active) tutorial.cancel()
         // Ekran kapanırken bekleyen kayıt beklemeden yazılır
@@ -638,7 +731,7 @@ class CanvasEditViewModel(
     /** v37 basit çizimde (basit not dışında) kağıdın kenarına basılı tutunca genişletme modu açılır. */
     fun holdPaperEdge(): Boolean {
         val kind = canvas.value?.kind ?: return false
-        if (!kind.simple || kind == com.karapp.drawguidance.data.model.CanvasKind.SIMPLE_NOTES) return false
+        if (!kind.simple || kind.isNotes) return false
         chooseMode(EditMode.EXPAND)
         return true
     }
@@ -1517,10 +1610,10 @@ class CanvasEditViewModel(
     // --- Kaydetme ---
 
     /** Otomatik kayıt açık mı (kapalıysa üst menüde Kaydet düğmesi görünür). */
-    val autosave: StateFlow<Boolean> get() = prefs.autosave
+    val autosave: StateFlow<Boolean> get() = if (tempSession != null) tempAutosaveOff else prefs.autosave
     /** Kaydedilmemiş değişiklik var mı (otomatik kayıt kapalıyken). */
     val dirty: StateFlow<Boolean> get() = store.dirty
-    fun setAutosave(value: Boolean) = prefs.setAutosave(value)
+    fun setAutosave(value: Boolean) { if (tempSession == null) prefs.setAutosave(value) }
 
     /** v20 çizim düzeltme önerileri açık mı. */
     val suggestions: StateFlow<Boolean> get() = prefs.handwriting
@@ -1585,6 +1678,8 @@ class CanvasEditViewModel(
     }
     fun saveNow() {
         texts.commitOpenDraft()
+        // v51 geçici resim tuvalinde Kaydet resmi nota aktarır
+        if (tempSession != null) { commitTempImage(); return }
         store.saveNow()
         emit(EditEvent.Saved)
     }

@@ -50,7 +50,7 @@ class V33SimpleCatalogTest {
 
         // v45 basit not, gelişmiş not almanın bütün kategorilerini birebir sunar (v34'teki 42 şekillik üç kategori kalktı;
         // ayrıntılı karşılaştırma V45SimpleNotesCatalogTest'te); v42 basit resimde genel şekiller (akış şeması yok)
-        ShapeRegistry.categories(CanvasKind.SIMPLE_NOTES).let { cats ->
+        ShapeRegistry.categories(CanvasKind.NOTES).let { cats ->
             val notes = ShapeRegistry.categories(CanvasKind.NOTES)
             assertEquals(notes.map { it.id }, cats.map { it.id })
             val items = cats.flatMap { it.items }
@@ -86,8 +86,8 @@ class V33SimpleCatalogTest {
             assertTrue(models.all { id -> Catalog3D.all.any { it.id == id } })
             assertEquals(SimpleCatalog.diagrams, SimpleCatalog.diagrams(k))
         }
-        assertEquals(null, SimpleCatalog.models3d(CanvasKind.SIMPLE_NOTES))
-        assertEquals(null, SimpleCatalog.diagrams(CanvasKind.SIMPLE_NOTES))
+        assertEquals(null, SimpleCatalog.models3d(CanvasKind.NOTES))
+        assertEquals(null, SimpleCatalog.diagrams(CanvasKind.NOTES))
         assertEquals(10, SimpleCatalog.legacyNoteModels.toSet().size)
         assertTrue(SimpleCatalog.legacyNoteModels.all { id -> Catalog3D.all.any { it.id == id } })
         assertEquals(null, SimpleCatalog.models3d(CanvasKind.ART))
@@ -187,7 +187,7 @@ class V33SimpleModeTest : V33EditorBase() {
 
     @Test
     fun simpleNotesHasDiagramAndFormula() {
-        openKind("Basit not", CanvasKind.SIMPLE_NOTES)
+        openKind("Basit not", CanvasKind.NOTES)
         assertTrue(exists("simple_tool_diagram") && exists("simple_tool_formula"))
         compose.onNodeWithTag("simple_tool_formula").performScrollTo().performClick()
         waitFor { exists("formula_picker") }
@@ -197,13 +197,13 @@ class V33SimpleModeTest : V33EditorBase() {
         assertTrue(FormulaCatalog.categories.size > 1)
         compose.onAllNodesWithText(calc.title)[0].performScrollTo().performClick()
         waitForText("Türev tanımı")
-        assertNull(SimpleCatalog.formulas(CanvasKind.SIMPLE_NOTES))
+        assertNull(SimpleCatalog.formulas(CanvasKind.NOTES))
     }
 
     /** v35 basit menüde aynı anda tek araç seçili; seçilenin simgesinin yanında adı yazar; öteki pencere kapanır. */
     @Test
     fun onlyOneSimpleToolSelected() {
-        openKind("Tek seçim", CanvasKind.SIMPLE_NOTES)
+        openKind("Tek seçim", CanvasKind.NOTES)
         val ids = listOf("brush", "eraser", "shape", "formula", "diagram", "background", "image", "text", "model3d", "paint", "elements", "select")
         fun selectedIds() = ids.filter { id ->
             compose.onAllNodes(hasTestTag("simple_tool_$id")).fetchSemanticsNodes().firstOrNull()
@@ -242,7 +242,8 @@ class V33HomeChooserTest : V30EditorBase() {
         // Basit çizim: üç alt mod
         compose.onNodeWithTag("home_new_simple").performScrollTo().performClick()
         waitFor { exists("new_kind_KIDS") }
-        assertTrue(exists("new_kind_SIMPLE_ART") && exists("new_kind_SIMPLE_NOTES"))
+        assertTrue(exists("new_kind_SIMPLE_ART") && exists("new_kind_NOTES"))
+        assertFalse(exists("new_kind_SIMPLE_NOTES"))
         assertFalse(exists("new_kind_ART") || exists("new_kind_3D"))
         compose.onNodeWithTag("new_kind_KIDS").performScrollTo().performClick()
         waitForText("Yeni Tuval Oluştur")
@@ -258,7 +259,7 @@ class V33HomeChooserTest : V30EditorBase() {
         // Gelişmiş çizim: resim, not, çizgi roman ve 3B şekil oluşturma
         compose.onNodeWithTag("home_new_advanced").performScrollTo().performClick()
         waitFor { exists("new_kind_3D") }
-        assertTrue(exists("new_kind_ART") && exists("new_kind_NOTES") && exists("new_kind_COMIC"))
+        assertTrue(exists("new_kind_ART") && exists("new_kind_COMIC") && !exists("new_kind_NOTES"))
         // v34 ayrı pencere yok: liste ana sayfanın içinde; aynı düğmeye yeniden dokununca kapanır
         assertFalse(exists("new_drawing_sheet"))
         assertTrue(exists("new_drawing_list") && exists("home_screen"))

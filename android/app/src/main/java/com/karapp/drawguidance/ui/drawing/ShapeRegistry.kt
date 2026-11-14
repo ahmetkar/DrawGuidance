@@ -277,7 +277,7 @@ object ShapeRegistry {
     fun categories(kind: CanvasKind): List<PickerCategory> {
         // v45 basit not alma gelişmiş not almanın bütün şekillerini, grafiklerini, eğrilerini ve fen/bilim şekillerini sunar
         // (v33–v44'teki 42 şekillik üç kategori kalktı); kategoriler ve kimlikler birebir aynıdır.
-        if (kind == CanvasKind.SIMPLE_NOTES) return categories(CanvasKind.NOTES)
+        if (kind == CanvasKind.SIMPLE_NOTES) return categories(CanvasKind.NOTES) // v51 eski kayıt adı
         val out = ArrayList<PickerCategory>()
         val basicSection = "Temel"
         ShapeCategory.forKind(kind).forEach { cat ->

@@ -347,7 +347,7 @@
 "canvas_kind_kids_hint" = "86 kids' shapes · cartoon characters · tap to color";
 "canvas_kind_label" = "Canvas type";
 "canvas_kind_notes" = "Study / Notes";
-"canvas_kind_notes_hint" = "Note pens · math and geometry shapes";
+"canvas_kind_notes_hint" = "Single menu · note pens · all shapes, diagrams and formulas · pages";
 "canvas_kind_simple_art" = "Simple art";
 "canvas_kind_simple_art_hint" = "One menu · 3 brush groups · 42 shapes (basic, nature, objects)";
 "canvas_kind_simple_notes" = "Simple note-taking";
@@ -3006,6 +3006,12 @@
 "v50_tut_types_t" = "Three types, fine tuning";
 "v50_tut_vec_b" = "Select the image and tap \"Auto-vectorize\" under Edit. Its edges become vector lines with editable points.";
 "v50_tut_vec_t" = "Vectorize the image";
+"v51_notes_remove_old_guides" = "Remove old guide lines";
+"v51_temp_image_failed" = "Could not open the image for editing";
+"v51_temp_image_hint" = "You are editing on a temporary canvas. Tap Save to put the image back into your note and delete this canvas; leaving without saving discards the changes.";
+"v51_temp_image_name" = "Image editing (temporary)";
+"v51_temp_image_save" = "Save to note";
+"v51_temp_image_saved" = "Image added back to your note";
 "vector_cut" = "Cut";
 "vector_delete" = "Delete";
 "vector_edit_open" = "Edit vector";

@@ -12,7 +12,7 @@ struct TemplateEntry: Codable, Equatable, Identifiable {
     var width = 0
     var height = 0
 
-    var canvasKind: CanvasKind? { CanvasKind(rawValue: kind) }
+    var canvasKind: CanvasKind? { CanvasKind(rawValue: kind).map { CanvasKind.parse($0.rawValue) } }
 
     init(from decoder: Decoder) throws {
         let c = try decoder.container(keyedBy: CodingKeys.self)
@@ -72,7 +72,7 @@ enum CanvasTemplates {
     static let DIR = "templates"
     static let CATALOG = "\(DIR)/catalog.json"
     /// Şablonu olan tuval türleri (v47 basit not almada da).
-    static let KINDS: Set<CanvasKind> = [.COMIC, .NOTES, .SIMPLE_NOTES]
+    static let KINDS: Set<CanvasKind> = [.COMIC, .NOTES]
 
     private final class Marker {}
 
@@ -96,7 +96,8 @@ enum CanvasTemplates {
 
     static func reset() { loaded = nil }
 
-    static func forKind(_ kind: CanvasKind) -> [TemplateEntry] { catalog.filter { $0.kind == kind.rawValue } }
+    /// v51 eski basit not şablonları ("SIMPLE_NOTES") tek not alma modunda listelenir.
+    static func forKind(_ kind: CanvasKind) -> [TemplateEntry] { catalog.filter { CanvasKind.parse($0.kind) == kind } }
     static func find(_ id: String) -> TemplateEntry? { catalog.first { $0.id == id } }
 
     static func name(_ e: TemplateEntry, _ lang: String = I18n.language) -> String { e.names[lang] ?? e.names["en"] ?? e.names["tr"] ?? e.id }

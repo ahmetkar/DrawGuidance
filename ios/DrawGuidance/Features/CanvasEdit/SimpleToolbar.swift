@@ -21,7 +21,7 @@ struct SimpleToolbar: View {
         let id: String; let icon: String; let label: String; var selected = false; var enabled = true; let run: () -> Void
     }
 
-    private var notes: Bool { store.canvas?.kind == .SIMPLE_NOTES }
+    private var notes: Bool { store.canvas?.kind.isNotes == true }
     private var erasing: Bool { brush.settings.brushType == .ERASER }
 
     private var addTools: [Tool] {
@@ -43,7 +43,7 @@ struct SimpleToolbar: View {
 
     private var drawTools: [Tool] {
         let drawing = vm.mode == .DRAW
-        return [
+        var t: [Tool] = [
             Tool(id: "brush", icon: "pencil.tip", label: L("mode_draw"), selected: drawing && !erasing) {
                 vm.chooseMode(.DRAW); if erasing { brush.toggleEraser() }
             },
@@ -51,26 +51,31 @@ struct SimpleToolbar: View {
                 vm.chooseMode(.DRAW); if !erasing { brush.toggleEraser() }
             },
             Tool(id: "paint", icon: "drop.fill", label: L("mode_paint"), selected: vm.mode == .PAINT) { vm.chooseMode(.PAINT) },
-            Tool(id: "eyedropper", icon: "eyedropper", label: L("v43_eyedropper"), selected: vm.canvasPick == .EYEDROPPER) {
+        ]
+        if !notes {
+            // v51 not almada damlalık yok
+            t.append(Tool(id: "eyedropper", icon: "eyedropper", label: L("v43_eyedropper"), selected: vm.canvasPick == .EYEDROPPER) {
                 if vm.mode != .DRAW { vm.chooseMode(.DRAW) }
                 vm.toggleCanvasPick(.EYEDROPPER)
-            },
-            Tool(id: "ruler", icon: "ruler", label: L("v40_ruler"), selected: ruler.session == .RULER) {
-                if ruler.session == .RULER { ruler.finish() } else { openRuler() }
-            },
-            Tool(id: "template", icon: "star.square.on.square", label: L("v40_template"),
-                 selected: ruler.session == .TEMPLATE || ruler.session == .TEMPLATE_PICK) {
-                if ruler.session == .TEMPLATE || ruler.session == .TEMPLATE_PICK { ruler.finish() } else { ruler.openTemplate(); ruler.libraryOpen = true }
-            },
-        ] + (store.canvas?.kind == .SIMPLE_ART ? [
+            })
+        }
+        t.append(Tool(id: "ruler", icon: "ruler", label: L("v40_ruler"), selected: ruler.session == .RULER) {
+            if ruler.session == .RULER { ruler.finish() } else { openRuler() }
+        })
+        t.append(Tool(id: "template", icon: "star.square.on.square", label: L("v40_template"),
+                      selected: ruler.session == .TEMPLATE || ruler.session == .TEMPLATE_PICK) {
+            if ruler.session == .TEMPLATE || ruler.session == .TEMPLATE_PICK { ruler.finish() } else { ruler.openTemplate(); ruler.libraryOpen = true }
+        })
+        if store.canvas?.kind == .SIMPLE_ART {
             // v50 yetişkin çizim alıştırmaları
-            Tool(id: "practice", icon: "figure.strengthtraining.traditional", label: L("v50_practice"), selected: vm.practice.active) { vm.practice.listOpen = true },
-        ] : [])
+            t.append(Tool(id: "practice", icon: "figure.strengthtraining.traditional", label: L("v50_practice"), selected: vm.practice.active) { vm.practice.listOpen = true })
+        }
+        return t
     }
 
     private var editTools: [Tool] {
         let has = !store.selectedIds.isEmpty
-        return [
+        var t: [Tool] = [
             Tool(id: "select", icon: "hand.tap", label: L("mode_select"), selected: vm.mode == .SELECT && vm.canvasPick != .RECT_SELECT) {
                 vm.chooseMode(.SELECT)
             },
@@ -87,6 +92,11 @@ struct SimpleToolbar: View {
             Tool(id: "layers", icon: "square.3.layers.3d", label: L("tab_layers")) { sheet = .layers },
             Tool(id: "brush_settings", icon: "slider.horizontal.3", label: L("brush_settings_toggle")) { brushPickerOpen = true },
         ]
+        if notes && (store.canvas?.guide.kind ?? .NONE) != .NONE {
+            // v51 not almada kılavuz aracı yok: eski notlarda kalan kılavuz çizgileri buradan kaldırılır
+            t.append(Tool(id: "remove_old_guides", icon: "grid", label: L("v51_notes_remove_old_guides")) { vm.guides.removeGuide() })
+        }
+        return t
     }
 
     var body: some View {

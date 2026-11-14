@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- v51 tek not alma modu (gelişmiş ve basit not alma birleşti) ve geçici tuvalde resim düzenleme -->
+<resources>
+    <string name="v51_notes_remove_old_guides">Eski kılavuz çizgilerini kaldır</string>
+    <string name="v51_temp_image_name">Resim düzenleme (geçici)</string>
+    <string name="v51_temp_image_hint">Geçici tuvalde düzenliyorsun. Kaydet\'e dokununca resim nota aktarılır ve bu tuval silinir; kaydetmeden çıkarsan değişiklikler atılır.</string>
+    <string name="v51_temp_image_saved">Resim nota aktarıldı</string>
+    <string name="v51_temp_image_failed">Resim düzenlemeye açılamadı</string>
+    <string name="v51_temp_image_save">Kaydet ve nota aktar</string>
+</resources>

@@ -116,7 +116,8 @@ final class CanvasStore: ObservableObject {
         let ids: [String] = files.queue.sync {
             ((try? FileManager.default.contentsOfDirectory(at: files.root, includingPropertiesForKeys: nil)) ?? []).map(\.lastPathComponent)
         }
-        canvases = ids.compactMap { id in files.queue.sync { files.load(id) } }.sorted { $0.updatedAt > $1.updatedAt }
+        // v51 not almanın geçici resim tuvalleri listelerde görünmez
+        canvases = ids.filter { !TempCanvases.isTemp($0) }.compactMap { id in files.queue.sync { files.load(id) } }.sorted { $0.updatedAt > $1.updatedAt }
     }
 
     /// Kayıttan sonra listedeki tuvali yeniler.
@@ -126,6 +127,7 @@ final class CanvasStore: ObservableObject {
     }
 
     private func upsert(_ c: CanvasUi) {
+        if TempCanvases.isTemp(c.localId) { return }
         if let i = canvases.firstIndex(where: { $0.localId == c.localId }) { canvases[i] = c } else { canvases.insert(c, at: 0) }
         canvases.sort { $0.updatedAt > $1.updatedAt }
     }

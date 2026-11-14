@@ -347,7 +347,7 @@
 "canvas_kind_kids_hint" = "子ども向け図形86個 · アニメキャラクター · タップで塗り絵";
 "canvas_kind_label" = "キャンバスの種類";
 "canvas_kind_notes" = "学習 / ノート";
-"canvas_kind_notes_hint" = "ノート用ペン · 数学・幾何の図形";
+"canvas_kind_notes_hint" = "1つのメニュー · ノート用ペン · すべての図形・ダイアグラム・数式 · ページ";
 "canvas_kind_simple_art" = "シンプルイラスト";
 "canvas_kind_simple_art_hint" = "メニュー1つ · ブラシ3グループ · 図形42個（基本、自然、身近なもの）";
 "canvas_kind_simple_notes" = "シンプルノート";
@@ -3006,6 +3006,12 @@
 "v50_tut_types_t" = "3つの種類と微調整";
 "v50_tut_vec_b" = "画像を選び、編集の「自動ベクター化」をタップ。輪郭が点を編集できるベクター線になります。";
 "v50_tut_vec_t" = "画像をベクター化";
+"v51_notes_remove_old_guides" = "古いガイド線を削除";
+"v51_temp_image_failed" = "画像を編集用に開けませんでした";
+"v51_temp_image_hint" = "一時キャンバスで編集しています。保存をタップすると画像がノートに戻り、このキャンバスは削除されます。保存せずに戻ると変更は破棄されます。";
+"v51_temp_image_name" = "画像の編集（一時）";
+"v51_temp_image_save" = "保存してノートに戻す";
+"v51_temp_image_saved" = "画像をノートに戻しました";
 "vector_cut" = "カット";
 "vector_delete" = "削除";
 "vector_edit_open" = "ベクター編集";

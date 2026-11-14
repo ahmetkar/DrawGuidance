@@ -13,12 +13,15 @@ protocol EditorHost: AnyObject {
     func inserted(_ ids: Set<String>)
     func onInk(_ stroke: Stroke)
     func emit(_ event: EditEvent)
+    /// v51 resim başka yerde düzenlenecekse (not alma: geçici basit resim tuvali) true döner.
+    func editImageElsewhere(_ image: Stroke) -> Bool
 }
 
 extension EditorHost {
     func startAction(_ mode: EditMode) { startAction(mode, target: []) }
     func endAction() { setMode(.SELECT) }
     func onInk(_ stroke: Stroke) {}
+    func editImageElsewhere(_ image: Stroke) -> Bool { false }
 }
 
 /// Çizim ekranının tek doğruluk kaynağı (Android `EditorStore`): tuval (sayfalar), seçim, eleman dizini ve geri al /

@@ -30,7 +30,7 @@ data class TemplateEntry(
     val width: Int = 0,
     val height: Int = 0,
 ) {
-    val canvasKind: CanvasKind? get() = runCatching { CanvasKind.valueOf(kind) }.getOrNull()
+    val canvasKind: CanvasKind? get() = runCatching { CanvasKind.valueOf(kind) }.getOrNull()?.let { CanvasKind.parse(it.name) }
 }
 
 @Serializable
@@ -70,7 +70,7 @@ object CanvasTemplates {
 
     /** Şablonu olan tuval türleri (gelişmiş çizgi roman ve not alma). */
     /** v47 basit not almada da şablonlar. */
-    val KINDS = setOf(CanvasKind.COMIC, CanvasKind.NOTES, CanvasKind.SIMPLE_NOTES)
+    val KINDS = setOf(CanvasKind.COMIC, CanvasKind.NOTES)
 
     private val json = Json { ignoreUnknownKeys = true; encodeDefaults = false }
 
@@ -98,7 +98,8 @@ object CanvasTemplates {
     fun encodeMeta(m: TemplateMeta): String = Json { prettyPrint = true; encodeDefaults = false }.encodeToString(TemplateMeta.serializer(), m)
 
     /** [kind] türünün şablonları (katalog sırasıyla). */
-    fun forKind(kind: CanvasKind): List<TemplateEntry> = catalog.templates.filter { it.kind == kind.name }
+    // v51 eski basit not şablonları ("SIMPLE_NOTES") tek not alma modunda listelenir
+    fun forKind(kind: CanvasKind): List<TemplateEntry> = catalog.templates.filter { CanvasKind.parse(it.kind) == kind }
 
     fun find(id: String): TemplateEntry? = catalog.templates.firstOrNull { it.id == id }
 

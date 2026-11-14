@@ -227,6 +227,8 @@ fun appModule(apiBaseUrl: String) = module {
 
     single { CanvasRepository(get(), get(), get<AppDatabase>()) }
     single { CanvasSaveQueue(get()) }
+    // v51 not almada resim düzenleme için geçici basit resim tuvalleri
+    single { com.karapp.drawguidance.data.notes.TempImageEditor(androidContext(), get(), get(), get()) }
     // v29 moda özel şekil tahmini (her modun kendi sinir ağı; cihazda eğitilir, uygulama klasöründe saklanır)
     single { com.karapp.drawguidance.content.shapes.ShapeModeModels(java.io.File(androidContext().filesDir, "shape_models")) }
     // v29 modlar arası aktarma (tuval → not/çizgi roman, 3B → tuval/çizgi roman)
@@ -292,7 +294,7 @@ fun appModule(apiBaseUrl: String) = module {
     viewModel { SettingsViewModel(get(), get(), get(), tutorials = get()) }
     viewModel { com.karapp.drawguidance.ui.screens.logs.LogsViewModel(androidContext()) }
     viewModel { (canvasLocalId: String) ->
-        CanvasEditViewModel(get(), get(), get(), get(), get(), get(), get(), get(), canvasLocalId, get(), get(), transfer = get(), shapeModels = get(), recent = get(), tutorialPrefs = get())
+        CanvasEditViewModel(get(), get(), get(), get(), get(), get(), get(), get(), canvasLocalId, get(), get(), transfer = get(), shapeModels = get(), recent = get(), tutorialPrefs = get(), tempImages = get())
     }
     // Boş kimlik: yok (yeni model / tuvalsiz açılış)
     viewModel { (modelId: String, canvasId: String, strokeId: String, name: String) ->

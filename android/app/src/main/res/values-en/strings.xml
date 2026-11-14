@@ -184,7 +184,7 @@
     <string name="canvas_kind_art">Art</string>
     <string name="canvas_kind_art_hint">All art brushes · landscape and portrait shapes</string>
     <string name="canvas_kind_notes">Study / Notes</string>
-    <string name="canvas_kind_notes_hint">Note pens · math and geometry shapes</string>
+    <string name="canvas_kind_notes_hint">Single menu · note pens · all shapes, diagrams and formulas · pages</string>
     <string name="canvas_kind_badge_notes">Notes</string>
     <string name="brush_note_pencil">Pencil</string>
     <string name="brush_note_ballpoint">Ballpoint pen</string>

@@ -41,7 +41,8 @@ object TutorialScripts {
         // v46 yenilikler (iki parçalı üst menü, seçim menüsü, Panel ekle, formülle çizilen şekiller, mekân ve karakterler)
         // v48 yenilikler (yeni mod menüsü, Özellikler, ayrı Taşı/Genişlet, üç basit menü, çocuk sırası)
         CanvasKind.ART -> listOf(artBasics(), artAdd(), artAi(), TutorialV40.art, TutorialV46.art, TutorialV48.advanced(kind), TutorialV50.advanced(kind))
-        CanvasKind.NOTES -> listOf(notesWrite(), notesFormula(), notesAi(), TutorialV40.notes, TutorialV46.notes, TutorialV48.advanced(kind))
+        // v51 tek not alma modu basit çizimde: basit notun tek menülü eğitimleri (eski gelişmiş not eğitimleri mod menüsü ister)
+        CanvasKind.NOTES -> listOf(TutorialV40.simpleNotes, TutorialV46.simpleNotes, TutorialV48.simple(kind))
         CanvasKind.COMIC -> listOf(comicPanels(), comicText(), comicAi(), TutorialV40.comic, TutorialV46.comic, TutorialV48.advanced(kind), TutorialV50.advanced(kind))
         // v40 basit resim ve basit notta kısa, sade dilli tanıtım (v46 yenilikler ayrı grupta)
         CanvasKind.SIMPLE_ART -> listOf(TutorialV40.simpleArt, TutorialV46.simpleArt, TutorialV48.simple(kind), TutorialV50.simpleArt)
@@ -57,7 +58,7 @@ object TutorialScripts {
     fun whatsNew(kind: CanvasKind): TutorialGroup? = when (kind) {
         // v50 çizim modlarında "Resimden çizim" (vektörleştirme ve kalıpla çizme), not türlerinde v48 menüleri
         CanvasKind.ART, CanvasKind.COMIC -> TutorialV50.advanced(kind)
-        CanvasKind.NOTES -> TutorialV48.advanced(kind)
+        CanvasKind.NOTES -> TutorialV48.simple(kind)
         CanvasKind.SIMPLE_ART -> TutorialV50.simpleArt
         CanvasKind.SIMPLE_NOTES -> TutorialV48.simple(kind)
         CanvasKind.KIDS -> TutorialV50.kids

@@ -38,7 +38,7 @@ class V41CompatTest : V33EditorBase() {
     @Test
     fun everyKindOpensAndDraws() {
         waitFor { compose.onAllNodesWithText("Ayarlar").fetchSemanticsNodes().isNotEmpty() }
-        val kinds = listOf(CanvasKind.ART, CanvasKind.NOTES, CanvasKind.COMIC, CanvasKind.SIMPLE_ART, CanvasKind.SIMPLE_NOTES, CanvasKind.KIDS)
+        val kinds = listOf(CanvasKind.ART, CanvasKind.NOTES, CanvasKind.COMIC, CanvasKind.SIMPLE_ART, CanvasKind.KIDS)
         runBlocking { kinds.forEach { k -> repo().createCanvas("Uyum ${k.name}", 1000, 1000, "#FFFFFF", aiEnabled = false, kind = k) } }
         // Tuvallerim
         compose.onAllNodesWithText("Tuvallerim").onFirst().performClick()

@@ -36,15 +36,33 @@ enum CanvasSizeTemplate: String, CaseIterable {
 }
 
 /// Tuval türü: fırça ve şekil kataloğunu belirler.
+/// v51 gelişmiş not alma ve basit not alma tek not alma modunda ([NOTES]) birleşti: basit çizim grubunda, tek menülü;
+/// gelişmiş not almanın bütün katalogları var, damlalık, kılavuz çizgileri, vektör (nokta/çizgi) düzenleme ve resim
+/// vektörleştirme yok. Resim geçici bir basit resim tuvalinde düzenlenir (`TempImageEdit`). [SIMPLE_NOTES] yalnız eski
+/// kayıtların adıdır: okunurken [NOTES]'a çevrilir.
 enum CanvasKind: String, CaseIterable, Codable, Identifiable {
     case ART, NOTES, COMIC, SIMPLE_ART, SIMPLE_NOTES, KIDS
 
     var id: String { rawValue }
 
-    static func parse(_ value: String?) -> CanvasKind { value.flatMap(CanvasKind.init(rawValue:)) ?? .ART }
+    /// v51 eski basit not alma kayıtlarının adı.
+    static let LEGACY_SIMPLE_NOTES = "SIMPLE_NOTES"
 
-    static let Simple: [CanvasKind] = [.SIMPLE_ART, .SIMPLE_NOTES, .KIDS]
-    static let Advanced: [CanvasKind] = [.ART, .NOTES, .COMIC]
+    static func parse(_ value: String?) -> CanvasKind {
+        if value == LEGACY_SIMPLE_NOTES { return .NOTES }
+        return value.flatMap(CanvasKind.init(rawValue:)) ?? .ART
+    }
+
+    /// v51 kayıtlardan okunurken eski basit not alma tek not alma moduna taşınır.
+    init(from decoder: Decoder) throws {
+        let raw = try decoder.singleValueContainer().decode(String.self)
+        self = CanvasKind.parse(raw)
+    }
+
+    static let Simple: [CanvasKind] = [.SIMPLE_ART, .NOTES, .KIDS]
+    static let Advanced: [CanvasKind] = [.ART, .COMIC]
+    /// v51 kullanıcıya sunulan türler (eski basit not alma yok).
+    static let Selectable: [CanvasKind] = Advanced + Simple
 
     /// Fırça, şekil kataloğu ve kağıt seçeneklerinde kullanılan temel tür.
     var base: CanvasKind {
@@ -56,7 +74,7 @@ enum CanvasKind: String, CaseIterable, Codable, Identifiable {
     }
 
     var paged: Bool { self == .NOTES || self == .COMIC || self == .SIMPLE_NOTES }
-    var simple: Bool { self == .SIMPLE_ART || self == .SIMPLE_NOTES || self == .KIDS }
+    var simple: Bool { self == .SIMPLE_ART || self == .SIMPLE_NOTES || self == .NOTES || self == .KIDS }
     var isNotes: Bool { base == .NOTES }
 
     func packMode() -> String {

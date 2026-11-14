@@ -26,6 +26,15 @@ final class CanvasStoreTests: XCTestCase {
         XCTAssertTrue(CanvasKind.COMIC.paged)
         XCTAssertEqual(CanvasKind.COMIC.maxPages, 1000)
         XCTAssertEqual(CanvasKind.KIDS.packMode(), "ART")
-        XCTAssertEqual(CanvasKind.Simple, [.SIMPLE_ART, .SIMPLE_NOTES, .KIDS])
+        XCTAssertEqual(CanvasKind.Simple, [.SIMPLE_ART, .NOTES, .KIDS])
+        XCTAssertEqual(CanvasKind.Advanced, [.ART, .COMIC])
+        XCTAssertTrue(CanvasKind.NOTES.simple)
+    }
+
+    /// v51 not alma tek mod: eski "SIMPLE_NOTES" kayıtları okunurken not almaya çevrilir.
+    func testLegacySimpleNotesMigratesToNotes() throws {
+        XCTAssertEqual(CanvasKind.parse("SIMPLE_NOTES"), .NOTES)
+        let decoded = try JSONDecoder().decode([CanvasKind].self, from: Data(#"["SIMPLE_NOTES","ART"]"#.utf8))
+        XCTAssertEqual(decoded, [.NOTES, .ART])
     }
 }

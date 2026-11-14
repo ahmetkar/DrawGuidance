@@ -139,7 +139,7 @@ class V37SimpleModesTest : V33EditorBase() {
 
     @Test
     fun simpleNotesHaveNoExpand() {
-        openKind("Basit not kenar", CanvasKind.SIMPLE_NOTES)
+        openKind("Basit not kenar", CanvasKind.NOTES)
         assertFalse(exists("simple_tool_expand"))
         // Kenara basılı tutmak genişletme açmaz
         longPress(screenOf(canvas().width.toFloat(), canvas().height / 2f))

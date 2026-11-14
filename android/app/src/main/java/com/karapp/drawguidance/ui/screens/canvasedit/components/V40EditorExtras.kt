@@ -42,6 +42,16 @@ fun V40MoreMenuItems(kind: CanvasKind, viewModel: CanvasEditViewModel, close: ()
         )
     }
     // v42 CBZ olarak kaydet ⋮ menüsünde değil, birleşik Kaydet penceresinde (CBZ sekmesi)
+    // v51 not almada kılavuz çizgisi aracı yok: eski notlarda kalan kılavuz çizgileri buradan kaldırılır
+    if (kind.isNotes) {
+        val guide = viewModel.canvas.collectAsState().value?.guide
+        if (guide != null && guide.kind != com.karapp.drawguidance.data.model.GuideKind.NONE) DropdownMenuItem(
+            text = { Text(stringResource(R.string.v51_notes_remove_old_guides)) },
+            leadingIcon = { Icon(Icons.Filled.FormatListNumbered, null, tint = colors.accent) },
+            onClick = { close(); viewModel.removeGuide() },
+            modifier = Modifier.testTag("notes_remove_guides_menu_item"),
+        )
+    }
 }
 
 /**

@@ -906,8 +906,34 @@ object DiagramCatalog {
     fun inheritRole(role: String?): String? = role?.takeIf { it in structuralRoles && it != "hub" && it != "axis" }
 
     /** Nicel türde yeni adımın yazısı: [near] adımının değerleriyle (grafikte hemen görünsün). */
+    /**
+     * v50 örnek yazıyı uygulamanın diline çevirir: önce satırın tamamı, olmazsa " · " parçaları, köşeli ayraç içi,
+     * sondaki sayılar (değerler korunur) ve baştaki işaretler (+, -, →…) ayrılarak. Çevirisi olmayan kısım aynen kalır.
+     */
+    fun localizeText(text: String): String = text.split('\n').joinToString("\n") { localizeLine(it) }
+
+    fun localize(edge: DiagramEdge): DiagramEdge = edge.copy(
+        label = localizeText(edge.label),
+        fromLabel = edge.fromLabel?.let(::localizeText), toLabel = edge.toLabel?.let(::localizeText),
+    )
+
+    private val trailingNumbers = Regex("^(.*?\\S)((?:\\s+[-+~=]?[\\d.,:%\\-–/=]*\\d[\\d.,:%\\-–/=]*|\\s+=)+)$")
+    private val leadingMark = Regex("^([+\\-→#Δ−«»]+\\s*)(.+)$")
+    private val bracketed = Regex("^\\[(.+)]$")
+
+    private fun localizeLine(line: String): String {
+        if (line.isBlank()) return line
+        val tr = com.karapp.drawguidance.i18n.I18n.tr(line)
+        if (tr != line) return tr
+        if (" · " in line) return line.split(" · ").joinToString(" · ") { localizeLine(it) }
+        bracketed.matchEntire(line)?.let { return "[" + localizeLine(it.groupValues[1]) + "]" }
+        trailingNumbers.matchEntire(line)?.let { return localizeLine(it.groupValues[1]) + it.groupValues[2] }
+        leadingMark.matchEntire(line)?.let { return it.groupValues[1] + localizeLine(it.groupValues[2]) }
+        return line
+    }
+
     fun newNodeText(kind: DiagramKind, index: Int, near: String?): String {
-        val base = "Adım $index"
+        val base = com.karapp.drawguidance.i18n.I18n.trf("Adım {0}", index)
         if (!isData(kind) || near == null) return base
         val it = parse(near)
         if (it.values.isEmpty()) return base
@@ -916,10 +942,10 @@ object DiagramCatalog {
             DiagramKind.GANTT -> {
                 val a = it.values.getOrElse(it.values.size - 2) { 1f }; val b = it.values.last()
                 val len = (b - a).coerceAtLeast(0f)
-                "Yeni iş ${f(b + 1)}-${f(b + 1 + len)}"
+                "${com.karapp.drawguidance.i18n.I18n.tr("Yeni iş")} ${f(b + 1)}-${f(b + 1 + len)}"
             }
-            DiagramKind.WATERFALL -> "Kalem +10"
-            else -> (listOf("Yeni") + it.values.map { v -> f(v) }).joinToString(" ")
+            DiagramKind.WATERFALL -> com.karapp.drawguidance.i18n.I18n.tr("Kalem") + " +10"
+            else -> (listOf(com.karapp.drawguidance.i18n.I18n.tr("Yeni")) + it.values.map { v -> f(v) }).joinToString(" ")
         }
     }
 

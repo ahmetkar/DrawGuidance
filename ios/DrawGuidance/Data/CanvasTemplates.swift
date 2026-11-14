@@ -64,6 +64,8 @@ struct PreparedTemplate {
     let guide: GuideSpec
     /// Yeni kimlik → (baytlar, şablondaki resim kaydı).
     let assets: [(String, Data, TemplateAsset)]
+    /// v50 sayfa arka planları (çizgi roman şablonuna eklenen örnek kapak: ilk sayfa `cover`).
+    var pageBackgrounds: [PageBackground?] = []
 }
 
 enum CanvasTemplates {
@@ -109,9 +111,10 @@ enum CanvasTemplates {
               let content = opener("\(DIR)/\(id)/content.bin"), let doc = try? ContentCodec.decodeDocument(content) else { return nil }
         var ids: [String: String] = [:]
         for a in meta.assets { ids[a.id] = newId() }
-        let pages = doc.pages.enumerated().map { p, page in
+        var pages = doc.pages.enumerated().map { p, page in
             page.map { s -> Stroke in
-                var n = s
+                // v50 şablonun yazıları uygulamanın diline çevrilir (Türkçede değişmez)
+                var n = translate(s)
                 if let a = s.assetId, let new = ids[a] { n.assetId = new }
                 if p == 0, let t = meta.titleId, n.id == t { n = ComicCover.retitle(n, meta.width, canvasName) }
                 return n
@@ -122,6 +125,33 @@ enum CanvasTemplates {
         let background = bg.isEmpty ? BackgroundSpec() : (try? JSONDecoder().decode(BackgroundSpec.self, from: Data(bg.utf8))) ?? BackgroundSpec()
         let guideSpec = guide.isEmpty ? GuideSpec() : (try? JSONDecoder().decode(GuideSpec.self, from: Data(guide.utf8))) ?? GuideSpec()
         let assets = meta.assets.map { a in (ids[a.id]!, opener("\(DIR)/\(id)/\(a.file)") ?? Data(), a) }
-        return PreparedTemplate(meta: meta, pages: pages, layers: doc.layers, background: background, guide: guideSpec, assets: assets)
+        var outMeta = meta
+        var pageBackgrounds: [PageBackground?] = []
+        // v50 kapaksız çizgi roman şablonuna örnek kapak sayfası (başlık tuvalin adı); şablon kapaktan sonraki sayfada açılır
+        if find(id)?.kind == CanvasKind.COMIC.rawValue && meta.titleId == nil && meta.background.isEmpty {
+            pages.insert(ComicCover.build(meta.width, meta.height, canvasName, ComicCover.subtitlePlaceholder()), at: 0)
+            pageBackgrounds = [PageBackground(cover: true)]
+            outMeta.currentPage = meta.currentPage + 1
+        }
+        return PreparedTemplate(meta: outMeta, pages: pages, layers: doc.layers, background: background, guide: guideSpec, assets: assets,
+                                pageBackgrounds: pageBackgrounds)
+    }
+
+    /// v50 yazı elemanının içeriği etkin dile çevrilir; döndürülmemiş düz yazının kutusu aynı sol üst köşede yeniden ölçülür.
+    private static func translate(_ s: Stroke) -> Stroke {
+        guard let spec = s.text else { return s }
+        let tr = I18n.tr(spec.content)
+        if tr == spec.content { return s }
+        var next = spec
+        next.content = tr
+        var out = s
+        out.text = next
+        if spec.box?.balloon != nil || s.points.count != 4 { return out }
+        let xs = s.points.map(\.x), ys = s.points.map(\.y)
+        let left = xs.min()!, top = ys.min()!, right = xs.max()!, bottom = ys.max()!
+        let axisAligned = s.points.allSatisfy { ($0.x == left || $0.x == right) && ($0.y == top || $0.y == bottom) }
+        if !axisAligned { return out }
+        out.points = TextRenderer.quadAt(next, s.sizePx, left, top).map { StrokePoint(ContentCodec.quantize($0.x), ContentCodec.quantize($0.y)) }
+        return out
     }
 }

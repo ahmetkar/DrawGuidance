@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- v50 düzenleyici, çeviri ve çizgi roman iyileştirmeleri -->
+<resources>
+    <string name="lines_krackle">طقطقة الطاقة</string>
+    <string name="lines_impact">نجمة الاصطدام</string>
+    <string name="lines_surprise">خطوط الدهشة</string>
+    <string name="lines_electric">كهرباء</string>
+    <string name="lines_benday">نقاط بن داي</string>
+    <string name="lines_gloom">خطوط الكآبة</string>
+    <string name="lines_sparkle">بريق</string>
+    <string name="lines_crosshatch">تظليل متقاطع</string>
+    <string name="lines_speed_dense">سرعة كثيفة</string>
+    <string name="v50_lines_style_comic">قصص مصورة</string>
+    <string name="v50_lines_style_manga">مانغا</string>
+    <string name="v50_lines_add">إضافة: %1$s</string>
+    <string name="v50_lines_reset">إعادة ضبط</string>
+</resources>

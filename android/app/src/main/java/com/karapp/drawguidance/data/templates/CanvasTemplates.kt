@@ -125,18 +125,21 @@ object CanvasTemplates {
         val meta = opener(metaPath(id)).use { parseMeta(it.readBytes().decodeToString()) }
         val content = opener(contentPath(id)).use { it.readBytes() }
         val files = meta.assets.associate { a -> a.id to opener(assetPath(id, a.file)).use { it.readBytes() } }
-        prepare(meta, content, files, canvasName, newId)
+        prepare(meta, content, files, canvasName, newId, withCover = find(id)?.canvasKind == CanvasKind.COMIC)
     }.onFailure { com.karapp.drawguidance.diagnostics.AppLog.e("Templates", "Şablon okunamadı: $id", it) }.getOrNull()
 
     /** [prepare]'in saf kısmı (dosyalar okunmuş). */
     fun prepare(
         meta: TemplateMeta, content: ByteArray, files: Map<String, ByteArray>, canvasName: String,
         newId: () -> String = { UUID.randomUUID().toString() },
+        /** v50 çizgi roman şablonu: kapağı yoksa örnek kapak eklenir. */
+        withCover: Boolean = false,
     ): PreparedTemplate {
         val ids = meta.assets.associate { it.id to newId() }
         val doc = ContentCodec.decodeDocument(content)
-        val pages = doc.pages.mapIndexed { p, page ->
-            page.map { s -> remap(s, ids).let { if (p == 0 && meta.titleId != null && it.id == meta.titleId) retitle(it, meta.width, canvasName) else it } }
+        var pages = doc.pages.mapIndexed { p, page ->
+            // v50 şablonun yazıları uygulamanın diline çevrilir (resources/i18n tabloları; Türkçede değişmez)
+            page.map { s -> translate(remap(s, ids)).let { if (p == 0 && meta.titleId != null && it.id == meta.titleId) retitle(it, meta.width, canvasName) else it } }
         }
         var background = meta.background
         var guide = meta.guide
@@ -144,8 +147,41 @@ object CanvasTemplates {
             background = background.replace(old, new)
             guide = guide.replace(old, new)
         }
+        var outMeta = meta
+        // v50 kapaksız çizgi roman şablonuna örnek kapak sayfası (başlık tuvalin adı, yazar alanı): yeni boş çizgi roman
+        // tuvaliyle aynı kapak; sayfa numarası almaz, şablon kapaktan sonraki sayfada açılır
+        if (withCover && meta.titleId == null && background.isBlank()) {
+            val cover = com.karapp.drawguidance.ui.screens.canvasedit.state.ComicCover.build(
+                meta.width, meta.height, canvasName, com.karapp.drawguidance.ui.screens.canvasedit.state.ComicCover.subtitlePlaceholder(),
+            )
+            pages = listOf(cover) + pages
+            background = com.karapp.drawguidance.data.repository.encodeBackground(
+                com.karapp.drawguidance.data.model.BackgroundSpec(), listOf(com.karapp.drawguidance.data.model.PageBackground(cover = true)),
+            )
+            outMeta = meta.copy(currentPage = meta.currentPage + 1)
+        }
         val assets = meta.assets.map { a -> ids.getValue(a.id) to ((files[a.id] ?: ByteArray(0)) to a) }
-        return PreparedTemplate(meta, ContentCodec.encodePages(pages, layers = doc.layers), background, guide, assets)
+        return PreparedTemplate(outMeta, ContentCodec.encodePages(pages, layers = doc.layers), background, guide, assets)
+    }
+
+    /**
+     * v50 yazı elemanının içeriği etkin dile çevrilir; çeviri farklıysa yazının kutusu aynı sol üst köşede yeniden
+     * ölçülür (döndürülmüş yazılar ve balonlar yalnız içerikle güncellenir).
+     */
+    private fun translate(s: Stroke): Stroke {
+        val spec = s.text ?: return s
+        val tr = com.karapp.drawguidance.i18n.I18n.tr(spec.content)
+        if (tr == spec.content) return s
+        val next = spec.copy(content = tr)
+        if (spec.box?.balloon != null || s.points.size != 4) return s.copy(text = next)
+        val q = ContentCodec::quantize
+        val left = s.points.minOf { it.x }
+        val top = s.points.minOf { it.y }
+        val axisAligned = s.points.all { p -> p.x == left || p.x == s.points.maxOf { it.x } } && s.points.all { p -> p.y == top || p.y == s.points.maxOf { it.y } }
+        if (!axisAligned) return s.copy(text = next)
+        val points = runCatching { com.karapp.drawguidance.ui.drawing.TextRenderer.quadAt(next, s.sizePx, left, top) }.getOrNull()
+            ?: return s.copy(text = next)
+        return s.copy(text = next, points = points.map { com.karapp.drawguidance.data.model.StrokePoint(q(it.x), q(it.y)) })
     }
 
     private fun remap(s: Stroke, ids: Map<String, String>): Stroke {

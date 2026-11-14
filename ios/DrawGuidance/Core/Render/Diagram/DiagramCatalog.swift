@@ -437,8 +437,43 @@ extension DiagramCatalog {
     }
 
     /// Nicel türde yeni adımın yazısı: [near] adımının değerleriyle.
+    /// v50 örnek yazıyı uygulamanın diline çevirir (Android `localizeText`): önce satırın tamamı, olmazsa " · " parçaları,
+    /// köşeli ayraç içi, sondaki sayılar (değerler korunur) ve baştaki işaretler ayrılarak.
+    static func localizeText(_ text: String) -> String {
+        text.components(separatedBy: "\n").map { localizeLine($0) }.joined(separator: "\n")
+    }
+
+    static func localize(_ edge: DiagramEdge) -> DiagramEdge {
+        var e = edge
+        e.label = localizeText(edge.label)
+        e.fromLabel = edge.fromLabel.map { localizeText($0) }
+        e.toLabel = edge.toLabel.map { localizeText($0) }
+        return e
+    }
+
+    private static let trailingNumbers = try! NSRegularExpression(pattern: "^(.*?\\S)((?:\\s+[-+~=]?[\\d.,:%\\-–/=]*\\d[\\d.,:%\\-–/=]*|\\s+=)+)$")
+    private static let leadingMark = try! NSRegularExpression(pattern: "^([+\\-→#Δ−«»]+\\s*)(.+)$")
+    private static let bracketed = try! NSRegularExpression(pattern: "^\\[(.+)\\]$")
+
+    private static func groups(_ re: NSRegularExpression, _ s: String) -> [String]? {
+        let ns = s as NSString
+        guard let m = re.firstMatch(in: s, range: NSRange(location: 0, length: ns.length)), m.range.length == ns.length else { return nil }
+        return (1..<m.numberOfRanges).map { m.range(at: $0).location == NSNotFound ? "" : ns.substring(with: m.range(at: $0)) }
+    }
+
+    private static func localizeLine(_ line: String) -> String {
+        if line.trimmingCharacters(in: .whitespaces).isEmpty { return line }
+        let tr = I18n.tr(line)
+        if tr != line { return tr }
+        if line.contains(" · ") { return line.components(separatedBy: " · ").map { localizeLine($0) }.joined(separator: " · ") }
+        if let g = groups(bracketed, line) { return "[" + localizeLine(g[0]) + "]" }
+        if let g = groups(trailingNumbers, line) { return localizeLine(g[0]) + g[1] }
+        if let g = groups(leadingMark, line) { return g[0] + localizeLine(g[1]) }
+        return line
+    }
+
     static func newNodeText(_ kind: DiagramKind, _ index: Int, _ near: String?) -> String {
-        let base = "Adım \(index)"
+        let base = I18n.trf("Adım {0}", index)
         guard isData(kind), let near else { return base }
         let it = parse(near)
         if it.values.isEmpty { return base }
@@ -447,9 +482,9 @@ extension DiagramCatalog {
         case .GANTT:
             let a = secondLast(it.values, 1), b = it.values.last!
             let len = max(b - a, 0)
-            return "Yeni iş \(f(b + 1))-\(f(b + 1 + len))"
-        case .WATERFALL: return "Kalem +10"
-        default: return (["Yeni"] + it.values.map { f($0) }).joined(separator: " ")
+            return "\(I18n.tr("Yeni iş")) \(f(b + 1))-\(f(b + 1 + len))"
+        case .WATERFALL: return I18n.tr("Kalem") + " +10"
+        default: return ([I18n.tr("Yeni")] + it.values.map { f($0) }).joined(separator: " ")
         }
     }
 

@@ -76,6 +76,7 @@ final class CanvasStore: ObservableObject {
         c.background = t.background
         c.guide = t.guide
         c.currentPage = min(max(t.meta.currentPage, 0), c.pages.count - 1)
+        if !t.pageBackgrounds.isEmpty { c.pageBackgrounds = t.pageBackgrounds }
         c.folderId = folderId
         save(c)
         return canvases.first { $0.localId == c.localId } ?? c

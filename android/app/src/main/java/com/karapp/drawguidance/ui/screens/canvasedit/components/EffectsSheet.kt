@@ -108,6 +108,25 @@ object EffectsSheetTabs {
     }
 }
 
+/**
+ * v50 her çizgi türünün kendi ayarları (ortak değil): pencere kapanıp açılsa da uygulama açık kaldıkça hatırlanır.
+ * Tür ilk kez seçildiğinde önerilen ayarlarla başlar ([ComicLines.defaults]).
+ */
+internal object LinesPresetMemory {
+    private val map = androidx.compose.runtime.mutableStateMapOf<ComicLinesKind, LinesOptions>()
+    var activeKind by mutableStateOf(ComicLinesKind.SPEED_H)
+    var style by mutableStateOf(com.karapp.drawguidance.content.comic.ComicLinesStyle.COMIC)
+
+    fun defaultFor(kind: ComicLinesKind): LinesOptions {
+        val (d, len, th) = ComicLines.defaults(kind)
+        return LinesOptions(density = d, length = len, thickness = th)
+    }
+
+    fun get(kind: ComicLinesKind): LinesOptions = map[kind] ?: defaultFor(kind)
+    fun set(kind: ComicLinesKind, o: LinesOptions) { map[kind] = o }
+    fun reset(kind: ComicLinesKind) { map.remove(kind) }
+}
+
 @Composable
 private fun LinesTabContent(
     columns: Int,
@@ -115,9 +134,12 @@ private fun LinesTabContent(
     onLines: (ComicLinesKind, LinesOptions) -> Unit,
     onSelected: (LinesOptions) -> Unit,
 ) {
+    val mem = LinesPresetMemory
+    val access = com.karapp.drawguidance.ui.premium.LocalPremium.current
     Box(Modifier.testTag("lines_sheet")) {
         Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
             if (selected != null) {
+                // Seçili grup yalnız kendi ayarlarıyla düzenlenir (öteki çizgiler ve yeni çizgi ayarları değişmez)
                 val (kind, initial) = selected
                 var o by remember(selected) { mutableStateOf(initial) }
                 Section(stringResource(R.string.lines_selected_title) + ": " + linesLabel(kind), "lines_selected") {
@@ -126,11 +148,35 @@ private fun LinesTabContent(
                     }
                 }
             }
-            var o by remember { mutableStateOf(LinesOptions()) }
             Text(stringResource(R.string.lines_hint), style = MaterialTheme.typography.bodySmall, color = NeuTheme.colors.contentMuted)
-            Grid(ComicLinesKind.entries, columns.coerceAtMost(4)) { kind, m -> LinesTile(kind, o, m) { onLines(kind, o) } }
-            Section(stringResource(R.string.lines_new_title), "lines_new") {
-                LinesControls(o, null, "lines_new", densityTag = "lines_new_density", densityLabel = stringResource(R.string.lines_new_density)) { o = it }
+            PillTabs(
+                listOf(
+                    Triple(com.karapp.drawguidance.content.comic.ComicLinesStyle.COMIC, stringResource(R.string.v50_lines_style_comic), Icons.Filled.Flare),
+                    Triple(com.karapp.drawguidance.content.comic.ComicLinesStyle.MANGA, stringResource(R.string.v50_lines_style_manga), Icons.Filled.Flare),
+                ),
+                mem.style, tagPrefix = "lines_style_",
+            ) { mem.style = it }
+            val kinds = ComicLines.kinds(mem.style)
+            Grid(kinds, columns.coerceAtMost(4)) { kind, m ->
+                LinesTile(kind, mem.get(kind), m, selected = kind == mem.activeKind) { mem.activeKind = kind }
+            }
+            val kind = mem.activeKind
+            val o = mem.get(kind)
+            Section(stringResource(R.string.lines_new_title) + ": " + linesLabel(kind), "lines_new") {
+                LinesControls(o, kind, "lines_new", densityTag = "lines_new_density", densityLabel = stringResource(R.string.lines_new_density)) { mem.set(kind, it) }
+                Row(horizontalArrangement = Arrangement.spacedBy(10.dp), verticalAlignment = Alignment.CenterVertically) {
+                    com.karapp.drawguidance.ui.components.NeuButton(
+                        text = stringResource(R.string.v50_lines_add, linesLabel(kind)),
+                        onClick = {
+                            val lock = com.karapp.drawguidance.data.billing.PremiumFeature.COMIC_EFFECTS.takeIf { com.karapp.drawguidance.data.billing.PremiumRules.isAdvancedLines(kind) }
+                            if (access.request(lock)) onLines(kind, mem.get(kind))
+                        }, primary = true,
+                        modifier = Modifier.weight(1f).testTag("lines_add"),
+                    )
+                    androidx.compose.material3.TextButton(onClick = { mem.reset(kind) }, modifier = Modifier.testTag("lines_reset")) {
+                        Text(stringResource(R.string.v50_lines_reset))
+                    }
+                }
             }
         }
     }
@@ -172,10 +218,10 @@ private fun LinesControls(o: LinesOptions, kind: ComicLinesKind?, prefix: String
 
 /** Çizgi türünün küçük önizlemesi: yeni çizgilerin ayarlarıyla (odak, yön, uzunluk, sıklık). */
 @Composable
-private fun LinesTile(kind: ComicLinesKind, o: LinesOptions, modifier: Modifier, onClick: () -> Unit) {
+private fun LinesTile(kind: ComicLinesKind, o: LinesOptions, modifier: Modifier, selected: Boolean = false, onClick: () -> Unit) {
     val ink = NeuTheme.colors.content
     val color = o.colorHex?.let { hexToColor(it) }
-    ComicTile(linesLabel(kind), false, onClick, modifier, "lines_${kind.name}", premium = com.karapp.drawguidance.data.billing.PremiumFeature.COMIC_EFFECTS.takeIf { com.karapp.drawguidance.data.billing.PremiumRules.isAdvancedLines(kind) }) {
+    ComicTile(linesLabel(kind), selected, onClick, modifier, "lines_${kind.name}", premium = com.karapp.drawguidance.data.billing.PremiumFeature.COMIC_EFFECTS.takeIf { com.karapp.drawguidance.data.billing.PremiumRules.isAdvancedLines(kind) }) {
         Canvas(Modifier.fillMaxWidth().height(64.dp)) {
             val lines = ComicLines.generate(kind, 0f, 0f, size.width, size.height, seed = 5, density = o.density * 0.6f, focusX = o.focusX, focusY = o.focusY, angle = o.angle, length = o.length)
             val k = ComicLines.widthFactor(kind) * o.thickness

@@ -73,7 +73,7 @@ final class ComicController {
     func insertBalloon(_ style: BalloonStyle, speakers: Int, center: P?, options: BalloonTextOptions = BalloonTextOptions()) {
         guard let current = store.canvas else { return }
         let typed = !options.content.isBlank
-        guard let stroke = balloonStroke(style, speakers: speakers, center: center, content: typed ? options.content : Self.DEFAULT_TEXT, options: options) else { return }
+        guard let stroke = balloonStroke(style, speakers: speakers, center: center, content: typed ? options.content : I18n.tr(Self.DEFAULT_TEXT), options: options) else { return }
         store.commit(current.strokes + [stroke])
         host.setMode(.SELECT)
         store.select([stroke.id])
@@ -242,7 +242,7 @@ final class ComicController {
         let c = center ?? P(Float(current.width) / 2, Float(current.height) / 2)
         let font = TextFont(rawValue: preset.font) ?? .BANGERS
         let shadow: String? = preset.shadow.count == 7 || !preset.shadow.hasSuffix("00000000") ? preset.shadow : nil
-        let spec = TextSpec(content: preset.text, font: font, align: .CENTER, outlineColorHex: preset.outline, outlineWidth: size * 0.07,
+        let spec = TextSpec(content: I18n.tr(preset.text), font: font, align: .CENTER, outlineColorHex: preset.outline, outlineWidth: size * 0.07,
                             box: TextBox(effects: TextEffects(shadowHex: shadow, shadowDx: 0.07, shadowDy: 0.08,
                                                               gradient: GradientSpec(colors: preset.colors, angle: 90), caps: true, letterSpacing: 0.02)))
         let (w, h) = TextRenderer.measure(spec, size)

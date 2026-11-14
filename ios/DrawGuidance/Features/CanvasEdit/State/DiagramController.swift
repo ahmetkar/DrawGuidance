@@ -62,8 +62,11 @@ final class DiagramController: ObservableObject {
             let cx = (left + right) / 2, cy = (top + bottom) / 2
             left = cx - w / 2; right = cx + w / 2; top = cy - h / 2; bottom = cy + h / 2
         }
-        let nodes = DiagramRenderer.layout(kind, DiagramRenderer.defaultNodes(kind))
-        let spec = DiagramSpec(kind: kind, nodes: nodes, edges: DiagramRenderer.defaultEdges(kind, nodes), style: newShapeStyle(),
+        var nodes = DiagramRenderer.layout(kind, DiagramRenderer.defaultNodes(kind))
+        // v50 örnek yazılar uygulamanın dilinde eklenir (sayılar ve kodlar korunur)
+        let edges = DiagramRenderer.defaultEdges(kind, nodes).map { DiagramCatalog.localize($0) }
+        for i in nodes.indices { nodes[i].text = DiagramCatalog.localizeText(nodes[i].text) }
+        let spec = DiagramSpec(kind: kind, nodes: nodes, edges: edges, style: newShapeStyle(),
                                manual: DiagramCatalog.template(kind)?.manual ?? false, theme: theme)
         let id = StableId.from("\(gestureId)-diagram")
         let stroke = Stroke(id: id, points: [StrokePoint(left, top), StrokePoint(right, top), StrokePoint(right, bottom), StrokePoint(left, bottom)],

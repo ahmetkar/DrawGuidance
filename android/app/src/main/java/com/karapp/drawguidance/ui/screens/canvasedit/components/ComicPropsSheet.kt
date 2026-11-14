@@ -63,7 +63,7 @@ internal fun ComicPropsBrowser(kind: ComicAssetKind, columns: Int, tag: String, 
     val showStyles = kind != ComicAssetKind.OBJECT
     val colors = NeuTheme.colors
     var styleId by rememberSaveable(kind) { mutableStateOf(ComicStyle.COMIC.id) }
-    var theme by rememberSaveable(kind) { mutableStateOf<String?>(null) }
+    val theme: String? = null
     var category by rememberSaveable(kind) { mutableStateOf<String?>(null) }
     val style = ComicStyle.entries.firstOrNull { it.id == styleId } ?: ComicStyle.COMIC
     val index by ComicThemeIndex.flow.collectAsState()
@@ -71,10 +71,11 @@ internal fun ComicPropsBrowser(kind: ComicAssetKind, columns: Int, tag: String, 
     Column(Modifier.fillMaxWidth().testTag(tag), verticalArrangement = Arrangement.spacedBy(10.dp)) {
         if (showStyles) Row(Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()).testTag("${tag}_styles"), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             ComicStyle.entries.forEach { s ->
-                NeuChip(styleLabel(s), s == style, onClick = { styleId = s.id; theme = null; category = null }, modifier = Modifier.testTag("${tag}_style_${s.id}"))
+                NeuChip(styleLabel(s), s == style, onClick = { styleId = s.id; category = null }, modifier = Modifier.testTag("${tag}_style_${s.id}"))
             }
         }
-        ThemePackChips(kind, style, theme, "${tag}_theme") { theme = it; category = null }
+        // v50 efekt ve nesnelerde tema paketleri ("Şehir ve ev", "Uzman karakterler"…) gösterilmez: eklenecek resme
+        // uymayan bağlamsız süzgeçler yerine yalnız içerik kategorileri (patlama, enerji, silah, hazine…)
         val categories = remember(kind, style, theme, index) { ComicAssets.propCategories(kind, style, theme) }
         if (categories.size > 1) {
             Row(Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()).testTag("${tag}_categories"), horizontalArrangement = Arrangement.spacedBy(8.dp)) {

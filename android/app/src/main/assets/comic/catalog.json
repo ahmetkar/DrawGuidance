@@ -4,109 +4,109 @@
   {
    "id": "okul",
    "names": {
-    "tr": "Okul",
-    "en": "School",
-    "ar": "المدرسة",
-    "ja": "学校",
-    "ko": "학교",
-    "ru": "Школа",
-    "zh": "校园"
+    "tr": "Okul ve gençlik",
+    "en": "School & youth",
+    "ar": "المدرسة والشباب",
+    "ja": "学園・青春",
+    "ko": "학교·청춘",
+    "ru": "Школа и юность",
+    "zh": "校园青春"
    }
   },
   {
    "id": "gunluk",
    "names": {
-    "tr": "Günlük Hayat",
-    "en": "Everyday Life",
-    "ar": "الحياة اليومية",
-    "ja": "日常生活",
-    "ko": "일상",
-    "ru": "Повседневная жизнь",
-    "zh": "日常生活"
+    "tr": "Şehir ve ev",
+    "en": "City & home",
+    "ar": "المدينة والمنزل",
+    "ja": "街と家",
+    "ko": "도시·집",
+    "ru": "Город и дом",
+    "zh": "城市与家"
    }
   },
   {
    "id": "meslek",
    "names": {
-    "tr": "Meslekler",
-    "en": "Professions",
-    "ar": "المهن",
-    "ja": "職業",
-    "ko": "직업",
-    "ru": "Профессии",
-    "zh": "职业"
+    "tr": "Uzman karakterler",
+    "en": "Specialists",
+    "ar": "شخصيات متخصصة",
+    "ja": "専門家キャラ",
+    "ko": "전문가 캐릭터",
+    "ru": "Специалисты",
+    "zh": "专业人士"
    }
   },
   {
    "id": "tarih",
    "names": {
-    "tr": "Tarih",
-    "en": "History",
-    "ar": "التاريخ",
-    "ja": "歴史",
-    "ko": "역사",
-    "ru": "История",
-    "zh": "历史"
+    "tr": "Tarihî dönem",
+    "en": "Historical era",
+    "ar": "حقبة تاريخية",
+    "ja": "歴史の時代",
+    "ko": "역사 시대",
+    "ru": "Историческая эпоха",
+    "zh": "历史时代"
    }
   },
   {
    "id": "askeri",
    "names": {
-    "tr": "Askeri",
-    "en": "Military",
-    "ar": "عسكري",
-    "ja": "軍事",
-    "ko": "군사",
-    "ru": "Военные",
-    "zh": "军事"
+    "tr": "Savaş ve ordu",
+    "en": "War & army",
+    "ar": "الحرب والجيش",
+    "ja": "戦争・軍隊",
+    "ko": "전쟁·군대",
+    "ru": "Война и армия",
+    "zh": "战争与军队"
    }
   },
   {
    "id": "bilimkurgu",
    "names": {
-    "tr": "Bilim Kurgu",
-    "en": "Sci-Fi",
-    "ar": "خيال علمي",
-    "ja": "SF",
-    "ko": "SF",
-    "ru": "Фантастика",
-    "zh": "科幻"
+    "tr": "Uzay ve gelecek",
+    "en": "Space & future",
+    "ar": "الفضاء والمستقبل",
+    "ja": "宇宙・未来",
+    "ko": "우주·미래",
+    "ru": "Космос и будущее",
+    "zh": "太空与未来"
    }
   },
   {
    "id": "fantastik",
    "names": {
-    "tr": "Fantastik",
-    "en": "Fantasy",
-    "ar": "فانتازيا",
-    "ja": "ファンタジー",
-    "ko": "판타지",
-    "ru": "Фэнтези",
-    "zh": "奇幻"
+    "tr": "Büyü ve fantastik",
+    "en": "Magic & fantasy",
+    "ar": "السحر والفانتازيا",
+    "ja": "魔法・ファンタジー",
+    "ko": "마법·판타지",
+    "ru": "Магия и фэнтези",
+    "zh": "魔法与奇幻"
    }
   },
   {
    "id": "kahraman",
    "names": {
-    "tr": "Süper Kahraman",
-    "en": "Superhero",
-    "ar": "بطل خارق",
+    "tr": "Süper kahramanlar",
+    "en": "Superheroes",
+    "ar": "أبطال خارقون",
     "ja": "スーパーヒーロー",
     "ko": "슈퍼히어로",
-    "ru": "Супергерой",
+    "ru": "Супергерои",
     "zh": "超级英雄"
    }
   },
   {
    "id": "spor",
    "names": {
-    "tr": "Spor",
-    "en": "Sports",
-    "ar": "رياضة",
-    "ja": "スポーツ",
-    "ko": "스포츠",
-    "ru": "Спорт",
-    "zh": "体育"
+    "tr": "Spor ve dövüş",
+    "en": "Sports & fighting",
+    "ar": "الرياضة والقتال",
+    "ja": "スポーツ・格闘",
+    "ko": "스포츠·격투",
+    "ru": "Спорт и бои",
+    "zh": "运动与格斗"
    }
   },
   {
@@ -124,49 +124,49 @@
   {
    "id": "polisiye",
    "names": {
-    "tr": "Polisiye",
-    "en": "Crime",
-    "ar": "بوليسي",
-    "ja": "刑事・探偵",
+    "tr": "Suç ve dedektif",
+    "en": "Crime & detective",
+    "ar": "الجريمة والتحقيق",
+    "ja": "犯罪・探偵",
     "ko": "범죄·탐정",
-    "ru": "Детектив",
-    "zh": "侦探"
+    "ru": "Преступление и детектив",
+    "zh": "犯罪与侦探"
    }
   },
   {
    "id": "steampunk",
    "names": {
-    "tr": "Steampunk",
-    "en": "Steampunk",
-    "ar": "ستيمبانك",
-    "ja": "スチームパンク",
-    "ko": "스팀펑크",
-    "ru": "Стимпанк",
-    "zh": "蒸汽朋克"
+    "tr": "Buhar ve icat (steampunk)",
+    "en": "Steam & invention (steampunk)",
+    "ar": "البخار والاختراع",
+    "ja": "蒸気と発明（スチームパンク）",
+    "ko": "증기·발명 (스팀펑크)",
+    "ru": "Пар и изобретения (стимпанк)",
+    "zh": "蒸汽与发明（蒸汽朋克）"
    }
   },
   {
    "id": "macera",
    "names": {
-    "tr": "Macera",
-    "en": "Adventure",
-    "ar": "مغامرة",
-    "ja": "冒険",
-    "ko": "모험",
-    "ru": "Приключения",
-    "zh": "冒险"
+    "tr": "Keşif ve macera",
+    "en": "Exploration & adventure",
+    "ar": "الاستكشاف والمغامرة",
+    "ja": "探検・冒険",
+    "ko": "탐험·모험",
+    "ru": "Исследования и приключения",
+    "zh": "探险与冒险"
    }
   },
   {
    "id": "kiyamet",
    "names": {
-    "tr": "Kıyamet Sonrası",
-    "en": "Post-Apocalyptic",
-    "ar": "ما بعد الكارثة",
-    "ja": "終末世界",
-    "ko": "포스트 아포칼립스",
+    "tr": "Kıyamet sonrası",
+    "en": "Post-apocalypse",
+    "ar": "ما بعد نهاية العالم",
+    "ja": "終末後",
+    "ko": "종말 이후",
     "ru": "Постапокалипсис",
-    "zh": "末日废土"
+    "zh": "末日之后"
    }
   }
  ],

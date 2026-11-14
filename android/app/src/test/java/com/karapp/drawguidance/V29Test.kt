@@ -272,11 +272,15 @@ class V29ComicTest : V29EditorBase() {
         waitFor { chip("effects_sheet") }
         compose.onNodeWithTag("effects_tab_lines").performSemanticsAction(SemanticsActions.OnClick)
         waitFor { chip("lines_sheet") }
+        // v50 çizgi roman ve manga bölümleri; her türün kendi ayarları (tür seçilir, ayarlanır, "Ekle")
+        compose.onNodeWithTag("lines_style_comic").performSemanticsAction(SemanticsActions.OnClick)
         assertTrue(exists("lines_SWIRL") || runCatching { compose.onNodeWithTag("lines_SWIRL").performScrollTo(); true }.getOrDefault(false))
+        compose.onNodeWithTag("lines_style_manga").performSemanticsAction(SemanticsActions.OnClick)
+        compose.onNodeWithTag("lines_FOCUS").performScrollTo().performSemanticsAction(SemanticsActions.OnClick)
         slider("lines_new_density").performSemanticsAction(SemanticsActions.SetProgress) { it(2f) }
         compose.waitForIdle()
         shotAll("v29-03-lines-sheet")
-        compose.onNodeWithTag("lines_FOCUS").performScrollTo().performSemanticsAction(SemanticsActions.OnClick)
+        compose.onNodeWithTag("lines_add").performScrollTo().performSemanticsAction(SemanticsActions.OnClick)
         waitFor { canvas().strokes.size > 20 }
         val dense = canvas().strokes.size
         assertTrue(canvas().strokes.all { it.params?.comicLines?.density == 2f })

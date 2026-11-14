@@ -52,8 +52,15 @@ enum ComicLinesKind: String, KotlinEnum {
     case SPEED_H, SPEED_V, FOCUS, BURST
     case SPEED_DIAG, MOTION_CURVE, FOCUS_ROUGH, FLASH, RADIATE, DRIP, WAVER, BLUSH, SWIRL, RINGS
     case ZOOM, PERSPECTIVE, BEAMS, MANGA_DENSE, ANIME_SOFT
+    /// v50 Batı çizgi romanı: enerji çıtırtısı, darbe yıldızı, şaşkınlık, elektrik, Ben-Day noktaları.
+    /// Manga: kasvet (tate-sen), parıltı (kira-kira), tarama (kake-ami), yoğun hız (ryūsen-beta).
+    case KRACKLE, IMPACT, SURPRISE, ELECTRIC, BENDAY
+    case GLOOM, SPARKLE, CROSSHATCH, SPEED_DENSE
     static var fallback: ComicLinesKind { .FOCUS }
 }
+
+/// v50 odak çizgilerinin tarzı (pencerede iki bölüm): Batı çizgi romanı ve manga/anime.
+enum ComicLinesStyle: String, CaseIterable { case COMIC, MANGA }
 
 /// Tek çizgi: noktalar ve nokta başına basınç (incelme).
 struct ComicLine {
@@ -68,9 +75,39 @@ enum ComicLines {
     static let MIN_LENGTH: Float = 0.2
     static let MAX_LENGTH: Float = 1.6
 
+    /// v50 türün tarzı (pencerede Çizgi roman ya da Manga bölümünde).
+    static func style(_ kind: ComicLinesKind) -> ComicLinesStyle { kinds(.MANGA).contains(kind) ? .MANGA : .COMIC }
+
+    /// v50 tarzın türleri (pencere sırası; Android ile aynı).
+    static func kinds(_ style: ComicLinesStyle) -> [ComicLinesKind] {
+        switch style {
+        case .COMIC:
+            return [.SPEED_H, .SPEED_V, .SPEED_DIAG, .MOTION_CURVE, .BURST, .IMPACT, .ZOOM, .PERSPECTIVE, .BEAMS, .RINGS,
+                    .SWIRL, .KRACKLE, .ELECTRIC, .SURPRISE, .BENDAY]
+        case .MANGA:
+            return [.FOCUS, .MANGA_DENSE, .FOCUS_ROUGH, .FLASH, .RADIATE, .SPEED_DENSE, .DRIP, .GLOOM, .WAVER, .BLUSH,
+                    .SPARKLE, .CROSSHATCH, .ANIME_SOFT]
+        }
+    }
+
+    /// v50 türün önerilen ayarları: (sıklık, uzunluk, kalınlık çarpanı); her tür kendi ayarlarıyla başlar.
+    static func defaults(_ kind: ComicLinesKind) -> (density: Float, length: Float, thickness: Float) {
+        switch kind {
+        case .MANGA_DENSE, .SPEED_DENSE: return (1.2, 1, 0.8)
+        case .IMPACT: return (1, 1, 1.6)
+        case .ELECTRIC: return (1, 1, 1.4)
+        case .SPARKLE, .KRACKLE: return (1, 1, 1.2)
+        case .CROSSHATCH, .BENDAY: return (1, 1, 0.7)
+        case .GLOOM: return (1, 0.8, 0.9)
+        default: return (1, 1, 1)
+        }
+    }
+
     static func usesFocus(_ kind: ComicLinesKind) -> Bool { FOCUSED.contains(kind) }
 
-    static func usesAngle(_ kind: ComicLinesKind) -> Bool { kind == .SPEED_H || kind == .SPEED_V || kind == .SPEED_DIAG || kind == .BEAMS }
+    static func usesAngle(_ kind: ComicLinesKind) -> Bool {
+        kind == .SPEED_H || kind == .SPEED_V || kind == .SPEED_DIAG || kind == .BEAMS || kind == .CROSSHATCH || kind == .SPEED_DENSE
+    }
 
     static func widthFactor(_ kind: ComicLinesKind) -> Float {
         switch kind {
@@ -84,7 +121,8 @@ enum ComicLines {
     static let SOFT_COLORS = ["#FF9EC7", "#8FD3FF", "#C7A6FF", "#FFE08A", "#9FF0D0"]
 
     private static let FOCUSED: Set<ComicLinesKind> = [.FOCUS, .BURST, .FOCUS_ROUGH, .FLASH, .RADIATE, .SWIRL, .RINGS, .WAVER,
-                                                       .ZOOM, .PERSPECTIVE, .BEAMS, .MANGA_DENSE, .ANIME_SOFT]
+                                                       .ZOOM, .PERSPECTIVE, .BEAMS, .MANGA_DENSE, .ANIME_SOFT,
+                                                       .IMPACT, .SURPRISE, .ELECTRIC, .KRACKLE, .SPARKLE, .SPEED_DENSE]
 
     private static let PI = Double.pi
 
@@ -355,8 +393,162 @@ enum ComicLines {
                 let (ix, iy) = innerAt(ca, sa, inner(0.55 + rnd.nextFloat() * 0.2), outer)
                 out.append(taper(cx + ca * outer, cy + sa * outer, ix, iy, startThin: false, end: 0.1))
             }
+        case .KRACKLE:
+            // Enerji çıtırtısı (Kirby krackle): odağın çevresinde kümelenen küçük halkalar
+            let n = count(46, 10, 160)
+            let rMax = min(w, h) * 0.05
+            for _ in 0..<n {
+                let a = rnd.nextDouble() * 2 * PI
+                let dist = (0.15 + rnd.nextFloat() * 0.8) * min(len, 1.2)
+                let px = cx + Float(cos(a)) * w / 2 * dist, py = cy + Float(sin(a)) * h / 2 * dist
+                let rr = rMax * (0.25 + rnd.nextFloat() * 0.75) * max(1.1 - dist * 0.5, 0.3)
+                if let c = circle(px, py, rr, l, t, r, b) { out.append(c) }
+            }
+        case .IMPACT:
+            // Darbe yıldızı: sivri uçlu, düzensiz patlama kenarı ve içinde ikinci kenar
+            let spikes = count(14, 7, 40)
+            for ring in 0..<2 {
+                let m = spikes * 2 + 1
+                var xs = [Float](repeating: 0, count: m), ys = [Float](repeating: 0, count: m)
+                let k: Float = ring == 0 ? 1 : 0.62
+                for j in 0..<m {
+                    let a = 2 * PI * Double(j) / Double(m - 1) + Double(ring) * 0.2
+                    let tip = j % 2 == 0
+                    let rr = (tip ? 0.72 + rnd.nextFloat() * 0.26 : 0.36 + rnd.nextFloat() * 0.12) * k * min(len, 1.3)
+                    xs[j] = clampF(cx + Float(cos(a)) * w / 2 * rr, l, r); ys[j] = clampF(cy + Float(sin(a)) * h / 2 * rr, t, b)
+                }
+                xs[m - 1] = xs[0]; ys[m - 1] = ys[0]
+                out.append(ComicLine(xs: xs, ys: ys, pressures: [Float](repeating: 1, count: m)))
+            }
+        case .SURPRISE:
+            // Şaşkınlık çizgileri (emanata): odağın üstünde yelpaze gibi açılan kısa, kalın çizgiler
+            let n = count(5, 3, 14)
+            for i in 0..<n {
+                let a = -PI / 2 + (Double(i) / max(Double(n) - 1, 1) - 0.5) * 1.6
+                let (ca, sa) = dir(a)
+                let r0: Float = 0.42, r1 = r0 + 0.38 * len
+                out.append(taper(cx + ca * w / 2 * r0, cy + sa * h / 2 * r0, cx + ca * w / 2 * r1, cy + sa * h / 2 * r1, startThin: true, end: 0.35))
+            }
+        case .ELECTRIC:
+            // Elektrik: odaktan dışa doğru zikzak şimşekler
+            let n = count(7, 3, 24)
+            for i in 0..<n {
+                let a = 2 * PI * Double((Float(i) + rnd.nextFloat() * 0.5) / Float(n))
+                let (ca, sa) = dir(a)
+                let outer = edgeFrom(cx, cy, ca, sa, l, t, r, b) * min(len, 1)
+                let segs = 5 + rnd.nextInt(4)
+                let m = segs + 1
+                var line = ComicLine(xs: [], ys: [], pressures: [])
+                let r0 = outer * 0.18
+                for j in 0..<m {
+                    let f = Float(j) / Float(segs)
+                    let d = r0 + (outer - r0) * f
+                    let sign: Float = j % 2 == 0 ? 1 : -1
+                    let jit: Float = outer * (0.04 + rnd.nextFloat() * 0.05)
+                    let j0: Float = (j == 0 || j == segs) ? 0 : sign * jit
+                    line.xs.append(clampF(cx + ca * d - sa * j0, l, r)); line.ys.append(clampF(cy + sa * d + ca * j0, t, b))
+                    line.pressures.append(1 - 0.85 * f)
+                }
+                out.append(line)
+            }
+        case .BENDAY:
+            // Ben-Day nokta tramı: düzgün ızgarada küçük halkalar
+            let cols = count(12, 5, 32)
+            let step = w / Float(cols)
+            let rows = clampI(ktInt(h / step), 1, 64)
+            let rr = step * 0.3 * clampF(len, 0.4, 1.4)
+            for ry in 0..<rows {
+                for rx in 0..<cols {
+                    let px = l + step * (Float(rx) + 0.5 + (ry % 2 == 1 ? 0.5 : 0))
+                    let py = t + step * (Float(ry) + 0.5)
+                    if px + rr > r || py + rr > b { continue }
+                    if let c = circle(px, py, rr, l, t, r, b, segments: 10) { out.append(c) }
+                }
+            }
+        case .GLOOM:
+            // Kasvet (tate-sen): üst kenardan inen sık dikey çizgiler
+            let n = count(56, 12, 220)
+            for i in 0..<n {
+                let x = l + (Float(i) + 0.5 + (rnd.nextFloat() - 0.5) * 0.5) / Float(n) * w
+                let ln = min(h * (0.35 + rnd.nextFloat() * 0.3) * len, h)
+                out.append(taper(x, t, x, t + ln, startThin: false, end: 0.05))
+            }
+        case .SPARKLE:
+            // Parıltı (kira-kira): dört köşeli yıldızlar
+            let n = count(9, 3, 40)
+            let base = min(w, h) * 0.09 * clampF(len, 0.3, 1.6)
+            for _ in 0..<n {
+                let px = l + w * (0.08 + rnd.nextFloat() * 0.84), py = t + h * (0.08 + rnd.nextFloat() * 0.84)
+                let sz = base * (0.35 + rnd.nextFloat() * 0.65)
+                let hx = min(sz, min(px - l, r - px)), vy = min(sz, min(py - t, b - py))
+                out.append(star(px - hx, py, px + hx, py))
+                out.append(star(px, py - vy, px, py + vy))
+            }
+        case .CROSSHATCH:
+            // Tarama (kake-ami): iki yönde çapraz paralel çizgiler
+            let n = count(22, 6, 90)
+            let a = (45.0 + Double(angle)) * PI / 180
+            hatch(&out, a, l, t, r, b, n)
+            hatch(&out, a + PI / 2, l, t, r, b, n)
+        case .SPEED_DENSE:
+            // Yoğun hız (ryūsen-beta): çok sık çizgiler, ortada boş bir şerit
+            let ang = Double(angle) * PI / 180
+            let (ux, uy) = dir(ang)
+            let px = -uy, py = ux
+            let span = kHypot(w, h)
+            let n = count(110, 20, 360)
+            for i in 0..<n {
+                let off = ((Float(i) + 0.5 + (rnd.nextFloat() - 0.5) * 0.6) / Float(n) - 0.5) * span
+                let center = (focusY - 0.5) * h
+                if abs(off - center) < h * 0.12 * (0.6 + rnd.nextFloat() * 0.6) { continue }
+                let ln = min(span * (0.35 + rnd.nextFloat() * 0.6) * len, span)
+                let along = (rnd.nextFloat() - 0.5) * (span - ln)
+                let mx = (l + r) / 2, my = (t + b) / 2
+                let sx = mx + px * off + ux * (along - ln / 2), sy = my + py * off + uy * (along - ln / 2)
+                if let c = clip(sx, sy, sx + ux * ln, sy + uy * ln, l, t, r, b) {
+                    out.append(taper(c[0], c[1], c[2], c[3], startThin: rnd.nextBoolean(), end: 0.05))
+                }
+            }
         }
         return out
+    }
+
+    /// v50 merkezli halka (alanın dışına taşıyorsa nil).
+    private static func circle(_ x: Float, _ y: Float, _ rr: Float, _ l: Float, _ t: Float, _ r: Float, _ b: Float, segments: Int = 14) -> ComicLine? {
+        if rr < 0.5 || x - rr < l || x + rr > r || y - rr < t || y + rr > b { return nil }
+        var line = ComicLine(xs: [], ys: [], pressures: [])
+        for j in 0...segments {
+            let a = 2 * PI * Double(j) / Double(segments)
+            line.xs.append(x + Float(cos(a)) * rr); line.ys.append(y + Float(sin(a)) * rr); line.pressures.append(0.8)
+        }
+        return line
+    }
+
+    /// v50 iki ucu ince, ortası kalın çizgi (parıltının kolu).
+    private static func star(_ x0: Float, _ y0: Float, _ x1: Float, _ y1: Float) -> ComicLine {
+        let n = 9
+        var line = ComicLine(xs: [], ys: [], pressures: [])
+        for i in 0..<n {
+            let f = Float(i) / (Float(n) - 1)
+            line.xs.append(x0 + (x1 - x0) * f); line.ys.append(y0 + (y1 - y0) * f)
+            line.pressures.append(0.05 + 0.95 * (1 - abs(f - 0.5) * 2))
+        }
+        return line
+    }
+
+    /// v50 [rad] doğrultusunda eşit aralıklı paralel çizgiler (alanın içine kırpılır).
+    private static func hatch(_ out: inout [ComicLine], _ rad: Double, _ l: Float, _ t: Float, _ r: Float, _ b: Float, _ n: Int) {
+        let ux = Float(cos(rad)), uy = Float(sin(rad))
+        let px = -uy, py = ux
+        let cx = (l + r) / 2, cy = (t + b) / 2
+        let span = kHypot(r - l, b - t)
+        for i in 0..<n {
+            let off = ((Float(i) + 0.5) / Float(n) - 0.5) * span
+            let sx = cx + px * off - ux * span / 2, sy = cy + py * off - uy * span / 2
+            if let c = clip(sx, sy, sx + ux * span, sy + uy * span, l, t, r, b) {
+                out.append(ComicLine(xs: [c[0], (c[0] + c[2]) / 2, c[2]], ys: [c[1], (c[1] + c[3]) / 2, c[3]], pressures: [0.7, 0.7, 0.7]))
+            }
+        }
     }
 
     private static func parallel(_ out: inout [ComicLine], _ rnd: inout KotlinRandom, _ rad: Double, _ l: Float, _ t: Float, _ r: Float, _ b: Float,

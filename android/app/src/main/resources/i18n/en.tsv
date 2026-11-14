@@ -3028,3 +3028,255 @@ F = m·a neyi anlatır?	What does F = m·a tell us?
 Limanda bir hareket var.	Something's moving at the harbour.
 Hemen geliyorum!	I'm on my way!
 Şehrin çatılarında bir kovalamaca	A chase across the city rooftops
+Fizik · Dinamik · Ders notu	Physics · Dynamics · Lecture notes
+1. EYLEMSİZLİK YASASI	1. LAW OF INERTIA
+Net kuvvet sıfırsa duran cisim durur, hareket eden cisim sabit hızla doğrusal hareketine devam eder.	If the net force is zero, a body at rest stays at rest and a moving body keeps moving in a straight line at constant speed.
+2. TEMEL YASA	2. FUNDAMENTAL LAW
+Net kuvvet, kütle ile ivmenin çarpımına eşittir. Kuvvet ile ivme aynı yöndedir.	The net force equals mass times acceleration. Force and acceleration point in the same direction.
+3. ETKİ–TEPKİ YASASI	3. ACTION–REACTION LAW
+Bir cisim ötekine kuvvet uygularsa öteki de ona eşit büyüklükte ve zıt yönde kuvvet uygular. Kuvvetler farklı cisimlere etki ettiği için birbirini yok etmez.	If one body exerts a force on another, the other exerts a force of equal size in the opposite direction. The forces act on different bodies, so they do not cancel each other.
+ANAHTAR SORULAR	KEY QUESTIONS
+Konu: Dinamik\nTarih: ____	Topic: Dynamics\nDate: ____
+Cisim neden hareketini sürdürür?	Why does a body keep moving?
+F = m·a neyi anlatır? Birimler?	What does F = m·a describe? Units?
+Sürtünme ivmeyi nasıl değiştirir?	How does friction change acceleration?
+Etki ve tepki birbirini yok eder mi?	Do action and reaction cancel each other?
+ÖZET	SUMMARY
+Kuvvet hareketi değil, hareketteki değişimi (ivmeyi) belirler: a = F_net / m. Kuvvetler her zaman çiftler hâlinde oluşur; serbest cisim diyagramında yalnız cisme etki edenler çizilir.	Force determines not motion but the change in motion (acceleration): a = F_net / m. Forces always come in pairs; a free-body diagram shows only the forces acting on the body.
+Deney Raporu: Basit Sarkacın Periyodu	Lab Report: Period of a Simple Pendulum
+Amaç: Periyodun ip uzunluğuna bağlılığını ölçmek.   Hipotez: T, √L ile artar; kütleye bağlı değildir.	Aim: Measure how the period depends on string length.   Hypothesis: T grows with √L and does not depend on mass.
+Ad: ______________   ·   Sınıf: ______   ·   Tarih: ________	Name: ______________   ·   Class: ______   ·   Date: ________
+MALZEMELER	MATERIALS
+• Statif ve ip\n• 50 g ve 100 g kütle\n• Kronometre\n• Şerit metre	• Stand and string\n• 50 g and 100 g masses\n• Stopwatch\n• Tape measure
+YÖNTEM	METHOD
+1. İpi 20 cm uzunluğa ayarla.\n2. Kütleyi 10°'den küçük açıyla bırak.\n3. 10 tam salınımın süresini ölç, 10'a böl.\n4. Ölçümü 20 cm artırarak 100 cm'ye kadar tekrarla.\n5. Kütleyi değiştirip bir ölçümü yinele.	1. Set the string to 20 cm.\n2. Release the mass at an angle under 10°.\n3. Time 10 full swings and divide by 10.\n4. Repeat in 20 cm steps up to 100 cm.\n5. Change the mass and repeat one measurement.
+VERİLER	DATA
+Ölçülen periyotlar T = 2π√(L/g) ile uyumludur: uzunluk 4 katına çıkınca periyot 2 katına çıkar. Kütle değişince periyot değişmedi; hipotez doğrulandı.	The measured periods agree with T = 2π√(L/g): when the length is 4 times longer, the period doubles. Changing the mass did not change the period; the hypothesis is confirmed.
+HATA KAYNAKLARI	SOURCES OF ERROR
+• Kronometreyi başlatma ve durdurma gecikmesi\n• Büyük açılarda yaklaşımın bozulması\n• Hava direnci	• Delay in starting and stopping the stopwatch\n• The approximation breaks down at large angles\n• Air resistance
+İkinci Dereceden Denklemler	Quadratic Equations
+Çalışma kâğıdı   ·   Ad: ______________   ·   Tarih: ________	Worksheet   ·   Name: ______________   ·   Date: ________
+Hedef: ax² + bx + c = 0 denklemini çarpanlara ayırarak ve diskriminantla çözmek.	Goal: Solve ax² + bx + c = 0 by factoring and with the discriminant.
+FORMÜLLER	FORMULAS
+Δ > 0: iki farklı kök   ·   Δ = 0: çakışık kök   ·   Δ < 0: gerçek kök yok	Δ > 0: two distinct roots   ·   Δ = 0: double root   ·   Δ < 0: no real roots
+ÇÖZÜMLÜ ÖRNEK	WORKED EXAMPLE
+Ç = { 1, 3 }	S = { 1, 3 }
+Kökler, parabolün x eksenini kestiği noktalardır: x = 1 ve x = 3. Tepe noktası (2, −1).	The roots are where the parabola crosses the x-axis: x = 1 and x = 3. Vertex (2, −1).
+ALIŞTIRMALAR	EXERCISES
+☐ x² − 5x + 6 = 0\n☐ 2x² + 3x − 2 = 0\n☐ x² + 6x + 9 = 0\n☐ x² + x + 1 = 0  (Δ < 0 ise?)	☐ x² − 5x + 6 = 0\n☐ 2x² + 3x − 2 = 0\n☐ x² + 6x + 9 = 0\n☐ x² + x + 1 = 0  (if Δ < 0?)
+Haftalık Ürün Toplantısı	Weekly Product Meeting
+Tarih: __.__.____   ·   Saat: 10.00–10.45   ·   Katılımcılar: Ayşe, Can, Ece, Mert	Date: __.__.____   ·   Time: 10:00–10:45   ·   Attendees: Ayşe, Can, Ece, Mert
+Amaç: Sürüm takvimini kesinleştirmek ve geri bildirimleri önceliklendirmek.	Goal: Finalize the release schedule and prioritize feedback.
+GÜNDEM	AGENDA
+1. Geçen haftanın değerlendirmesi\n2. Yeni sürüm takvimi\n3. Kullanıcı geri bildirimleri\n4. Riskler ve engeller	1. Review of last week\n2. New release schedule\n3. User feedback\n4. Risks and blockers
+NOTLAR	NOTES
+• Geri bildirimlerin çoğu arama hızıyla ilgili.\n• Ödeme ekranında iki hata bildirildi.\n• Test ortamı perşembeye hazır olacak.	• Most feedback is about search speed.\n• Two bugs were reported on the payment screen.\n• The test environment will be ready by Thursday.
+KARARLAR	DECISIONS
+• Sürüm 20 Mart'ta mağazaya gönderilecek.\n• Arama iyileştirmesi bu sürüme alınacak.	• The release will be submitted to the store on March 20.\n• The search improvement goes into this release.
+SÜRÜM TAKVİMİ	RELEASE SCHEDULE
+YAPILACAKLAR	TO DO
+☐ Sürüm notlarını yaz — Ayşe · 14 Mart\n☐ Test planını güncelle — Mert · 15 Mart\n☐ Ödeme hatalarını düzelt — Can · 16 Mart\n☐ Anket sonuçlarını özetle — Ece · 17 Mart	☐ Write release notes — Ayşe · Mar 14\n☐ Update the test plan — Mert · Mar 15\n☐ Fix the payment bugs — Can · Mar 16\n☐ Summarize the survey results — Ece · Mar 17
+AÇIK SORULAR	OPEN QUESTIONS
+• Arama için ek sunucu gerekli mi?\n• Mağaza görselleri kimde?	• Do we need an extra server for search?\n• Who has the store screenshots?
+SONRAKİ TOPLANTI	NEXT MEETING
+Pazartesi 10.00 · Konu: test sonuçları	Monday 10:00 · Topic: test results
+Fotosentez · Zihin Haritası	Photosynthesis · Mind Map
+Biyoloji · Canlılarda enerji dönüşümleri	Biology · Energy conversion in living things
+TEPKİME	REACTION
+(ışık ve klorofil varlığında, kloroplastta)	(in the presence of light and chlorophyll, in the chloroplast)
+ANAHTAR KAVRAMLAR	KEY CONCEPTS
+• Klorofil: ışığı soğuran yeşil pigment\n• Kloroplast: fotosentezin yapıldığı organel\n• Stoma: gaz alışverişini sağlayan gözenek\n• ATP: hücrenin enerji taşıyıcısı	• Chlorophyll: the green pigment that absorbs light\n• Chloroplast: the organelle where photosynthesis happens\n• Stoma: the pore for gas exchange\n• ATP: the cell's energy carrier
+Su Döngüsü	The Water Cycle
+Fen bilimleri · Ders notu · Tarih: ________	Science · Lesson notes · Date: ________
+• Buharlaşma: Güneş'in ısıttığı su buhar olup havaya yükselir.\n• Yoğuşma: Yükselen buhar soğuyup küçük damlacıklara dönüşür, bulutlar oluşur.\n• Yağış: Damlacıklar büyüyüp ağırlaşınca yağmur, kar ya da dolu olarak düşer.\n• Toplanma: Su derelerde, göllerde, denizlerde ve yer altında birikir.	• Evaporation: water warmed by the Sun turns into vapor and rises.\n• Condensation: rising vapor cools into tiny droplets and forms clouds.\n• Precipitation: droplets grow heavy and fall as rain, snow or hail.\n• Collection: water gathers in streams, lakes, seas and underground.
+Su, Güneş'ten aldığı enerjiyle sürekli yer değiştirir; miktarı değişmez, yalnız hâli (sıvı, gaz, katı) ve yeri değişir.	Driven by the Sun's energy, water keeps moving; its amount stays the same, only its state (liquid, gas, solid) and place change.
+Soru: Bulutlar neden yüksekte oluşur?	Question: Why do clouds form high up?
+Bu haftanın yapılacakları	This week's to-dos
+Tarih: __.__.____ – __.__.____	Date: __.__.____ – __.__.____
+OKUL	SCHOOL
+☐ Matematik ödevi\n☐ Fen deney raporu\n☐ Kitap okuma (her gün 30 dakika)\n☐ Yabancı dil kelime tekrarı	☐ Math homework\n☐ Science lab report\n☐ Reading (30 minutes every day)\n☐ Foreign language vocabulary review
+EV	HOME
+☐ Odayı toplamak\n☐ Bitkileri sulamak\n☐ Çantayı hazırlamak	☐ Tidy the room\n☐ Water the plants\n☐ Pack the school bag
+KENDİM İÇİN	FOR MYSELF
+☐ Spor ya da yürüyüş\n☐ Resim çizmek\n☐ Erken uyumak	☐ Sports or a walk\n☐ Drawing\n☐ Going to bed early
+En önemli üç iş: ______________________	Top three tasks: ______________________
+Haftalık Plan	Weekly Plan
+PAZARTESİ	MONDAY
+SALI	TUESDAY
+ÇARŞAMBA	WEDNESDAY
+PERŞEMBE	THURSDAY
+CUMA	FRIDAY
+CUMARTESİ	SATURDAY
+PAZAR	SUNDAY
+oku	read
+yaz	write
+Müşteri	Customer
+ad	name
+e-posta	email
+Sipariş	Order
+müşteri_id	customer_id
+tarih	date
+toplam	total
+Sipariş kalemi	Order item
+sipariş_id	order_id
+ürün_id	product_id
+adet	qty
+Ürün	Product
+fiyat	price
+verir	places
+Varlık	Entity
+eşit(o): Bool	equals(o): Bool
+arayüz»	interface»
+Depo	Repository
+bul(id): T	find(id): T
+kaydet(t: T)	save(t: T)
+ad: String	name: String
+e-posta: String	email: String
+giriş(): Bool	login(): Bool
+KullanıcıDeposu	UserRepository
+bul(id): Kullanıcı	find(id): User
+sil(id)	delete(id)
+HATA	BUG
+DESTEK	SUPPORT
+Giriş sayfası	Login page
+Arama filtresi	Search filter
+Ödeme API	Payment API
+Bildirimler	Notifications
+Profil	Profile
+Tema	Theme
+ETKİNLİK	ACTIVITY
+Veriyi bul	Find data
+Rapor kur	Build report
+Paylaş	Share
+Güven	Trust
+SONRA	LATER
+Katalog arama	Catalog search
+Hazır şablon	Ready template
+Bağlantı paylaş	Share link
+Satır izinleri	Row permissions
+Kayıtlı sorgular	Saved queries
+Grafik türleri	Chart types
+Zamanlanmış e-posta	Scheduled email
+KENAR	EDGE
+statik	static
+Çalışan	Worker
+YÖNETİLEN	MANAGED
+RDS birincil	RDS primary
+RDS yedek	RDS replica
+KUYRUK	QUEUE
+PROJE	PROJECT
+DOSYA	FILE
+Sunum	Presentation
+Uygulama	Application
+uygulama	app
+Etki alanı	Domain
+iş kuralları	business rules
+Altyapı	Infrastructure
+Topla	Collect
+sinyaller	signals
+Araştır	Research
+kanıt	evidence
+insan onaylar	human approves
+Uygula	Apply
+iş çıkar	ships work
+Ölç	Measure
+sonuçlar	results
+Öğren	Learn
+yöntem güncellenir	method updated
+Ortak hafıza	Shared memory
+tek kayıt, her tur	one record, every loop
+db-istemci	db-client
+TOPLAMA	COLLECTION
+YAYIN	PUBLISHING
+Anket sistemi	Survey system
+Eski uygulamalar	Legacy apps
+yönetim portalları	admin portals
+Nüfus kaydı	Population registry
+dış kaynak	external source
+Ortak sürücü	Shared drive
+sürüm denetimi yok	no version control
+Analist makineleri	Analyst machines
+şirket içi	on-premises
+Eski portal	Legacy portal
+elle darboğaz	manual bottleneck
+Web sitesi	Website
+statik sayfalar	static pages
+Bakanlıklar	Ministries
+~6 kurum	~6 agencies
+KAYNAKLAR	SOURCES
+ALIM	INGEST
+DEPOLAMA	STORAGE
+KOPYALA	COPY
+Web formları	Web forms
+zamanlayıcı	scheduler
+alım	ingest
+nesne deposu	object store
+SORGU	QUERY
+Defterler	Notebooks
+panolar	dashboards
+HAM	RAW
+ham-kova	raw-bucket
+Veri mühendisi	Data engineer
+ANONİM	ANONYMIZED
+anonim-kova	anon-bucket
+HAZIRLIK	STAGING
+hazırlık-kova	staging-bucket
+temiz	clean
+ağırlıklı	weighted
+Veri bilimci	Data scientist
+TOPLU	AGGREGATE
+toplu-kova	agg-bucket
+göstergeler	indicators
+ARŞİV	ARCHIVE
+arşiv-kova	archive-bucket
+soğuk katman	cold tier
+TOPLA	COLLECT
+DEPOLA	STORE
+YAYINLA	PUBLISH
+YÖN	ADM
+Proje kurulumu	Project setup
+Erişim denetimi	Access control
+MÜH	ENG
+Kaynak alımı	Source ingest
+Ham depo	Raw store
+Temizle	Clean
+BİL	SCI
+Keşfet ve modelle	Explore and model
+Bulguları yayınla	Publish findings
+TÜK	CONS
+Sorgula	Query
+Veritabanları	Databases
+dosya	file
+E-posta	Email
+birleşik SQL	federated SQL
+madalyon depo	medallion store
+defter	notebook
+Masaüstü	Desktop
+Raporlar	Reports
+Sipariş API	Order API
+doğrudan gönderim	direct send
+kuyruğa yazar	writes to queue
+doğrudan → kuyruk	direct → queue
+eklendi	added
+kaldırıldı	removed
+Yalnız SELECT	SELECT only
+cam	glass
+Ana kart	Mainboard
+işlemci	CPU
+bellek	memory
+Kasa	Casing
+alüminyum	aluminum
+Otopark	Parking
+1 kat	1 floor
+2 kat	2 floors
+4 kat	4 floors
+Yeni iş	New task
+E-POSTA	EMAIL
+arama	search
+profil	profile
+Oku/Yaz	Read/Write
+TIK TAK	TICK TOCK
+DUYGU	FEELING
+EYLEM	ACTION
+SIKINTI	PAIN
+ZAMAN KAYBI	TIME SINK

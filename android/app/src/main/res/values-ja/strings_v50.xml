@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- v50 düzenleyici, çeviri ve çizgi roman iyileştirmeleri -->
+<resources>
+    <string name="lines_krackle">エネルギー・クラックル</string>
+    <string name="lines_impact">インパクトスター</string>
+    <string name="lines_surprise">びっくり線</string>
+    <string name="lines_electric">電撃</string>
+    <string name="lines_benday">ベンデイ・ドット</string>
+    <string name="lines_gloom">縦線（どんより）</string>
+    <string name="lines_sparkle">キラキラ</string>
+    <string name="lines_crosshatch">カケアミ</string>
+    <string name="lines_speed_dense">流線（ベタ）</string>
+    <string name="v50_lines_style_comic">コミック</string>
+    <string name="v50_lines_style_manga">マンガ</string>
+    <string name="v50_lines_add">追加: %1$s</string>
+    <string name="v50_lines_reset">リセット</string>
+</resources>

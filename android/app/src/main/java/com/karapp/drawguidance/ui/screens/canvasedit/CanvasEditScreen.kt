@@ -164,6 +164,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.material.icons.filled.Colorize
 import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.zIndex
 import com.karapp.drawguidance.R
 import com.karapp.drawguidance.data.model.BrushType
 import com.karapp.drawguidance.ui.common.hexToColor
@@ -522,6 +523,8 @@ fun CanvasEditScreen(
     }
     // Yatay ekran ve tabletlerde araçlar başlık satırına, modlar sol kenardaki dikey raya taşınır
     val wide = configuration.screenWidthDp >= 600 || configuration.screenWidthDp > configuration.screenHeightDp
+    // v50 dikey ekranda alt pencereler çizim alanının altında (seçim menüsüyle birlikte kullanılır); yatayda null
+    val dockedSheets = com.karapp.drawguidance.ui.screens.canvasedit.components.dockedSheetHostOrNull()
     // Yatay telefon gibi alçak ekranlarda araçlar başlık satırına alınır; tuvale ve panele yer kalır
     val compactHeight = wide && configuration.screenHeightDp < 600
     // v38 yatay ekran: üst menüdeki düğmelerin adı simgelerinin altında sürekli görünür
@@ -1494,9 +1497,12 @@ fun CanvasEditScreen(
                     ),
                     editItems = editItems,
                     resetKey = selectedIds,
-                    bottomInset = { modeBarHeightPx },
+                    // v50 dikey ekranda açık alt pencerenin üstüne yerleşir (yer yoksa çakışır; son dokunulan üstte)
+                    bottomInset = { maxOf(modeBarHeightPx, dockedSheets?.coveredBottomPx ?: 0) },
                     openEdit = contextEdit,
                     onEditOpened = { contextEdit = false },
+                    modifier = if (dockedSheets != null) Modifier.zIndex(dockedSheets.menuZ()) else Modifier,
+                    onTouched = { dockedSheets?.menuTouched() },
                 )
             }
             // v23 3B şeklin resmi hazırlanırken
@@ -2053,6 +2059,10 @@ fun CanvasEditScreen(
                         }
                     }
                 }
+            }
+            // v50 dikey ekranda alt pencereler çizim alanının altında (kalıcı değil; seçim menüsüyle sırası değişir)
+            if (dockedSheets != null) {
+                com.karapp.drawguidance.ui.screens.canvasedit.components.DockedSheetsLayer(dockedSheets)
             }
             // v33 araç açıklaması kutusu: çizim alanının sağ üst köşesinde, yakınlık göstergesinin altında (panel açıkken
             // sol üstte); panellerin ve öneri balonlarının da üstünde

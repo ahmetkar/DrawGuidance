@@ -13,6 +13,8 @@ struct DrawGuidanceApp: App {
         CanvasAssetStore.shared.install()
         // Google ve Apple ile giriş (GoogleService-Info.plist pakette varsa Firebase açılır)
         FirebaseAuthService.configure()
+        // Abonelik: hesap bağlanır (girişliyse sunucudaki abonelik de okunur)
+        SubscriptionStore.shared.connect(AccountStore.shared)
         // Koddaki Türkçe metinlerin (3B şekil adları, iletiler) çevirisi
         I18n.setLanguage(I18n.systemLanguage())
     }

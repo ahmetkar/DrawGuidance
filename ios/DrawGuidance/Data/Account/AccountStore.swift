@@ -137,6 +137,8 @@ final class AccountStore: ObservableObject {
     private func store(_ u: LocalUser?) {
         user = u
         if let u, let data = try? JSONEncoder().encode(u) { defaults.set(data, forKey: Self.KEY) } else { defaults.removeObject(forKey: Self.KEY) }
+        // Giriş/çıkış: abonelik sunucudan yeniden okunur (uid değişmediyse bir şey yapmaz)
+        if self === AccountStore.shared { Task { await SubscriptionStore.shared.accountChanged() } }
     }
 
     /// Açılışta: Firebase oturumu kapandıysa cihazdaki kayıt da kapanır; sunucuya yazılmamışsa yeniden denenir.
@@ -260,4 +262,10 @@ final class AccountStore: ObservableObject {
         f.dateFormat = "yyyy-MM-dd"
         return f.string(from: d)
     }
+}
+
+/// Abonelik sunucu doğrulaması için hesap (Firebase uid ve kimlik jetonu).
+extension AccountStore: SubscriptionAccount {
+    var subscriptionUid: String? { user?.firebaseUid }
+    func subscriptionIdToken(force: Bool) async -> String? { await auth.idToken(force: force) }
 }

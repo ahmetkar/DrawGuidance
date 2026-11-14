@@ -23,6 +23,10 @@
 	<key>NSPhotoLibraryAddUsageDescription</key><string>Çizimlerinizi galeriye kaydetmek için.</string>
 	<key>NSPhotoLibraryUsageDescription</key><string>Tuvale resim eklemek için.</string>
 	<key>NSCameraUsageDescription</key><string>Tuvale fotoğraf eklemek için.</string>
+	<!-- v51 cihazlar arası paylaşım: aynı Wi-Fi ağındaki cihazları bulma (Bonjour) -->
+	<key>NSLocalNetworkUsageDescription</key><string>Aynı Wi-Fi ağındaki cihazlarla tuval ve resim paylaşmak ve canlı yayın yapmak için.</string>
+	<key>NSBonjourServices</key>
+	<array><string>_dgshare._tcp</string></array>
 	<!-- AdMob: Google'ın test uygulama kimliği (gerçek kimlik gelene kadar) -->
 	<key>GADApplicationIdentifier</key><string>ca-app-pub-3940256099942544~1458002511</string>
 	<!-- Google ile giriş: hesap seçiciden dönüş adresi (REVERSED_CLIENT_ID; bkz. project.yml DG_GOOGLE_URL_SCHEME) -->

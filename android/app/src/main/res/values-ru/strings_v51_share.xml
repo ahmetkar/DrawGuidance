@@ -58,7 +58,7 @@
     <string name="v51_share_folder">Помещать полученные холсты в папку «Полученные»</string>
     <string name="v51_share_folder_hint">Полученные холсты собираются в отдельной папке в «Мои холсты»</string>
     <string name="v51_share_smooth">Плавная трансляция</string>
-    <string name="v51_share_smooth_hint">Трансляция обновляется часто; выключите при медленном Bluetooth</string>
+    <string name="v51_share_smooth_hint">Трансляция обновляется часто; выключите в медленной сети Wi-Fi</string>
     <string name="v51_share_shared_badge">Полученный · %1$s</string>
     <string name="v51_share_platform_ios">iPhone / iPad</string>
     <string name="v51_share_platform_android">Android</string>

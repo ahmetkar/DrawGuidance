@@ -58,7 +58,7 @@
     <string name="v51_share_folder">受信したキャンバスを「共有」フォルダーに入れる</string>
     <string name="v51_share_folder_hint">受信したキャンバスはマイキャンバスの専用フォルダーにまとめられます</string>
     <string name="v51_share_smooth">なめらかな配信</string>
-    <string name="v51_share_smooth_hint">配信を頻繁に更新します。遅い Bluetooth 接続ではオフにしてください</string>
+    <string name="v51_share_smooth_hint">配信を頻繁に更新します。遅い Wi-Fi ではオフにしてください</string>
     <string name="v51_share_shared_badge">共有 · %1$s</string>
     <string name="v51_share_platform_ios">iPhone / iPad</string>
     <string name="v51_share_platform_android">Android</string>

@@ -58,7 +58,7 @@
     <string name="v51_share_folder">将收到的画布放入“已共享”文件夹</string>
     <string name="v51_share_folder_hint">收到的画布会集中在我的画布中的单独文件夹里</string>
     <string name="v51_share_smooth">流畅直播</string>
-    <string name="v51_share_smooth_hint">直播会频繁更新；蓝牙较慢时请关闭</string>
+    <string name="v51_share_smooth_hint">直播会频繁更新；Wi-Fi 较慢时请关闭</string>
     <string name="v51_share_shared_badge">已共享 · %1$s</string>
     <string name="v51_share_platform_ios">iPhone / iPad</string>
     <string name="v51_share_platform_android">Android</string>

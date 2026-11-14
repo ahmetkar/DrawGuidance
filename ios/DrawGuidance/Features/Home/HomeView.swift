@@ -25,7 +25,10 @@ struct HomeView: View {
                 .tabItem { Label(L("drawer_settings"), systemImage: "gearshape") }.tag(Tab.settings)
                 .accessibilityIdentifier("home_settings")
         }
+        // v51 cihazlar arası paylaşım: gelen teklif, alınan içerik, yayın görüntüleyici
+        .shareHost()
         .onAppear {
+            ShareManager.shared.attach()
             // v39 açılış reklamı (kurallara göre; ilk açılışta yok)
             if !Self.entered { Self.entered = true; AdsCoordinator.shared.onAppEntry() }
         }

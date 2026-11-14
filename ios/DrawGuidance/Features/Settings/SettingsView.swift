@@ -68,6 +68,8 @@ struct SettingsView: View {
         } header: { Text(L("language_title")) } footer: {
             Text(L("language_auto_hint", Locale.current.localizedString(forRegionCode: Locale.current.region?.identifier ?? "") ?? ""))
         }
+        // v51 cihazlar arası paylaşım
+        ShareSettingsSection()
         Section(L("v40_theme_mode_title")) {
             Picker(L("v40_theme_mode_title"), selection: $theme) {
                 ForEach(ThemeMode.allCases, id: \.rawValue) { Text(L($0.labelKey)).tag($0.rawValue) }

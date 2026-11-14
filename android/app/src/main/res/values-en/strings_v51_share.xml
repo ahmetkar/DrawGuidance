@@ -58,7 +58,7 @@
     <string name="v51_share_folder">Put received canvases in a “Shared” folder</string>
     <string name="v51_share_folder_hint">Received canvases are collected in their own folder in My canvases</string>
     <string name="v51_share_smooth">Smooth broadcast</string>
-    <string name="v51_share_smooth_hint">The broadcast updates often; turn off on slow Bluetooth connections</string>
+    <string name="v51_share_smooth_hint">The broadcast updates often; turn off on a slow Wi-Fi network</string>
     <string name="v51_share_shared_badge">Shared · %1$s</string>
     <string name="v51_share_platform_ios">iPhone / iPad</string>
     <string name="v51_share_platform_android">Android</string>

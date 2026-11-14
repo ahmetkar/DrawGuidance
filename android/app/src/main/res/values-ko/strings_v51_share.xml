@@ -58,7 +58,7 @@
     <string name="v51_share_folder">받은 캔버스를 “공유됨” 폴더에 넣기</string>
     <string name="v51_share_folder_hint">받은 캔버스는 내 캔버스의 별도 폴더에 모입니다</string>
     <string name="v51_share_smooth">부드러운 방송</string>
-    <string name="v51_share_smooth_hint">방송을 자주 갱신합니다. 느린 블루투스 연결에서는 끄세요</string>
+    <string name="v51_share_smooth_hint">방송을 자주 갱신합니다. 느린 Wi-Fi에서는 끄세요</string>
     <string name="v51_share_shared_badge">공유됨 · %1$s</string>
     <string name="v51_share_platform_ios">iPhone / iPad</string>
     <string name="v51_share_platform_android">Android</string>

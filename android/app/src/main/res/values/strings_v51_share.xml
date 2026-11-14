@@ -58,7 +58,7 @@
     <string name="v51_share_folder">Alınanları “Paylaşılanlar” klasörüne koy</string>
     <string name="v51_share_folder_hint">Alınan tuvaller Tuvallerim\'de ayrı bir klasörde toplanır</string>
     <string name="v51_share_smooth">Akıcı yayın</string>
-    <string name="v51_share_smooth_hint">Yayın sık güncellenir; yavaş Bluetooth bağlantısında kapatın</string>
+    <string name="v51_share_smooth_hint">Yayın sık güncellenir; yavaş Wi-Fi ağında kapatın</string>
     <string name="v51_share_shared_badge">Paylaşılan · %1$s</string>
     <string name="v51_share_platform_ios">iPhone / iPad</string>
     <string name="v51_share_platform_android">Android</string>

@@ -56,6 +56,8 @@ struct CanvasEditScreen: View {
             .overlay(alignment: .top) { if vm.loaded { ParamControlsHost(vm: vm, shapes: vm.shapes) } }
             .overlay(alignment: .bottom) { if vm.loaded { Draw3dHost(vm: vm, store: vm.store) } }
             .overlay(alignment: .bottom) { if vm.loaded { SuggestionLayer(vm: vm, hw: vm.handwriting, texts: vm.texts, ctl: vm.challenge) } }
+            // v51 canlı yayın: bu tuval yayındaysa değişiklikler karşı cihaza gider
+            .overlay(alignment: .bottom) { if vm.loaded { LiveBroadcastBridge(store: vm.store, canvasLocalId: vm.canvasLocalId) } }
         }
         .background(Color(uiColor: CanvasColors.background))
         .overlay { EditorToastHost(events: vm.events) }

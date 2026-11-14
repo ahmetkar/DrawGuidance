@@ -58,7 +58,7 @@
     <string name="v51_share_folder">ضع اللوحات المستلمة في مجلد «المشتركة»</string>
     <string name="v51_share_folder_hint">تُجمع اللوحات المستلمة في مجلد خاص في لوحاتي</string>
     <string name="v51_share_smooth">بث سلس</string>
-    <string name="v51_share_smooth_hint">يتحدّث البث كثيرًا؛ أوقفه مع اتصالات البلوتوث البطيئة</string>
+    <string name="v51_share_smooth_hint">يتحدّث البث كثيرًا؛ أوقفه على شبكة Wi-Fi البطيئة</string>
     <string name="v51_share_shared_badge">مشتركة · %1$s</string>
     <string name="v51_share_platform_ios">iPhone / iPad</string>
     <string name="v51_share_platform_android">Android</string>

@@ -193,6 +193,9 @@ fun DrawGuidanceNavGraph(
                     onBack = { navController.popBackStack() },
                     onOpenModel3d = { modelId, strokeId -> navController.navigate(Routes.modelEdit(modelId, localId, strokeId)) },
                     onOpenSubscription = { navController.navigate(Routes.SUBSCRIPTION) },
+                    // v52 çizim ekranının Diğer menüsünden paylaşım ve canlı yayın
+                    onOpenShare = { navController.navigate(Routes.SHARE) },
+                    onOpenLiveShare = { navController.navigate(Routes.SHARE_LIVE) },
                     // v51 notta resim düzenleme: geçici basit resim tuvali (kaydedince ya da çıkınca nota dönülür)
                     onOpenCanvas = { id -> navController.navigate(Routes.canvasEdit(id)) },
                     // v51 yeni alıştırma yeni tuvalde: eski düzenleyici yığından çıkar

@@ -198,6 +198,7 @@ fun ShareScreen(
             Pick.CANVAS, Pick.LIVE -> CanvasPickDialog(
                 title = stringResource(if (kind == Pick.LIVE) R.string.v51_share_pick_live else R.string.v51_share_pick_canvas),
                 onDismiss = { pick = null },
+                filter = if (kind == Pick.LIVE) ({ c: CanvasUi -> liveAllowed(c.kind) }) else ({ _: CanvasUi -> true }),
             ) { canvas ->
                 pick = null
                 if (kind == Pick.LIVE) share.startLive(peer.key, canvas) else share.sendCanvas(peer.key, canvas)
@@ -271,6 +272,18 @@ private fun PeerRow(peer: SharePeer, mode: ShareMode, onDisconnect: () -> Unit, 
     }
 }
 
+/** v52 Ayarlar → Genel ve Gelişmiş: paylaşım ve canlı yayın sayfalarına kısa yol (ayarları Bağlantı'da). */
+@Composable
+fun ShareLinksCard(onOpenShare: () -> Unit, onOpenLive: () -> Unit) {
+    SettingsCard(Icons.Filled.Share, stringResource(R.string.v52_share_links_title), Modifier.testTag("share_links_card"), subtitle = stringResource(R.string.v52_share_links_hint)) {
+        NeuButton(stringResource(R.string.v52_share_send_open), onOpenShare, Modifier.fillMaxWidth().testTag("settings_link_share"), primary = true, icon = Icons.Filled.Share)
+        NeuButton(stringResource(R.string.v52_share_live_open), onOpenLive, Modifier.fillMaxWidth().testTag("settings_link_live"), icon = Icons.Filled.Cast)
+    }
+}
+
+/** v52 canlı yayın yalnız çizim, not alma ve çizgi roman tuvallerinde (çocuk tuvali yayınlanmaz). */
+fun liveAllowed(kind: com.karapp.drawguidance.data.model.CanvasKind): Boolean = kind != com.karapp.drawguidance.data.model.CanvasKind.KIDS
+
 /** Tuval/resim paylaşımı ayarları kartı (paylaşım sayfasında ve Ayarlar → Bağlantı'da). v52 yayın ayarları ayrı kartta. */
 @Composable
 fun ShareSettingsCard(settings: ShareSettings = koinInject(), onOpenShare: (() -> Unit)? = null) {
@@ -330,7 +343,7 @@ private fun RenameDialog(current: String, onDismiss: () -> Unit, onSave: (String
 }
 
 @Composable
-private fun CanvasPickDialog(title: String, onDismiss: () -> Unit, repo: CanvasRepository = koinInject(), onPick: (CanvasUi) -> Unit) {
+private fun CanvasPickDialog(title: String, onDismiss: () -> Unit, repo: CanvasRepository = koinInject(), filter: (CanvasUi) -> Boolean = { true }, onPick: (CanvasUi) -> Unit) {
     val list by repo.observeCanvases().collectAsState(initial = null)
     val colors = NeuTheme.colors
     AlertDialog(
@@ -338,7 +351,7 @@ private fun CanvasPickDialog(title: String, onDismiss: () -> Unit, repo: CanvasR
         containerColor = colors.background,
         title = { Text(title) },
         text = {
-            val items = list?.sortedByDescending { it.updatedAt }
+            val items = list?.filter(filter)?.sortedByDescending { it.updatedAt }
             if (items != null && items.isEmpty()) Text(stringResource(R.string.v51_share_no_canvases), color = colors.contentMuted)
             else LazyColumn(Modifier.heightIn(max = 420.dp).testTag("share_canvas_pick"), verticalArrangement = Arrangement.spacedBy(6.dp)) {
                 items(items.orEmpty(), key = { it.localId }) { c ->

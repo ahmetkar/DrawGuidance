@@ -196,6 +196,9 @@ fun CanvasEditScreen(
     viewModel: CanvasEditViewModel = koinViewModel(parameters = { parametersOf(canvasLocalId) }),
     /** v23 3B düzenleyiciyi açar (model kimliği: null yeni; tuvaldeki şeklin kimliği: null ise kaydedince eklenir). */
     onOpenModel3d: (modelId: String?, strokeId: String?) -> Unit = { _, _ -> },
+    /** v52 Diğer menüsünde Tuval paylaş ve Canlı yayın (null: gösterilmez). */
+    onOpenShare: (() -> Unit)? = null,
+    onOpenLiveShare: (() -> Unit)? = null,
 ) {
     val colors = NeuTheme.colors
     val canvas by viewModel.canvas.collectAsState()
@@ -417,6 +420,9 @@ fun CanvasEditScreen(
     // v30 gizleme seçim penceresi
     var hideOpen by rememberSaveable { mutableStateOf(false) }
     // Başlıktaki ek düğmeler: Kaydet (otomatik kayıt kapalıyken), ⋮ (PDF, ayarlar); v19: Katmanlar üst menüde
+    // v52 çizim yardımcıları (resim tuvallerinde)
+    val drawHelpers = com.karapp.drawguidance.ui.screens.canvasedit.components.rememberDrawHelpers()
+    val helpersShown = kind == com.karapp.drawguidance.data.model.CanvasKind.ART || kind == com.karapp.drawguidance.data.model.CanvasKind.SIMPLE_ART
     val headerActions: @Composable () -> Unit = { com.karapp.drawguidance.ui.screens.canvasedit.components.ToolHelpScope(toolHelp) {
         if (viewModel.isTempImageEdit) {
             // v51 geçici resim tuvali: Kaydet resmi nota aktarır ve tuvali siler
@@ -458,6 +464,9 @@ fun CanvasEditScreen(
             aiEnabled = aiOn,
             onAiEnabled = viewModel::setAiEnabled,
             onTutorial = if (viewModel.tutorial.groups(kind).isNotEmpty()) viewModel.tutorial::openOffer else null,
+            onHelpers = if (helpersShown) ({ drawHelpers.sheet = true }) else null,
+            onShare = onOpenShare,
+            onLive = onOpenLiveShare,
             extraItems = { close ->
                 com.karapp.drawguidance.ui.screens.canvasedit.components.V40MoreMenuItems(kind, viewModel, close)
                 // v42 Cetvel ve Şekil kalıbı ⋮ menüsünde değil, Çiz satırında
@@ -978,6 +987,7 @@ fun CanvasEditScreen(
         add(com.karapp.drawguidance.ui.screens.canvasedit.components.SimpleTool("shape", Icons.Filled.Category, simpleTexts.shape, mode == EditMode.SHAPE, viewModel::openShapePicker))
         if (kids) add(challengeUi.tool())
         if (kind == com.karapp.drawguidance.data.model.CanvasKind.SIMPLE_ART) add(practiceUi.tool(practiceRun != null))
+        if (kind == com.karapp.drawguidance.data.model.CanvasKind.SIMPLE_ART) add(com.karapp.drawguidance.ui.screens.canvasedit.components.SimpleTool("helpers", Icons.Filled.GridOn, stringResource(R.string.v52_helpers_short), drawHelpers.active || drawHelpers.sheet, { drawHelpers.sheet = true }))
         // v36 basit resimde şekil düzenleme (az noktalı vektör düzenleme): seçili ya da dokunulan şekil açılır
         if (kind == com.karapp.drawguidance.data.model.CanvasKind.SIMPLE_ART) {
             add(com.karapp.drawguidance.ui.screens.canvasedit.components.SimpleTool(
@@ -1407,6 +1417,13 @@ fun CanvasEditScreen(
                         ?.map { s -> s.map { Offset(it.x, it.y) } },
                 ),
             )
+            // v52 kompozisyon kılavuzu ve kontrol önizlemesi
+            if (helpersShown) {
+                com.karapp.drawguidance.ui.screens.canvasedit.components.CompositionOverlay(drawHelpers.composition, shown, viewport)
+                Box(Modifier.fillMaxSize().padding(10.dp), contentAlignment = Alignment.BottomStart) {
+                    com.karapp.drawguidance.ui.screens.canvasedit.components.CheckPreview(drawHelpers, shown)
+                }
+            }
             // v32 eğitimde çizilmekte olan çizgiler
             if (tutorialUi != null) com.karapp.drawguidance.ui.screens.canvasedit.tutorial.TutorialLiveLayer(tutorialLive, viewport)
             // v37 çocuk boyamasında kova imleci ve boyanmaya hazır alan
@@ -1780,6 +1797,7 @@ fun CanvasEditScreen(
             if (kids) com.karapp.drawguidance.ui.screens.canvasedit.components.KidsMascotLayer(viewModel, mode, modeBarHeightPx, tutorialUi != null)
             if (kids) com.karapp.drawguidance.ui.screens.canvasedit.challenge.KidsChallengeLayer(viewModel, challengeUi, viewport, mode, modeBarHeightPx, tutorialUi != null)
             if (practiceShown) com.karapp.drawguidance.ui.screens.canvasedit.challenge.PracticeLayer(viewModel, practiceUi, viewport, tutorialUi != null)
+            if (helpersShown) com.karapp.drawguidance.ui.screens.canvasedit.components.DrawHelpersSheet(drawHelpers)
 
             // Tuval üstü diyagram düzenleme: odaktaki adımın/okun yanında küçük panel
             if (mode == EditMode.DIAGRAM_EDIT) {

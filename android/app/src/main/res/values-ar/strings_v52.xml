@@ -26,4 +26,22 @@
     <string name="v52_temp_edit_failed">تعذر الفتح للتحرير</string>
     <string name="v52_live_paused">البث متوقف مؤقتًا: المرسل يحرر</string>
     <string name="v52_live_paused_badge">البث متوقف مؤقتًا</string>
+    <string name="v52_helpers_title">مساعدات الرسم</string>
+    <string name="v52_helpers_short">المساعدات</string>
+    <string name="v52_helper_composition">دليل التكوين</string>
+    <string name="v52_helper_composition_hint">ضع العنصر الرئيسي على الخطوط وتقاطعاتها؛ لا يُحفظ على الورقة.</string>
+    <string name="v52_helper_none">إيقاف</string>
+    <string name="v52_helper_thirds">قاعدة الأثلاث</string>
+    <string name="v52_helper_golden">النسبة الذهبية</string>
+    <string name="v52_helper_diagonals">الأقطار</string>
+    <string name="v52_helper_center">المركز</string>
+    <string name="v52_helper_preview">معاينة التحقق</string>
+    <string name="v52_helper_preview_hint">معاينة صغيرة في الزاوية: انظر إلى رسمك بعين جديدة واكتشف الأخطاء.</string>
+    <string name="v52_helper_mirror">عرض معكوس</string>
+    <string name="v52_helper_mirror_hint">الصورة المقلوبة أفقيًا تُبرز أخطاء النسب والتماثل.</string>
+    <string name="v52_helper_gray">تدرج رمادي (القيم)</string>
+    <string name="v52_helper_gray_hint">تحقق من توازن الفاتح والداكن دون ألوان.</string>
+    <string name="v52_helper_preview_both">معكوس · رمادي</string>
+    <string name="v52_share_links_title">المشاركة والبث المباشر</string>
+    <string name="v52_share_links_hint">أرسل اللوحات إلى الأجهزة على شبكة Wi-Fi نفسها أو بث لوحات الرسم والملاحظات والقصص المصورة مباشرة. الإعدادات في تبويب الاتصال.</string>
 </resources>

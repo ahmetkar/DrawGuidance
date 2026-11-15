@@ -26,4 +26,22 @@
     <string name="v52_temp_edit_failed">无法打开进行编辑</string>
     <string name="v52_live_paused">直播已暂停：发送方正在编辑</string>
     <string name="v52_live_paused_badge">直播已暂停</string>
+    <string name="v52_helpers_title">绘图辅助</string>
+    <string name="v52_helpers_short">辅助</string>
+    <string name="v52_helper_composition">构图参考线</string>
+    <string name="v52_helper_composition_hint">把主体放在线及其交点上；不会保存到纸上。</string>
+    <string name="v52_helper_none">关闭</string>
+    <string name="v52_helper_thirds">三分法</string>
+    <string name="v52_helper_golden">黄金比例</string>
+    <string name="v52_helper_diagonals">对角线</string>
+    <string name="v52_helper_center">中心</string>
+    <string name="v52_helper_preview">检查预览</string>
+    <string name="v52_helper_preview_hint">角落的小预览：换个角度看画，发现错误。</string>
+    <string name="v52_helper_mirror">镜像视图</string>
+    <string name="v52_helper_mirror_hint">水平翻转后，比例和对称错误会更明显。</string>
+    <string name="v52_helper_gray">灰度（明暗）</string>
+    <string name="v52_helper_gray_hint">去掉颜色检查明暗平衡。</string>
+    <string name="v52_helper_preview_both">镜像 · 灰度</string>
+    <string name="v52_share_links_title">分享与直播</string>
+    <string name="v52_share_links_hint">向同一 Wi-Fi 下的设备发送画布，或直播绘图、笔记和漫画画布。设置在“连接”标签中。</string>
 </resources>

@@ -31,6 +31,9 @@ fun CanvasEditRoute(
     onOpenCanvas: (String) -> Unit = {},
     /** v51 başka bir tuvale geç (yeni alıştırma yeni tuvalde; bu düzenleyici kapanır). */
     onSwitchCanvas: (localId: String) -> Unit = {},
+    /** v52 Diğer menüsünden paylaşım ve canlı yayın sayfaları. */
+    onOpenShare: () -> Unit = {},
+    onOpenLiveShare: () -> Unit = {},
 ) {
     val vm: CanvasEditViewModel = koinViewModel(parameters = { parametersOf(canvasLocalId) })
     androidx.compose.runtime.LaunchedEffect(vm) { vm.openCanvas.collect { onSwitchCanvas(it) } }
@@ -90,6 +93,8 @@ fun CanvasEditRoute(
             onBack = leave,
             viewModel = vm,
             onOpenModel3d = onOpenModel3d,
+            onOpenShare = if (temp) null else onOpenShare,
+            onOpenLiveShare = if (temp || !com.karapp.drawguidance.ui.screens.share.liveAllowed(kind)) null else onOpenLiveShare,
         )
     }
     }

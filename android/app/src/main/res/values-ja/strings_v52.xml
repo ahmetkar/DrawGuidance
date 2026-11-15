@@ -26,4 +26,22 @@
     <string name="v52_temp_edit_failed">編集用に開けませんでした</string>
     <string name="v52_live_paused">配信を一時停止中：送信者が編集中</string>
     <string name="v52_live_paused_badge">配信を一時停止中</string>
+    <string name="v52_helpers_title">描画アシスト</string>
+    <string name="v52_helpers_short">アシスト</string>
+    <string name="v52_helper_composition">構図ガイド</string>
+    <string name="v52_helper_composition_hint">主役を線と交点に置きましょう。用紙には保存されません。</string>
+    <string name="v52_helper_none">オフ</string>
+    <string name="v52_helper_thirds">三分割法</string>
+    <string name="v52_helper_golden">黄金比</string>
+    <string name="v52_helper_diagonals">対角線</string>
+    <string name="v52_helper_center">中心</string>
+    <string name="v52_helper_preview">チェック用プレビュー</string>
+    <string name="v52_helper_preview_hint">隅の小さなプレビューで、新鮮な目で見て間違いを見つけます。</string>
+    <string name="v52_helper_mirror">左右反転表示</string>
+    <string name="v52_helper_mirror_hint">左右反転するとバランスや対称のずれが目立ちます。</string>
+    <string name="v52_helper_gray">グレースケール（明暗）</string>
+    <string name="v52_helper_gray_hint">色を除いて明暗のバランスを確認します。</string>
+    <string name="v52_helper_preview_both">反転・グレー</string>
+    <string name="v52_share_links_title">共有とライブ配信</string>
+    <string name="v52_share_links_hint">同じWi-Fiの端末にキャンバスを送ったり、描画・ノート・コミックのキャンバスをライブ配信したりできます。設定は「接続」タブにあります。</string>
 </resources>

@@ -26,4 +26,22 @@
     <string name="v52_temp_edit_failed">Couldn\'t open for editing</string>
     <string name="v52_live_paused">Broadcast paused: the sender is editing</string>
     <string name="v52_live_paused_badge">Broadcast paused</string>
+    <string name="v52_helpers_title">Drawing helpers</string>
+    <string name="v52_helpers_short">Helpers</string>
+    <string name="v52_helper_composition">Composition guide</string>
+    <string name="v52_helper_composition_hint">Place the main subject on the lines and their crossings; not saved on the paper.</string>
+    <string name="v52_helper_none">Off</string>
+    <string name="v52_helper_thirds">Rule of thirds</string>
+    <string name="v52_helper_golden">Golden ratio</string>
+    <string name="v52_helper_diagonals">Diagonals</string>
+    <string name="v52_helper_center">Center</string>
+    <string name="v52_helper_preview">Check preview</string>
+    <string name="v52_helper_preview_hint">A small preview in the corner: see your drawing with fresh eyes and catch mistakes.</string>
+    <string name="v52_helper_mirror">Mirrored view</string>
+    <string name="v52_helper_mirror_hint">A horizontally flipped view makes proportion and symmetry errors stand out.</string>
+    <string name="v52_helper_gray">Grayscale (values)</string>
+    <string name="v52_helper_gray_hint">Check the balance of lights and darks without colour.</string>
+    <string name="v52_helper_preview_both">Mirrored · grayscale</string>
+    <string name="v52_share_links_title">Sharing and live broadcast</string>
+    <string name="v52_share_links_hint">Send canvases to devices on the same Wi-Fi or broadcast drawing, note and comic canvases live. Settings are in the Connection tab.</string>
 </resources>

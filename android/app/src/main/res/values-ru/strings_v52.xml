@@ -26,4 +26,22 @@
     <string name="v52_temp_edit_failed">Не удалось открыть для редактирования</string>
     <string name="v52_live_paused">Трансляция на паузе: отправитель редактирует</string>
     <string name="v52_live_paused_badge">Трансляция на паузе</string>
+    <string name="v52_helpers_title">Помощники рисования</string>
+    <string name="v52_helpers_short">Помощники</string>
+    <string name="v52_helper_composition">Сетка композиции</string>
+    <string name="v52_helper_composition_hint">Размещайте главный объект на линиях и их пересечениях; на бумаге не сохраняется.</string>
+    <string name="v52_helper_none">Выкл.</string>
+    <string name="v52_helper_thirds">Правило третей</string>
+    <string name="v52_helper_golden">Золотое сечение</string>
+    <string name="v52_helper_diagonals">Диагонали</string>
+    <string name="v52_helper_center">Центр</string>
+    <string name="v52_helper_preview">Контрольный просмотр</string>
+    <string name="v52_helper_preview_hint">Маленький просмотр в углу: посмотрите на рисунок свежим взглядом и найдите ошибки.</string>
+    <string name="v52_helper_mirror">Зеркальный вид</string>
+    <string name="v52_helper_mirror_hint">Отражённое изображение выявляет ошибки пропорций и симметрии.</string>
+    <string name="v52_helper_gray">Оттенки серого (тон)</string>
+    <string name="v52_helper_gray_hint">Проверьте баланс светлого и тёмного без цвета.</string>
+    <string name="v52_helper_preview_both">Зеркально · серый</string>
+    <string name="v52_share_links_title">Обмен и трансляция</string>
+    <string name="v52_share_links_hint">Отправляйте холсты на устройства в той же сети Wi-Fi или транслируйте холсты рисунков, заметок и комиксов. Настройки — во вкладке «Подключение».</string>
 </resources>

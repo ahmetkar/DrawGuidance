@@ -26,4 +26,22 @@
     <string name="v52_temp_edit_failed">편집용으로 열 수 없습니다</string>
     <string name="v52_live_paused">방송 일시 중지: 보내는 사람이 편집 중</string>
     <string name="v52_live_paused_badge">방송 일시 중지</string>
+    <string name="v52_helpers_title">그리기 도우미</string>
+    <string name="v52_helpers_short">도우미</string>
+    <string name="v52_helper_composition">구도 가이드</string>
+    <string name="v52_helper_composition_hint">주요 대상을 선과 교차점 위에 두세요. 종이에는 저장되지 않습니다.</string>
+    <string name="v52_helper_none">끔</string>
+    <string name="v52_helper_thirds">3분할 법칙</string>
+    <string name="v52_helper_golden">황금비</string>
+    <string name="v52_helper_diagonals">대각선</string>
+    <string name="v52_helper_center">중심</string>
+    <string name="v52_helper_preview">확인 미리보기</string>
+    <string name="v52_helper_preview_hint">모서리의 작은 미리보기로 새로운 눈으로 보고 실수를 찾으세요.</string>
+    <string name="v52_helper_mirror">좌우 반전 보기</string>
+    <string name="v52_helper_mirror_hint">좌우로 뒤집으면 비율과 대칭 오류가 잘 보입니다.</string>
+    <string name="v52_helper_gray">회색조(명암)</string>
+    <string name="v52_helper_gray_hint">색 없이 밝고 어두움의 균형을 확인하세요.</string>
+    <string name="v52_helper_preview_both">반전 · 회색조</string>
+    <string name="v52_share_links_title">공유와 실시간 방송</string>
+    <string name="v52_share_links_hint">같은 Wi-Fi의 기기로 캔버스를 보내거나 그림, 노트, 만화 캔버스를 실시간 방송하세요. 설정은 연결 탭에 있습니다.</string>
 </resources>

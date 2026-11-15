@@ -201,6 +201,8 @@ fun SettingsScreen(
                         ThemePaletteCard()
                         // v40 bildirimler (güncelleme, hatırlatma; Android 13+ izni)
                         NotificationSettingsCard()
+                        // v52 paylaşım ve yayın sayfalarına kısa yol
+                        if (!com.karapp.drawguidance.ui.kids.LocalKidsLocked.current) com.karapp.drawguidance.ui.screens.share.ShareLinksCard(onOpenShare, onOpenLiveShare)
                         // v33 giriş yapılmışsa çıkış
                         com.karapp.drawguidance.ui.screens.account.SignOutButton(accountViewModel)
                     }
@@ -226,6 +228,7 @@ fun SettingsScreen(
                         }
                     }
                     SettingsTab.ADVANCED -> {
+                        if (!com.karapp.drawguidance.ui.kids.LocalKidsLocked.current) com.karapp.drawguidance.ui.screens.share.ShareLinksCard(onOpenShare, onOpenLiveShare)
                         // v37 hata raporları
                         ErrorReportsCard()
                         // v40 mod başına geri bildirim

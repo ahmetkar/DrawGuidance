@@ -73,6 +73,37 @@ s("v52_temp_edit_failed", "Düzenlemeye açılamadı", "Couldn't open for editin
 s("v52_live_paused", "Yayına ara verildi: gönderen düzenliyor", "Broadcast paused: the sender is editing", "البث متوقف مؤقتًا: المرسل يحرر", "配信を一時停止中：送信者が編集中", "방송 일시 중지: 보내는 사람이 편집 중", "Трансляция на паузе: отправитель редактирует", "直播已暂停：发送方正在编辑")
 s("v52_live_paused_badge", "Yayına ara verildi", "Broadcast paused", "البث متوقف مؤقتًا", "配信を一時停止中", "방송 일시 중지", "Трансляция на паузе", "直播已暂停")
 
+# --- Madde 11: yeni çizim yardımcıları
+s("v52_helpers_title", "Çizim yardımcıları", "Drawing helpers", "مساعدات الرسم", "描画アシスト", "그리기 도우미", "Помощники рисования", "绘图辅助")
+s("v52_helpers_short", "Yardımcılar", "Helpers", "المساعدات", "アシスト", "도우미", "Помощники", "辅助")
+s("v52_helper_composition", "Kompozisyon kılavuzu", "Composition guide", "دليل التكوين", "構図ガイド", "구도 가이드", "Сетка композиции", "构图参考线")
+s("v52_helper_composition_hint", "Ana öğeyi çizgilerin ve kesişim noktalarının üstüne yerleştir; kâğıda yazılmaz.", "Place the main subject on the lines and their crossings; not saved on the paper.",
+  "ضع العنصر الرئيسي على الخطوط وتقاطعاتها؛ لا يُحفظ على الورقة.", "主役を線と交点に置きましょう。用紙には保存されません。", "주요 대상을 선과 교차점 위에 두세요. 종이에는 저장되지 않습니다.", "Размещайте главный объект на линиях и их пересечениях; на бумаге не сохраняется.", "把主体放在线及其交点上；不会保存到纸上。")
+s("v52_helper_none", "Kapalı", "Off", "إيقاف", "オフ", "끔", "Выкл.", "关闭")
+s("v52_helper_thirds", "Üçler kuralı", "Rule of thirds", "قاعدة الأثلاث", "三分割法", "3분할 법칙", "Правило третей", "三分法")
+s("v52_helper_golden", "Altın oran", "Golden ratio", "النسبة الذهبية", "黄金比", "황금비", "Золотое сечение", "黄金比例")
+s("v52_helper_diagonals", "Köşegenler", "Diagonals", "الأقطار", "対角線", "대각선", "Диагонали", "对角线")
+s("v52_helper_center", "Merkez", "Center", "المركز", "中心", "중심", "Центр", "中心")
+s("v52_helper_preview", "Kontrol önizlemesi", "Check preview", "معاينة التحقق", "チェック用プレビュー", "확인 미리보기", "Контрольный просмотр", "检查预览")
+s("v52_helper_preview_hint", "Köşede küçük önizleme: çizimi farklı gözle görüp hataları yakala.", "A small preview in the corner: see your drawing with fresh eyes and catch mistakes.",
+  "معاينة صغيرة في الزاوية: انظر إلى رسمك بعين جديدة واكتشف الأخطاء.", "隅の小さなプレビューで、新鮮な目で見て間違いを見つけます。", "모서리의 작은 미리보기로 새로운 눈으로 보고 실수를 찾으세요.", "Маленький просмотр в углу: посмотрите на рисунок свежим взглядом и найдите ошибки.", "角落的小预览：换个角度看画，发现错误。")
+s("v52_helper_mirror", "Aynalı bakış", "Mirrored view", "عرض معكوس", "左右反転表示", "좌우 반전 보기", "Зеркальный вид", "镜像视图")
+s("v52_helper_mirror_hint", "Yatay çevrilmiş görüntü oran ve simetri hatalarını belirginleştirir.", "A horizontally flipped view makes proportion and symmetry errors stand out.",
+  "الصورة المقلوبة أفقيًا تُبرز أخطاء النسب والتماثل.", "左右反転するとバランスや対称のずれが目立ちます。", "좌우로 뒤집으면 비율과 대칭 오류가 잘 보입니다.", "Отражённое изображение выявляет ошибки пропорций и симметрии.", "水平翻转后，比例和对称错误会更明显。")
+s("v52_helper_gray", "Gri ton (değer)", "Grayscale (values)", "تدرج رمادي (القيم)", "グレースケール（明暗）", "회색조(명암)", "Оттенки серого (тон)", "灰度（明暗）")
+s("v52_helper_gray_hint", "Renkler olmadan açık-koyu dengesini kontrol et.", "Check the balance of lights and darks without colour.",
+  "تحقق من توازن الفاتح والداكن دون ألوان.", "色を除いて明暗のバランスを確認します。", "색 없이 밝고 어두움의 균형을 확인하세요.", "Проверьте баланс светлого и тёмного без цвета.", "去掉颜色检查明暗平衡。")
+s("v52_helper_preview_both", "Aynalı · gri ton", "Mirrored · grayscale", "معكوس · رمادي", "反転・グレー", "반전 · 회색조", "Зеркально · серый", "镜像 · 灰度")
+
+s("v52_share_links_title", "Paylaşım ve canlı yayın", "Sharing and live broadcast", "المشاركة والبث المباشر", "共有とライブ配信", "공유와 실시간 방송", "Обмен и трансляция", "分享与直播")
+s("v52_share_links_hint", "Aynı Wi-Fi'deki cihazlara tuval gönder ya da çizim, not ve çizgi roman tuvallerini canlı yayınla. Ayarları Bağlantı sekmesinde.",
+  "Send canvases to devices on the same Wi-Fi or broadcast drawing, note and comic canvases live. Settings are in the Connection tab.",
+  "أرسل اللوحات إلى الأجهزة على شبكة Wi-Fi نفسها أو بث لوحات الرسم والملاحظات والقصص المصورة مباشرة. الإعدادات في تبويب الاتصال.",
+  "同じWi-Fiの端末にキャンバスを送ったり、描画・ノート・コミックのキャンバスをライブ配信したりできます。設定は「接続」タブにあります。",
+  "같은 Wi-Fi의 기기로 캔버스를 보내거나 그림, 노트, 만화 캔버스를 실시간 방송하세요. 설정은 연결 탭에 있습니다.",
+  "Отправляйте холсты на устройства в той же сети Wi-Fi или транслируйте холсты рисунков, заметок и комиксов. Настройки — во вкладке «Подключение».",
+  "向同一 Wi-Fi 下的设备发送画布，或直播绘图、笔记和漫画画布。设置在“连接”标签中。")
+
 def xml_escape(t):
     t = escape(t).replace("'", "\\'").replace('"', '\\"')
     return t

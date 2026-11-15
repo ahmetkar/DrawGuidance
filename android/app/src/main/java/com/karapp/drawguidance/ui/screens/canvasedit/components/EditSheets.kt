@@ -24,6 +24,9 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.GridOn
+import androidx.compose.material.icons.filled.Share
+import androidx.compose.material.icons.filled.Cast
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Functions
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
@@ -928,6 +931,11 @@ fun EditorMoreMenu(
     onAiEnabled: ((Boolean) -> Unit)? = null,
     /** v32 eğitim modu (çizim, not alma, çizgi roman). */
     onTutorial: (() -> Unit)? = null,
+    /** v52 çizim yardımcıları (kompozisyon kılavuzu, aynalı / gri ton kontrol önizlemesi). */
+    onHelpers: (() -> Unit)? = null,
+    /** v52 paylaşım ve canlı yayın sayfaları. */
+    onShare: (() -> Unit)? = null,
+    onLive: (() -> Unit)? = null,
     /** v38 çizgi önerisi (yazı ve şekil önerisinden ayrı). */
     lineSuggest: Boolean = true,
     onLineSuggest: (Boolean) -> Unit = {},
@@ -944,6 +952,30 @@ fun EditorMoreMenu(
             modifier = Modifier.tutorialAnchor(com.karapp.drawguidance.ui.screens.canvasedit.tutorial.TutorialAnchor.MORE),
         )
         DropdownMenu(expanded = open, onDismissRequest = { open = false }, modifier = Modifier.background(colors.background)) {
+            if (onShare != null) {
+                DropdownMenuItem(
+                    text = { Text(stringResource(R.string.v52_share_send_title)) },
+                    leadingIcon = { Icon(Icons.Filled.Share, null, tint = colors.accent) },
+                    onClick = { open = false; onShare() },
+                    modifier = Modifier.testTag("share_menu_item"),
+                )
+            }
+            if (onLive != null) {
+                DropdownMenuItem(
+                    text = { Text(stringResource(R.string.v52_share_live_title)) },
+                    leadingIcon = { Icon(Icons.Filled.Cast, null, tint = colors.accent) },
+                    onClick = { open = false; onLive() },
+                    modifier = Modifier.testTag("live_menu_item"),
+                )
+            }
+            if (onHelpers != null) {
+                DropdownMenuItem(
+                    text = { Text(stringResource(R.string.v52_helpers_title)) },
+                    leadingIcon = { Icon(Icons.Filled.GridOn, null, tint = colors.accent) },
+                    onClick = { open = false; onHelpers() },
+                    modifier = Modifier.testTag("helpers_menu_item"),
+                )
+            }
             if (onTutorial != null) {
                 DropdownMenuItem(
                     text = { Text(stringResource(R.string.tut_menu)) },

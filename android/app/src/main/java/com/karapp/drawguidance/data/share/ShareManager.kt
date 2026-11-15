@@ -215,6 +215,8 @@ class ShareManager(
 
     /** Yayın teklifi: karşı taraf kabul edince tuval ona açılır ve bu tuvaldeki değişiklikler ona akar. */
     fun startLive(peerKey: String, canvas: CanvasUi) = scope.launch {
+        // v52 yalnız çizim, not alma ve çizgi roman tuvalleri yayınlanır
+        if (canvas.kind == com.karapp.drawguidance.data.model.CanvasKind.KIDS) return@launch
         stopLive()
         val id = UUID.randomUUID().toString()
         outgoing[id] = Outgoing(peerKey, ShareWire.TYPE_LIVE, canvas.name, canvas.localId, null)

@@ -26,4 +26,22 @@
     <string name="v52_temp_edit_failed">Düzenlemeye açılamadı</string>
     <string name="v52_live_paused">Yayına ara verildi: gönderen düzenliyor</string>
     <string name="v52_live_paused_badge">Yayına ara verildi</string>
+    <string name="v52_helpers_title">Çizim yardımcıları</string>
+    <string name="v52_helpers_short">Yardımcılar</string>
+    <string name="v52_helper_composition">Kompozisyon kılavuzu</string>
+    <string name="v52_helper_composition_hint">Ana öğeyi çizgilerin ve kesişim noktalarının üstüne yerleştir; kâğıda yazılmaz.</string>
+    <string name="v52_helper_none">Kapalı</string>
+    <string name="v52_helper_thirds">Üçler kuralı</string>
+    <string name="v52_helper_golden">Altın oran</string>
+    <string name="v52_helper_diagonals">Köşegenler</string>
+    <string name="v52_helper_center">Merkez</string>
+    <string name="v52_helper_preview">Kontrol önizlemesi</string>
+    <string name="v52_helper_preview_hint">Köşede küçük önizleme: çizimi farklı gözle görüp hataları yakala.</string>
+    <string name="v52_helper_mirror">Aynalı bakış</string>
+    <string name="v52_helper_mirror_hint">Yatay çevrilmiş görüntü oran ve simetri hatalarını belirginleştirir.</string>
+    <string name="v52_helper_gray">Gri ton (değer)</string>
+    <string name="v52_helper_gray_hint">Renkler olmadan açık-koyu dengesini kontrol et.</string>
+    <string name="v52_helper_preview_both">Aynalı · gri ton</string>
+    <string name="v52_share_links_title">Paylaşım ve canlı yayın</string>
+    <string name="v52_share_links_hint">Aynı Wi-Fi\'deki cihazlara tuval gönder ya da çizim, not ve çizgi roman tuvallerini canlı yayınla. Ayarları Bağlantı sekmesinde.</string>
 </resources>

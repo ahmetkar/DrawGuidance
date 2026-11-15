@@ -439,27 +439,20 @@ struct LiveBroadcastBridge: View {
     @ObservedObject var store: EditorStore
     let canvasLocalId: String
     @State private var confirmStop = false
+    @Environment(\.scenePhase) private var scenePhase
 
     var body: some View {
         ZStack(alignment: .bottom) {
             Color.clear.frame(width: 1, height: 1).allowsHitTesting(false)
             if let out = share.liveOut, out.canvasId == canvasLocalId {
-                Button { confirmStop = true } label: {
-                    HStack(spacing: 6) {
-                        Circle().fill(.white).frame(width: 8, height: 8)
-                        Text(L("v51_share_live_badge") + " · " + out.peerName).lineLimit(1)
-                        Image(systemName: "stop.fill")
+                // v52 çizim ekranında yayının genel bilgileri küçük bir çubukta: durum, alıcı cihaz, süre, tuval adı
+                Button { confirmStop = true } label: { LiveInfoBar(out: out, canvasName: store.canvas?.name ?? "") }
+                    .buttonStyle(.plain)
+                    .padding(.bottom, 6)
+                    .accessibilityIdentifier("live_badge")
+                    .confirmationDialog(L("v51_share_live_stop"), isPresented: $confirmStop) {
+                        Button(L("v51_share_live_stop"), role: .destructive) { share.stopLive() }
                     }
-                    .font(.caption.weight(.semibold)).foregroundStyle(.white)
-                    .padding(.horizontal, 12).padding(.vertical, 7)
-                    .background(Capsule().fill(Color.red))
-                }
-                .buttonStyle(.plain)
-                .padding(.bottom, 6)
-                .accessibilityIdentifier("live_badge")
-                .confirmationDialog(L("v51_share_live_stop"), isPresented: $confirmStop) {
-                    Button(L("v51_share_live_stop"), role: .destructive) { share.stopLive() }
-                }
             }
         }
         .onReceive(store.$canvas) { c in
@@ -469,5 +462,42 @@ struct LiveBroadcastBridge: View {
             // Yayın başlarken tuvalin o anki hali hemen gider
             if let out, out.canvasId == canvasLocalId, let c = store.canvas { share.publishLive(c) }
         }
+        // v52 düzenleyiciye dönüldü: ara verilen yayın sürer; başka ekrana geçilince (ya da arka planda) ara verilir
+        .onAppear {
+            share.resumeLive(canvasLocalId)
+            if let c = store.canvas { share.publishLive(c) }
+        }
+        .onDisappear { share.pauseLive(canvasLocalId) }
+        .onChange(of: scenePhase) { _, phase in
+            if phase == .background { share.pauseLive(canvasLocalId) }
+            else if phase == .active { share.resumeLive(canvasLocalId); if let c = store.canvas { share.publishLive(c) } }
+        }
+    }
+}
+
+/// v52 yayın bilgi çubuğu (canlı / ara verildi, alıcı, süre, tuval adı, durdur).
+struct LiveInfoBar: View {
+    let out: ShareLiveOut
+    let canvasName: String
+    @State private var pulse = false
+
+    var body: some View {
+        TimelineView(.periodic(from: .now, by: 1)) { ctx in
+            let secs = max(0, Int(ctx.date.timeIntervalSince(out.startedAt)))
+            let elapsed = secs >= 3600 ? String(format: "%d:%02d:%02d", secs / 3600, secs / 60 % 60, secs % 60) : String(format: "%02d:%02d", secs / 60, secs % 60)
+            HStack(spacing: 6) {
+                Circle().fill(.white).frame(width: 8, height: 8).opacity(out.paused ? 1 : (pulse ? 0.3 : 1))
+                Text(L(out.paused ? "v52_live_paused_badge" : "v51_share_live_badge")).fontWeight(.bold).lineLimit(1)
+                Image(systemName: "dot.radiowaves.left.and.right").font(.caption2)
+                Text(out.peerName).lineLimit(1).frame(maxWidth: 120)
+                Text("· " + elapsed).monospacedDigit().accessibilityIdentifier("live_elapsed")
+                if !canvasName.isEmpty { Text("· " + canvasName).font(.caption2).lineLimit(1).frame(maxWidth: 110) }
+                Image(systemName: "stop.fill").font(.caption2).padding(5).background(Circle().fill(Color.white.opacity(0.22)))
+            }
+            .font(.caption.weight(.semibold)).foregroundStyle(.white)
+            .padding(.leading, 12).padding(.trailing, 4).padding(.vertical, 4)
+            .background(Capsule().fill(out.paused ? Color(red: 0.55, green: 0.43, blue: 0) : Color(red: 0.78, green: 0.16, blue: 0.16)).opacity(0.94))
+        }
+        .onAppear { withAnimation(.easeInOut(duration: 0.8).repeatForever(autoreverses: true)) { pulse = true } }
     }
 }

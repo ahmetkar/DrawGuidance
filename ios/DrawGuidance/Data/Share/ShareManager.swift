@@ -25,7 +25,7 @@ struct ShareTransferStatus: Equatable {
     var progress: Double?
 }
 
-struct ShareLiveOut: Equatable { let canvasId: String; let peerId: String; let peerName: String; var paused = false }
+struct ShareLiveOut: Equatable { let canvasId: String; let peerId: String; let peerName: String; var paused = false; var startedAt = Date() }
 struct ShareLiveIn: Equatable { let canvasId: String; let peerId: String; let peerName: String; var ended = false; var paused = false }
 
 /// Alınan içerik bildirimi ("Tuvali aç" düğmeli pencere).

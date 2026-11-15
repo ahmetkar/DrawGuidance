@@ -3209,6 +3209,7 @@
 "v52_add_graph" = "그래프 추가";
 "v52_add_table" = "표 추가";
 "v52_graph_short" = "그래프";
+"v52_help_table" = "표 추가: 행·열 수, 머리글, 테두리, 테마를 고릅니다. 이후 각 셀·행·열을 따로 편집할 수 있습니다.";
 "v52_helper_center" = "중심";
 "v52_helper_composition" = "구도 가이드";
 "v52_helper_composition_hint" = "주요 대상을 선과 교차점 위에 두세요. 종이에는 저장되지 않습니다.";

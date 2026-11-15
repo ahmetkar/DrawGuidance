@@ -55,12 +55,8 @@ class EditorNotesCanvasTest : EditorTestBase() {
         waitForText("Geometrik Cisimler")
         listOf("Dik Üçgen", "Silindir").forEach { assertTrue(it, exists(it)) }
         assertTrue(compose.onAllNodesWithText("Dağlar").fetchSemanticsNodes().isEmpty())
-        // v15: grafikler ve grafik eğrileri ayrı bölümde
-        compose.onAllNodesWithText("Grafik")[0].performClick()
-        waitForText("Grafik eğrileri")
-        listOf("Grafikler", "Koordinat ekseni", "Sayı doğrusu", "Sinüs", "Parabol").forEach { assertTrue(it, exists(it)) }
-        compose.onAllNodesWithText("Temel")[0].performClick()
-        waitForText("Geometrik Cisimler")
+        // v52: grafikler ve grafik eğrileri ayrı "Grafik ekle" penceresinde (bu pencerede yok)
+        assertTrue(compose.onAllNodesWithText("Grafik eğrileri").fetchSemanticsNodes().isEmpty())
         compose.onNodeWithText("Küp").performSemanticsAction(SemanticsActions.OnClick)
         waitForText("Şekil: Küp")
 

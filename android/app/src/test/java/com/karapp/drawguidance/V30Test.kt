@@ -297,6 +297,9 @@ class V30ImageToolsTest : V30EditorBase() {
         }
         waitFor { noteVm.selectedIds.value == setOf(original.id) }
         compose.runOnIdle { noteVm.editSelectedImage() }
+        // v52 düzenleme yeri sorulur: gelişmiş çizim
+        waitFor { noteVm.imageEditChoice.value != null }
+        compose.runOnIdle { noteVm.chooseImageEdit(com.karapp.drawguidance.ui.screens.canvasedit.ImageEditChoice.ADVANCED) }
         // Geçici tuval açılır: basit resim, otomatik kayıt kapalı, tuval listesinde görünmez
         waitFor { com.karapp.drawguidance.data.notes.TempCanvases.allSessions().size == 1 }
         val temp = com.karapp.drawguidance.data.notes.TempCanvases.allSessions().single()

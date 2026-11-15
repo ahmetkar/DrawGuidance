@@ -130,6 +130,12 @@ abstract class EditorTestBase {
     }
 
     /** Ekle menüsünden bir öğe (Şekil ekle / Yazı ekle / Resim ekle). */
+    /** v52 not almada grafikler ayrı "Grafik ekle" penceresinde. */
+    protected fun openGraphPicker() {
+        compose.runOnIdle { (com.karapp.drawguidance.ui.screens.canvasedit.CanvasEditViewModel.lastCreated?.get() ?: error("düzenleyici yok")).openGraphPicker() }
+        waitFor { compose.onAllNodesWithTag("shape_picker").fetchSemanticsNodes().isNotEmpty() }
+    }
+
     protected fun addMenu(item: String) {
         // v51 not alma basit menüde: eklenecekler Ekle menüsünde doğrudan
         if (simpleRow() && clickSimple(item)) return

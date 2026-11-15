@@ -168,4 +168,5 @@
     <string name="v52_share_err_no_device">未找到设备</string>
     <string name="v52_share_err_no_canvas">未找到画布</string>
     <string name="v52_share_err_image">无法读取图片</string>
+    <string name="v52_help_table">添加表格：行列数、表头、边框和现成主题。之后可分别编辑每个单元格、行和列。</string>
 </resources>

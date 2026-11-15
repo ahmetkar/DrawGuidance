@@ -3209,6 +3209,7 @@
 "v52_add_graph" = "添加图表";
 "v52_add_table" = "添加表格";
 "v52_graph_short" = "图表";
+"v52_help_table" = "添加表格：行列数、表头、边框和现成主题。之后可分别编辑每个单元格、行和列。";
 "v52_helper_center" = "中心";
 "v52_helper_composition" = "构图参考线";
 "v52_helper_composition_hint" = "把主体放在线及其交点上；不会保存到纸上。";

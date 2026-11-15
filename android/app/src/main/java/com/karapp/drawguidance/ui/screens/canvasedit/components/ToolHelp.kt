@@ -56,6 +56,8 @@ object ToolDescriptions {
         // v38 çocuk modunda çizim görevi
         R.string.kids_challenge to R.string.help_kids_challenge,
         R.string.v50_practice to R.string.v50_help_practice,
+        // v52 not almada Tablo ekle
+        R.string.v52_table_short to R.string.v52_help_table,
         // v40 cetvel ve şekil kalıbı (basit menüde ayrı düğmeler)
         R.string.v40_ruler to R.string.v40_help_ruler,
         R.string.v40_template to R.string.v40_help_template,

@@ -168,4 +168,5 @@
     <string name="v52_share_err_no_device">Cihaz bulunamadı</string>
     <string name="v52_share_err_no_canvas">Tuval bulunamadı</string>
     <string name="v52_share_err_image">Resim okunamadı</string>
+    <string name="v52_help_table">Tablo ekler: satır ve sütun sayısı, başlık, kenarlık ve hazır temalar. Sonra her hücre, satır ve sütun ayrı düzenlenir.</string>
 </resources>

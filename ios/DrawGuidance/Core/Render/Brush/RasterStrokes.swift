@@ -81,12 +81,43 @@ enum RasterStrokes {
         }
         let paper: UInt32 = (relevant == nil || !stroke.brushType.isHelper) ? 0 : paperNow()
         let key = stroke.id as NSString
-        if let e = cache.object(forKey: key), e.stroke == stroke, e.context == relevant, e.paper == paper { return e }
+        let cached = cache.object(forKey: key)
+        if let e = cached, e.stroke == stroke, e.context == relevant, e.paper == paper { return e }
 
         let rw = Float(region.width), rh = Float(region.height)
         if rw <= 0 || rh <= 0 { return nil }
         let scale = min(MAX_SCALE, (MAX_PIXELS / (rw * rh)).squareRoot())
         let w = max(1, Int(ceil(rw * scale))), h = max(1, Int(ceil(rh * scale)))
+        // v52 donma düzeltmesi: ana iş parçacığında büyük hesap yapılmaz; arka planda hesaplanır, o sırada eski sonuç
+        // (varsa) çizilir, bitince `didUpdate` bildirimiyle yeniden çizim istenir. Küçük izler (fırça önizlemesi) hemen.
+        if Thread.isMainThread && w * h > SYNC_PIXELS && !isTesting {
+            let token = "\(stroke.id)|\(stroke.points.count)|\(relevant?.count ?? -1)|\(paper)"
+            lock.lock()
+            let fresh = inFlight.insert(token).inserted
+            lock.unlock()
+            if fresh {
+                worker.async {
+                    _ = compute(stroke, region, relevant, paper, stroke.id, scale, w, h)
+                    lock.lock(); inFlight.remove(token); lock.unlock()
+                    DispatchQueue.main.async { NotificationCenter.default.post(name: didUpdate, object: nil) }
+                }
+            }
+            return cached
+        }
+        return compute(stroke, region, relevant, paper, stroke.id, scale, w, h)
+    }
+
+    /// Arka planda bir iz hesaplanıp önbelleğe girince gönderilir (düzenleyici yeniden çizer).
+    static let didUpdate = Notification.Name("dg.raster.updated")
+    /// Ana iş parçacığında hemen hesaplanan en çok piksel sayısı.
+    private static let SYNC_PIXELS = 160_000
+    private static let worker = DispatchQueue(label: "dg.raster.worker", qos: .userInitiated)
+    private static let lock = NSLock()
+    nonisolated(unsafe) private static var inFlight = Set<String>()
+    private static let isTesting = ProcessInfo.processInfo.environment["XCTestConfigurationFilePath"] != nil
+
+    private static func compute(_ stroke: Stroke, _ region: CGRect, _ relevant: [Stroke]?, _ paper: UInt32, _ id: String,
+                                _ scale: Float, _ w: Int, _ h: Int) -> Entry? {
         let left = Float(floor(region.minX)), top = Float(floor(region.minY))
         let patch = RasterBrush.Patch(left: left, top: top, scale: scale, w: w, h: h)
         if let relevant, !relevant.isEmpty || (paper >> 24) != 0 { renderBase(relevant, patch, paper: paper) }
@@ -118,7 +149,7 @@ enum RasterStrokes {
         let rect = CGRect(x: CGFloat(left), y: CGFloat(top), width: CGFloat(Float(w) / scale), height: CGFloat(Float(h) / scale))
         let e = Entry(stroke: stroke, context: relevant, rect: rect, color: colorImage, mask: maskImage)
         e.paper = paper
-        cache.setObject(e, forKey: key, cost: n * 8)
+        cache.setObject(e, forKey: id as NSString, cost: n * 8)
         return e
     }
 

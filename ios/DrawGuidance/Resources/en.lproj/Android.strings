@@ -3209,6 +3209,7 @@
 "v52_add_graph" = "Add graph";
 "v52_add_table" = "Add table";
 "v52_graph_short" = "Graph";
+"v52_help_table" = "Adds a table: rows and columns, header, borders and ready-made themes. Each cell, row and column can then be edited.";
 "v52_helper_center" = "Center";
 "v52_helper_composition" = "Composition guide";
 "v52_helper_composition_hint" = "Place the main subject on the lines and their crossings; not saved on the paper.";

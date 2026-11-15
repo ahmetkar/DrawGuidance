@@ -168,4 +168,5 @@
     <string name="v52_share_err_no_device">Устройство не найдено</string>
     <string name="v52_share_err_no_canvas">Холст не найден</string>
     <string name="v52_share_err_image">Не удалось прочитать изображение</string>
+    <string name="v52_help_table">Добавляет таблицу: строки и столбцы, заголовок, границы и готовые темы. Затем можно править каждую ячейку, строку и столбец.</string>
 </resources>

@@ -168,4 +168,5 @@
     <string name="v52_share_err_no_device">Device not found</string>
     <string name="v52_share_err_no_canvas">Canvas not found</string>
     <string name="v52_share_err_image">Couldn\'t read the image</string>
+    <string name="v52_help_table">Adds a table: rows and columns, header, borders and ready-made themes. Each cell, row and column can then be edited.</string>
 </resources>

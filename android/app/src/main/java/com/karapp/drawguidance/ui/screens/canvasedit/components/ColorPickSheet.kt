@@ -251,12 +251,7 @@ fun KidsPalette(selectedHex: String?, onColor: (String) -> Unit, modifier: Modif
 fun KidsBackgroundSheet(currentHex: String, onColor: (String) -> Unit, onDismiss: () -> Unit, onTransform: (() -> Unit)? = null) {
     val colors = NeuTheme.colors
     var chosen by androidx.compose.runtime.remember { androidx.compose.runtime.mutableStateOf(currentHex) }
-    androidx.compose.material3.ModalBottomSheet(
-        onDismissRequest = onDismiss,
-        sheetState = androidx.compose.material3.rememberModalBottomSheetState(skipPartiallyExpanded = true),
-        containerColor = colors.background,
-        contentColor = colors.content,
-    ) {
+    NeuSheet(onDismiss) {
         androidx.compose.foundation.layout.Column(
             Modifier.fillMaxWidth().portraitFill().navigationBarsPadding().padding(start = 20.dp, end = 20.dp, bottom = 24.dp).testTag("kids_background_sheet"),
             verticalArrangement = Arrangement.spacedBy(16.dp),

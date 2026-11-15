@@ -96,15 +96,44 @@ internal object RasterStrokes {
         return r
     }
 
+    /** v52 ana iş parçacığında istenen ama önbellekte olmayan sonuçlar burada hesaplanır (çizim donmasın). */
+    private val worker = java.util.concurrent.Executors.newSingleThreadExecutor { r -> Thread(r, "dg-raster").apply { isDaemon = true; priority = Thread.NORM_PRIORITY - 1 } }
+    private val inFlight = java.util.concurrent.ConcurrentHashMap.newKeySet<String>()
+    /** Arka planda bir sonuç bitince artar; düzenleyici tuvali bunu okur ve yeniden çizer. */
+    val version = androidx.compose.runtime.mutableIntStateOf(0)
+
     private fun entryFor(stroke: Stroke, context: List<Stroke>?): Entry? {
         val region = region(stroke) ?: return null
         val relevant = context?.filter { !it.hidden && StrokeRenderer.paintBounds(it)?.overlaps(region) == true }
         val paper = if (relevant == null || !stroke.brushType.isHelper) 0 else paperNow()
         var key = if (relevant == null) -1L else 17L + paper
         relevant?.forEach { key = key * 31 + System.identityHashCode(it) }
+        val stale: Entry?
         synchronized(cache) {
-            cache.get(stroke.id)?.let { if (it.contextKey == key && sameLook(it.stroke, stroke)) return it }
+            val e = cache.get(stroke.id)
+            if (e != null && e.contextKey == key && sameLook(e.stroke, stroke)) return e
+            stale = e?.takeIf { sameLook(it.stroke, stroke) }
         }
+        // v52 ana iş parçacığında ağır piksel hesabı yapılmaz: eski sonuç (varsa) gösterilir, yenisi arka planda
+        // hesaplanınca tuval yeniden çizilir. Dışa aktarma ve önbellek üretimi (arka plan) eskisi gibi beklenir.
+        if (android.os.Looper.myLooper() == android.os.Looper.getMainLooper() && android.os.Build.FINGERPRINT != "robolectric") {
+            val job = stroke.id + "@" + key
+            if (inFlight.add(job)) {
+                worker.execute {
+                    try { compute(stroke, region, relevant, paper, key) } catch (t: Throwable) {
+                        com.karapp.drawguidance.diagnostics.AppLog.w("RasterStrokes", "piksel fırça hesaplanamadı", t)
+                    } finally {
+                        inFlight.remove(job)
+                        android.os.Handler(android.os.Looper.getMainLooper()).post { version.intValue++ }
+                    }
+                }
+            }
+            return stale
+        }
+        return compute(stroke, region, relevant, paper, key)
+    }
+
+    private fun compute(stroke: Stroke, region: Rect, relevant: List<Stroke>?, paper: Int, key: Long): Entry? {
         val rw = region.width; val rh = region.height
         if (rw <= 0f || rh <= 0f) return null
         val scale = min(MAX_SCALE, sqrt(MAX_PIXELS / (rw * rh)))

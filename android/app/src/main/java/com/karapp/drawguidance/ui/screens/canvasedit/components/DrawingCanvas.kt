@@ -688,6 +688,8 @@ fun DrawingCanvas(
                     }
                 },
         ) {
+            // v52 piksel fırça sonuçları arka planda hesaplanır; biten sonuç yeniden çizdirir
+            com.karapp.drawguidance.ui.drawing.RasterStrokes.version.intValue
             val scale = viewport.scale
             val offset = viewport.offset
             val expandRect = (activePreview as? Preview.Expand)?.rect

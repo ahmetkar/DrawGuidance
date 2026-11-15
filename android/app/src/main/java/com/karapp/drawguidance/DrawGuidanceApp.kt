@@ -83,6 +83,8 @@ open class DrawGuidanceApp : Application() {
             modules(appModule(apiBaseUrl))
         }.koin
         // Ayar dosyaları ve yazı tipleri arka planda hazırlanır: ilk ekranlar ana iş parçacığında diske gitmez
+        // v52 donma bekçisi (ana iş parçacığı 2,5 sn yanıt vermezse yığın izi rapora)
+        com.karapp.drawguidance.diagnostics.MainThreadWatchdog.start()
         Thread({
             // v37 merkezi hata yönetimi: raporlar olay tablosuyla gönderilir; önceki çalışmada çökme olduysa sorulur
             // v42 önceki çalışma ön plandayken kapandıysa (istisnasız) günlüklerle rapor hazırlanır

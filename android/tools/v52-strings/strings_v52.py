@@ -245,6 +245,8 @@ s("v52_share_err_no_device", "Cihaz bulunamadı", "Device not found", "لم يت
 s("v52_share_err_no_canvas", "Tuval bulunamadı", "Canvas not found", "لم يتم العثور على اللوحة", "キャンバスが見つかりません", "캔버스를 찾을 수 없습니다", "Холст не найден", "未找到画布")
 s("v52_share_err_image", "Resim okunamadı", "Couldn't read the image", "تعذّرت قراءة الصورة", "画像を読み込めませんでした", "이미지를 읽을 수 없습니다", "Не удалось прочитать изображение", "无法读取图片")
 
+s("v52_help_table", "Tablo ekler: satır ve sütun sayısı, başlık, kenarlık ve hazır temalar. Sonra her hücre, satır ve sütun ayrı düzenlenir.", "Adds a table: rows and columns, header, borders and ready-made themes. Each cell, row and column can then be edited.", "يضيف جدولًا: عدد الصفوف والأعمدة والعنوان والحدود وسمات جاهزة. ثم يمكن تعديل كل خلية وصف وعمود.", "表を追加：行と列の数、見出し、罫線、テーマを選べます。あとから各セル・行・列を編集できます。", "표 추가: 행·열 수, 머리글, 테두리, 테마를 고릅니다. 이후 각 셀·행·열을 따로 편집할 수 있습니다.", "Добавляет таблицу: строки и столбцы, заголовок, границы и готовые темы. Затем можно править каждую ячейку, строку и столбец.", "添加表格：行列数、表头、边框和现成主题。之后可分别编辑每个单元格、行和列。")
+
 def xml_escape(t):
     t = escape(t).replace("'", "\\'").replace('"', '\\"')
     return t

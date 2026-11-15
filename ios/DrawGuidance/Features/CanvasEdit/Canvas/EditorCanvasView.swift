@@ -106,6 +106,8 @@ final class EditorCanvasView: UIView {
         backgroundColor = CanvasColors.background
         contentMode = .redraw
         accessibilityIdentifier = "drawing_canvas"
+        // v52 piksel fırça sonucu arka planda hazır olunca yeniden çiz
+        NotificationCenter.default.addObserver(self, selector: #selector(onRasterReady), name: RasterStrokes.didUpdate, object: nil)
         PerspectiveTool.vanishingPoints = { spec, r in GuideRenderer.vanishingPoints(spec, r.cg).map { $0.p } }
         if #available(iOS 13.0, *) {
             let hoverer = UIHoverGestureRecognizer(target: self, action: #selector(onHover(_:)))
@@ -144,6 +146,8 @@ final class EditorCanvasView: UIView {
         layoutViewport()
         setNeedsDisplay()
     }
+
+    @objc private func onRasterReady() { setNeedsDisplay() }
 
     @objc private func onHover(_ g: UIHoverGestureRecognizer) {
         switch g.state {

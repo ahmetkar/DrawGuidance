@@ -3209,6 +3209,7 @@
 "v52_add_graph" = "Grafik ekle";
 "v52_add_table" = "Tablo ekle";
 "v52_graph_short" = "Grafik";
+"v52_help_table" = "Tablo ekler: satır ve sütun sayısı, başlık, kenarlık ve hazır temalar. Sonra her hücre, satır ve sütun ayrı düzenlenir.";
 "v52_helper_center" = "Merkez";
 "v52_helper_composition" = "Kompozisyon kılavuzu";
 "v52_helper_composition_hint" = "Ana öğeyi çizgilerin ve kesişim noktalarının üstüne yerleştir; kâğıda yazılmaz.";

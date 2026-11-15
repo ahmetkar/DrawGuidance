@@ -168,4 +168,5 @@
     <string name="v52_share_err_no_device">لم يتم العثور على الجهاز</string>
     <string name="v52_share_err_no_canvas">لم يتم العثور على اللوحة</string>
     <string name="v52_share_err_image">تعذّرت قراءة الصورة</string>
+    <string name="v52_help_table">يضيف جدولًا: عدد الصفوف والأعمدة والعنوان والحدود وسمات جاهزة. ثم يمكن تعديل كل خلية وصف وعمود.</string>
 </resources>

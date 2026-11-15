@@ -450,11 +450,14 @@ private struct PracticeTile: View {
 /// Alıştırmanın küçük resmi: görünen kılavuz (simetride sol yarı ve eksen).
 private struct PracticeThumb: View {
     let level: PracticeLevel
+    // v52 küçük resim arka planda hesaplanır (90 alıştırmanın şekilleri ana iş parçacığında üretilince liste açılırken
+    // uygulama donuyordu)
+    @State private var loaded: PracticeTarget?
 
     var body: some View {
-        let target = PracticeThumbs.target(level)
+        let target = loaded ?? PracticeThumbs.cache[level.id]
         Canvas { ctx, size in
-            guard let box = ChallengeScore.bounds(target.lines), box.width > 0, box.height > 0 else { return }
+            guard let target, let box = ChallengeScore.bounds(target.lines), box.width > 0, box.height > 0 else { return }
             let pad: CGFloat = 4
             let s = min((size.width - 2 * pad) / CGFloat(box.width), (size.height - 2 * pad) / CGFloat(box.height))
             let ox = (size.width - CGFloat(box.width) * s) / 2 - CGFloat(box.left) * s
@@ -475,16 +478,17 @@ private struct PracticeThumb: View {
                 ctx.stroke(axis, with: .color(axisRed), style: StrokeStyle(lineWidth: 1, dash: [3, 3]))
             }
         }
+        .task(id: level.id) {
+            if PracticeThumbs.cache[level.id] != nil { return }
+            let lv = level
+            let t = await Task.detached(priority: .utility) { PracticeLevels.target(lv, 1000, 1000) }.value
+            PracticeThumbs.cache[lv.id] = t
+            loaded = t
+        }
     }
 }
 
 @MainActor
 private enum PracticeThumbs {
     static var cache: [String: PracticeTarget] = [:]
-    static func target(_ level: PracticeLevel) -> PracticeTarget {
-        if let t = cache[level.id] { return t }
-        let t = PracticeLevels.target(level, 1000, 1000)
-        cache[level.id] = t
-        return t
-    }
 }

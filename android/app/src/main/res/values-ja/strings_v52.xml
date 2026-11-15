@@ -168,4 +168,5 @@
     <string name="v52_share_err_no_device">端末が見つかりません</string>
     <string name="v52_share_err_no_canvas">キャンバスが見つかりません</string>
     <string name="v52_share_err_image">画像を読み込めませんでした</string>
+    <string name="v52_help_table">表を追加：行と列の数、見出し、罫線、テーマを選べます。あとから各セル・行・列を編集できます。</string>
 </resources>

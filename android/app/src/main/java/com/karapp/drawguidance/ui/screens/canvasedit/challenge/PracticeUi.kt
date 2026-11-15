@@ -667,12 +667,21 @@ private fun PracticeTile(level: PracticeLevel, score: Int?, current: Boolean, lo
     }
 }
 
+private object PracticeThumbCache { val map = java.util.concurrent.ConcurrentHashMap<String, PracticeTarget>() }
+
 /** Alıştırmanın küçük resmi: görünen kılavuz (simetri görevinde sol yarı). */
 @Composable
 private fun PracticeThumb(level: PracticeLevel, modifier: Modifier) {
-    val target = remember(level.id) { PracticeLevels.target(level, 1000, 1000) }
+    // v52 küçük resimler arka planda hesaplanır ve saklanır: 90 alıştırmanın şekilleri (gül, yüz, rumi…) ana iş
+    // parçacığında üretilince alıştırma listesi açılırken uygulama donuyordu
+    val target by androidx.compose.runtime.produceState(PracticeThumbCache.map[level.id], level.id) {
+        if (value == null) value = kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.Default) {
+            PracticeThumbCache.map.getOrPut(level.id) { PracticeLevels.target(level, 1000, 1000) }
+        }
+    }
     val ink = NeuTheme.colors.content
     Canvas(modifier) {
+        val target = target ?: return@Canvas
         val box = ChallengeScore.bounds(target.lines) ?: return@Canvas
         val pad = 4.dp.toPx()
         val s = minOf((size.width - 2 * pad) / box.width, (size.height - 2 * pad) / box.height)

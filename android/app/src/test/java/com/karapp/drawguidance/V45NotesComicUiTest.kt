@@ -298,8 +298,9 @@ class V45SimpleNotesShapesUiTest : V45NotesComicUiBase() {
     private fun shapeEls(): List<Stroke> = strokes().filter { it.brushType == BrushType.SHAPE }
 
     /** Basit üst menüden şekil seçip tuvale sürükleyerek ekler; eklenen şekil döner. */
-    private fun addShape(title: String): Stroke {
-        compose.onNodeWithTag("simple_tool_shape").performScrollTo().performClick()
+    private fun addShape(title: String, graph: Boolean = false): Stroke {
+        // v52 grafikler ayrı "Grafik" düğmesinde
+        compose.onNodeWithTag(if (graph) "simple_tool_graph" else "simple_tool_shape").performScrollTo().performClick()
         pickShape(title)
         waitFor { vm().mode.value == EditMode.SHAPE }
         val n = shapeEls().size
@@ -326,7 +327,7 @@ class V45SimpleNotesShapesUiTest : V45NotesComicUiBase() {
     @Test
     fun graphIsAddedFromSimplePickerAndEditedWithGraphToolAndFormula() {
         open("Basit grafik", CanvasKind.NOTES)
-        val g = addShape("Fonksiyon grafiği")
+        val g = addShape("Fonksiyon grafiği", graph = true)
         assertEquals(ShapeRegistryIds.FUNCTION, g.shape!!.kind)
         assertNotNull("grafik verisiyle", g.shape!!.graph)
         openShapeEditor(g)

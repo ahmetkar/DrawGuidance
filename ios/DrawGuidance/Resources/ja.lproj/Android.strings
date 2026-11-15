@@ -3209,6 +3209,7 @@
 "v52_add_graph" = "グラフを追加";
 "v52_add_table" = "表を追加";
 "v52_graph_short" = "グラフ";
+"v52_help_table" = "表を追加：行と列の数、見出し、罫線、テーマを選べます。あとから各セル・行・列を編集できます。";
 "v52_helper_center" = "中心";
 "v52_helper_composition" = "構図ガイド";
 "v52_helper_composition_hint" = "主役を線と交点に置きましょう。用紙には保存されません。";

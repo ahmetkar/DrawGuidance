@@ -609,8 +609,8 @@ class V45CanvasMenusTest : V45EditorBase() {
         waitFor { exists("selection_menu_edit_list") }
         // Not tuvalinde şekilden ok çıkarma da Düzenle'de (eski bağlam menüsünden)
         assertTrue(compose.onAllNodes(hasText("Bu şekilden ok çıkar") and hasAnyAncestor(hasTestTag("selection_menu_edit_list"))).fetchSemanticsNodes().isNotEmpty())
-        // v51 not almada düz şekil vektör düzenlemeye açılmaz: "Şekli düzenle" yok
-        assertTrue(compose.onAllNodes(hasText("Şekli düzenle") and hasAnyAncestor(hasTestTag("selection_menu_edit_list"))).fetchSemanticsNodes().isEmpty())
+        // v52 not almada "Şekli düzenle" düz şekli gelişmiş çizim tuvalinde açar
+        assertTrue(compose.onAllNodes(hasText("Şekli düzenle") and hasAnyAncestor(hasTestTag("selection_menu_edit_list"))).fetchSemanticsNodes().isNotEmpty())
         compose.runOnIdle { vm().clearSelection() }
         compose.waitForIdle()
 

@@ -255,9 +255,7 @@ class V15GraphTest : V15EditorBase() {
     fun graphToolIncreasesPatternAndPointsAndEditsNumbers() {
         createNotesCanvasAndOpen("Grafik Testi")
         val size = canvasSize()
-        addMenu("Şekil ekle")
-        waitForText("Grafik")
-        compose.onAllNodesWithText("Grafik")[0].performClick()
+        openGraphPicker()
         waitForText("Grafik eğrileri")
         compose.onNodeWithText("Sinüs").performSemanticsAction(SemanticsActions.OnClick)
         tap(Offset(size.x * 0.5f, size.y * 0.4f))

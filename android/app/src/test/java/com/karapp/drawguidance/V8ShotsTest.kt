@@ -55,10 +55,7 @@ abstract class V8ShotsBase : WideLayoutTestBase() {
         val size = canvasSize()
         drag(Offset(size.x * 0.15f, size.y * 0.15f), Offset(size.x * 0.35f, size.x * 0.35f))
         waitFor { canvas().strokes.isNotEmpty() }
-        addMenu("Şekil ekle")
-        // v15: grafikler ayrı bölümde
-        waitForText("Grafik")
-        compose.onAllNodesWithText("Grafik")[0].performClick()
+        openGraphPicker()
         waitForText("Koordinat ekseni")
         compose.onNodeWithText("Koordinat ekseni").performSemanticsAction(SemanticsActions.OnClick)
         waitForText("Şekil: Koordinat ekseni")

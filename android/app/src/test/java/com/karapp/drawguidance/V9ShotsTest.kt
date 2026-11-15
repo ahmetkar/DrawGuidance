@@ -39,10 +39,7 @@ abstract class V9ShotsBase : WideLayoutTestBase() {
         shot("$prefix-2-page-strip")
 
         // Şekil: grafik, sonra biçim paneli
-        addMenu("Şekil ekle")
-        waitForText("Geometrik Cisimler")
-        // v15: grafikler ayrı bölümde (yeni grafik motoru)
-        compose.onAllNodesWithText("Grafik")[0].performClick()
+        openGraphPicker()
         waitForText("Fonksiyon grafiği")
         compose.onNodeWithText("Fonksiyon grafiği").performSemanticsAction(SemanticsActions.OnClick)
         waitForText("Şekil: Fonksiyon grafiği")

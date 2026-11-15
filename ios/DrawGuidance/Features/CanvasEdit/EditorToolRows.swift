@@ -129,6 +129,8 @@ struct ModeToolRow: View {
             ShapeEditToolRow(vm: vm, shapes: vm.shapes)
         case .IMAGE_EDIT:
             // v50 Resmi düzenle: Kırp ve vektörleştirme türleri doğrudan (Android imageEditTools; varsayılan ayarlarla)
+            // v52 Foto düzenle: bütün raster düzenlemeleri menülere ayrılmış tam ekran düzenleyicide
+            ToolButton(icon: "camera.filters", label: L("v52_photo_open"), id: "image_photo_edit") { vm.openPhotoEditor() }
             ToolButton(icon: "crop", label: L("image_crop"), id: "image_crop") { vm.startAction(.CROP, target: store.selection) }
             ToolButton(icon: "scribble.variable", label: L("vectorize_direct_auto"), selected: vm.imageEdit.tracing, id: "vectorize_auto", anchor: "vectorize_auto") {
                 vm.imageEdit.vectorize(EdgeOptions(mode: .AUTO), lineWidth: 2.5, keepImage: true)

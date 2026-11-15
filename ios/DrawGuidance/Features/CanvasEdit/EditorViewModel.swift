@@ -76,6 +76,10 @@ final class EditorViewModel: ObservableObject, EditorHost {
     private(set) var formulas: FormulaController!
     /// v52 not almada tablo ekleme ve düzenleme.
     private(set) var tables: TableController!
+    /// v52 foto düzenleme modu.
+    private(set) var photo: PhotoEditController!
+    /// v52 not almada ve çizgi romanda resim düzenlemenin nerede yapılacağı sorulur (resim elemanının kimliği).
+    @Published var imageEditChoice: String?
     private(set) var pen: PenController!
     private(set) var scene: ObjectSceneController!
     private(set) var layers: LayerController!
@@ -165,6 +169,13 @@ final class EditorViewModel: ObservableObject, EditorHost {
         v45 = V45NotesComicController(store, self, pages)
         formulas = FormulaController(store, self) { [unowned self] in brush }
         tables = TableController(store, self)
+        photo = PhotoEditController(store, self, assets: deps.assets)
+        // v52 foto düzenleme açıkken yayına ara verilir, kapanınca sürer
+        photo.$openId.map { $0 != nil }.removeDuplicates().dropFirst().sink { [weak self] open in
+            guard let self else { return }
+            if open { ShareManager.shared.pauseLive(canvasLocalId) }
+            else { ShareManager.shared.resumeLive(canvasLocalId); if let c = store.canvas { ShareManager.shared.publishLive(c) } }
+        }.store(in: &bag)
         pen = PenController(store, self) { [unowned self] in shapes.newShapeStyle() }
         scene = ObjectSceneController(store)
         layers = LayerController(store)
@@ -244,7 +255,7 @@ final class EditorViewModel: ObservableObject, EditorHost {
         store.indexNow()
         loaded = true
         // v51 notta: geçici tuvalde düzenlenen resimler nota aktarılır, açık kalmamış geçici tuvaller silinir
-        if c.kind.isNotes && tempSession == nil {
+        if (c.kind.isNotes || c.kind == .COMIC) && tempSession == nil {
             TempCanvases.results.sink { [weak self] r in
                 guard let self, r.sourceId == canvasLocalId else { return }
                 applyTempResult(r)
@@ -255,9 +266,30 @@ final class EditorViewModel: ObservableObject, EditorHost {
         await drawing.cleanOnOpen(c)
     }
 
-    /// v51 notta seçili resim geçici basit resim tuvalinde düzenlenir (not almada resim düzenleme araçları yok).
+    /// v51 notta seçili resim geçici gelişmiş çizim tuvalinde düzenlenir. v52 not almada ve çizgi romanda önce nerede
+    /// düzenleneceği sorulur (foto düzenleme / gelişmiş çizim / çizgi romanda burada).
     func editImageElsewhere(_ image: Stroke) -> Bool {
-        guard let c = store.canvas, c.kind.isNotes, tempSession == nil else { return false }
+        guard let c = store.canvas, c.kind.isNotes || c.kind == .COMIC, tempSession == nil else { return false }
+        imageEditChoice = image.id
+        return true
+    }
+
+    func chooseImageEdit(_ choice: ImageEditChoice) {
+        guard let id = imageEditChoice else { return }
+        imageEditChoice = nil
+        guard let image = store.canvas?.strokes.first(where: { $0.id == id && $0.brushType == .IMAGE }) else { return }
+        switch choice {
+        case .ADVANCED: startTempImage(image)
+        case .PHOTO: photo.open(image.id)
+        case .HERE: store.select([image.id]); startAction(.IMAGE_EDIT, target: [image.id])
+        }
+    }
+
+    /// v52 gelişmiş/basit çizimde Resmi düzenle satırındaki Foto düzenle.
+    func openPhotoEditor() { photo.open() }
+
+    private func startTempImage(_ image: Stroke) {
+        guard tempSession == nil else { return }
         texts.commitOpenDraft()
         store.saveNow()
         if let id = TempImageEditor.start(sourceId: canvasLocalId, image: image, deps: deps) {
@@ -266,7 +298,6 @@ final class EditorViewModel: ObservableObject, EditorHost {
         } else {
             emit(.message(L("v51_temp_image_failed")))
         }
-        return true
     }
 
     /// v52 notta seçili düz şekil gelişmiş çizim tuvalinde düzenlenir; kaydedilince nota döner. Yayın varsa ara verilir.

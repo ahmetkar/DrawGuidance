@@ -204,6 +204,7 @@ struct SimpleVectorRow: View {
         ScrollView(.horizontal, showsIndicators: false) {
             HStack(spacing: 6) {
                 if vm.mode == .IMAGE_EDIT {
+                    ToolButton(icon: "camera.filters", label: L("v52_photo_open"), id: "simple_image_photo_edit") { vm.openPhotoEditor() }
                     ToolButton(icon: "crop", label: L("image_crop"), id: "simple_image_crop") { vm.startAction(.CROP, target: store.selection) }
                     ToolButton(icon: "scribble.variable", label: L("vectorize_direct_auto"), selected: vm.imageEdit.tracing, id: "simple_vectorize_auto") {
                         vm.imageEdit.vectorize(EdgeOptions(mode: .AUTO), lineWidth: 2.5, keepImage: true)

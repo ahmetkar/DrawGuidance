@@ -104,6 +104,7 @@ struct CanvasEditScreen: View {
         }
         .modifier(TempImageEditCloser(vm: vm))
         .modifier(TableSheetsHost(ctl: vm.tables, store: vm.store, viewport: vm.viewport))
+        .modifier(PhotoEditorHost(vm: vm, photo: vm.photo))
         .sheet(isPresented: $brushPickerOpen) { brushPicker }
         .sheet(item: $sheet) { s in
             switch s {
@@ -371,5 +372,21 @@ struct CanvasEditHost: View {
     var body: some View {
         CanvasEditScreen(canvasLocalId: canvasLocalId) { canvasLocalId = $0 }
             .id(canvasLocalId)
+    }
+}
+
+/// v52 resim düzenlemenin yeri (not alma, çizgi roman) ve tam ekran foto düzenleme.
+struct PhotoEditorHost: ViewModifier {
+    @ObservedObject var vm: EditorViewModel
+    @ObservedObject var photo: PhotoEditController
+
+    func body(content: Content) -> some View {
+        content
+            .sheet(isPresented: Binding(get: { vm.imageEditChoice != nil }, set: { if !$0 { vm.imageEditChoice = nil } })) {
+                ImageEditChoiceView(comic: vm.store.canvas?.kind == .COMIC) { vm.chooseImageEdit($0) }
+            }
+            .fullScreenCover(isPresented: Binding(get: { photo.openId != nil }, set: { if !$0 { photo.close() } })) {
+                PhotoEditorView(photo: photo, kind: vm.store.canvas?.kind)
+            }
     }
 }

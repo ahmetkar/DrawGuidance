@@ -30,7 +30,7 @@
 - `DrawGuidance-v52-ios-unsigned.ipa` (Device Farm, 1.10.0 / 52; CI çalıştırması 108).
 - `DrawGuidance-v52-ios-signed.ipa` (App Store imzalı, 1.10.0 / 52, CI çalıştırması 114; App Store Connect'e Transporter ile yüklenebilir): CI `ios.yml` → `signed=true` (TestFlight'a göndermek için `upload=true`). Sertifika ve App Store profili App Store Connect API ile CI'da otomatik hazırlanır (`ios/tools/signing/asc_signing.py`). Gerekli GitHub Secrets: `SIGN_ASC_KEY_ID`, `SIGN_ASC_ISSUER_ID`, `SIGN_ASC_KEY_P8` (AuthKey_T4SPAHTFAT.p8 içeriği) ve `SIGN_DIST_KEY` (`yayin-anahtari\ios-dagitim-anahtari.pem` içeriği). Uygulama içi satın alma için olan `ASC_*` değişkenlerine dokunulmaz.
 - `DrawGuidance-v52-degisen-dosyalar.zip`: v49'dan (`16bbbc2`) bu yana değişen bütün dosyalar.
-- `DrawGuidance-v52-son-degisiklikler.zip`: yalnız önceki zipten (`43946bd`) bu yana değişen 39 dosya (silinen yok); PC kök klasörüne üzerine yazarak açılır.
+- `DrawGuidance-v52-son-degisiklikler.zip`: yalnız önceki zipten (`43946bd`) bu yana değişen 38 dosya (silinen yok); PC kök klasörüne üzerine yazarak açılır.
 - `DrawGuidance-v52-ios-unsigned.ipa` donma düzeltmelerinden önceki koddan (CI 108); Device Farm için gerekirse `signed=false` ile yeniden alınır.
 
 ## Yayın öncesi düzeltmeler (v52 son)

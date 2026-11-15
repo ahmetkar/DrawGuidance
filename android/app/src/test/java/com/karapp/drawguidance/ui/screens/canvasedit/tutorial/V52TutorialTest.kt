@@ -12,9 +12,12 @@ import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
+import org.robolectric.annotation.Config
+import com.karapp.drawguidance.TestDrawGuidanceApp
 
 /** v52 not alma "Bilim şekilleri ve hesaplama" eğitimi: şekiller kurulur, formüllerin sonucu eklenir. */
 @RunWith(RobolectricTestRunner::class)
+@Config(sdk = [34], application = TestDrawGuidanceApp::class)
 class V52TutorialTest {
     @Test fun scienceGroupInNotes() {
         val g = TutorialScripts.groups(CanvasKind.NOTES).first { it.id == "notes_science_v52" }

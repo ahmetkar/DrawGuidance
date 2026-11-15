@@ -2,7 +2,7 @@
 
 **Durum:** ara sürüm (iş sürüyor). Bu not her büyük adımda güncellenir.
 **Dal:** `claude/project-thread-db34s3` (GitHub `ahmetkar/DrawGuidance`), v51 `ios/v51-entegrasyon` üstüne.
-**Hedef sürüm:** versionCode 52 / 1.10.0 (sürüm numarası henüz yükseltilmedi).
+**Sürüm:** versionCode 52 / 1.10.0 (Android `build.gradle.kts` ve iOS `project.yml` yükseltildi).
 **Zip tabanı:** `16bbbc2` (Android v49 kaynakları). Zip, o günden bu yana eklenen/değişen bütün dosyaları içerir; PC kök klasörüne üzerine yazarak açılır. Silinen 2 dosya `SILINEN-DOSYALAR.txt` içinde listelenir.
 
 ## Biten maddeler (Android + iOS)
@@ -17,12 +17,12 @@
 ## Kısmen biten
 20. **Foto düzenleme modu**
    - Android: bitti. Tam ekran düzenleyici, 7 menü: Kırp ve döndür (90° döndürme, çevirme, eğim düzeltme, oranlı kırpma çerçevesi), Işık (pozlama, vurgular, gölgeler, beyazlar, siyahlar, netlik, parlaklık, karşıtlık), Renk (doygunluk, canlılık, sıcaklık, ton, solukluk), Filtreler (16 görünüm), Efektler (çizgi roman filtreleri, bulanıklık, keskinlik, vinyet, gren), Arka plan (otomatik kaldırma, dokunarak kaldır/geri getir), Rötuş fırçaları (aç, koyulaştır, cilt yumuşat, bulanıklaştır, boya, geri getir). Üstte geri al, yinele, önce/sonra (basılı tut), sıfırla, kaydet. Kaydedince resim geldiği yere konur (oran değiştiyse çerçeve uyar). Not almada ve çizgi romanda resim düzenlenirken "Foto düzenlemede / Gelişmiş çizimde / (çizgi romanda) Burada düzenle" seçilir; gelişmiş/basit çizimde Resmi düzenle satırında "Foto düzenle" düğmesi. Foto düzenleme açıkken yayına ara verilir.
-   - iOS: yapılıyor.
+   - iOS: aynı özellikler Swift ile (PhotoEdit.swift aynı hesap sırası, PhotoEditorView tam ekran, düzenleme yeri seçimi, Resmi düzenle satırında ve basit menüde "Foto düzenle"). iOS'ta daha önce resim filtre/efekt/arka plan pencereleri yoktu; bunlar artık foto düzenlemenin menülerinde.
 14. Ödüllü reklam: kod düzeltmesi bitti (aşağıdaki açıklama).
 
+12. Not alma eğitimlerine **"Bilim şekilleri ve hesaplama"** grubu (Android + iOS): formülden molekül (H2O → CO2 → CH4 → etanol), atom numarasından Bohr atomu (6 → 8 → 11), hız ve açıdan eğik atış, formül yuvalarına değer yazınca sonucun eklenmesi (daire alanı r = 3, F = m·a) ve değer değişince sonucun yenilenmesi.
+
 ## Kalan
-- 20 iOS foto düzenleme.
-- 12: Formülle oluşturulan kimya/fizik şekilleri ve formül hesaplama için not alma eğitimleri.
 - 13: Mağaza ekran görüntüleri (formüllü şekiller, alıştırmalar, çocuk modu görevleri, tuval paylaşma, iki cihaz arası canlı yayın).
 - Sürüm 52 / 1.10.0, bütün testler, APK / AAB / imzasız .ipa (Device Farm) / imzalı .ipa (Apple sertifikaları gerekir).
 

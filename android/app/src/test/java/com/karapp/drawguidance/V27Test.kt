@@ -9,6 +9,7 @@ import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.onAllNodesWithTag
 import androidx.compose.ui.test.onAllNodesWithText
 import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollTo
@@ -142,13 +143,20 @@ class V27SelectionSuggestTest : V27EditorBase() {
 @Config(sdk = [34], application = TestDrawGuidanceApp::class, qualifiers = "w411dp-h891dp-xxhdpi")
 class V27GuideTest : V27EditorBase() {
     @Test
-    fun notesHaveNoPerspectiveAndGuidesCanBeCleared() {
+    fun notesHaveNoGuideToolsButOldGuidesCanBeRemoved() {
+        // v51 not almada kılavuz ve perspektif aracı yok; eski notlarda kalan kılavuz ⋮ menüsünden kaldırılır
         createNotesCanvasAndOpen("Not kılavuz")
-        mode("Ekle")
-        compose.waitForIdle()
-        val inRow = { d: String -> hasContentDescription(d) and hasAnyAncestor(hasTestTag("tool_row_context")) }
-        waitFor { compose.onAllNodes(inRow("Kılavuz çizgileri")).fetchSemanticsNodes().isNotEmpty() }
-        assertTrue("not tuvalinde perspektif eklenmez", compose.onAllNodes(inRow("Perspektif çizgileri")).fetchSemanticsNodes().isEmpty())
+        waitFor { compose.onAllNodesWithTag("simple_tool_row").fetchSemanticsNodes().isNotEmpty() }
+        listOf("Kılavuz çizgileri", "Perspektif çizgileri").forEach {
+            assertTrue("$it not almada yok", compose.onAllNodes(hasContentDescription(it)).fetchSemanticsNodes().isEmpty())
+        }
+        val vm = com.karapp.drawguidance.ui.screens.canvasedit.CanvasEditViewModel.lastCreated!!.get()!!
+        compose.runOnIdle { vm.setGuide(com.karapp.drawguidance.data.model.GuideSpec(kind = GuideKind.RULED)) }
+        waitFor { canvas().guide.kind == GuideKind.RULED }
+        compose.onNodeWithContentDescription("Diğer seçenekler").performSemanticsAction(SemanticsActions.OnClick)
+        waitFor { compose.onAllNodesWithTag("notes_remove_guides_menu_item").fetchSemanticsNodes().isNotEmpty() }
+        compose.onNodeWithTag("notes_remove_guides_menu_item").performSemanticsAction(SemanticsActions.OnClick)
+        waitFor { canvas().guide.kind == GuideKind.NONE }
     }
 
     @Test

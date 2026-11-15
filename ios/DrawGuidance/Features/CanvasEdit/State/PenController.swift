@@ -26,6 +26,8 @@ final class PenController: ObservableObject {
     }
 
     func start() {
+        // v51 not almada kalem aracı (yol) yok
+        if store.canvas?.kind.isNotes == true { return }
         anchors = []; pending = nil; bending = nil
         host.startAction(.PEN)
     }

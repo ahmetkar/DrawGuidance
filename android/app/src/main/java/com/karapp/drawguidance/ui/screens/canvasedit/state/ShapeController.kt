@@ -243,14 +243,22 @@ class ShapeController(
      * Şekil düzenleme moduna girer (seçili şekil üzerinde çalışılır); grafikler grafik aracıyla, v45 parametreli şekiller
      * değer/formül düzenleyicisiyle açılır (vektör noktaları oradaki "Vektör düzenle" ile).
      */
+    private fun editToolFor(shape: Stroke): ShapeTool = when {
+        shape.shape?.let { com.karapp.drawguidance.ui.drawing.ShapeRegistry.isGraph(it.kind) && it.graph != null } == true -> ShapeTool.GRAPH
+        paramShapes.model(shape) != null -> ShapeTool.PARAMS
+        else -> ShapeTool.NODES
+    }
+
+    /** v51 seçili şekil düzenleyicide açılabilir mi (not almada düz şekiller açılmaz: "Şekli düzenle" gösterilmez). */
+    fun canEditSelected(): Boolean {
+        val shape = store.selectedStroke { it.shape != null } ?: return false
+        return vectorEditAllowed || !isVectorTool(editToolFor(shape))
+    }
+
     fun editSelected() {
         val shape = store.selectedStroke { it.shape != null } ?: return
         paramShapes.clearError()
-        val tool = when {
-            shape.shape?.let { com.karapp.drawguidance.ui.drawing.ShapeRegistry.isGraph(it.kind) && it.graph != null } == true -> ShapeTool.GRAPH
-            paramShapes.model(shape) != null -> ShapeTool.PARAMS
-            else -> ShapeTool.NODES
-        }
+        val tool = editToolFor(shape)
         // v51 not almada düz şekiller vektör düzenlemeye açılmaz (değerli şekiller ve grafikler açılır)
         if (!vectorEditAllowed && isVectorTool(tool)) return
         _tool.value = tool

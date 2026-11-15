@@ -77,18 +77,8 @@ class V9ShapeEditTest : EditorTestBase() {
         compose.onNodeWithContentDescription("Paneli kapat").performClick()
         compose.waitForIdle()
 
-        // Şekil düzenleme modu (v16): vektör noktaları ve çizgiler; eski parça araçları yok
-        mode("Seç")
-        editButton("Şekli düzenle")
-        waitForText("Şekli Düzenle: Noktalar")
-        listOf("Noktalar", "Nokta ekle", "Çizgi çiz", "Çizgiler", "Alan boya").forEach { assertTrue(it, compose.onAllNodesWithContentDescription(it).fetchSemanticsNodes().isNotEmpty()) }
-        listOf("Parça özellikleri", "Kes", "Sil").forEach {
-            assertTrue(it, compose.onAllNodes(androidx.compose.ui.test.hasContentDescription(it)).fetchSemanticsNodes().isNotEmpty())
-        }
-        listOf("Dönüştür", "Ayır", "Parçala", "Boya", "Eğri").forEach { assertTrue(it, compose.onAllNodesWithText(it).fetchSemanticsNodes().isEmpty()) }
+        // v51 not almada düz şekil vektör (nokta) düzenlemeye açılmaz: "Şekli düzenle" yok
+        assertTrue(compose.onAllNodesWithText("Şekli düzenle").fetchSemanticsNodes().isEmpty())
         assertTrue(canvas().strokes.all { it.brushType == BrushType.SHAPE })
-        compose.onNodeWithContentDescription("Bitti").performClick()
-        // v16: düzenleme bitince İncele
-        waitForText("Elemana dokunarak seç", substring = true)
     }
 }

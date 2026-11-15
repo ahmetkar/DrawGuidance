@@ -109,9 +109,10 @@ class V10FillAndMoveTest : V10EditorBase() {
 
     @Test
     fun paintBucketFillsTheSelectedShapeOrTheCanvasAndMovePicksTheTouchedElement() {
-        createNotesCanvasAndOpen("Boya")
+        // v51 boya kutusu (seçime ya da tuvale) gelişmiş menüde; not alma basit menüde: resim tuvalinde
+        createCanvasAndOpen("Boya")
         addMenu("Şekil ekle")
-        waitForText("Geometrik Cisimler")
+        waitForText("Kare")
         compose.onNodeWithText("Kare").performSemanticsAction(SemanticsActions.OnClick)
         waitForText("Şekil: Kare")
         val size = canvasSize()
@@ -126,7 +127,7 @@ class V10FillAndMoveTest : V10EditorBase() {
         waitFor { canvas().strokes.single().shape!!.style.fillColorHex != null }
         assertEquals(background, canvas().backgroundColorHex)
         closeSheet("color_pick_sheet")
-        compose.onNodeWithContentDescription("Geri al").performScrollTo().performClick()
+        compose.onNodeWithContentDescription("Geri al").performSemanticsAction(androidx.compose.ui.semantics.SemanticsActions.OnClick)
         waitFor { canvas().strokes.single().shape!!.style.fillColorHex == null }
 
         // v34: Boya kutusu Çiz satırında; Düzenle'de kalem ve silgi yok; çizmek için Çiz

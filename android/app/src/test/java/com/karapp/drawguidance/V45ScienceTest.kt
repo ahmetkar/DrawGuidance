@@ -279,13 +279,8 @@ class V45ScienceUiTest : V33EditorBase() {
         assertTrue("açı büyüdü: $th", th > 45.0)
         assertEquals(EditMode.SHAPE_EDIT, vm().mode.value)
 
-        // Vektör düzenle → nokta düzenleme; değer kaydı korunur
-        val kept = shape().shape!!.params
-        compose.onNodeWithTag("param_vector_edit").performSemanticsAction(SemanticsActions.OnClick)
-        waitFor { vm().shapeTool.value == ShapeTool.NODES }
-        waitFor { !has("param_controls") }
-        assertFalse(has("param_handles"))
-        assertEquals(kept, shape().shape!!.params)
+        // v51 not almada vektör (nokta) düzenleme yok: "Vektör düzenle" düğmesi görünmez
+        assertFalse(has("param_vector_edit"))
     }
 
     @Test

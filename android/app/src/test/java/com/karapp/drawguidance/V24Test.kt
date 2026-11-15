@@ -75,6 +75,8 @@ abstract class V24EditorBase : V23EditorBase() {
     protected fun openBackground() {
         // v34: Arka plan yalnız Çiz satırında
         val node = hasContentDescription("Arka plan") and hasClickAction() and (hasAnyAncestor(hasTestTag("tool_row_context")) or hasAnyAncestor(hasTestTag("tool_row_draw")))
+        // v51 not alma basit menüde: Arka plan Ekle menüsünde
+        if (simpleRow() && clickSimple("Arka plan")) { waitFor { exists("background_sheet") }; return }
         if (compose.onAllNodes(node).fetchSemanticsNodes().isEmpty()) mode("Çiz")
         waitFor { compose.onAllNodes(node).fetchSemanticsNodes().isNotEmpty() }
         runCatching { compose.onNode(node).performScrollTo() }

@@ -95,14 +95,7 @@ abstract class V8ShotsBase : WideLayoutTestBase() {
         compose.onNode(hasText("Kırp") and hasClickAction()).performClick()
         compose.waitForIdle()
 
-        clickFill()
-        waitForText("Renk seç")
-        compose.onNodeWithTag("color_sv_area").performTouchInput { click(Offset(width * 0.12f, height * 0.05f)) }
-        waitFor { canvas().backgroundColorHex != "#FFFFFF" }
-        compose.waitForIdle()
-        shot("$prefix-9-background")
-        SystemBack.press()
-        waitFor { compose.onAllNodesWithTag("color_pick_sheet").fetchSemanticsNodes().isEmpty() }
+        // v51 not alma basit menüde: seçimsiz boya kutusu (tuval rengini boyama) yok; kağıt rengi Arka plan penceresinde
         shot("$prefix-10-final")
     }
 

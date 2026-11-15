@@ -273,16 +273,53 @@ class V30ImageToolsTest : V30EditorBase() {
     }
 
     @Test
-    fun imageToolsExistOnNotesCanvas() {
+    fun notesImageIsEditedOnATemporaryCanvasAndSavedBack() {
+        // v51 not almada resim düzenleme araçları yok: resim, otomatik kaydı kapalı geçici bir basit resim tuvalinde
+        // düzenlenir; Kaydet resmi nota aktarır ve geçici tuvali siler
         createNotesCanvasAndOpen("Not resim")
-        addImageAndEdit()
-        assertTrue(hasTopTool("Arka planı kaldır") && hasTopTool("Efektler"))
-        val original = image().assetId!!
-        topTool("Efektler").performClick()
-        waitFor { exists("image_effects_sheet") }
-        compose.onNodeWithTag("adj_brightness").performScrollTo().performSemanticsAction(SemanticsActions.SetProgress) { it(0.6f) }
-        compose.onNodeWithTag("image_effects_apply").performScrollTo().performClick()
-        waitFor(20_000) { image().assetId != original }
+        val note = canvas().localId
+        val file = java.io.File(compose.activity.cacheDir, "cizim51.png").apply {
+            writeBytes(ImageImportValidatorTest.png(ImageImportValidatorTest.simpleDrawing(600, 450)))
+        }
+        addMenu("Resim ekle")
+        if (exists("image_source_sheet")) compose.onNodeWithTag("image_source_device").performSemanticsAction(SemanticsActions.OnClick)
+        compose.waitForIdle()
+        val shadow = org.robolectric.Shadows.shadowOf(compose.activity)
+        val started = requireNotNull(shadow.nextStartedActivityForResult) { "resim seçici açılmadı" }
+        shadow.receiveResult(started.intent, android.app.Activity.RESULT_OK, android.content.Intent().setData(android.net.Uri.fromFile(file)))
+        waitFor { canvas().strokes.any { it.brushType == BrushType.IMAGE } }
+        val original = image()
+        val noteVm = com.karapp.drawguidance.ui.screens.canvasedit.CanvasEditViewModel.lastCreated!!.get()!!
+        val box = com.karapp.drawguidance.ui.screens.canvasedit.editor.ElementOps.bounds(listOf(original))!!
+        compose.runOnIdle {
+            noteVm.chooseMode(com.karapp.drawguidance.ui.screens.canvasedit.EditMode.SELECT)
+            noteVm.selectOnlyAt(box.center.x, box.center.y, 8f)
+        }
+        waitFor { noteVm.selectedIds.value == setOf(original.id) }
+        compose.runOnIdle { noteVm.editSelectedImage() }
+        // Geçici tuval açılır: basit resim, otomatik kayıt kapalı, tuval listesinde görünmez
+        waitFor { com.karapp.drawguidance.data.notes.TempCanvases.allSessions().size == 1 }
+        val temp = com.karapp.drawguidance.data.notes.TempCanvases.allSessions().single()
+        assertEquals(note, temp.sourceId)
+        waitFor { com.karapp.drawguidance.ui.screens.canvasedit.CanvasEditViewModel.lastCreated?.get()?.canvas?.value?.localId == temp.tempId }
+        val tempVm = com.karapp.drawguidance.ui.screens.canvasedit.CanvasEditViewModel.lastCreated!!.get()!!
+        assertEquals(com.karapp.drawguidance.data.model.CanvasKind.SIMPLE_ART, tempVm.canvas.value!!.kind)
+        assertEquals(false, tempVm.autosave.value)
+        assertEquals(note, canvas().localId)
+        // Geçici tuvalde resmin üstüne çizilir, Kaydet'e dokunulur
+        compose.runOnIdle { tempVm.setMode(com.karapp.drawguidance.ui.screens.canvasedit.EditMode.DRAW) }
+        val size = canvasSize()
+        drag(Offset(size.x * 0.3f, size.y * 0.5f), Offset(size.x * 0.4f, 0f))
+        waitFor { tempVm.canvas.value!!.strokes.size >= 2 }
+        compose.onNodeWithTag("temp_image_save").performSemanticsAction(SemanticsActions.OnClick)
+        // Notta resim yenisiyle değişir (konumu aynı), geçici tuval silinir
+        waitFor(20_000) { image().assetId != original.assetId }
+        assertEquals(original.id, image().id)
+        assertEquals(original.points, image().points)
+        waitFor { com.karapp.drawguidance.data.notes.TempCanvases.allSessions().isEmpty() }
+        val repo = org.koin.core.context.GlobalContext.get().get<com.karapp.drawguidance.data.repository.CanvasRepository>()
+        waitFor { kotlinx.coroutines.runBlocking { repo.getCanvas(temp.tempId) } == null }
+        waitFor { exists("drawing_canvas") }
     }
 }
 

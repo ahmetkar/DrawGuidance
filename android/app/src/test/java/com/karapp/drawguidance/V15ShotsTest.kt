@@ -179,18 +179,7 @@ abstract class V15ShotsBase : WideLayoutTestBase() {
         // v16: iş bitince İncele moduna geçilir
         compose.onNodeWithContentDescription("Bitti").performClick()
         settle()
-        mode("Seç")
-        // Altıgenin kenarı (tuval → ekran: kağıt görünüme sığdırılmış)
-        tap(fit(size, 1240f, 1754f, 300f + 600f * 0.25f, 1000f + 560f * 0.07f))
-        editButton("Şekli düzenle")
-        waitForText("Şekli Düzenle: Noktalar")
-        settle()
-        shot("$prefix-2-points")
-        compose.onNodeWithContentDescription("Parça özellikleri").performClick()
-        waitFor { compose.onAllNodesWithTag("part_style_sheet").fetchSemanticsNodes().isNotEmpty() }
-        compose.onNodeWithText("Noktalı").performClick()
-        settle()
-        shot("$prefix-3-part-style")
+        // v51 not almada düz şekillerin nokta düzenlemesi yok (altıgen adımları kaldırıldı)
     }
 
     protected fun brushes(prefix: String) {

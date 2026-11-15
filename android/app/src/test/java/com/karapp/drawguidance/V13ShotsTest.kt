@@ -58,31 +58,10 @@ abstract class V13ShotsBase : WideLayoutTestBase() {
         drag(corner, Offset(size.x * 0.34f, size.x * 0.34f))
         waitFor { canvas().strokes.size == 1 }
         shot("$prefix-2-shape-added-select")
-        val cube = canvas().strokes.single()
-        val b = ElementOps.bounds(cube)!!
-        val scale = (size.x * 0.34f) / b.width
-        val map = Mapping(scale, Offset(corner.x - b.left * scale, corner.y - b.top * scale))
-        editButton("Şekli düzenle")
-        waitForText("Şekli Düzenle: Noktalar")
-        // v16: ön yüzün köşesine dokun: vektör noktası seçilir
-        val paths = com.karapp.drawguidance.ui.drawing.ShapeFactory.subPaths(cube)
-        val front = paths.first()
-        val p0 = front.points[0]
-        tap(map.toScreen(p0.x, p0.y))
-        compose.waitForIdle()
-        shot("$prefix-3-part-selected")
-        // Özellik: seçili noktanın çizgilerinin parçasına dolgu
-        compose.onNodeWithContentDescription("Parça özellikleri").performClick()
-        waitFor { compose.onAllNodesWithTag("part_style_sheet").fetchSemanticsNodes().isNotEmpty() }
-        compose.onNodeWithContentDescription("Parça dolgusu").performClick()
-        waitFor { canvas().strokes.single().shape!!.subpaths.any { it.fillColorHex != null } }
-        shot("$prefix-4-paint-sheet")
-        closeSheet("part_style_sheet")
-        shot("$prefix-5-region-painted")
-        compose.onNodeWithContentDescription("Bitti").performClick()
+        // v51 not almada düz şekillerin nokta düzenlemesi yok (parça boyama adımları kaldırıldı)
 
         // Yazı: başlık + liste
-        compose.onNodeWithContentDescription("Çiz").performClick()
+        mode("Çiz")
         addMenu("Yazı ekle")
         tap(Offset(size.x * 0.55f, size.y * 0.12f))
         waitFor { compose.onAllNodesWithTag("inline_text_editor").fetchSemanticsNodes().isNotEmpty() }
@@ -91,9 +70,9 @@ abstract class V13ShotsBase : WideLayoutTestBase() {
         field.performTextInput("Küp")
         compose.onNodeWithContentDescription("Yazıyı bitir").performSemanticsAction(SemanticsActions.OnClick)
         waitFor { canvas().strokes.count { it.text != null } == 1 }
-        compose.onNodeWithContentDescription("Çiz").performClick()
+        mode("Çiz")
         addMenu("Yazı ekle")
-        tap(Offset(size.x * 0.55f, size.y * 0.24f))
+        tap(Offset(size.x * 0.55f, size.y * 0.45f))
         waitFor { compose.onAllNodesWithTag("inline_text_editor").fetchSemanticsNodes().isNotEmpty() }
         val field2 = compose.onNode(hasSetTextAction() and hasAnyAncestor(hasTestTag("inline_text_editor")))
         compose.onNode(hasContentDescription("Numaralı liste") and hasAnyAncestor(hasTestTag("inline_font_bar"))).performSemanticsAction(SemanticsActions.OnClick)
@@ -110,7 +89,7 @@ abstract class V13ShotsBase : WideLayoutTestBase() {
         compose.onNode(hasContentDescription("Poppins") and hasClickAction()).performClick()
         compose.onNodeWithContentDescription("Yazıyı bitir").performSemanticsAction(SemanticsActions.OnClick)
         waitFor { canvas().strokes.count { it.text != null } == 2 }
-        compose.onNodeWithContentDescription("Çiz").performClick()
+        mode("Çiz")
 
         // Diyagram: boşluğa bırakılan ok yeni adım (yazı yazılırken görünüm kaymış olabilir: önce sığdırılır)
         fitView()
@@ -137,7 +116,7 @@ abstract class V13ShotsBase : WideLayoutTestBase() {
         closeSheet("part_color_sheet")
         shot("$prefix-8-diagram-dropped-node")
         compose.onNodeWithContentDescription("Bitti").performClick()
-        compose.onNodeWithContentDescription("Çiz").performClick()
+        mode("Çiz")
         shot("$prefix-9-page")
     }
 

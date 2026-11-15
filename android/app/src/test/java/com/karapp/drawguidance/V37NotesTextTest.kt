@@ -70,12 +70,7 @@ class V37NotesTextTest : V33EditorBase() {
     fun notesMenusStartWithTextDiagramFormula() {
         // Ötekilerin sırası değişmez
         assertEquals(listOf("text", "diagram", "formula", "shape", "image"), notesFirst(listOf("shape", "formula", "text", "image", "diagram")) { it })
-        open("Not menü", CanvasKind.NOTES)
-        compose.runOnIdle { vm().chooseMode(EditMode.ADD) }
-        waitFor { compose.onAllNodes(hasContentDescription("Yazı ekle") and hasAnyAncestor(hasTestTag("tool_row_context"))).fetchSemanticsNodes().isNotEmpty() }
-        val order = listOf("Yazı ekle", "Diyagram ekle", "Formül ekle", "Şekil ekle").map(::leftOf)
-        shot("v47-notes-add-row")
-        assertEquals("Ekle: yazı, diyagram, formül, şekil", order.sorted(), order)
+        // v51 not alma tek mod: gelişmiş Ekle satırı yok, sıra basit menüde (simpleNotesRowStartsWithTextDiagramFormula)
     }
 
     @Test

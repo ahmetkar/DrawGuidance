@@ -90,7 +90,7 @@ class EditorNotesCanvasTest : EditorTestBase() {
         waitFor { canvas().strokes.size == cube.size + 1 }
         val circle = ElementOps.bounds(canvas().strokes.last())!!
         assertEquals(1240 * 0.3f, circle.width, 20f)
-        compose.onNodeWithContentDescription("Geri al").performScrollTo().performClick()
+        compose.onNodeWithContentDescription("Geri al").performSemanticsAction(androidx.compose.ui.semantics.SemanticsActions.OnClick)
         waitFor { canvas().strokes.size == cube.size }
 
         // Tuval listesinde tür etiketi

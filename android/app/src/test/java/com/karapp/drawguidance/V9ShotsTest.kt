@@ -86,19 +86,7 @@ abstract class V9ShotsBase : WideLayoutTestBase() {
         compose.onNodeWithContentDescription("Bitti").performClick()
         compose.waitForIdle()
 
-        // Kılavuz: pencerede yalnızca tür, genel ayarlar çizim alanının altında
-        addMenu("Kılavuz çizgileri")
-        waitForText("Kılavuz Çizgileri")
-        compose.waitForIdle()
-        shot("$prefix-7-guide-sheet")
-        compose.onNodeWithText("Kareli").performSemanticsAction(SemanticsActions.OnClick)
-        waitFor { canvas().guide.kind != com.karapp.drawguidance.data.model.GuideKind.NONE }
-        waitForText("Aralık")
-        // v27 not tuvalinde perspektif yok (yalnız kılavuz)
-        compose.waitForIdle()
-        shot("$prefix-8-guide-on-canvas")
-        compose.onNodeWithText("Bitti").performClick()
-        compose.waitForIdle()
+        // v51 not almada kılavuz çizgisi aracı yok (kılavuz adımları kaldırıldı)
 
         // Şekil düzenleme modu
         mode("Seç")

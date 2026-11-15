@@ -3354,6 +3354,18 @@
 "v52_temp_shape_name" = "도형 편집(임시)";
 "v52_temp_shape_save" = "저장하고 노트로 돌려보내기";
 "v52_temp_shape_saved" = "도형을 노트로 돌려보냈습니다";
+"v52_tut_atom" = "원자 번호로 보어 원자";
+"v52_tut_atom_text" = "보어 원자에 원자 번호를 쓰면 껍질과 전자가 저절로 배치됩니다.";
+"v52_tut_calc" = "공식으로 계산";
+"v52_tut_calc_edit" = "값을 바꾸면 결과도 바뀝니다";
+"v52_tut_calc_edit_text" = "공식을 눌러 값(r = 5, m = 6)을 바꾸면 바로 다시 계산됩니다.";
+"v52_tut_calc_text" = "공식 추가에서 공식을 고르고 칸에 값(r = 3, m = 4, a = 3)을 쓰면 결과가 끝에 자동으로 붙습니다.";
+"v52_tut_molecule" = "공식으로 분자";
+"v52_tut_molecule_text" = "도형 추가 › 과학에서 분자를 고르고 화학식(H2O, CO2, C2H5OH…)을 입력하세요. 식이 바뀌면 구조가 다시 그려집니다.";
+"v52_tut_projectile" = "속도와 각도로 포물선 운동";
+"v52_tut_projectile_text" = "처음 속도와 각도를 넣으면 궤도, 사거리, 최고 높이가 계산되어 그려집니다.";
+"v52_tut_science" = "과학 도형과 계산";
+"v52_tut_science_text" = "공식으로 분자·원자·포물선 운동을 그리고, 공식에 값을 넣어 결과를 보세요.";
 "v52_vector_fine_nodes" = "세부 점";
 "vector_cut" = "끊기";
 "vector_delete" = "삭제";

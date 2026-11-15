@@ -98,6 +98,8 @@ object TutorialScripts {
                     listOf(n40[2]), TutorialV46.simpleNotes.steps),
                 merge("simple_notes_guides", kind, R.string.tut51_select_guides, R.string.tut51_select_guides_text, Icons.Filled.Straighten, false,
                     n40.subList(3, 5)),
+                // v52 formülle bilim şekilleri ve formül hesaplama
+                TutorialV52.notesScience.let { g -> TutorialGroup(g.id, kind, g.title, g.summary, g.icon, g.ai, g.steps) },
             )
         }
         // v37 çocuklar için maskot Boyacık araçları tanıtır; sonraki araçlar (cetvel, taşıma, görev) tek grupta, kalıpla çizme ayrı.

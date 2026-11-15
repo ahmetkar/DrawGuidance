@@ -150,4 +150,16 @@
     <string name="v52_image_edit_choice_photo_hint">Kırp, döndür, ışık, renk, filtre, efekt, arka plan ve rötuş.</string>
     <string name="v52_image_edit_choice_here">Burada düzenle</string>
     <string name="v52_image_edit_choice_here_hint">Kırp, döndür, vektörleştir ve sayfadaki araçlar.</string>
+    <string name="v52_tut_science">Bilim şekilleri ve hesaplama</string>
+    <string name="v52_tut_science_text">Formülden molekül, atom ve eğik atış çizin; formüllere değer yazıp sonucu görün.</string>
+    <string name="v52_tut_molecule">Formülden molekül</string>
+    <string name="v52_tut_molecule_text">Şekil ekle › Bilim\'den Molekül\'ü seçin ve kimyasal formülü yazın (H2O, CO2, C2H5OH…). Formül değişince yapı yeniden çizilir.</string>
+    <string name="v52_tut_atom">Atom numarasından Bohr atomu</string>
+    <string name="v52_tut_atom_text">Bohr atomuna atom numarasını yazın: katmanlar ve elektronlar kendiliğinden dizilir.</string>
+    <string name="v52_tut_projectile">Hız ve açıdan eğik atış</string>
+    <string name="v52_tut_projectile_text">Eğik atışa ilk hızı ve açıyı yazın: yörünge, menzil ve en büyük yükseklik formülle hesaplanıp çizilir.</string>
+    <string name="v52_tut_calc">Formülle hesaplama</string>
+    <string name="v52_tut_calc_text">Formül ekle\'den bir formül seçin ve kutulara değer yazın (r = 3, m = 4, a = 3): sonuç formülün sonuna kendiliğinden eklenir.</string>
+    <string name="v52_tut_calc_edit">Değeri değiştirin, sonuç yenilensin</string>
+    <string name="v52_tut_calc_edit_text">Formüle dokunup bir değeri değiştirin (r = 5, m = 6): sonuç hemen yeniden hesaplanır.</string>
 </resources>

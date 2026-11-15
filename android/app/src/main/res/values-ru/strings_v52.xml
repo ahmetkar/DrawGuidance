@@ -150,4 +150,16 @@
     <string name="v52_image_edit_choice_photo_hint">Обрезка, поворот, свет, цвет, фильтры, эффекты, фон и ретушь.</string>
     <string name="v52_image_edit_choice_here">Изменить здесь</string>
     <string name="v52_image_edit_choice_here_hint">Обрезка, поворот, векторизация и инструменты страницы.</string>
+    <string name="v52_tut_science">Научные фигуры и вычисления</string>
+    <string name="v52_tut_science_text">Рисуйте молекулы, атомы и траектории по формулам; подставляйте значения и смотрите результат.</string>
+    <string name="v52_tut_molecule">Молекула по формуле</string>
+    <string name="v52_tut_molecule_text">Выберите «Молекула» в «Добавить фигуру › Наука» и введите формулу (H2O, CO2, C2H5OH…). При изменении формулы структура перерисовывается.</string>
+    <string name="v52_tut_atom">Атом Бора по номеру</string>
+    <string name="v52_tut_atom_text">Введите номер элемента: оболочки и электроны расставятся сами.</string>
+    <string name="v52_tut_projectile">Бросок под углом по скорости и углу</string>
+    <string name="v52_tut_projectile_text">Введите скорость и угол: траектория, дальность и высота вычисляются и рисуются.</string>
+    <string name="v52_tut_calc">Вычисления по формулам</string>
+    <string name="v52_tut_calc_text">Выберите формулу в «Добавить формулу» и впишите значения (r = 3, m = 4, a = 3): результат добавится сам.</string>
+    <string name="v52_tut_calc_edit">Измените значение — результат обновится</string>
+    <string name="v52_tut_calc_edit_text">Нажмите на формулу и измените значение (r = 5, m = 6): результат сразу пересчитается.</string>
 </resources>

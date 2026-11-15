@@ -150,4 +150,16 @@
     <string name="v52_image_edit_choice_photo_hint">裁剪、旋转、光线、颜色、滤镜、效果、背景和修饰。</string>
     <string name="v52_image_edit_choice_here">在此编辑</string>
     <string name="v52_image_edit_choice_here_hint">裁剪、旋转、矢量化和页面工具。</string>
+    <string name="v52_tut_science">科学图形与计算</string>
+    <string name="v52_tut_science_text">根据公式绘制分子、原子和抛体运动；在公式中填入数值并查看结果。</string>
+    <string name="v52_tut_molecule">由化学式生成分子</string>
+    <string name="v52_tut_molecule_text">在 添加图形 › 科学 中选择“分子”，输入化学式（H2O、CO2、C2H5OH…）。化学式改变时结构会重新绘制。</string>
+    <string name="v52_tut_atom">由原子序数生成玻尔原子</string>
+    <string name="v52_tut_atom_text">在玻尔原子中输入原子序数：电子层和电子会自动排列。</string>
+    <string name="v52_tut_projectile">由速度和角度生成抛体运动</string>
+    <string name="v52_tut_projectile_text">输入初速度和角度：轨迹、射程和最大高度会被计算并绘制。</string>
+    <string name="v52_tut_calc">用公式计算</string>
+    <string name="v52_tut_calc_text">在 添加公式 中选择公式并在方框中填入数值（r = 3、m = 4、a = 3）：结果会自动加在末尾。</string>
+    <string name="v52_tut_calc_edit">修改数值，结果随之更新</string>
+    <string name="v52_tut_calc_edit_text">点按公式并修改数值（r = 5、m = 6）：结果会立即重新计算。</string>
 </resources>

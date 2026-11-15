@@ -150,4 +150,16 @@
     <string name="v52_image_edit_choice_photo_hint">切り抜き・回転・ライト・カラー・フィルター・エフェクト・背景・レタッチ。</string>
     <string name="v52_image_edit_choice_here">ここで編集</string>
     <string name="v52_image_edit_choice_here_hint">切り抜き・回転・ベクター化とページのツール。</string>
+    <string name="v52_tut_science">理科の図形と計算</string>
+    <string name="v52_tut_science_text">式から分子・原子・放物運動を描き、式に値を入れて結果を見る。</string>
+    <string name="v52_tut_molecule">式から分子</string>
+    <string name="v52_tut_molecule_text">図形を追加 › 理科で「分子」を選び、化学式（H2O、CO2、C2H5OH…）を入力。式を変えると構造が描き直されます。</string>
+    <string name="v52_tut_atom">原子番号からボーア模型</string>
+    <string name="v52_tut_atom_text">ボーア模型に原子番号を入力すると、殻と電子が自動で並びます。</string>
+    <string name="v52_tut_projectile">速さと角度から放物運動</string>
+    <string name="v52_tut_projectile_text">初速度と角度を入れると、軌道・到達距離・最高点が計算されて描かれます。</string>
+    <string name="v52_tut_calc">式で計算</string>
+    <string name="v52_tut_calc_text">式を追加から式を選び、枠に値（r = 3、m = 4、a = 3）を入力すると、結果が末尾に自動で付きます。</string>
+    <string name="v52_tut_calc_edit">値を変えると結果も更新</string>
+    <string name="v52_tut_calc_edit_text">式をタップして値（r = 5、m = 6）を変えると、すぐに再計算されます。</string>
 </resources>

@@ -3354,6 +3354,18 @@
 "v52_temp_shape_name" = "Şekil düzenleme (geçici)";
 "v52_temp_shape_save" = "Kaydet ve nota aktar";
 "v52_temp_shape_saved" = "Şekil nota aktarıldı";
+"v52_tut_atom" = "Atom numarasından Bohr atomu";
+"v52_tut_atom_text" = "Bohr atomuna atom numarasını yazın: katmanlar ve elektronlar kendiliğinden dizilir.";
+"v52_tut_calc" = "Formülle hesaplama";
+"v52_tut_calc_edit" = "Değeri değiştirin, sonuç yenilensin";
+"v52_tut_calc_edit_text" = "Formüle dokunup bir değeri değiştirin (r = 5, m = 6): sonuç hemen yeniden hesaplanır.";
+"v52_tut_calc_text" = "Formül ekle'den bir formül seçin ve kutulara değer yazın (r = 3, m = 4, a = 3): sonuç formülün sonuna kendiliğinden eklenir.";
+"v52_tut_molecule" = "Formülden molekül";
+"v52_tut_molecule_text" = "Şekil ekle › Bilim'den Molekül'ü seçin ve kimyasal formülü yazın (H2O, CO2, C2H5OH…). Formül değişince yapı yeniden çizilir.";
+"v52_tut_projectile" = "Hız ve açıdan eğik atış";
+"v52_tut_projectile_text" = "Eğik atışa ilk hızı ve açıyı yazın: yörünge, menzil ve en büyük yükseklik formülle hesaplanıp çizilir.";
+"v52_tut_science" = "Bilim şekilleri ve hesaplama";
+"v52_tut_science_text" = "Formülden molekül, atom ve eğik atış çizin; formüllere değer yazıp sonucu görün.";
 "v52_vector_fine_nodes" = "Ayrıntılı noktalar";
 "vector_cut" = "Kes";
 "vector_delete" = "Sil";

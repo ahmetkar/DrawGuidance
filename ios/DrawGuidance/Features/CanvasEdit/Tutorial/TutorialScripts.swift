@@ -53,6 +53,9 @@ enum TutorialScripts {
                 merge("simple_notes_intro", kind, "tut51_notes_write", "tut51_notes_write_text", "square.and.pencil", [TutorialV48.simple(kind).steps, Array(n40.prefix(2)), Array(n40[5..<7])]),
                 merge("simple_notes_v46", kind, "tut51_notes_add", "tut51_notes_add_text", "function", [[n40[2]], TutorialV46.simpleNotes.steps]),
                 merge("simple_notes_guides", kind, "tut51_select_guides", "tut51_select_guides_text", "ruler", [Array(n40[3..<5])]),
+                // v52 formülle bilim şekilleri ve formül hesaplama
+                TutorialGroup(id: TutorialV52.notesScience.id, kind: kind, title: TutorialV52.notesScience.title, summary: TutorialV52.notesScience.summary,
+                              icon: TutorialV52.notesScience.icon, ai: false, steps: TutorialV52.notesScience.steps),
             ]
         // v37 çocuklar için maskot Boyacık araçları tanıtır; sonraki araçlar tek grupta (maskot adımları sarılmaz)
         case .KIDS:

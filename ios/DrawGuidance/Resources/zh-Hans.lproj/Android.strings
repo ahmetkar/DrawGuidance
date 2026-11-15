@@ -3354,6 +3354,18 @@
 "v52_temp_shape_name" = "编辑形状（临时）";
 "v52_temp_shape_save" = "保存并放回笔记";
 "v52_temp_shape_saved" = "形状已放回笔记";
+"v52_tut_atom" = "由原子序数生成玻尔原子";
+"v52_tut_atom_text" = "在玻尔原子中输入原子序数：电子层和电子会自动排列。";
+"v52_tut_calc" = "用公式计算";
+"v52_tut_calc_edit" = "修改数值，结果随之更新";
+"v52_tut_calc_edit_text" = "点按公式并修改数值（r = 5、m = 6）：结果会立即重新计算。";
+"v52_tut_calc_text" = "在 添加公式 中选择公式并在方框中填入数值（r = 3、m = 4、a = 3）：结果会自动加在末尾。";
+"v52_tut_molecule" = "由化学式生成分子";
+"v52_tut_molecule_text" = "在 添加图形 › 科学 中选择“分子”，输入化学式（H2O、CO2、C2H5OH…）。化学式改变时结构会重新绘制。";
+"v52_tut_projectile" = "由速度和角度生成抛体运动";
+"v52_tut_projectile_text" = "输入初速度和角度：轨迹、射程和最大高度会被计算并绘制。";
+"v52_tut_science" = "科学图形与计算";
+"v52_tut_science_text" = "根据公式绘制分子、原子和抛体运动；在公式中填入数值并查看结果。";
 "v52_vector_fine_nodes" = "详细节点";
 "vector_cut" = "切断";
 "vector_delete" = "删除";

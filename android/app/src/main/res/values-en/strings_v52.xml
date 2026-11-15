@@ -150,4 +150,16 @@
     <string name="v52_image_edit_choice_photo_hint">Crop, rotate, light, color, filters, effects, background and retouch.</string>
     <string name="v52_image_edit_choice_here">Edit here</string>
     <string name="v52_image_edit_choice_here_hint">Crop, rotate, vectorize and page tools.</string>
+    <string name="v52_tut_science">Science shapes and calculation</string>
+    <string name="v52_tut_science_text">Draw molecules, atoms and projectiles from formulas; fill formulas with values and see the result.</string>
+    <string name="v52_tut_molecule">Molecule from a formula</string>
+    <string name="v52_tut_molecule_text">Pick Molecule under Add shape › Science and type a chemical formula (H2O, CO2, C2H5OH…). The structure is redrawn when the formula changes.</string>
+    <string name="v52_tut_atom">Bohr atom from atomic number</string>
+    <string name="v52_tut_atom_text">Type the atomic number into the Bohr atom: shells and electrons arrange themselves.</string>
+    <string name="v52_tut_projectile">Projectile from speed and angle</string>
+    <string name="v52_tut_projectile_text">Enter the initial speed and angle: the path, range and maximum height are calculated and drawn.</string>
+    <string name="v52_tut_calc">Calculating with formulas</string>
+    <string name="v52_tut_calc_text">Pick a formula under Add formula and type values into its boxes (r = 3, m = 4, a = 3): the result is added at the end automatically.</string>
+    <string name="v52_tut_calc_edit">Change a value, the result updates</string>
+    <string name="v52_tut_calc_edit_text">Tap the formula and change a value (r = 5, m = 6): the result is recalculated at once.</string>
 </resources>

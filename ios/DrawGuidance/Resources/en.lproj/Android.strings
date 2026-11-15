@@ -3354,6 +3354,18 @@
 "v52_temp_shape_name" = "Shape editing (temporary)";
 "v52_temp_shape_save" = "Save and return to note";
 "v52_temp_shape_saved" = "Shape returned to the note";
+"v52_tut_atom" = "Bohr atom from atomic number";
+"v52_tut_atom_text" = "Type the atomic number into the Bohr atom: shells and electrons arrange themselves.";
+"v52_tut_calc" = "Calculating with formulas";
+"v52_tut_calc_edit" = "Change a value, the result updates";
+"v52_tut_calc_edit_text" = "Tap the formula and change a value (r = 5, m = 6): the result is recalculated at once.";
+"v52_tut_calc_text" = "Pick a formula under Add formula and type values into its boxes (r = 3, m = 4, a = 3): the result is added at the end automatically.";
+"v52_tut_molecule" = "Molecule from a formula";
+"v52_tut_molecule_text" = "Pick Molecule under Add shape › Science and type a chemical formula (H2O, CO2, C2H5OH…). The structure is redrawn when the formula changes.";
+"v52_tut_projectile" = "Projectile from speed and angle";
+"v52_tut_projectile_text" = "Enter the initial speed and angle: the path, range and maximum height are calculated and drawn.";
+"v52_tut_science" = "Science shapes and calculation";
+"v52_tut_science_text" = "Draw molecules, atoms and projectiles from formulas; fill formulas with values and see the result.";
 "v52_vector_fine_nodes" = "Detailed points";
 "vector_cut" = "Cut";
 "vector_delete" = "Delete";

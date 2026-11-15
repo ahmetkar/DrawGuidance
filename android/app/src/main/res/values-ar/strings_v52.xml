@@ -150,4 +150,16 @@
     <string name="v52_image_edit_choice_photo_hint">قص، تدوير، إضاءة، لون، مرشحات، تأثيرات، خلفية وتنقيح.</string>
     <string name="v52_image_edit_choice_here">التحرير هنا</string>
     <string name="v52_image_edit_choice_here_hint">قص، تدوير، تحويل إلى متجه وأدوات الصفحة.</string>
+    <string name="v52_tut_science">أشكال علمية وحساب</string>
+    <string name="v52_tut_science_text">ارسم الجزيئات والذرات والمقذوفات من الصيغ؛ واملأ الصيغ بالقيم وشاهد النتيجة.</string>
+    <string name="v52_tut_molecule">جزيء من صيغة</string>
+    <string name="v52_tut_molecule_text">اختر الجزيء من إضافة شكل › العلوم واكتب صيغة كيميائية (H2O، CO2، C2H5OH…). يُعاد رسم البنية عند تغيير الصيغة.</string>
+    <string name="v52_tut_atom">ذرة بور من العدد الذري</string>
+    <string name="v52_tut_atom_text">اكتب العدد الذري في ذرة بور: تترتب الأغلفة والإلكترونات تلقائيًا.</string>
+    <string name="v52_tut_projectile">مقذوف من السرعة والزاوية</string>
+    <string name="v52_tut_projectile_text">أدخل السرعة الابتدائية والزاوية: يُحسب المسار والمدى وأقصى ارتفاع ويُرسم.</string>
+    <string name="v52_tut_calc">الحساب بالصيغ</string>
+    <string name="v52_tut_calc_text">اختر صيغة من إضافة صيغة واكتب القيم في خاناتها (r = 3، m = 4، a = 3): تُضاف النتيجة تلقائيًا في نهايتها.</string>
+    <string name="v52_tut_calc_edit">غيّر قيمة فتتحدث النتيجة</string>
+    <string name="v52_tut_calc_edit_text">انقر على الصيغة وغيّر قيمة (r = 5، m = 6): تُعاد النتيجة فورًا.</string>
 </resources>

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- v52 metinleri (android/tools/v52-strings/strings_v52.py ile üretilir) -->
+<resources>
+    <string name="v52_vector_fine_nodes">详细节点</string>
+    <string name="v52_share_send_title">分享画布</string>
+    <string name="v52_share_live_title">画布直播</string>
+    <string name="v52_share_send_how">两台设备需连接同一 Wi-Fi。应用打开时会自动发现彼此，可以向设备发送画布或图片。</string>
+    <string name="v52_share_live_how">两台设备需连接同一 Wi-Fi。开始直播后，所选画布上的每次修改都会实时显示在另一台设备上。</string>
+    <string name="v52_share_send_hint">向同一 Wi-Fi 下的设备（Android、iPhone、iPad）发送画布和图片</string>
+    <string name="v52_share_send_open">打开分享页面</string>
+    <string name="v52_share_ask_hint">关闭后，将直接接收已连接设备发送的画布和图片</string>
+    <string name="v52_share_live_settings_title">直播设置</string>
+    <string name="v52_share_live_hint">向同一 Wi-Fi 下的设备直播画布，或观看他人的直播</string>
+    <string name="v52_share_live_open">打开直播页面</string>
+    <string name="v52_live_ask">加入直播前询问</string>
+    <string name="v52_live_ask_hint">关闭后，将直接加入已连接设备开始的直播</string>
+    <string name="v52_live_auto_open">自动打开直播</string>
+    <string name="v52_live_auto_open_hint">关闭后，从画布直播页面的卡片打开已加入的直播</string>
+</resources>

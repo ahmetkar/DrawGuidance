@@ -39,12 +39,10 @@ private struct DockedEditorSheet: ViewModifier {
 
     func body(content: Content) -> some View {
         if hSize == .compact && vSize == .regular {
+            // v52 dikey telefonda bütün pencereler ekranı kaplar (Ahmet: alta yerleşik küçük pencere kalmasın)
             content
-                .presentationDetents([DockedSheetState.low, DockedSheetState.normal, .large], selection: $state.detent)
-                .presentationBackgroundInteraction(.enabled(upThrough: DockedSheetState.normal))
-                .presentationContentInteraction(.scrolls)
-                .onAppear { state.openCount += 1; state.detent = DockedSheetState.normal }
-                .onDisappear { state.openCount = max(state.openCount - 1, 0) }
+                .presentationDetents([.large])
+                .presentationDragIndicator(.visible)
         } else {
             content.presentationDetents([.medium, .large])
         }
@@ -61,7 +59,24 @@ private struct FullEditorSheet: ViewModifier {
     }
 }
 
+/// v52 genel pencereler: dikey telefonda yalnız tam ekran, öteki boyutlarda yarım/tam.
+private struct PortraitFullDetents: ViewModifier {
+    @Environment(\.horizontalSizeClass) private var hSize
+    @Environment(\.verticalSizeClass) private var vSize
+
+    func body(content: Content) -> some View {
+        if hSize == .compact && vSize == .regular {
+            content.presentationDetents([.large]).presentationDragIndicator(.visible)
+        } else {
+            content.presentationDetents([.medium, .large])
+        }
+    }
+}
+
 extension View {
+    /// v52 dikey telefonda tam ekran pencere (bkz. [PortraitFullDetents]).
+    func portraitFullDetents() -> some View { modifier(PortraitFullDetents()) }
+
     /// v51 tam ekran düzenleyici penceresi (ekleme ve seçim pencereleri; bkz. [FullEditorSheet]).
     func fullEditorSheet() -> some View { modifier(FullEditorSheet()) }
 

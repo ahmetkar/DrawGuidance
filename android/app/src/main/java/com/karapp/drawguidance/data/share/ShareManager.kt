@@ -329,7 +329,9 @@ class ShareManager(
             }
             ShareWire.OFFER -> {
                 val o = ShareWire.header<ShareOffer>(m)
-                if (settings.askBeforeReceive.value) _offer.value = ShareIncomingOffer(key, peerName(key), o)
+                // v52 canlı yayın daveti kendi ayarıyla (tuval/resim alma ayarından ayrı)
+                val ask = if (o.type == ShareWire.TYPE_LIVE) settings.askBeforeLive.value else settings.askBeforeReceive.value
+                if (ask) _offer.value = ShareIncomingOffer(key, peerName(key), o)
                 else reply(key, o, true)
             }
             ShareWire.ACCEPT -> {
@@ -359,7 +361,7 @@ class ShareManager(
                 _liveIn.value = ShareLiveIn(canvasId, key, peerName(key))
                 _status.value = null
                 refreshLiveCanvas(canvasId)
-                _events.tryEmit(ShareEvent.OpenLive(canvasId))
+                if (settings.liveAutoOpen.value) _events.tryEmit(ShareEvent.OpenLive(canvasId))
             }
             ShareWire.LIVE_UPDATE -> {
                 val inn = _liveIn.value ?: return

@@ -1,5 +1,6 @@
 package com.karapp.drawguidance.ui.screens.canvaslist.components
 
+import com.karapp.drawguidance.ui.components.portraitFill
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -139,6 +140,7 @@ fun CanvasFormModal(
         Column(
             modifier = Modifier
                 .fillMaxWidth()
+                .portraitFill()
                 .verticalScroll(rememberScrollState())
                 .padding(horizontal = 22.dp)
                 .navigationBarsPadding()

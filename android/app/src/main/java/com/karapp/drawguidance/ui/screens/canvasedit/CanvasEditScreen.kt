@@ -1125,6 +1125,8 @@ fun CanvasEditScreen(
     val canCutVector = remember(vectorSelection, selectedShape) { mode == EditMode.SHAPE_EDIT && viewModel.canCutVector() }
     val canDeleteVector = remember(vectorSelection, selectedShape) { mode == EditMode.SHAPE_EDIT && viewModel.canDeleteVector() }
     val simplifyText = stringResource(R.string.vector_simplify)
+    val vectorizeText = stringResource(R.string.image_vectorize)
+    val cropText = stringResource(R.string.mode_crop)
     val canSimplifyVector = remember(selectedShape, mode) { simple && mode == EditMode.SHAPE_EDIT && viewModel.canSimplifyVector() }
     val done = com.karapp.drawguidance.ui.screens.canvasedit.components.ModeAction(doneText, Icons.Filled.Check, viewModel::finishAction, primary = true)
     val modeActions: List<com.karapp.drawguidance.ui.screens.canvasedit.components.ModeAction>? = when (mode) {
@@ -1140,8 +1142,14 @@ fun CanvasEditScreen(
             com.karapp.drawguidance.ui.screens.canvasedit.components.ModeAction(deleteVectorText, Icons.Filled.Delete, viewModel::deleteVector, enabled = canDeleteVector, danger = true),
             done,
         )
-        // v17: resim düzenleme araçları (Kırp, Vektörleştir, Kalem) üst menüde
-        EditMode.IMAGE_EDIT -> listOf(done)
+        // v17: resim düzenleme araçları (Kırp, Vektörleştir, Kalem) üst menüde. v52 basit menüde Düzenle satırı yok:
+        // Vektörleştir, Kırp ve Döndür mod çubuğunda
+        EditMode.IMAGE_EDIT -> if (!simple || kind.isNotes) listOf(done) else listOf(
+            com.karapp.drawguidance.ui.screens.canvasedit.components.ModeAction(vectorizeText, Icons.Filled.Polyline, { vectorizeMode = null; vectorizeOpen = true }),
+            com.karapp.drawguidance.ui.screens.canvasedit.components.ModeAction(cropText, Icons.Filled.Crop, viewModel::cropSelectedImage),
+            com.karapp.drawguidance.ui.screens.canvasedit.components.ModeAction(rotateText, Icons.AutoMirrored.Filled.RotateRight, { viewModel.chooseMode(EditMode.ROTATE) }),
+            done,
+        )
         EditMode.PEN -> listOf(
             com.karapp.drawguidance.ui.screens.canvasedit.components.ModeAction(penUndoText, Icons.AutoMirrored.Filled.Undo, viewModel::penUndo, enabled = penAnchors.isNotEmpty()),
             com.karapp.drawguidance.ui.screens.canvasedit.components.ModeAction(penFinishText, Icons.Filled.Polyline, { viewModel.penFinish(false) }, enabled = penAnchors.size >= 2),
@@ -1160,7 +1168,7 @@ fun CanvasEditScreen(
     }
     // Moda özel ek ayarlar (mod çubuğunun üstünde)
     val graphParams = if (mode == EditMode.SHAPE_EDIT && shapeTool == ShapeTool.GRAPH) remember(selectedShape) { viewModel.selectedGraphParams() } else null
-    val modeExtra: (@Composable () -> Unit)? = when {
+    val baseModeExtra: (@Composable () -> Unit)? = when {
         graphParams != null -> {
             {
                 // v45 grafiğin formülü (her grafik türünde; hatada kırmızı ileti, son geçerli eğri kalır)
@@ -1222,6 +1230,18 @@ fun CanvasEditScreen(
         }
         else -> null
     }
+    // v52 basit resimde vektör düzenleme ayarları (Noktalar / Çizgiler / Alan boya, ayrıntılı noktalar) mod çubuğunun üstünde
+    val fineVectorNodes by viewModel.fineVectorNodes.collectAsState()
+    val modeExtra: (@Composable () -> Unit)? =
+        if (simple && !kind.isNotes && mode == EditMode.SHAPE_EDIT && com.karapp.drawguidance.ui.screens.canvasedit.components.SimpleVectorTools.applies(shapeTool)) {
+            {
+                com.karapp.drawguidance.ui.screens.canvasedit.components.SimpleVectorControls(
+                    tool = shapeTool, onTool = viewModel::selectShapeTool,
+                    fineNodes = fineVectorNodes, onFineNodes = viewModel::setFineVectorNodes,
+                    icon = ::shapeToolIcon, content = baseModeExtra,
+                )
+            }
+        } else baseModeExtra
 
     androidx.compose.runtime.CompositionLocalProvider(com.karapp.drawguidance.ui.screens.canvasedit.tutorial.LocalTutorialAnchors provides tutorialAnchors) {
     Scaffold(

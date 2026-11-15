@@ -1343,6 +1343,9 @@ class CanvasEditViewModel(
 
     /** v36 basit düzenleme: Noktaları azalt (seçili şeklin vektör noktaları en belirginlerine iner). */
     fun canSimplifyVector(): Boolean = shapes.canSimplify()
+    /** v52 basit modda vektör düzenleme ayarı: ayrıntılı (bütün) noktalar. */
+    val fineVectorNodes: StateFlow<Boolean> get() = shapes.fineNodes
+    fun setFineVectorNodes(value: Boolean) = shapes.setFineNodes(value)
     fun simplifyVector() = shapes.simplifySelected()
 
     /**

@@ -1,5 +1,6 @@
 package com.karapp.drawguidance.ui.screens.canvasedit.components
 
+import com.karapp.drawguidance.ui.components.portraitFill
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.filled.OpenWith
 import androidx.compose.foundation.layout.Arrangement
@@ -252,11 +253,12 @@ fun KidsBackgroundSheet(currentHex: String, onColor: (String) -> Unit, onDismiss
     var chosen by androidx.compose.runtime.remember { androidx.compose.runtime.mutableStateOf(currentHex) }
     androidx.compose.material3.ModalBottomSheet(
         onDismissRequest = onDismiss,
+        sheetState = androidx.compose.material3.rememberModalBottomSheetState(skipPartiallyExpanded = true),
         containerColor = colors.background,
         contentColor = colors.content,
     ) {
         androidx.compose.foundation.layout.Column(
-            Modifier.fillMaxWidth().navigationBarsPadding().padding(start = 20.dp, end = 20.dp, bottom = 24.dp).testTag("kids_background_sheet"),
+            Modifier.fillMaxWidth().portraitFill().navigationBarsPadding().padding(start = 20.dp, end = 20.dp, bottom = 24.dp).testTag("kids_background_sheet"),
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
             androidx.compose.material3.Text(stringResource(R.string.simple_paint_background), style = androidx.compose.material3.MaterialTheme.typography.titleLarge)

@@ -34,7 +34,7 @@ import kotlin.math.roundToInt
 
 /**
  * v51 not almada resim düzenleme: not alma modunda resim düzenleme araçları yok; düzenlenmek istenen resim geçici bir
- * basit resim tuvaline ([CanvasKind.SIMPLE_ART]) eklenir. O tuvalde otomatik kayıt kapalıdır; Kaydet'e dokununca tuval
+ * gelişmiş çizim tuvaline ([CanvasKind.ART]; v52, önce basit resimdi) eklenir. O tuvalde otomatik kayıt kapalıdır; Kaydet'e dokununca tuval
  * resme çevrilip nottaki resmin yerine konur ve geçici tuval silinir. Kaydetmeden çıkılırsa geçici tuval silinir.
  *
  * Geçici tuvaller ve nota henüz aktarılmamış sonuçlar uygulama kapansa da kaybolmasın diye burada saklanır; geçici
@@ -232,7 +232,7 @@ class TempImageEditor(
         try {
             repository.createCanvas(
                 name = appContext.getString(R.string.v51_temp_image_name), width = w, height = h,
-                backgroundColorHex = "#FFFFFF", aiEnabled = false, kind = CanvasKind.SIMPLE_ART, localId = tempId,
+                backgroundColorHex = "#FFFFFF", aiEnabled = false, kind = CanvasKind.ART, localId = tempId,
             )
             val copied = assetStore.copyTo(assetId, tempId) ?: error("resim kopyalanamadı")
             val stroke = Stroke(

@@ -286,8 +286,21 @@ class ShapeController(
         }
     }
 
-    /** v36 basit çizim türlerinde şekil düzenleme sade: parça başına az vektör noktası ([VectorEdit.SIMPLE_NODES]). */
-    val coarse: Boolean get() = store.canvas.value?.kind?.simple == true
+    /**
+     * v36 basit çizim türlerinde şekil düzenleme sade: parça başına az vektör noktası ([VectorEdit.SIMPLE_NODES]).
+     * v52 basit resimde vektör düzenleme ayarı "Ayrıntılı noktalar" açıksa bütün noktalar gösterilir (gelişmişteki gibi).
+     */
+    val coarse: Boolean get() = store.canvas.value?.kind?.simple == true && !_fineNodes.value
+
+    private val _fineNodes = MutableStateFlow(false)
+    /** v52 basit modda ayrıntılı (bütün) vektör noktaları. */
+    val fineNodes: StateFlow<Boolean> = _fineNodes.asStateFlow()
+
+    fun setFineNodes(value: Boolean) {
+        if (_fineNodes.value == value) return
+        _fineNodes.value = value
+        reset()
+    }
 
     private fun graphOf(stroke: Stroke): VectorEdit.Graph = VectorEdit.graph(stroke, coarse)
 

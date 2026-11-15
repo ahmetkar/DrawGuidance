@@ -251,7 +251,7 @@ struct GlbImportSheet: View {
             .navigationBarTitleDisplayMode(.inline)
             .toolbar { ToolbarItem(placement: .cancellationAction) { Button(L("cancel_button"), action: onDismiss) } }
         }
-        .presentationDetents([.medium])
+        .portraitFullDetents() // v52 dikeyde tam ekran
     }
 }
 

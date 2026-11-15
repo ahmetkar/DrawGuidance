@@ -75,6 +75,9 @@ import org.koin.compose.koinInject
 
 private enum class Pick { CANVAS, IMAGE, LIVE }
 
+/** v52 paylaşım sayfasının türü: tuval/resim gönderme ya da canlı tuval yayını (ayrı sayfalar, ayrı ayarlar). */
+enum class ShareMode { SEND, LIVE }
+
 /**
  * v51 Cihazlar arası paylaşım sayfası (Tuvallerim'in sağ üst köşesinden ve Ayarlar → Bağlantı'dan açılır):
  * bu cihazın görünen adı, yakındaki cihazlar (Nearby: Wi-Fi Direct/Bluetooth; aynı Wi-Fi: iPhone/iPad dahil),
@@ -86,6 +89,7 @@ fun ShareScreen(
     onBack: () -> Unit,
     onOpenCanvas: (String) -> Unit,
     onOpenLive: (String) -> Unit,
+    mode: ShareMode = ShareMode.SEND,
     share: ShareManager = koinInject(),
     settings: ShareSettings = koinInject(),
 ) {
@@ -109,7 +113,7 @@ fun ShareScreen(
         containerColor = colors.background,
         topBar = {
             NeuTopBar(
-                title = stringResource(R.string.v51_share_title),
+                title = stringResource(if (mode == ShareMode.LIVE) R.string.v52_share_live_title else R.string.v52_share_send_title),
                 navigation = { NeuIconButton(Icons.AutoMirrored.Filled.ArrowBack, stringResource(R.string.back), onBack) },
             )
         },
@@ -117,7 +121,7 @@ fun ShareScreen(
         Column(
             Modifier.fillMaxSize().padding(padding).verticalScroll(rememberScrollState())
                 .padding(start = 20.dp, end = 20.dp, top = 6.dp, bottom = 24.dp)
-                .wrapContentWidth(Alignment.CenterHorizontally).widthIn(max = 640.dp).testTag("share_screen"),
+                .wrapContentWidth(Alignment.CenterHorizontally).widthIn(max = 640.dp).testTag(if (mode == ShareMode.LIVE) "share_live_screen" else "share_screen"),
             verticalArrangement = Arrangement.spacedBy(18.dp),
         ) {
             // Bu cihaz
@@ -127,7 +131,7 @@ fun ShareScreen(
                 trailing = { NeuIconButton(Icons.Filled.Edit, stringResource(R.string.v51_share_rename), { renaming = true }, size = 38.dp) },
             ) {
                 Text(name, translate = false, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold, modifier = Modifier.testTag("share_device_name"))
-                Text(stringResource(R.string.v51_share_how), style = MaterialTheme.typography.bodySmall, color = colors.contentMuted)
+                Text(stringResource(if (mode == ShareMode.LIVE) R.string.v52_share_live_how else R.string.v52_share_send_how), style = MaterialTheme.typography.bodySmall, color = colors.contentMuted)
                 error?.let { Text(stringResource(R.string.v51_share_error, it), style = MaterialTheme.typography.bodySmall, color = colors.contentMuted) }
             }
 
@@ -146,8 +150,8 @@ fun ShareScreen(
                 }
             }
 
-            // Canlı yayın
-            liveOut?.let { out ->
+            // Canlı yayın (yalnız yayın sayfasında)
+            if (mode == ShareMode.LIVE) liveOut?.let { out ->
                 LiveCard(
                     icon = Icons.Filled.CastConnected,
                     text = stringResource(R.string.v51_share_live_out, canvasName(out.canvasId), out.peerName),
@@ -155,7 +159,7 @@ fun ShareScreen(
                     secondary = stringResource(R.string.v51_share_live_stop) to { share.stopLive() },
                 )
             }
-            liveIn?.let { inn ->
+            if (mode == ShareMode.LIVE) liveIn?.let { inn ->
                 LiveCard(
                     icon = Icons.Filled.Cast,
                     text = stringResource(R.string.v51_share_live_in, inn.peerName, canvasName(inn.canvasId)) +
@@ -172,15 +176,15 @@ fun ShareScreen(
                 if (peers.isEmpty()) Text(stringResource(R.string.v51_share_nearby_empty), style = MaterialTheme.typography.bodySmall, color = colors.contentMuted)
                 peers.sortedWith(compareBy({ it.state != PeerState.CONNECTED }, { it.name })).forEach { peer ->
                     PeerRow(
-                        peer,
+                        peer, mode,
                         onDisconnect = { share.disconnect(peer) },
                         onPick = { pick = it to peer },
                     )
                 }
             }
 
-            // Ayarlar
-            ShareSettingsCard(settings)
+            // Ayarlar (sayfaya göre ayrı)
+            if (mode == ShareMode.LIVE) LiveSettingsCard(settings) else ShareSettingsCard(settings)
         }
     }
 
@@ -231,7 +235,7 @@ private fun LiveCard(icon: androidx.compose.ui.graphics.vector.ImageVector, text
 }
 
 @Composable
-private fun PeerRow(peer: SharePeer, onDisconnect: () -> Unit, onPick: (Pick) -> Unit) {
+private fun PeerRow(peer: SharePeer, mode: ShareMode, onDisconnect: () -> Unit, onPick: (Pick) -> Unit) {
     val colors = NeuTheme.colors
     val ios = peer.platform == "ios"
     NeuSurface(Modifier.fillMaxWidth().testTag("share_peer"), elevation = 4.dp, selected = peer.state == PeerState.CONNECTED) {
@@ -258,34 +262,51 @@ private fun PeerRow(peer: SharePeer, onDisconnect: () -> Unit, onPick: (Pick) ->
                     PeerState.CONNECTED -> NeuIconButton(Icons.Filled.LinkOff, stringResource(R.string.v51_share_disconnect), onDisconnect, size = 38.dp)
                 }
             }
-            run {
-                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    NeuButton(stringResource(R.string.v51_share_send_canvas), { onPick(Pick.CANVAS) }, Modifier.weight(1f).testTag("share_send_canvas"), icon = Icons.AutoMirrored.Filled.Send)
-                    NeuButton(stringResource(R.string.v51_share_send_image), { onPick(Pick.IMAGE) }, Modifier.weight(1f).testTag("share_send_image"), icon = Icons.Filled.Image)
-                }
-                NeuButton(stringResource(R.string.v51_share_start_live), { onPick(Pick.LIVE) }, Modifier.fillMaxWidth().testTag("share_start_live"), primary = true, icon = Icons.Filled.Cast)
-            }
+            // v52 gönderme sayfasında tuval/resim, yayın sayfasında yalnız yayın başlatma
+            if (mode == ShareMode.SEND) Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                NeuButton(stringResource(R.string.v51_share_send_canvas), { onPick(Pick.CANVAS) }, Modifier.weight(1f).testTag("share_send_canvas"), icon = Icons.AutoMirrored.Filled.Send)
+                NeuButton(stringResource(R.string.v51_share_send_image), { onPick(Pick.IMAGE) }, Modifier.weight(1f).testTag("share_send_image"), icon = Icons.Filled.Image)
+            } else NeuButton(stringResource(R.string.v51_share_start_live), { onPick(Pick.LIVE) }, Modifier.fillMaxWidth().testTag("share_start_live"), primary = true, icon = Icons.Filled.Cast)
         }
     }
 }
 
-/** Paylaşım ayarları kartı (paylaşım sayfasında ve Ayarlar → Bağlantı'da). */
+/** Tuval/resim paylaşımı ayarları kartı (paylaşım sayfasında ve Ayarlar → Bağlantı'da). v52 yayın ayarları ayrı kartta. */
 @Composable
 fun ShareSettingsCard(settings: ShareSettings = koinInject(), onOpenShare: (() -> Unit)? = null) {
     val ask by settings.askBeforeReceive.collectAsState()
     val folder by settings.receivedFolder.collectAsState()
-    val smooth by settings.liveSmooth.collectAsState()
     val visible by settings.discoverable.collectAsState()
     SettingsCard(
         if (onOpenShare != null) Icons.Filled.Share else Icons.Filled.Settings,
-        stringResource(if (onOpenShare != null) R.string.v51_share_title else R.string.v51_share_settings_title),
+        stringResource(if (onOpenShare != null) R.string.v52_share_send_title else R.string.v51_share_settings_title),
         Modifier.testTag("share_settings_card"),
-        subtitle = if (onOpenShare != null) stringResource(R.string.v51_share_settings_hint) else null,
+        subtitle = if (onOpenShare != null) stringResource(R.string.v52_share_send_hint) else null,
     ) {
-        if (onOpenShare != null) NeuButton(stringResource(R.string.v51_share_open_page), onOpenShare, Modifier.fillMaxWidth().testTag("settings_open_share"), primary = true, icon = Icons.Filled.Share)
+        if (onOpenShare != null) NeuButton(stringResource(R.string.v52_share_send_open), onOpenShare, Modifier.fillMaxWidth().testTag("settings_open_share"), primary = true, icon = Icons.Filled.Share)
         SettingSwitchRow(stringResource(R.string.v51_share_discoverable), stringResource(R.string.v51_share_discoverable_hint), visible, settings::setDiscoverable, divider = onOpenShare != null)
-        SettingSwitchRow(stringResource(R.string.v51_share_ask), stringResource(R.string.v51_share_ask_hint), ask, settings::setAskBeforeReceive)
+        SettingSwitchRow(stringResource(R.string.v51_share_ask), stringResource(R.string.v52_share_ask_hint), ask, settings::setAskBeforeReceive)
         SettingSwitchRow(stringResource(R.string.v51_share_folder), stringResource(R.string.v51_share_folder_hint), folder, settings::setReceivedFolder)
+    }
+}
+
+/** v52 canlı tuval yayını ayarları kartı (yayın sayfasında ve Ayarlar → Bağlantı'da). */
+@Composable
+fun LiveSettingsCard(settings: ShareSettings = koinInject(), onOpenLive: (() -> Unit)? = null) {
+    val askLive by settings.askBeforeLive.collectAsState()
+    val autoOpen by settings.liveAutoOpen.collectAsState()
+    val smooth by settings.liveSmooth.collectAsState()
+    val visible by settings.discoverable.collectAsState()
+    SettingsCard(
+        if (onOpenLive != null) Icons.Filled.Cast else Icons.Filled.Settings,
+        stringResource(if (onOpenLive != null) R.string.v52_share_live_title else R.string.v52_share_live_settings_title),
+        Modifier.testTag("live_settings_card"),
+        subtitle = if (onOpenLive != null) stringResource(R.string.v52_share_live_hint) else null,
+    ) {
+        if (onOpenLive != null) NeuButton(stringResource(R.string.v52_share_live_open), onOpenLive, Modifier.fillMaxWidth().testTag("settings_open_live"), primary = true, icon = Icons.Filled.Cast)
+        SettingSwitchRow(stringResource(R.string.v51_share_discoverable), stringResource(R.string.v51_share_discoverable_hint), visible, settings::setDiscoverable, divider = onOpenLive != null)
+        SettingSwitchRow(stringResource(R.string.v52_live_ask), stringResource(R.string.v52_live_ask_hint), askLive, settings::setAskBeforeLive)
+        SettingSwitchRow(stringResource(R.string.v52_live_auto_open), stringResource(R.string.v52_live_auto_open_hint), autoOpen, settings::setLiveAutoOpen)
         SettingSwitchRow(stringResource(R.string.v51_share_smooth), stringResource(R.string.v51_share_smooth_hint), smooth, settings::setLiveSmooth)
     }
 }

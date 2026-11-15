@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- v52 metinleri (android/tools/v52-strings/strings_v52.py ile üretilir) -->
+<resources>
+    <string name="v52_vector_fine_nodes">Ayrıntılı noktalar</string>
+    <string name="v52_share_send_title">Tuval paylaş</string>
+    <string name="v52_share_live_title">Canlı tuval yayını</string>
+    <string name="v52_share_send_how">İki cihaz aynı Wi-Fi ağında olmalı. Uygulama açıkken cihazlar birbirini kendiliğinden bulur; bir cihaza tuval ya da resim gönderebilirsiniz.</string>
+    <string name="v52_share_live_how">İki cihaz aynı Wi-Fi ağında olmalı. Yayın başlattığınızda seçtiğiniz tuvalde yaptığınız her değişiklik karşı cihazda canlı görünür.</string>
+    <string name="v52_share_send_hint">Aynı Wi-Fi ağındaki cihazlara (Android, iPhone, iPad) tuval ve resim gönderin</string>
+    <string name="v52_share_send_open">Paylaşım sayfasını aç</string>
+    <string name="v52_share_ask_hint">Kapalıysa bağlı cihazlardan gelen tuval ve resimler sormadan alınır</string>
+    <string name="v52_share_live_settings_title">Yayın ayarları</string>
+    <string name="v52_share_live_hint">Bir tuvali aynı Wi-Fi ağındaki cihazlara canlı yayınlayın ya da başkasının yayınını izleyin</string>
+    <string name="v52_share_live_open">Yayın sayfasını aç</string>
+    <string name="v52_live_ask">Yayın davetlerini sor</string>
+    <string name="v52_live_ask_hint">Kapalıysa bağlı cihazların başlattığı yayına sormadan katılınır</string>
+    <string name="v52_live_auto_open">Yayını kendiliğinden aç</string>
+    <string name="v52_live_auto_open_hint">Kapalıysa katılınan yayın Canlı tuval yayını sayfasındaki karttan açılır</string>
+</resources>

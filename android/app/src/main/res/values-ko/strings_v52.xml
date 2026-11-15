@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- v52 metinleri (android/tools/v52-strings/strings_v52.py ile üretilir) -->
+<resources>
+    <string name="v52_vector_fine_nodes">세부 점</string>
+    <string name="v52_share_send_title">캔버스 공유</string>
+    <string name="v52_share_live_title">캔버스 라이브 방송</string>
+    <string name="v52_share_send_how">두 기기가 같은 Wi-Fi에 있어야 합니다. 앱이 열려 있으면 서로를 자동으로 찾고, 캔버스나 이미지를 보낼 수 있습니다.</string>
+    <string name="v52_share_live_how">두 기기가 같은 Wi-Fi에 있어야 합니다. 방송을 시작하면 선택한 캔버스의 모든 변경이 상대 기기에 실시간으로 보입니다.</string>
+    <string name="v52_share_send_hint">같은 Wi-Fi의 기기(Android, iPhone, iPad)로 캔버스와 이미지 보내기</string>
+    <string name="v52_share_send_open">공유 페이지 열기</string>
+    <string name="v52_share_ask_hint">끄면 연결된 기기의 캔버스와 이미지를 묻지 않고 받습니다</string>
+    <string name="v52_share_live_settings_title">방송 설정</string>
+    <string name="v52_share_live_hint">같은 Wi-Fi의 기기로 캔버스를 실시간 방송하거나 다른 사람의 방송을 보세요</string>
+    <string name="v52_share_live_open">방송 페이지 열기</string>
+    <string name="v52_live_ask">방송 참여 전에 묻기</string>
+    <string name="v52_live_ask_hint">끄면 연결된 기기가 시작한 방송에 묻지 않고 참여합니다</string>
+    <string name="v52_live_auto_open">방송 자동으로 열기</string>
+    <string name="v52_live_auto_open_hint">끄면 참여한 방송은 라이브 방송 페이지의 카드에서 엽니다</string>
+</resources>

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- v52 metinleri (android/tools/v52-strings/strings_v52.py ile üretilir) -->
+<resources>
+    <string name="v52_vector_fine_nodes">نقاط مفصلة</string>
+    <string name="v52_share_send_title">مشاركة اللوحة</string>
+    <string name="v52_share_live_title">بث اللوحة المباشر</string>
+    <string name="v52_share_send_how">يجب أن يكون الجهازان على شبكة Wi-Fi نفسها. أثناء فتح التطبيق يجد كل منهما الآخر تلقائيًا، ويمكنك إرسال لوحة أو صورة إلى جهاز.</string>
+    <string name="v52_share_live_how">يجب أن يكون الجهازان على شبكة Wi-Fi نفسها. عند بدء البث يظهر كل تغيير على اللوحة المختارة مباشرة على الجهاز الآخر.</string>
+    <string name="v52_share_send_hint">أرسل اللوحات والصور إلى الأجهزة على شبكة Wi-Fi نفسها (Android وiPhone وiPad)</string>
+    <string name="v52_share_send_open">فتح صفحة المشاركة</string>
+    <string name="v52_share_ask_hint">عند الإيقاف تُستقبل اللوحات والصور من الأجهزة المتصلة دون سؤال</string>
+    <string name="v52_share_live_settings_title">إعدادات البث</string>
+    <string name="v52_share_live_hint">بث لوحة مباشرة إلى الأجهزة على شبكة Wi-Fi نفسها أو شاهد بث شخص آخر</string>
+    <string name="v52_share_live_open">فتح صفحة البث</string>
+    <string name="v52_live_ask">السؤال قبل الانضمام إلى البث</string>
+    <string name="v52_live_ask_hint">عند الإيقاف يتم الانضمام إلى البث الذي تبدؤه الأجهزة المتصلة دون سؤال</string>
+    <string name="v52_live_auto_open">فتح البث تلقائيًا</string>
+    <string name="v52_live_auto_open_hint">عند الإيقاف يُفتح البث من البطاقة في صفحة بث اللوحة المباشر</string>
+</resources>

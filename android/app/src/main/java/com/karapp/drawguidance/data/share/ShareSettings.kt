@@ -22,7 +22,7 @@ class ShareSettings(context: Context) {
     val deviceName: StateFlow<String> = _name.asStateFlow()
 
     private val _ask = MutableStateFlow(prefs.getBoolean(KEY_ASK, true))
-    /** Gelen tuval/resim/yayın teklifleri için onay sorulsun (kapalıysa bağlı cihazdan gelenler doğrudan alınır). */
+    /** Gelen tuval/resim teklifleri için onay sorulsun (kapalıysa bağlı cihazdan gelenler doğrudan alınır). v52 yayın ayrı. */
     val askBeforeReceive: StateFlow<Boolean> = _ask.asStateFlow()
 
     private val _folder = MutableStateFlow(prefs.getBoolean(KEY_FOLDER, true))
@@ -36,6 +36,17 @@ class ShareSettings(context: Context) {
     private val _smooth = MutableStateFlow(prefs.getBoolean(KEY_SMOOTH, true))
     /** Yayın sık güncellensin (kapalıysa daha seyrek; yavaş Bluetooth bağlantısında önerilir). */
     val liveSmooth: StateFlow<Boolean> = _smooth.asStateFlow()
+
+    private val _askLive = MutableStateFlow(prefs.getBoolean(KEY_ASK_LIVE, true))
+    /** v52 canlı yayın daveti için onay sorulsun (tuval/resim alma ayarından ayrı). */
+    val askBeforeLive: StateFlow<Boolean> = _askLive.asStateFlow()
+
+    private val _liveAutoOpen = MutableStateFlow(prefs.getBoolean(KEY_LIVE_OPEN, true))
+    /** v52 katılınan yayın kendiliğinden açılsın (kapalıysa Canlı yayın sayfasındaki karttan açılır). */
+    val liveAutoOpen: StateFlow<Boolean> = _liveAutoOpen.asStateFlow()
+
+    fun setAskBeforeLive(on: Boolean) { _askLive.value = on; prefs.edit().putBoolean(KEY_ASK_LIVE, on).apply() }
+    fun setLiveAutoOpen(on: Boolean) { _liveAutoOpen.value = on; prefs.edit().putBoolean(KEY_LIVE_OPEN, on).apply() }
 
     fun setDeviceName(name: String) {
         val n = name.trim().take(40)
@@ -64,6 +75,8 @@ class ShareSettings(context: Context) {
         const val KEY_FOLDER_ID = "received_folder_id"
         const val KEY_SMOOTH = "live_smooth"
         const val KEY_VISIBLE = "discoverable"
+        const val KEY_ASK_LIVE = "ask_before_live"
+        const val KEY_LIVE_OPEN = "live_auto_open"
 
         fun defaultName(): String {
             val maker = Build.MANUFACTURER.orEmpty().replaceFirstChar { it.uppercase() }

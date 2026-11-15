@@ -303,7 +303,7 @@ class V30ImageToolsTest : V30EditorBase() {
         assertEquals(note, temp.sourceId)
         waitFor { com.karapp.drawguidance.ui.screens.canvasedit.CanvasEditViewModel.lastCreated?.get()?.canvas?.value?.localId == temp.tempId }
         val tempVm = com.karapp.drawguidance.ui.screens.canvasedit.CanvasEditViewModel.lastCreated!!.get()!!
-        assertEquals(com.karapp.drawguidance.data.model.CanvasKind.SIMPLE_ART, tempVm.canvas.value!!.kind)
+        assertEquals(com.karapp.drawguidance.data.model.CanvasKind.ART, tempVm.canvas.value!!.kind)
         assertEquals(false, tempVm.autosave.value)
         assertEquals(note, canvas().localId)
         // Geçici tuvalde resmin üstüne çizilir, Kaydet'e dokunulur

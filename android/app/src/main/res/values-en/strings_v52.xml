@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- v52 metinleri (android/tools/v52-strings/strings_v52.py ile üretilir) -->
+<resources>
+    <string name="v52_vector_fine_nodes">Detailed points</string>
+    <string name="v52_share_send_title">Share canvas</string>
+    <string name="v52_share_live_title">Live canvas broadcast</string>
+    <string name="v52_share_send_how">Both devices must be on the same Wi-Fi network. While the app is open they find each other automatically; you can send a canvas or an image to a device.</string>
+    <string name="v52_share_live_how">Both devices must be on the same Wi-Fi network. When you start a broadcast, every change on the chosen canvas appears live on the other device.</string>
+    <string name="v52_share_send_hint">Send canvases and images to devices on the same Wi-Fi (Android, iPhone, iPad)</string>
+    <string name="v52_share_send_open">Open sharing page</string>
+    <string name="v52_share_ask_hint">When off, canvases and images from connected devices are received without asking</string>
+    <string name="v52_share_live_settings_title">Broadcast settings</string>
+    <string name="v52_share_live_hint">Broadcast a canvas live to devices on the same Wi-Fi or watch someone else\'s broadcast</string>
+    <string name="v52_share_live_open">Open broadcast page</string>
+    <string name="v52_live_ask">Ask before joining broadcasts</string>
+    <string name="v52_live_ask_hint">When off, broadcasts started by connected devices are joined without asking</string>
+    <string name="v52_live_auto_open">Open broadcast automatically</string>
+    <string name="v52_live_auto_open_hint">When off, a joined broadcast is opened from the card on the Live canvas broadcast page</string>
+</resources>

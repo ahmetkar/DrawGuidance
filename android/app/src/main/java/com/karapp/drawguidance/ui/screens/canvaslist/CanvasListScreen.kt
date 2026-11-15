@@ -18,6 +18,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Share
+import androidx.compose.material.icons.filled.Cast
 import androidx.compose.material.icons.filled.GridView
 import androidx.compose.material.icons.automirrored.filled.Sort
 import androidx.compose.material.icons.automirrored.filled.ViewList
@@ -73,6 +74,8 @@ fun CanvasListScreen(
     viewModel: CanvasListViewModel = koinViewModel(),
     /** v51 sağ üst köşedeki paylaşım düğmesi: cihazlar arası paylaşım sayfası (null: düğme yok). */
     onOpenShare: (() -> Unit)? = null,
+    /** v52 canlı tuval yayını sayfası (paylaşımdan ayrı düğme). */
+    onOpenLiveShare: (() -> Unit)? = null,
 ) {
     val colors = NeuTheme.colors
     val allCanvases by viewModel.canvases.collectAsState()
@@ -232,7 +235,9 @@ fun CanvasListScreen(
                         )
                         NeuIconButton(Icons.Filled.Add, stringResource(R.string.new_canvas), { showCreateModal = true }, tint = colors.accent)
                         // v51 cihazlar arası paylaşım (sağ üst köşe; çocuk kilidinde yok)
-                        if (onOpenShare != null && !kidsLocked) NeuIconButton(Icons.Filled.Share, stringResource(R.string.v51_share_title), onOpenShare, modifier = Modifier.testTag("canvas_list_share"))
+                        if (onOpenShare != null && !kidsLocked) NeuIconButton(Icons.Filled.Share, stringResource(R.string.v52_share_send_title), onOpenShare, modifier = Modifier.testTag("canvas_list_share"))
+                        // v52 canlı yayın ayrı düğme
+                        if (onOpenLiveShare != null && !kidsLocked) NeuIconButton(Icons.Filled.Cast, stringResource(R.string.v52_share_live_title), onOpenLiveShare, modifier = Modifier.testTag("canvas_list_live"))
                     },
                 )
             } else {
@@ -266,7 +271,9 @@ fun CanvasListScreen(
                         }
                         NeuIconButton(Icons.Filled.Add, stringResource(R.string.new_canvas), { showCreateModal = true }, tint = colors.accent)
                         // v51 cihazlar arası paylaşım (sağ üst köşe; çocuk kilidinde yok)
-                        if (onOpenShare != null && !kidsLocked) NeuIconButton(Icons.Filled.Share, stringResource(R.string.v51_share_title), onOpenShare, modifier = Modifier.testTag("canvas_list_share"))
+                        if (onOpenShare != null && !kidsLocked) NeuIconButton(Icons.Filled.Share, stringResource(R.string.v52_share_send_title), onOpenShare, modifier = Modifier.testTag("canvas_list_share"))
+                        // v52 canlı yayın ayrı düğme
+                        if (onOpenLiveShare != null && !kidsLocked) NeuIconButton(Icons.Filled.Cast, stringResource(R.string.v52_share_live_title), onOpenLiveShare, modifier = Modifier.testTag("canvas_list_live"))
                     },
                 )
             }

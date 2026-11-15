@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -25,7 +26,9 @@ import com.karapp.drawguidance.ui.theme.NeuTheme
 fun NeuSheet(onDismiss: () -> Unit, full: Boolean = false, content: @Composable ColumnScope.() -> Unit) {
     // v51 ekleme ve seçim pencereleri (karakterler, efektler, nesneler, şekiller, alıştırmalar, eğitimler...) dikey
     // ekranda da ekranın tamamını kaplar; içlerinde açılan pencereler yerleşik değil, normal alt pencere olur.
-    if (full && com.karapp.drawguidance.ui.screens.canvasedit.components.dockedSheetHostOrNull() != null) {
+    // v52 dikey ekranda bütün pencereler (düzenleyicide yerleşik olanlar da) ekranı kaplar; tablette yatayda kayan pencere
+    val portraitFull = isPortraitScreen() && com.karapp.drawguidance.ui.screens.canvasedit.components.LocalFloatingSheets.current == null
+    if (portraitFull || (full && com.karapp.drawguidance.ui.screens.canvasedit.components.dockedSheetHostOrNull() != null)) {
         val colors = NeuTheme.colors
         ModalBottomSheet(
             onDismissRequest = onDismiss,
@@ -84,3 +87,14 @@ val LocalFullSheet = staticCompositionLocalOf { false }
 @Composable
 fun Modifier.sheetBodyHeight(max: Dp = 620.dp): Modifier =
     if (LocalFullSheet.current) this.fillMaxHeight() else this.heightIn(max = max)
+
+/** v52 ekran dikey mi (pencereler dikeyde ekranı kaplar). */
+@Composable
+fun isPortraitScreen(): Boolean {
+    val c = LocalConfiguration.current
+    return c.screenHeightDp >= c.screenWidthDp
+}
+
+/** v52 doğrudan ModalBottomSheet kullanan pencerelerin gövdesi: dikey ekranda ekranı doldurur. */
+@Composable
+fun Modifier.portraitFill(): Modifier = if (isPortraitScreen()) this.fillMaxHeight() else this

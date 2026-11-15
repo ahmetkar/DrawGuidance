@@ -1,5 +1,6 @@
 package com.karapp.drawguidance.ui.premium
 
+import com.karapp.drawguidance.ui.components.portraitFill
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -105,9 +106,9 @@ val Gold = Color(0xFFF5B301)
 @Composable
 fun PremiumRequiredSheet(onDismiss: () -> Unit, onUpgrade: () -> Unit) {
     val c = NeuTheme.colors
-    ModalBottomSheet(onDismissRequest = onDismiss, containerColor = c.background) {
+    ModalBottomSheet(onDismissRequest = onDismiss, containerColor = c.background, sheetState = androidx.compose.material3.rememberModalBottomSheetState(skipPartiallyExpanded = true)) {
         Column(
-            Modifier.fillMaxWidth().padding(24.dp).navigationBarsPadding().testTag("premium_required_sheet"),
+            Modifier.fillMaxWidth().portraitFill().padding(24.dp).navigationBarsPadding().testTag("premium_required_sheet"),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {

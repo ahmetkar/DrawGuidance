@@ -3,7 +3,7 @@ import CoreGraphics
 import Foundation
 
 /// v51 not almada resim düzenleme (Android `TempImageEdit.kt`): not alma modunda resim düzenleme araçları yok; düzenlenmek
-/// istenen resim geçici bir basit resim tuvaline (`SIMPLE_ART`) eklenir. O tuvalde otomatik kayıt kapalıdır; Kaydet'e
+/// istenen resim geçici bir gelişmiş çizim tuvaline (`ART`; v52, önce basit resimdi) eklenir. O tuvalde otomatik kayıt kapalıdır; Kaydet'e
 /// dokununca tuval resme çevrilip nottaki resmin yerine konur ve geçici tuval silinir. Kaydetmeden çıkılırsa silinir.
 ///
 /// Geçici tuvaller ve nota henüz aktarılmamış sonuçlar uygulama kapansa da kaybolmasın diye saklanır; geçici tuvaller
@@ -143,7 +143,7 @@ enum TempImageEditor {
                             colorHex: "#000000", brushType: .IMAGE, sizePx: 1, opacity: 1, order: 0, assetId: copied)
         let now = CanvasStore.nowMs()
         let c = CanvasUi(localId: tempId, name: L("v51_temp_image_name"), width: w, height: h, backgroundColorHex: "#FFFFFF",
-                         aiEnabled: false, pages: [[stroke]], createdAt: now, updatedAt: now, kind: .SIMPLE_ART)
+                         aiEnabled: false, pages: [[stroke]], createdAt: now, updatedAt: now, kind: .ART)
         deps.canvases.save(c)
         return tempId
     }

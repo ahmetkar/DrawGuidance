@@ -1,5 +1,6 @@
 package com.karapp.drawguidance.ui.screens.canvasedit.components
 
+import com.karapp.drawguidance.ui.components.portraitFill
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.BoxWithConstraints
@@ -87,7 +88,7 @@ fun BrushPickerModal(
         contentColor = colors.content,
     ) {
         // İçerik tek GPU katmanında: sayfa açılış animasyonu ve kaydırma sırasında kartlar yeniden çizilmez
-        Column(Modifier.fillMaxWidth().navigationBarsPadding().graphicsLayer()) {
+        Column(Modifier.fillMaxWidth().portraitFill().navigationBarsPadding().graphicsLayer()) {
             Text(
                 stringResource(R.string.brush_picker_title),
                 style = MaterialTheme.typography.titleLarge,

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- v52 metinleri (android/tools/v52-strings/strings_v52.py ile üretilir) -->
+<resources>
+    <string name="v52_vector_fine_nodes">詳細なポイント</string>
+    <string name="v52_share_send_title">キャンバスを共有</string>
+    <string name="v52_share_live_title">キャンバスのライブ配信</string>
+    <string name="v52_share_send_how">2台の端末が同じWi-Fiに接続している必要があります。アプリを開いている間は自動的に見つかり、キャンバスや画像を送信できます。</string>
+    <string name="v52_share_live_how">2台の端末が同じWi-Fiに接続している必要があります。配信を始めると、選んだキャンバスの変更が相手の端末にライブで表示されます。</string>
+    <string name="v52_share_send_hint">同じWi-Fiの端末（Android、iPhone、iPad）にキャンバスや画像を送信</string>
+    <string name="v52_share_send_open">共有ページを開く</string>
+    <string name="v52_share_ask_hint">オフにすると、接続した端末からのキャンバスと画像を確認なしで受け取ります</string>
+    <string name="v52_share_live_settings_title">配信の設定</string>
+    <string name="v52_share_live_hint">同じWi-Fiの端末にキャンバスをライブ配信したり、他の人の配信を見たりできます</string>
+    <string name="v52_share_live_open">配信ページを開く</string>
+    <string name="v52_live_ask">配信への参加前に確認</string>
+    <string name="v52_live_ask_hint">オフにすると、接続した端末が始めた配信に確認なしで参加します</string>
+    <string name="v52_live_auto_open">配信を自動で開く</string>
+    <string name="v52_live_auto_open_hint">オフにすると、参加した配信はライブ配信ページのカードから開きます</string>
+</resources>

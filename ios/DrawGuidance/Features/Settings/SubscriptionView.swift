@@ -121,6 +121,6 @@ struct PremiumRequiredSheet: View {
             }
             .padding(24)
         }
-        .presentationDetents([.medium])
+        .portraitFullDetents() // v52 dikeyde tam ekran
     }
 }

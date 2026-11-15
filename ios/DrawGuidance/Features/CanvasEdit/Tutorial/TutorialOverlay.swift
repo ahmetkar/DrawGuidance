@@ -353,6 +353,6 @@ struct TutorialOfferSheet: View {
         }
         .accessibilityElement(children: .contain)
         .accessibilityIdentifier("tutorial_offer")
-        .presentationDetents([.medium, .large])
+        .portraitFullDetents() // v52 dikeyde tam ekran
     }
 }

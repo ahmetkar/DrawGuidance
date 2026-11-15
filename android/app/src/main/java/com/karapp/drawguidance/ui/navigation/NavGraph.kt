@@ -29,6 +29,8 @@ object Routes {
     const val MODELS = "models3d"
     /** v51 cihazlar arası paylaşım sayfası ve canlı yayın görüntüleyici (yayını alan taraf). */
     const val SHARE = "share"
+    /** v52 canlı tuval yayını ayrı sayfa (tuval paylaşımından ayrı). */
+    const val SHARE_LIVE = "share_live"
     const val LIVE = "live/{localId}"
     fun live(localId: String) = "live/$localId"
     const val MODEL_EDIT = "model3dEdit?modelId={modelId}&canvasId={canvasId}&strokeId={strokeId}&name={name}"
@@ -93,6 +95,7 @@ fun DrawGuidanceNavGraph(
                     onOpenCanvas = { localId -> navController.navigate(Routes.canvasEdit(localId)) },
                     bottomBar = bar,
                     onOpenShare = { navController.navigate(Routes.SHARE) },
+                    onOpenLiveShare = { navController.navigate(Routes.SHARE_LIVE) },
                 )
             }
         }
@@ -137,6 +140,7 @@ fun DrawGuidanceNavGraph(
                 SettingsScreen(
                     bottomBar = bar, onOpenAccount = { navController.navigate(Routes.ACCOUNT) }, onOpenSubscription = { navController.navigate(Routes.SUBSCRIPTION) },
                     onOpenShare = { navController.navigate(Routes.SHARE) },
+                    onOpenLiveShare = { navController.navigate(Routes.SHARE_LIVE) },
                 )
             }
         }
@@ -158,6 +162,15 @@ fun DrawGuidanceNavGraph(
                 onBack = { navController.popBackStack() },
                 onOpenCanvas = { id -> navController.navigate(Routes.canvasEdit(id)) },
                 onOpenLive = { id -> navController.navigate(Routes.live(id)) },
+                mode = com.karapp.drawguidance.ui.screens.share.ShareMode.SEND,
+            )
+        }
+        composable(Routes.SHARE_LIVE) {
+            if (!com.karapp.drawguidance.ui.kids.kidsBlocked { navController.popBackStack() }) com.karapp.drawguidance.ui.screens.share.ShareScreen(
+                onBack = { navController.popBackStack() },
+                onOpenCanvas = { id -> navController.navigate(Routes.canvasEdit(id)) },
+                onOpenLive = { id -> navController.navigate(Routes.live(id)) },
+                mode = com.karapp.drawguidance.ui.screens.share.ShareMode.LIVE,
             )
         }
         composable(Routes.LIVE) { entry ->

@@ -3287,6 +3287,12 @@
 "v52_photo_vibrance" = "Vibrance";
 "v52_photo_whites" = "Whites";
 "v52_share_ask_hint" = "When off, canvases and images from connected devices are received without asking";
+"v52_share_err_discover" = "Couldn't search for devices on the network";
+"v52_share_err_image" = "Couldn't read the image";
+"v52_share_err_no_canvas" = "Canvas not found";
+"v52_share_err_no_device" = "Device not found";
+"v52_share_err_server" = "Couldn't start the sharing server";
+"v52_share_err_visible" = "Couldn't become visible on the network";
 "v52_share_links_hint" = "Send canvases to devices on the same Wi-Fi or broadcast drawing, note and comic canvases live. Settings are in the Connection tab.";
 "v52_share_links_title" = "Sharing and live broadcast";
 "v52_share_live_hint" = "Broadcast a canvas live to devices on the same Wi-Fi or watch someone else's broadcast";

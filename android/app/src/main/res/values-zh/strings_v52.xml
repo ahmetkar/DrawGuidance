@@ -162,4 +162,10 @@
     <string name="v52_tut_calc_text">在 添加公式 中选择公式并在方框中填入数值（r = 3、m = 4、a = 3）：结果会自动加在末尾。</string>
     <string name="v52_tut_calc_edit">修改数值，结果随之更新</string>
     <string name="v52_tut_calc_edit_text">点按公式并修改数值（r = 5、m = 6）：结果会立即重新计算。</string>
+    <string name="v52_share_err_server">无法启动分享服务</string>
+    <string name="v52_share_err_visible">无法在网络中显示</string>
+    <string name="v52_share_err_discover">无法在网络中搜索设备</string>
+    <string name="v52_share_err_no_device">未找到设备</string>
+    <string name="v52_share_err_no_canvas">未找到画布</string>
+    <string name="v52_share_err_image">无法读取图片</string>
 </resources>

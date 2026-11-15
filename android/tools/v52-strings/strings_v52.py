@@ -238,6 +238,13 @@ s("v52_tut_calc_text", "Formül ekle'den bir formül seçin ve kutulara değer y
 s("v52_tut_calc_edit", "Değeri değiştirin, sonuç yenilensin", "Change a value, the result updates", "غيّر قيمة فتتحدث النتيجة", "値を変えると結果も更新", "값을 바꾸면 결과도 바뀝니다", "Измените значение — результат обновится", "修改数值，结果随之更新")
 s("v52_tut_calc_edit_text", "Formüle dokunup bir değeri değiştirin (r = 5, m = 6): sonuç hemen yeniden hesaplanır.", "Tap the formula and change a value (r = 5, m = 6): the result is recalculated at once.", "انقر على الصيغة وغيّر قيمة (r = 5، m = 6): تُعاد النتيجة فورًا.", "式をタップして値（r = 5、m = 6）を変えると、すぐに再計算されます。", "공식을 눌러 값(r = 5, m = 6)을 바꾸면 바로 다시 계산됩니다.", "Нажмите на формулу и измените значение (r = 5, m = 6): результат сразу пересчитается.", "点按公式并修改数值（r = 5、m = 6）：结果会立即重新计算。")
 
+s("v52_share_err_server", "Paylaşım sunucusu açılamadı", "Couldn't start the sharing server", "تعذّر تشغيل خادم المشاركة", "共有サーバーを開始できませんでした", "공유 서버를 시작할 수 없습니다", "Не удалось запустить сервер обмена", "无法启动分享服务")
+s("v52_share_err_visible", "Ağda görünür olunamadı", "Couldn't become visible on the network", "تعذّر الظهور على الشبكة", "ネットワーク上に表示できませんでした", "네트워크에 표시될 수 없습니다", "Не удалось стать видимым в сети", "无法在网络中显示")
+s("v52_share_err_discover", "Ağda cihaz araması yapılamadı", "Couldn't search for devices on the network", "تعذّر البحث عن أجهزة على الشبكة", "ネットワーク上の端末を検索できませんでした", "네트워크에서 기기를 찾을 수 없습니다", "Не удалось найти устройства в сети", "无法在网络中搜索设备")
+s("v52_share_err_no_device", "Cihaz bulunamadı", "Device not found", "لم يتم العثور على الجهاز", "端末が見つかりません", "기기를 찾을 수 없습니다", "Устройство не найдено", "未找到设备")
+s("v52_share_err_no_canvas", "Tuval bulunamadı", "Canvas not found", "لم يتم العثور على اللوحة", "キャンバスが見つかりません", "캔버스를 찾을 수 없습니다", "Холст не найден", "未找到画布")
+s("v52_share_err_image", "Resim okunamadı", "Couldn't read the image", "تعذّرت قراءة الصورة", "画像を読み込めませんでした", "이미지를 읽을 수 없습니다", "Не удалось прочитать изображение", "无法读取图片")
+
 def xml_escape(t):
     t = escape(t).replace("'", "\\'").replace('"', '\\"')
     return t

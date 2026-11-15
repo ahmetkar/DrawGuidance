@@ -3287,6 +3287,12 @@
 "v52_photo_vibrance" = "自然な彩度";
 "v52_photo_whites" = "白レベル";
 "v52_share_ask_hint" = "オフにすると、接続した端末からのキャンバスと画像を確認なしで受け取ります";
+"v52_share_err_discover" = "ネットワーク上の端末を検索できませんでした";
+"v52_share_err_image" = "画像を読み込めませんでした";
+"v52_share_err_no_canvas" = "キャンバスが見つかりません";
+"v52_share_err_no_device" = "端末が見つかりません";
+"v52_share_err_server" = "共有サーバーを開始できませんでした";
+"v52_share_err_visible" = "ネットワーク上に表示できませんでした";
 "v52_share_links_hint" = "同じWi-Fiの端末にキャンバスを送ったり、描画・ノート・コミックのキャンバスをライブ配信したりできます。設定は「接続」タブにあります。";
 "v52_share_links_title" = "共有とライブ配信";
 "v52_share_live_hint" = "同じWi-Fiの端末にキャンバスをライブ配信したり、他の人の配信を見たりできます";

@@ -162,4 +162,10 @@
     <string name="v52_tut_calc_text">Formül ekle\'den bir formül seçin ve kutulara değer yazın (r = 3, m = 4, a = 3): sonuç formülün sonuna kendiliğinden eklenir.</string>
     <string name="v52_tut_calc_edit">Değeri değiştirin, sonuç yenilensin</string>
     <string name="v52_tut_calc_edit_text">Formüle dokunup bir değeri değiştirin (r = 5, m = 6): sonuç hemen yeniden hesaplanır.</string>
+    <string name="v52_share_err_server">Paylaşım sunucusu açılamadı</string>
+    <string name="v52_share_err_visible">Ağda görünür olunamadı</string>
+    <string name="v52_share_err_discover">Ağda cihaz araması yapılamadı</string>
+    <string name="v52_share_err_no_device">Cihaz bulunamadı</string>
+    <string name="v52_share_err_no_canvas">Tuval bulunamadı</string>
+    <string name="v52_share_err_image">Resim okunamadı</string>
 </resources>

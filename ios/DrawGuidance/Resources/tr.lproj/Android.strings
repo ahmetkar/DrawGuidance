@@ -3287,6 +3287,12 @@
 "v52_photo_vibrance" = "Canlılık";
 "v52_photo_whites" = "Beyazlar";
 "v52_share_ask_hint" = "Kapalıysa bağlı cihazlardan gelen tuval ve resimler sormadan alınır";
+"v52_share_err_discover" = "Ağda cihaz araması yapılamadı";
+"v52_share_err_image" = "Resim okunamadı";
+"v52_share_err_no_canvas" = "Tuval bulunamadı";
+"v52_share_err_no_device" = "Cihaz bulunamadı";
+"v52_share_err_server" = "Paylaşım sunucusu açılamadı";
+"v52_share_err_visible" = "Ağda görünür olunamadı";
 "v52_share_links_hint" = "Aynı Wi-Fi'deki cihazlara tuval gönder ya da çizim, not ve çizgi roman tuvallerini canlı yayınla. Ayarları Bağlantı sekmesinde.";
 "v52_share_links_title" = "Paylaşım ve canlı yayın";
 "v52_share_live_hint" = "Bir tuvali aynı Wi-Fi ağındaki cihazlara canlı yayınlayın ya da başkasının yayınını izleyin";

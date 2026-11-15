@@ -162,4 +162,10 @@
     <string name="v52_tut_calc_text">Pick a formula under Add formula and type values into its boxes (r = 3, m = 4, a = 3): the result is added at the end automatically.</string>
     <string name="v52_tut_calc_edit">Change a value, the result updates</string>
     <string name="v52_tut_calc_edit_text">Tap the formula and change a value (r = 5, m = 6): the result is recalculated at once.</string>
+    <string name="v52_share_err_server">Couldn\'t start the sharing server</string>
+    <string name="v52_share_err_visible">Couldn\'t become visible on the network</string>
+    <string name="v52_share_err_discover">Couldn\'t search for devices on the network</string>
+    <string name="v52_share_err_no_device">Device not found</string>
+    <string name="v52_share_err_no_canvas">Canvas not found</string>
+    <string name="v52_share_err_image">Couldn\'t read the image</string>
 </resources>

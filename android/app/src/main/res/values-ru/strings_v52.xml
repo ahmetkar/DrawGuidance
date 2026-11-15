@@ -162,4 +162,10 @@
     <string name="v52_tut_calc_text">Выберите формулу в «Добавить формулу» и впишите значения (r = 3, m = 4, a = 3): результат добавится сам.</string>
     <string name="v52_tut_calc_edit">Измените значение — результат обновится</string>
     <string name="v52_tut_calc_edit_text">Нажмите на формулу и измените значение (r = 5, m = 6): результат сразу пересчитается.</string>
+    <string name="v52_share_err_server">Не удалось запустить сервер обмена</string>
+    <string name="v52_share_err_visible">Не удалось стать видимым в сети</string>
+    <string name="v52_share_err_discover">Не удалось найти устройства в сети</string>
+    <string name="v52_share_err_no_device">Устройство не найдено</string>
+    <string name="v52_share_err_no_canvas">Холст не найден</string>
+    <string name="v52_share_err_image">Не удалось прочитать изображение</string>
 </resources>

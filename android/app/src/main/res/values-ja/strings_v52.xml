@@ -162,4 +162,10 @@
     <string name="v52_tut_calc_text">式を追加から式を選び、枠に値（r = 3、m = 4、a = 3）を入力すると、結果が末尾に自動で付きます。</string>
     <string name="v52_tut_calc_edit">値を変えると結果も更新</string>
     <string name="v52_tut_calc_edit_text">式をタップして値（r = 5、m = 6）を変えると、すぐに再計算されます。</string>
+    <string name="v52_share_err_server">共有サーバーを開始できませんでした</string>
+    <string name="v52_share_err_visible">ネットワーク上に表示できませんでした</string>
+    <string name="v52_share_err_discover">ネットワーク上の端末を検索できませんでした</string>
+    <string name="v52_share_err_no_device">端末が見つかりません</string>
+    <string name="v52_share_err_no_canvas">キャンバスが見つかりません</string>
+    <string name="v52_share_err_image">画像を読み込めませんでした</string>
 </resources>

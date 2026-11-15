@@ -3287,6 +3287,12 @@
 "v52_photo_vibrance" = "생동감";
 "v52_photo_whites" = "흰색 계열";
 "v52_share_ask_hint" = "끄면 연결된 기기의 캔버스와 이미지를 묻지 않고 받습니다";
+"v52_share_err_discover" = "네트워크에서 기기를 찾을 수 없습니다";
+"v52_share_err_image" = "이미지를 읽을 수 없습니다";
+"v52_share_err_no_canvas" = "캔버스를 찾을 수 없습니다";
+"v52_share_err_no_device" = "기기를 찾을 수 없습니다";
+"v52_share_err_server" = "공유 서버를 시작할 수 없습니다";
+"v52_share_err_visible" = "네트워크에 표시될 수 없습니다";
 "v52_share_links_hint" = "같은 Wi-Fi의 기기로 캔버스를 보내거나 그림, 노트, 만화 캔버스를 실시간 방송하세요. 설정은 연결 탭에 있습니다.";
 "v52_share_links_title" = "공유와 실시간 방송";
 "v52_share_live_hint" = "같은 Wi-Fi의 기기로 캔버스를 실시간 방송하거나 다른 사람의 방송을 보세요";

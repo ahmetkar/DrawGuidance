@@ -323,7 +323,7 @@ class ShareManager(
     }
 
     override fun onError(route: ShareRoute, message: String) {
-        _errors.value = message
+        _errors.value = localize(message)
     }
 
     override fun onMessage(route: ShareRoute, endpoint: String, bytes: ByteArray) {
@@ -493,9 +493,20 @@ class ShareManager(
         else requireNotNull(context.contentResolver.openInputStream(u)).use { it.readBytes() }
     }
 
+    /** v52 aktarım katmanının (Türkçe kayıt) hata metinleri kullanıcının diline çevrilir. */
+    private fun localize(message: String): String = when (message) {
+        "Sunucu açılamadı" -> context.getString(com.karapp.drawguidance.R.string.v52_share_err_server)
+        "Ağda görünür olunamadı" -> context.getString(com.karapp.drawguidance.R.string.v52_share_err_visible)
+        "Ağda arama yapılamadı" -> context.getString(com.karapp.drawguidance.R.string.v52_share_err_discover)
+        "Cihaz bulunamadı" -> context.getString(com.karapp.drawguidance.R.string.v52_share_err_no_device)
+        "Tuval bulunamadı" -> context.getString(com.karapp.drawguidance.R.string.v52_share_err_no_canvas)
+        "Resim okunamadı" -> context.getString(com.karapp.drawguidance.R.string.v52_share_err_image)
+        else -> message
+    }
+
     private fun fail(message: String) {
         _status.value = null
-        _events.tryEmit(ShareEvent.Failed(message))
+        _events.tryEmit(ShareEvent.Failed(localize(message)))
     }
 
     private fun send(key: String, bytes: ByteArray) {

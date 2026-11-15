@@ -3287,6 +3287,12 @@
 "v52_photo_vibrance" = "自然饱和度";
 "v52_photo_whites" = "白色";
 "v52_share_ask_hint" = "关闭后，将直接接收已连接设备发送的画布和图片";
+"v52_share_err_discover" = "无法在网络中搜索设备";
+"v52_share_err_image" = "无法读取图片";
+"v52_share_err_no_canvas" = "未找到画布";
+"v52_share_err_no_device" = "未找到设备";
+"v52_share_err_server" = "无法启动分享服务";
+"v52_share_err_visible" = "无法在网络中显示";
 "v52_share_links_hint" = "向同一 Wi-Fi 下的设备发送画布，或直播绘图、笔记和漫画画布。设置在“连接”标签中。";
 "v52_share_links_title" = "分享与直播";
 "v52_share_live_hint" = "向同一 Wi-Fi 下的设备直播画布，或观看他人的直播";

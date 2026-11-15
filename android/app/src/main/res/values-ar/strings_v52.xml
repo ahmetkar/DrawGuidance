@@ -162,4 +162,10 @@
     <string name="v52_tut_calc_text">اختر صيغة من إضافة صيغة واكتب القيم في خاناتها (r = 3، m = 4، a = 3): تُضاف النتيجة تلقائيًا في نهايتها.</string>
     <string name="v52_tut_calc_edit">غيّر قيمة فتتحدث النتيجة</string>
     <string name="v52_tut_calc_edit_text">انقر على الصيغة وغيّر قيمة (r = 5، m = 6): تُعاد النتيجة فورًا.</string>
+    <string name="v52_share_err_server">تعذّر تشغيل خادم المشاركة</string>
+    <string name="v52_share_err_visible">تعذّر الظهور على الشبكة</string>
+    <string name="v52_share_err_discover">تعذّر البحث عن أجهزة على الشبكة</string>
+    <string name="v52_share_err_no_device">لم يتم العثور على الجهاز</string>
+    <string name="v52_share_err_no_canvas">لم يتم العثور على اللوحة</string>
+    <string name="v52_share_err_image">تعذّرت قراءة الصورة</string>
 </resources>

@@ -1,90 +1,482 @@
 {
- "01-cizgi-roman": {
-  "tr": ["Çizgi roman stüdyosu", "Panel şablonları, karakterler, mekânlar ve konuşma balonları"],
-  "en": ["Your comic studio", "Panel layouts, characters, locations and speech balloons"],
-  "ar": ["استوديو القصص المصورة", "قوالب لوحات وشخصيات وأماكن وفقاعات حوار"],
-  "ja": ["マンガ制作スタジオ", "コマ割り、キャラクター、背景、フキダシ"],
-  "ko": ["나만의 만화 스튜디오", "칸 템플릿, 캐릭터, 배경, 말풍선"],
-  "ru": ["Студия комиксов", "Раскладки кадров, персонажи, фоны и облачка"],
-  "zh": ["漫画工作室", "分格模板、角色、场景和对话气泡"]},
- "02-resim": {
-  "tr": ["Resim modu", "Fırçalar, katmanlar ve hazır sahnelerle illüstrasyon"],
-  "en": ["Paint mode", "Illustrate with brushes, layers and ready-made scenes"],
-  "ar": ["وضع الرسم", "ارسم بالفرش والطبقات والمشاهد الجاهزة"],
-  "ja": ["ペイントモード", "ブラシ、レイヤー、背景素材でイラストを"],
-  "ko": ["그림 모드", "브러시, 레이어, 준비된 장면으로 일러스트를"],
-  "ru": ["Режим рисования", "Кисти, слои и готовые сцены для иллюстраций"],
-  "zh": ["绘画模式", "用画笔、图层和现成场景创作插画"]},
- "03-not": {
-  "tr": ["Akıllı not alma", "Formüller, diyagramlar ve el yazısı tek sayfada"],
-  "en": ["Smart note-taking", "Formulas, diagrams and handwriting on one page"],
-  "ar": ["تدوين ذكي للملاحظات", "معادلات ومخططات وخط يد في صفحة واحدة"],
-  "ja": ["スマートなノート", "数式、図、手書きを1ページに"],
-  "ko": ["스마트 필기", "수식, 다이어그램, 손글씨를 한 페이지에"],
-  "ru": ["Умные конспекты", "Формулы, схемы и рукописный текст на одной странице"],
-  "zh": ["智能笔记", "公式、图表和手写内容尽在一页"]},
- "04-cocuk": {
-  "tr": ["Çocuklar için çizim", "Reklamsız, sade ve güvenli; Boyacık eşliğinde"],
-  "en": ["Drawing for kids", "Ad-free, simple and safe, with a friendly mascot"],
-  "ar": ["رسم للأطفال", "بلا إعلانات، بسيط وآمن، مع تميمة ودودة"],
-  "ja": ["キッズ向けお絵かき", "広告なしでシンプル＆安心、マスコットと一緒に"],
-  "ko": ["어린이 그림 그리기", "광고 없이 쉽고 안전하게, 마스코트와 함께"],
-  "ru": ["Рисование для детей", "Без рекламы, просто и безопасно, с дружелюбным талисманом"],
-  "zh": ["儿童绘画", "无广告、简单安全，还有可爱吉祥物相伴"]},
- "05-basit-resim": {
-  "tr": ["Basit resim", "Büyük düğmeler, hazır şekiller, kolay boyama"],
-  "en": ["Simple paint", "Big buttons, ready-made shapes, easy coloring"],
-  "ar": ["رسم بسيط", "أزرار كبيرة وأشكال جاهزة وتلوين سهل"],
-  "ja": ["シンプルペイント", "大きなボタン、図形素材、かんたん塗り"],
-  "ko": ["쉬운 그림", "큰 버튼, 준비된 도형, 쉬운 색칠"],
-  "ru": ["Простое рисование", "Крупные кнопки, готовые фигуры, лёгкая заливка"],
-  "zh": ["简易绘画", "大按钮、现成形状、轻松上色"]},
- "06-3b": {
-  "tr": ["3B şekil modu", "Parçaları birleştir, döndür ve çizimine ekle"],
-  "en": ["3D shape mode", "Combine parts, rotate them and add them to your drawing"],
-  "ar": ["وضع الأشكال ثلاثية الأبعاد", "اجمع الأجزاء وأدرها وأضفها إلى رسمك"],
-  "ja": ["3D図形モード", "パーツを組み合わせ、回して、絵に追加"],
-  "ko": ["3D 도형 모드", "부품을 합치고 돌려서 그림에 추가"],
-  "ru": ["Режим 3D-фигур", "Собирайте детали, вращайте и добавляйте в рисунок"],
-  "zh": ["3D形状模式", "组合部件、旋转并添加到画作中"]},
- "07-basit-not": {
-  "tr": ["Basit not", "Sayfalı defter, kolay yazı ve hazır paneller"],
-  "en": ["Simple notes", "Paged notebook, easy text and ready panels"],
-  "ar": ["ملاحظات بسيطة", "دفتر بصفحات وكتابة سهلة ولوحات جاهزة"],
-  "ja": ["シンプルノート", "ページ付きノート、かんたん入力、パネル素材"],
-  "ko": ["쉬운 노트", "페이지 노트, 쉬운 글쓰기, 준비된 패널"],
-  "ru": ["Простые заметки", "Тетрадь со страницами, лёгкий текст, готовые блоки"],
-  "zh": ["简易笔记", "分页笔记本、轻松输入、现成面板"]},
- "08-vektorlestir": {
-  "tr": ["Resmi vektörleştir", "Tek dokunuşla fotoğraf ya da eskiz düzenlenebilir çizgilere dönüşür"],
-  "en": ["Vectorize any image", "One tap turns a photo or sketch into editable lines"],
-  "ar": ["حوّل أي صورة إلى متجهات", "لمسة واحدة تحوّل الصورة أو الرسم إلى خطوط قابلة للتعديل"],
-  "ja": ["画像をベクター化", "ワンタップで写真やスケッチが編集できる線に"],
-  "ko": ["이미지를 벡터로", "한 번의 탭으로 사진과 스케치를 편집 가능한 선으로"],
-  "ru": ["Векторизация изображений", "Одно касание — и фото или эскиз становятся редактируемыми линиями"],
-  "zh": ["图片一键矢量化", "轻点一下，照片或草图就变成可编辑的线条"]},
- "09-kalipla-ciz": {
-  "tr": ["Kalıpla çiz", "Vektörü kalıp yap, kenarından çiz: çizgin hiç titremez"],
-  "en": ["Draw with stencils", "Turn vectors into stencils and trace them with steady lines"],
-  "ar": ["ارسم بالقوالب", "اجعل المتجه قالبًا وارسم على حافته بخطوط ثابتة"],
-  "ja": ["テンプレートで描く", "ベクターをテンプレートにして、ぶれない線でなぞる"],
-  "ko": ["템플릿으로 그리기", "벡터를 템플릿으로 만들고 흔들림 없이 따라 그리기"],
-  "ru": ["Рисуйте по шаблону", "Сделайте вектор шаблоном и обводите ровными линиями"],
-  "zh": ["用模板绘画", "把矢量做成模板，沿边描出稳定线条"]},
- "10-kutuphane-kalibi": {
-  "tr": ["Hazır kalıplar", "Kütüphaneden kedi, yıldız, kalp ve yüzlerce şekil"],
-  "en": ["Ready-made stencils", "Cats, stars, hearts and hundreds of shapes in the library"],
-  "ar": ["قوالب جاهزة", "قطط ونجوم وقلوب ومئات الأشكال في المكتبة"],
-  "ja": ["テンプレート素材", "ネコ、星、ハートなど数百の図形をライブラリから"],
-  "ko": ["준비된 템플릿", "고양이, 별, 하트 등 수백 가지 도형 라이브러리"],
-  "ru": ["Готовые шаблоны", "Кошки, звёзды, сердца и сотни фигур в библиотеке"],
-  "zh": ["现成模板", "图库中有猫、星星、爱心等数百种形状"]},
- "11-resimden-cizim": {
-  "tr": ["Resimden çizime", "Vektörleştir, kalıp yap, çiz: adım adım eğitimle"],
-  "en": ["From image to drawing", "Vectorize, make a stencil, draw — with a step-by-step tutorial"],
-  "ar": ["من الصورة إلى الرسم", "حوّل إلى متجهات، اصنع قالبًا، ارسم — مع درس خطوة بخطوة"],
-  "ja": ["画像から絵へ", "ベクター化、テンプレート化、なぞり描き — ステップ解説つき"],
-  "ko": ["이미지에서 그림으로", "벡터화, 템플릿, 따라 그리기 — 단계별 튜토리얼"],
-  "ru": ["От картинки к рисунку", "Векторизуйте, сделайте шаблон, рисуйте — с пошаговым уроком"],
-  "zh": ["从图片到画作", "矢量化、做模板、描画——附分步教程"]}
+  "01-cizgi-roman": {
+    "tr": [
+      "Çizgi roman stüdyosu",
+      "Panel şablonları, karakterler, mekânlar ve konuşma balonları"
+    ],
+    "en": [
+      "Your comic studio",
+      "Panel layouts, characters, locations and speech balloons"
+    ],
+    "ar": [
+      "استوديو القصص المصورة",
+      "قوالب لوحات وشخصيات وأماكن وفقاعات حوار"
+    ],
+    "ja": [
+      "マンガ制作スタジオ",
+      "コマ割り、キャラクター、背景、フキダシ"
+    ],
+    "ko": [
+      "나만의 만화 스튜디오",
+      "칸 템플릿, 캐릭터, 배경, 말풍선"
+    ],
+    "ru": [
+      "Студия комиксов",
+      "Раскладки кадров, персонажи, фоны и облачка"
+    ],
+    "zh": [
+      "漫画工作室",
+      "分格模板、角色、场景和对话气泡"
+    ]
+  },
+  "02-resim": {
+    "tr": [
+      "Resim modu",
+      "Fırçalar, katmanlar ve hazır sahnelerle illüstrasyon"
+    ],
+    "en": [
+      "Paint mode",
+      "Illustrate with brushes, layers and ready-made scenes"
+    ],
+    "ar": [
+      "وضع الرسم",
+      "ارسم بالفرش والطبقات والمشاهد الجاهزة"
+    ],
+    "ja": [
+      "ペイントモード",
+      "ブラシ、レイヤー、背景素材でイラストを"
+    ],
+    "ko": [
+      "그림 모드",
+      "브러시, 레이어, 준비된 장면으로 일러스트를"
+    ],
+    "ru": [
+      "Режим рисования",
+      "Кисти, слои и готовые сцены для иллюстраций"
+    ],
+    "zh": [
+      "绘画模式",
+      "用画笔、图层和现成场景创作插画"
+    ]
+  },
+  "03-not": {
+    "tr": [
+      "Akıllı not alma",
+      "Formüller, diyagramlar ve el yazısı tek sayfada"
+    ],
+    "en": [
+      "Smart note-taking",
+      "Formulas, diagrams and handwriting on one page"
+    ],
+    "ar": [
+      "تدوين ذكي للملاحظات",
+      "معادلات ومخططات وخط يد في صفحة واحدة"
+    ],
+    "ja": [
+      "スマートなノート",
+      "数式、図、手書きを1ページに"
+    ],
+    "ko": [
+      "스마트 필기",
+      "수식, 다이어그램, 손글씨를 한 페이지에"
+    ],
+    "ru": [
+      "Умные конспекты",
+      "Формулы, схемы и рукописный текст на одной странице"
+    ],
+    "zh": [
+      "智能笔记",
+      "公式、图表和手写内容尽在一页"
+    ]
+  },
+  "04-cocuk": {
+    "tr": [
+      "Çocuklar için çizim",
+      "Reklamsız, sade ve güvenli; Boyacık eşliğinde"
+    ],
+    "en": [
+      "Drawing for kids",
+      "Ad-free, simple and safe, with a friendly mascot"
+    ],
+    "ar": [
+      "رسم للأطفال",
+      "بلا إعلانات، بسيط وآمن، مع تميمة ودودة"
+    ],
+    "ja": [
+      "キッズ向けお絵かき",
+      "広告なしでシンプル＆安心、マスコットと一緒に"
+    ],
+    "ko": [
+      "어린이 그림 그리기",
+      "광고 없이 쉽고 안전하게, 마스코트와 함께"
+    ],
+    "ru": [
+      "Рисование для детей",
+      "Без рекламы, просто и безопасно, с дружелюбным талисманом"
+    ],
+    "zh": [
+      "儿童绘画",
+      "无广告、简单安全，还有可爱吉祥物相伴"
+    ]
+  },
+  "05-basit-resim": {
+    "tr": [
+      "Basit resim",
+      "Büyük düğmeler, hazır şekiller, kolay boyama"
+    ],
+    "en": [
+      "Simple paint",
+      "Big buttons, ready-made shapes, easy coloring"
+    ],
+    "ar": [
+      "رسم بسيط",
+      "أزرار كبيرة وأشكال جاهزة وتلوين سهل"
+    ],
+    "ja": [
+      "シンプルペイント",
+      "大きなボタン、図形素材、かんたん塗り"
+    ],
+    "ko": [
+      "쉬운 그림",
+      "큰 버튼, 준비된 도형, 쉬운 색칠"
+    ],
+    "ru": [
+      "Простое рисование",
+      "Крупные кнопки, готовые фигуры, лёгкая заливка"
+    ],
+    "zh": [
+      "简易绘画",
+      "大按钮、现成形状、轻松上色"
+    ]
+  },
+  "06-3b": {
+    "tr": [
+      "3B şekil modu",
+      "Parçaları birleştir, döndür ve çizimine ekle"
+    ],
+    "en": [
+      "3D shape mode",
+      "Combine parts, rotate them and add them to your drawing"
+    ],
+    "ar": [
+      "وضع الأشكال ثلاثية الأبعاد",
+      "اجمع الأجزاء وأدرها وأضفها إلى رسمك"
+    ],
+    "ja": [
+      "3D図形モード",
+      "パーツを組み合わせ、回して、絵に追加"
+    ],
+    "ko": [
+      "3D 도형 모드",
+      "부품을 합치고 돌려서 그림에 추가"
+    ],
+    "ru": [
+      "Режим 3D-фигур",
+      "Собирайте детали, вращайте и добавляйте в рисунок"
+    ],
+    "zh": [
+      "3D形状模式",
+      "组合部件、旋转并添加到画作中"
+    ]
+  },
+  "07-basit-not": {
+    "tr": [
+      "Basit not",
+      "Sayfalı defter, kolay yazı ve hazır paneller"
+    ],
+    "en": [
+      "Simple notes",
+      "Paged notebook, easy text and ready panels"
+    ],
+    "ar": [
+      "ملاحظات بسيطة",
+      "دفتر بصفحات وكتابة سهلة ولوحات جاهزة"
+    ],
+    "ja": [
+      "シンプルノート",
+      "ページ付きノート、かんたん入力、パネル素材"
+    ],
+    "ko": [
+      "쉬운 노트",
+      "페이지 노트, 쉬운 글쓰기, 준비된 패널"
+    ],
+    "ru": [
+      "Простые заметки",
+      "Тетрадь со страницами, лёгкий текст, готовые блоки"
+    ],
+    "zh": [
+      "简易笔记",
+      "分页笔记本、轻松输入、现成面板"
+    ]
+  },
+  "08-vektorlestir": {
+    "tr": [
+      "Resmi vektörleştir",
+      "Tek dokunuşla fotoğraf ya da eskiz düzenlenebilir çizgilere dönüşür"
+    ],
+    "en": [
+      "Vectorize any image",
+      "One tap turns a photo or sketch into editable lines"
+    ],
+    "ar": [
+      "حوّل أي صورة إلى متجهات",
+      "لمسة واحدة تحوّل الصورة أو الرسم إلى خطوط قابلة للتعديل"
+    ],
+    "ja": [
+      "画像をベクター化",
+      "ワンタップで写真やスケッチが編集できる線に"
+    ],
+    "ko": [
+      "이미지를 벡터로",
+      "한 번의 탭으로 사진과 스케치를 편집 가능한 선으로"
+    ],
+    "ru": [
+      "Векторизация изображений",
+      "Одно касание — и фото или эскиз становятся редактируемыми линиями"
+    ],
+    "zh": [
+      "图片一键矢量化",
+      "轻点一下，照片或草图就变成可编辑的线条"
+    ]
+  },
+  "09-kalipla-ciz": {
+    "tr": [
+      "Kalıpla çiz",
+      "Vektörü kalıp yap, kenarından çiz: çizgin hiç titremez"
+    ],
+    "en": [
+      "Draw with stencils",
+      "Turn vectors into stencils and trace them with steady lines"
+    ],
+    "ar": [
+      "ارسم بالقوالب",
+      "اجعل المتجه قالبًا وارسم على حافته بخطوط ثابتة"
+    ],
+    "ja": [
+      "テンプレートで描く",
+      "ベクターをテンプレートにして、ぶれない線でなぞる"
+    ],
+    "ko": [
+      "템플릿으로 그리기",
+      "벡터를 템플릿으로 만들고 흔들림 없이 따라 그리기"
+    ],
+    "ru": [
+      "Рисуйте по шаблону",
+      "Сделайте вектор шаблоном и обводите ровными линиями"
+    ],
+    "zh": [
+      "用模板绘画",
+      "把矢量做成模板，沿边描出稳定线条"
+    ]
+  },
+  "10-kutuphane-kalibi": {
+    "tr": [
+      "Hazır kalıplar",
+      "Kütüphaneden kedi, yıldız, kalp ve yüzlerce şekil"
+    ],
+    "en": [
+      "Ready-made stencils",
+      "Cats, stars, hearts and hundreds of shapes in the library"
+    ],
+    "ar": [
+      "قوالب جاهزة",
+      "قطط ونجوم وقلوب ومئات الأشكال في المكتبة"
+    ],
+    "ja": [
+      "テンプレート素材",
+      "ネコ、星、ハートなど数百の図形をライブラリから"
+    ],
+    "ko": [
+      "준비된 템플릿",
+      "고양이, 별, 하트 등 수백 가지 도형 라이브러리"
+    ],
+    "ru": [
+      "Готовые шаблоны",
+      "Кошки, звёзды, сердца и сотни фигур в библиотеке"
+    ],
+    "zh": [
+      "现成模板",
+      "图库中有猫、星星、爱心等数百种形状"
+    ]
+  },
+  "11-resimden-cizim": {
+    "tr": [
+      "Resimden çizime",
+      "Vektörleştir, kalıp yap, çiz: adım adım eğitimle"
+    ],
+    "en": [
+      "From image to drawing",
+      "Vectorize, make a stencil, draw — with a step-by-step tutorial"
+    ],
+    "ar": [
+      "من الصورة إلى الرسم",
+      "حوّل إلى متجهات، اصنع قالبًا، ارسم — مع درس خطوة بخطوة"
+    ],
+    "ja": [
+      "画像から絵へ",
+      "ベクター化、テンプレート化、なぞり描き — ステップ解説つき"
+    ],
+    "ko": [
+      "이미지에서 그림으로",
+      "벡터화, 템플릿, 따라 그리기 — 단계별 튜토리얼"
+    ],
+    "ru": [
+      "От картинки к рисунку",
+      "Векторизуйте, сделайте шаблон, рисуйте — с пошаговым уроком"
+    ],
+    "zh": [
+      "从图片到画作",
+      "矢量化、做模板、描画——附分步教程"
+    ]
+  },
+  "12-formul-bilim": {
+    "tr": [
+      "Formülden bilim şekilleri",
+      "Molekül, atom ve eğik atış çizimleri; formüller kendiliğinden hesaplanır"
+    ],
+    "en": [
+      "Science shapes from formulas",
+      "Molecules, atoms and projectile motion; formulas calculate themselves"
+    ],
+    "ar": [
+      "أشكال علمية من الصيغ",
+      "جزيئات وذرات وحركة المقذوفات، والصيغ تُحسب تلقائيًا"
+    ],
+    "ja": [
+      "数式から理科の図",
+      "分子、原子、放物運動を描画。数式は自動で計算"
+    ],
+    "ko": [
+      "공식으로 그리는 과학 도형",
+      "분자, 원자, 포물선 운동을 그리고 공식은 자동으로 계산"
+    ],
+    "ru": [
+      "Научные фигуры по формулам",
+      "Молекулы, атомы и движение тела под углом; формулы считаются сами"
+    ],
+    "zh": [
+      "用公式生成科学图形",
+      "分子、原子和抛体运动，公式自动计算结果"
+    ]
+  },
+  "13-alistirma": {
+    "tr": [
+      "Adım adım çizim alıştırmaları",
+      "Elips, perspektif ve gölge seviyeleri; her çizime puan"
+    ],
+    "en": [
+      "Step-by-step drawing practice",
+      "Ellipse, perspective and shading levels, with a score for every drawing"
+    ],
+    "ar": [
+      "تمارين رسم خطوة بخطوة",
+      "مستويات للأشكال البيضاوية والمنظور والتظليل مع تقييم لكل رسمة"
+    ],
+    "ja": [
+      "ステップ式の描画練習",
+      "楕円、遠近法、陰影のレベル。描くたびにスコア"
+    ],
+    "ko": [
+      "단계별 드로잉 연습",
+      "타원, 원근, 명암 레벨과 그림마다 점수"
+    ],
+    "ru": [
+      "Пошаговые упражнения",
+      "Эллипсы, перспектива и светотень: оценка за каждый рисунок"
+    ],
+    "zh": [
+      "循序渐进的绘画练习",
+      "椭圆、透视和明暗关卡，每幅画都有评分"
+    ]
+  },
+  "14-cocuk-gorev": {
+    "tr": [
+      "Çocuklar için çizim görevleri",
+      "Seviye seviye eğlenceli görevler ve yardımcı maskot"
+    ],
+    "en": [
+      "Drawing quests for kids",
+      "Fun level-by-level quests with a friendly mascot"
+    ],
+    "ar": [
+      "مهام رسم للأطفال",
+      "مهام ممتعة مستوى بعد مستوى مع شخصية مساعدة"
+    ],
+    "ja": [
+      "子ども向けお絵かきミッション",
+      "レベルごとの楽しいミッションと応援キャラクター"
+    ],
+    "ko": [
+      "어린이 그림 미션",
+      "레벨별 재미있는 미션과 도우미 마스코트"
+    ],
+    "ru": [
+      "Задания для детей",
+      "Весёлые уровни и дружелюбный помощник"
+    ],
+    "zh": [
+      "儿童绘画任务",
+      "逐级趣味任务，还有可爱的吉祥物帮忙"
+    ]
+  },
+  "15-paylasim": {
+    "tr": [
+      "Tuvalini yakındaki cihaza gönder",
+      "Aynı Wi-Fi ağındaki telefon ve tabletlere internetsiz paylaşım"
+    ],
+    "en": [
+      "Send canvases to nearby devices",
+      "Share with phones and tablets on the same Wi-Fi, no internet needed"
+    ],
+    "ar": [
+      "أرسل لوحتك إلى جهاز قريب",
+      "شارك مع الهواتف والأجهزة اللوحية على نفس شبكة Wi-Fi دون إنترنت"
+    ],
+    "ja": [
+      "近くの端末にキャンバスを送信",
+      "同じWi-Fiのスマホやタブレットとネット不要で共有"
+    ],
+    "ko": [
+      "가까운 기기로 캔버스 보내기",
+      "같은 Wi-Fi의 휴대폰·태블릿과 인터넷 없이 공유"
+    ],
+    "ru": [
+      "Отправляйте холсты на соседние устройства",
+      "Обмен с телефонами и планшетами в той же сети Wi-Fi без интернета"
+    ],
+    "zh": [
+      "把画布发送到附近设备",
+      "同一 Wi-Fi 下的手机和平板，无需联网即可分享"
+    ]
+  },
+  "16-canli-yayin": {
+    "tr": [
+      "İki cihaz arasında canlı yayın",
+      "Sen çizerken öteki cihaz her çizgiyi anında görür"
+    ],
+    "en": [
+      "Live broadcast between two devices",
+      "The other device sees every stroke as you draw"
+    ],
+    "ar": [
+      "بث مباشر بين جهازين",
+      "يرى الجهاز الآخر كل خط فور رسمه"
+    ],
+    "ja": [
+      "2台の端末でライブ配信",
+      "描いた線がもう一方の端末にすぐ表示"
+    ],
+    "ko": [
+      "두 기기 간 실시간 방송",
+      "그리는 즉시 다른 기기에 모든 획이 보입니다"
+    ],
+    "ru": [
+      "Прямая трансляция между устройствами",
+      "Другое устройство видит каждый штрих сразу"
+    ],
+    "zh": [
+      "两台设备之间实时直播",
+      "你画的每一笔，另一台设备立即可见"
+    ]
+  }
 }

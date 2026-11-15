@@ -53,7 +53,8 @@ abstract class V52StoreShotsBase : V32EditorBase() {
     }
 
     /** Eğitim grubunu oynatır; [shotAt] adımında açıklama kutusuyla görüntü alınır. */
-    private fun play(kind: CanvasKind, groupId: String, shotAt: Map<Int, String> = emptyMap()) {
+    private fun play(kind: CanvasKind, groupId: String, shotAt: Map<Int, String> = emptyMap()): com.karapp.drawguidance.data.model.CanvasUi {
+        var snapshot: com.karapp.drawguidance.data.model.CanvasUi? = null
         val group = TutorialScripts.groups(kind).first { it.id == groupId }
         compose.runOnIdle { vm().tutorial.fast = true; vm().tutorial.start(group) }
         waitFor { calloutShown() }
@@ -62,9 +63,25 @@ abstract class V52StoreShotsBase : V32EditorBase() {
             awaitDemo(120_000)
             advanceMain(300)
             shotAt[i - 1]?.let { settleFor(1200); shot(shotName(it)) }
+            if (i == group.steps.size) snapshot = live()
             next()
         }
         waitFor { !calloutShown() }
+        return snapshot!!
+    }
+
+    /** Eğitimin son çizimini tuvale yazar ve tuvali yeniden açar (eğitim bitince sayfa eski haline döner). */
+    private fun keep(snap: com.karapp.drawguidance.data.model.CanvasUi, name: String) {
+        SystemBack.press()
+        waitFor { !exists("drawing_canvas") }
+        runBlocking {
+            repo().saveDocument(snap.localId, snap.pages, snap.width, snap.height, true, snap.backgroundColorHex, snap.currentPage, snap.layers)
+            repo().saveBackgroundSpec(snap.localId, snap.background, snap.pageBackgrounds)
+        }
+        waitForText(name)
+        compose.onAllNodesWithText(name)[0].performClick()
+        waitFor { exists("drawing_canvas") && vm().canvas.value?.strokes?.isNotEmpty() == true }
+        settleFor(4500)
     }
 
     /** Formülden molekül, Bohr atomu, eğik atış ve hesaplanan formüller (eğitimin son adımı ve temiz sayfa). */
@@ -72,8 +89,8 @@ abstract class V52StoreShotsBase : V32EditorBase() {
     fun scienceFormulas() {
         assumeTrue(System.getenv("DG_SHOTS") != null)
         open(t("science_name"), CanvasKind.NOTES)
-        play(CanvasKind.NOTES, "notes_science_v52", mapOf(1 to "12-formul-bilim-adim", 4 to "12-formul-bilim"))
-        settleFor(1200)
+        val snap = play(CanvasKind.NOTES, "notes_science_v52", mapOf(1 to "12-formul-bilim-adim", 4 to "12-formul-bilim"))
+        keep(snap, t("science_name"))
         shot(shotName("12-formul-bilim-temiz"))
     }
 
@@ -93,7 +110,7 @@ abstract class V52StoreShotsBase : V32EditorBase() {
     fun kidsChallenge() {
         assumeTrue(System.getenv("DG_SHOTS") != null)
         open(t("kids_name"), CanvasKind.KIDS)
-        compose.runOnIdle { vm().challenge.open(3) }
+        compose.runOnIdle { vm().challenge.open(0) }
         settleFor(2000)
         shot(shotName("14-cocuk-gorev"))
     }
@@ -120,7 +137,7 @@ abstract class V52StoreShotsBase : V32EditorBase() {
     fun liveBroadcast() {
         assumeTrue(System.getenv("DG_SHOTS") != null)
         open(t("science_name"), CanvasKind.NOTES)
-        play(CanvasKind.NOTES, "notes_science_v52")
+        keep(play(CanvasKind.NOTES, "notes_science_v52"), t("science_name"))
         val c = vm().canvas.value!!
         field<MutableStateFlow<ShareLiveOut?>>("_liveOut").value =
             ShareLiveOut(c.localId, "LAN:1", t("peer_tablet"), startedAt = System.currentTimeMillis() - 754_000)

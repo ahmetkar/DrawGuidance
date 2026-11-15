@@ -19,6 +19,8 @@ import com.karapp.drawguidance.TestDrawGuidanceApp
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [34], application = TestDrawGuidanceApp::class)
 class V52TutorialTest {
+    @org.junit.After fun tearDown() { org.koin.core.context.stopKoin() }
+
     @Test fun scienceGroupInNotes() {
         val g = TutorialScripts.groups(CanvasKind.NOTES).first { it.id == "notes_science_v52" }
         assertEquals(5, g.steps.size)

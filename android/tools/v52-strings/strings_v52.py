@@ -104,6 +104,74 @@ s("v52_share_links_hint", "Aynı Wi-Fi'deki cihazlara tuval gönder ya da çizim
   "Отправляйте холсты на устройства в той же сети Wi-Fi или транслируйте холсты рисунков, заметок и комиксов. Настройки — во вкладке «Подключение».",
   "向同一 Wi-Fi 下的设备发送画布，或直播绘图、笔记和漫画画布。设置在“连接”标签中。")
 
+# v52 grafik ve tablo
+s("v52_add_graph", "Grafik ekle", "Add graph", "إضافة رسم بياني", "グラフを追加", "그래프 추가", "Добавить график", "添加图表")
+s("v52_graph_short", "Grafik", "Graph", "رسم بياني", "グラフ", "그래프", "График", "图表")
+s("v52_add_table", "Tablo ekle", "Add table", "إضافة جدول", "表を追加", "표 추가", "Добавить таблицу", "添加表格")
+s("v52_table_short", "Tablo", "Table", "جدول", "表", "표", "Таблица", "表格")
+s("v52_table_create_hint", "Satır ve sütun sayısını seç. Ekledikten sonra her hücreyi, her satırı, her sütunu ve tablonun tamamını düzenleyebilirsin.",
+  "Choose the number of rows and columns. After adding, you can edit every cell, row, column and the whole table.",
+  "اختر عدد الصفوف والأعمدة. بعد الإضافة يمكنك تعديل كل خلية وصف وعمود والجدول كله.",
+  "行数と列数を選びます。追加後、各セル・各行・各列と表全体を編集できます。",
+  "행과 열 수를 선택하세요. 추가한 뒤 모든 셀, 행, 열과 표 전체를 편집할 수 있습니다.",
+  "Выберите число строк и столбцов. После добавления можно изменить каждую ячейку, строку, столбец и всю таблицу.",
+  "选择行数和列数。添加后可以编辑每个单元格、每行、每列以及整个表格。")
+s("v52_table_rows", "Satır", "Rows", "الصفوف", "行", "행", "Строки", "行")
+s("v52_table_cols", "Sütun", "Columns", "الأعمدة", "列", "열", "Столбцы", "列")
+s("v52_table_header_row", "Başlık satırı", "Header row", "صف العناوين", "見出し行", "머리글 행", "Строка заголовков", "标题行")
+s("v52_table_header_col", "Başlık sütunu", "Header column", "عمود العناوين", "見出し列", "머리글 열", "Столбец заголовков", "标题列")
+s("v52_table_zebra", "Dönüşümlü satır rengi", "Banded rows", "صفوف متناوبة الألوان", "縞模様の行", "줄무늬 행", "Чередование строк", "镶边行")
+s("v52_table_borders", "Çizgiler", "Borders", "الحدود", "罫線", "테두리", "Границы", "边框")
+s("v52_table_border_all", "Tüm çizgiler", "All borders", "كل الحدود", "すべての罫線", "모든 테두리", "Все границы", "所有边框")
+s("v52_table_border_outer", "Dış çerçeve", "Outside only", "الإطار الخارجي", "外枠のみ", "바깥 테두리", "Только внешние", "仅外框")
+s("v52_table_border_rows", "Yalnız satır çizgileri", "Row lines only", "خطوط الصفوف فقط", "行の線のみ", "행 선만", "Только линии строк", "仅行线")
+s("v52_table_border_header", "Çerçeve ve başlık çizgisi", "Outside and header line", "الإطار وخط العناوين", "外枠と見出し線", "바깥 테두리와 머리글 선", "Внешние и под заголовком", "外框和标题线")
+s("v52_table_border_none", "Çizgisiz", "No borders", "بلا حدود", "罫線なし", "테두리 없음", "Без границ", "无边框")
+s("v52_table_style", "Görünüm", "Style", "النمط", "スタイル", "스타일", "Стиль", "样式")
+s("v52_table_preset_classic", "Klasik", "Classic", "كلاسيكي", "クラシック", "클래식", "Классика", "经典")
+s("v52_table_preset_blue", "Mavi", "Blue", "أزرق", "ブルー", "파랑", "Синий", "蓝色")
+s("v52_table_preset_green", "Yeşil", "Green", "أخضر", "グリーン", "초록", "Зелёный", "绿色")
+s("v52_table_preset_orange", "Turuncu", "Orange", "برتقالي", "オレンジ", "주황", "Оранжевый", "橙色")
+s("v52_table_preset_purple", "Mor", "Purple", "بنفسجي", "パープル", "보라", "Фиолетовый", "紫色")
+s("v52_table_preset_minimal", "Sade", "Minimal", "بسيط", "シンプル", "미니멀", "Минимализм", "简约")
+s("v52_table_insert", "Tabloyu ekle", "Insert table", "إدراج الجدول", "表を挿入", "표 삽입", "Вставить таблицу", "插入表格")
+s("v52_table_edit", "Tabloyu düzenle", "Edit table", "تعديل الجدول", "表を編集", "표 편집", "Изменить таблицу", "编辑表格")
+s("v52_table_edit_hint", "Hücreye dokunup yaz. Satır numarasına ya da sütun harfine dokunarak o satırın ya da sütunun ayarlarını değiştir.",
+  "Tap a cell to type. Tap a row number or column letter to change that row's or column's settings.",
+  "اضغط على خلية للكتابة. اضغط على رقم الصف أو حرف العمود لتغيير إعداداته.",
+  "セルをタップして入力します。行番号や列の文字をタップすると、その行・列の設定を変更できます。",
+  "셀을 눌러 입력하세요. 행 번호나 열 문자를 누르면 그 행이나 열의 설정을 바꿀 수 있습니다.",
+  "Нажмите на ячейку, чтобы писать. Нажмите на номер строки или букву столбца, чтобы изменить их настройки.",
+  "点按单元格即可输入。点按行号或列字母可更改该行或该列的设置。")
+s("v52_table_scope_all", "Hepsi", "All", "الكل", "すべて", "전체", "Все", "全部")
+s("v52_table_scope_row", "Satır %1$d", "Row %1$d", "الصف %1$d", "%1$d 行目", "%1$d행", "Строка %1$d", "第 %1$d 行")
+s("v52_table_scope_col", "Sütun %1$s", "Column %1$s", "العمود %1$s", "%1$s 列", "%1$s열", "Столбец %1$s", "%1$s 列")
+s("v52_table_fill", "Dolgu rengi", "Fill color", "لون التعبئة", "塗りの色", "채우기 색", "Цвет заливки", "填充颜色")
+s("v52_table_text_color", "Yazı rengi", "Text color", "لون النص", "文字の色", "글자 색", "Цвет текста", "文字颜色")
+s("v52_table_border_color", "Çizgi rengi", "Border color", "لون الحدود", "罫線の色", "테두리 색", "Цвет границ", "边框颜色")
+s("v52_table_header_fill", "Başlık rengi", "Header color", "لون العناوين", "見出しの色", "머리글 색", "Цвет заголовков", "标题颜色")
+s("v52_table_header_text", "Başlık yazı rengi", "Header text color", "لون نص العناوين", "見出しの文字色", "머리글 글자 색", "Цвет текста заголовков", "标题文字颜色")
+s("v52_table_zebra_fill", "İkinci satır rengi", "Band color", "لون الصف المتناوب", "縞の色", "줄무늬 색", "Цвет чередования", "镶边颜色")
+s("v52_table_bg", "Hücre zemini", "Cell background", "خلفية الخلايا", "セルの背景", "셀 배경", "Фон ячеек", "单元格背景")
+s("v52_table_bold", "Kalın yazı", "Bold text", "نص عريض", "太字", "굵은 글씨", "Жирный текст", "粗体")
+s("v52_table_align", "Hizalama", "Alignment", "المحاذاة", "配置", "정렬", "Выравнивание", "对齐")
+s("v52_table_align_l", "Sola", "Left", "يسار", "左", "왼쪽", "Слева", "左")
+s("v52_table_align_c", "Ortaya", "Center", "وسط", "中央", "가운데", "По центру", "居中")
+s("v52_table_align_r", "Sağa", "Right", "يمين", "右", "오른쪽", "Справа", "右")
+s("v52_table_text_size", "Yazı boyu", "Text size", "حجم النص", "文字サイズ", "글자 크기", "Размер текста", "文字大小")
+s("v52_table_height", "Yükseklik", "Height", "الارتفاع", "高さ", "높이", "Высота", "高度")
+s("v52_table_width", "Genişlik", "Width", "العرض", "幅", "너비", "Ширина", "宽度")
+s("v52_table_line_width", "Çizgi kalınlığı", "Border width", "سماكة الحدود", "罫線の太さ", "테두리 두께", "Толщина границ", "边框粗细")
+s("v52_table_add_above", "Üste satır ekle", "Insert row above", "إدراج صف أعلى", "上に行を挿入", "위에 행 삽입", "Строка выше", "在上方插入行")
+s("v52_table_add_below", "Alta satır ekle", "Insert row below", "إدراج صف أسفل", "下に行を挿入", "아래에 행 삽입", "Строка ниже", "在下方插入行")
+s("v52_table_add_left", "Sola sütun ekle", "Insert column left", "إدراج عمود يسارًا", "左に列を挿入", "왼쪽에 열 삽입", "Столбец слева", "在左侧插入列")
+s("v52_table_add_right", "Sağa sütun ekle", "Insert column right", "إدراج عمود يمينًا", "右に列を挿入", "오른쪽에 열 삽입", "Столбец справа", "在右侧插入列")
+s("v52_table_delete_row", "Satırı sil", "Delete row", "حذف الصف", "行を削除", "행 삭제", "Удалить строку", "删除行")
+s("v52_table_delete_col", "Sütunu sil", "Delete column", "حذف العمود", "列を削除", "열 삭제", "Удалить столбец", "删除列")
+s("v52_table_clear", "Satırı/sütunu temizle", "Clear contents", "مسح المحتوى", "内容を消去", "내용 지우기", "Очистить", "清除内容")
+s("v52_table_default", "Varsayılan", "Default", "الافتراضي", "既定", "기본값", "По умолчанию", "默认")
+s("v52_table_reset_lines", "Satır ve sütun ayarlarını sıfırla", "Reset row and column settings", "إعادة ضبط إعدادات الصفوف والأعمدة", "行と列の設定をリセット", "행·열 설정 초기화", "Сбросить настройки строк и столбцов", "重置行列设置")
+
 def xml_escape(t):
     t = escape(t).replace("'", "\\'").replace('"', '\\"')
     return t

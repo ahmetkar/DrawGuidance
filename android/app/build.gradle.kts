@@ -123,6 +123,7 @@ android {
                 project.findProperty("basePackOut")?.let { p -> it.systemProperty("basePackOut", p.toString()) }
                 // v46 -PtemplateOut=<klasör>: hazır tuval şablonlarının üretimi (V46TemplateExport)
                 project.findProperty("templateOut")?.let { p -> it.systemProperty("templateOut", p.toString()) }
+                project.findProperty("tableOut")?.let { p -> it.systemProperty("tableOut", p.toString()) }
             }
         }
     }

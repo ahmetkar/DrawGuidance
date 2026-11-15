@@ -72,10 +72,11 @@ object ShapeRegistry {
         if (isLibrary(id)) ShapeLibrary.find(id)?.param else null
 
     /** Kimlikten yeniden kurulabilir mi (serbest yollar ve desenler kendi verileriyle saklanır). */
-    fun canBuild(id: String): Boolean = builtin(id) != null || isModernGraph(id) || (isLibrary(id) && ShapeLibrary.find(id) != null)
+    fun canBuild(id: String): Boolean = TableShape.isTable(id) || builtin(id) != null || isModernGraph(id) || (isLibrary(id) && ShapeLibrary.find(id) != null)
 
     /** Parmakla yerleştirme biçimi. */
     fun fit(id: String): ShapeFit {
+        if (TableShape.isTable(id)) return ShapeFit.BOX
         builtin(id)?.let { return it.fit }
         if (isModernGraph(id)) return if (graphKind(id) == GraphKind.NUMBER_LINE) ShapeFit.LINE else ShapeFit.BOX
         val lib = ShapeLibrary.find(id) ?: return ShapeFit.BOX
@@ -164,6 +165,8 @@ object ShapeRegistry {
      * Şeklin çizgileri (tuval koordinatlarında). Kesik çizgiler parça olarak kalır (çizimde kesik gösterilir).
      */
     fun paths(id: String, start: Offset, end: Offset, ink: Float, graph: GraphSpec? = null, params: Map<String, String>? = null): List<ShapePath> {
+        // v52 not almada tablo
+        if (TableShape.isTable(id)) return TableShape.paths(start, end, ink, params)
         builtin(id)?.let { kind ->
             if (legacyGraphs.containsKey(kind) || kind == ShapeKind.NUMBER_LINE) {
                 // Eski kayıttaki grafikler (yalnızca yeniden kurulurken): eski görünüm korunur
@@ -272,6 +275,9 @@ object ShapeRegistry {
         isLibrary(id) -> ShapeLibrary.find(id)?.title
         else -> null
     }
+
+    /** v52 not almada ayrı "Grafik ekle" penceresindeki kategoriler. */
+    val GRAPH_CATEGORIES = setOf("graphs", "curves")
 
     /** Tuval türünün seçici kategorileri (bölümlere ayrılmış). */
     fun categories(kind: CanvasKind): List<PickerCategory> {

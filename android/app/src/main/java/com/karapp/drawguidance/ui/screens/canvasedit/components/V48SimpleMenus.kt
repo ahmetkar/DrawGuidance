@@ -32,7 +32,7 @@ import com.karapp.drawguidance.ui.screens.canvasedit.tutorial.tutorialAnchor
 object SimpleMenus {
     enum class Menu(val tag: String) { ADD("simple_menu_add"), DRAW("simple_menu_draw"), EDIT("simple_menu_edit") }
 
-    private val ADD_IDS = setOf("shape", "text", "formula", "diagram", "packs", "panels", "background", "image", "model3d")
+    private val ADD_IDS = setOf("shape", "text", "formula", "graph", "table", "diagram", "packs", "panels", "background", "image", "model3d")
     private val DRAW_IDS = setOf("brush", "eraser", "paint", "paint_brush", "eyedropper", "ruler", "template")
 
     /** Aracın menüsü (bilinmeyen araçlar düzen menüsüne). */

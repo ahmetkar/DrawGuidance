@@ -295,6 +295,10 @@ object ShapeRenderer {
                     textPaint.alpha = (alpha * (sub.alpha ?: 1f).coerceIn(0f, 1f) * 255).toInt()
                 }
                 textPaint.textSize = max(4f, sub.labelSize)
+                // v52 tablo hücresi: hizalama ve kalın yazı etiketin tanımında ("tbl:cb")
+                val cellTag = sub.tag?.takeIf { it.startsWith(TableShape.TAG) }?.removePrefix(TableShape.TAG)
+                textPaint.textAlign = when (cellTag?.firstOrNull()) { 'c' -> Paint.Align.CENTER; 'r' -> Paint.Align.RIGHT; else -> Paint.Align.LEFT }
+                textPaint.isFakeBoldText = cellTag?.contains('b') == true
                 canvas.drawText(text, p.x, p.y + textPaint.textSize * 0.82f, textPaint)
             }
             start = end

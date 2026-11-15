@@ -90,7 +90,12 @@ class ShapeController(
         return c + d * t + d / len * margin
     }
 
-    fun openPicker() { _isPickerOpen.value = true }
+    private val _graphsOnly = MutableStateFlow(false)
+    /** v52 not almada grafikler ayrı pencerede: açık seçici yalnız grafikleri mi gösteriyor. */
+    val graphsOnly: StateFlow<Boolean> = _graphsOnly.asStateFlow()
+
+    fun openPicker() { _graphsOnly.value = false; _isPickerOpen.value = true }
+    fun openGraphPicker() { _graphsOnly.value = true; _isPickerOpen.value = true }
     fun closePicker() { _isPickerOpen.value = false }
 
     /** Şekil seçilince Şekil moduna geçilir: tuvalde sürükleyerek çizilir. */
@@ -252,11 +257,14 @@ class ShapeController(
     /** v51 seçili şekil düzenleyicide açılabilir mi (not almada düz şekiller açılmaz: "Şekli düzenle" gösterilmez). */
     fun canEditSelected(): Boolean {
         val shape = store.selectedStroke { it.shape != null } ?: return false
+        if (com.karapp.drawguidance.ui.drawing.TableShape.isTable(shape.shape?.kind)) return true
         return vectorEditAllowed || !isVectorTool(editToolFor(shape)) || host.canEditShapeElsewhere
     }
 
     fun editSelected() {
         val shape = store.selectedStroke { it.shape != null } ?: return
+        // v52 tablo kendi düzenleme penceresinde açılır
+        if (com.karapp.drawguidance.ui.drawing.TableShape.isTable(shape.shape?.kind)) { host.editTable(shape.id); return }
         paramShapes.clearError()
         val tool = editToolFor(shape)
         // v51 not almada düz şekiller vektör düzenlemeye açılmaz (değerli şekiller ve grafikler açılır);

@@ -99,18 +99,23 @@ fun ShapePickerModal(
     onModel3d: (String) -> Unit = {},
     onEditModel3d: (String) -> Unit = {},
     onNewModel3d: () -> Unit = {},
+    /** v52 not almada grafikler ayrı pencerede: true yalnız grafikler, false grafikler hariç, null hepsi. */
+    graphs: Boolean? = null,
 ) {
     val colors = NeuTheme.colors
     val context = androidx.compose.ui.platform.LocalContext.current
-    val categories = remember(kind, convertOnly) { if (convertOnly) ShapeRegistry.convertible(kind) else ShapeRegistry.categories(kind) }
+    val categories = remember(kind, convertOnly, graphs) {
+        val all = if (convertOnly) ShapeRegistry.convertible(kind) else ShapeRegistry.categories(kind)
+        when (graphs) { null -> all; true -> all.filter { it.id in ShapeRegistry.GRAPH_CATEGORIES }; false -> all.filterNot { it.id in ShapeRegistry.GRAPH_CATEGORIES } }
+    }
     val models3dSection = stringResource(R.string.model3d_my_models)
     val sections = remember(categories, models3d != null) { categories.map { it.section }.distinct() + listOfNotNull(models3dSection.takeIf { models3d != null }) }
-    var section by rememberSaveable(kind, convertOnly) { mutableStateOf(sections.firstOrNull() ?: "") }
+    var section by rememberSaveable(kind, convertOnly, graphs) { mutableStateOf(sections.firstOrNull() ?: "") }
     var fillColorOpen by remember { mutableStateOf(false) }
     // v36 arama ve kategori süzgeci (v43 nesne çizimleri ve stil süzgeci kaldırıldı)
-    var query by rememberSaveable(kind, convertOnly) { mutableStateOf("") }
+    var query by rememberSaveable(kind, convertOnly, graphs) { mutableStateOf("") }
     val sectionCats = remember(categories, section, sections) { categories.filter { it.section == section || sections.size <= 1 } }
-    var categoryId by rememberSaveable(kind, convertOnly, section) { mutableStateOf<String?>(null) }
+    var categoryId by rememberSaveable(kind, convertOnly, graphs, section) { mutableStateOf<String?>(null) }
     val index = remember(categories) {
         lazy {
             ShapePickerFilter.Index(

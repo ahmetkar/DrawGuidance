@@ -429,6 +429,8 @@ class CanvasEditViewModel(
     /** v45 çizgi roman kapağı (Kapak ekle) ve not alma panelleri (Panel ekle). */
     val v45 = com.karapp.drawguidance.ui.screens.canvasedit.state.V45NotesComicController(store, this, pages)
     private val formulas = FormulaController(store, this) { brush }
+    /** v52 not almada tablo ekleme ve düzenleme. */
+    val tables = com.karapp.drawguidance.ui.screens.canvasedit.state.TableController(store, this)
     private val pen = PenController(store, this, shapes)
     /** v43 Arkaplan ile Nesneyi Uyumla ve Nesneyi Mekâna Yerleştir. */
     private val scene = ObjectSceneController(store, this)
@@ -583,6 +585,8 @@ class CanvasEditViewModel(
     override val canEditShapeElsewhere: Boolean get() = tempImages != null && tempSession == null && store.canvas.value?.kind?.isNotes == true
 
     /** v52 notta seçili düz şekil gelişmiş çizim tuvalinde düzenlenir; kaydedilince nota döner. */
+    override fun editTable(id: String): Boolean { tables.edit(id); return true }
+
     override fun editShapeElsewhere(shape: Stroke): Boolean {
         if (!canEditShapeElsewhere) return false
         val editor = tempImages ?: return false
@@ -888,6 +892,7 @@ class CanvasEditViewModel(
     private fun afterContentReplaced() {
         handwriting.reset()
         formulas.onContentReplaced()
+        tables.onContentReplaced()
         diagrams.onContentReplaced()
         shapes.onContentReplaced()
         texts.onContentReplaced()
@@ -1218,6 +1223,8 @@ class CanvasEditViewModel(
     val shapeConnectFrom: StateFlow<Offset?> get() = shapes.connectFrom
 
     fun openShapePicker() = shapes.openPicker()
+    fun openGraphPicker() = shapes.openGraphPicker()
+    val shapePickerGraphsOnly: StateFlow<Boolean> get() = shapes.graphsOnly
     fun closeShapePicker() { addAnchor = null; shapes.closePicker() }
     fun selectShape(kind: ShapeKind) = selectShapeId(kind.name)
     fun selectShapeId(id: String) {

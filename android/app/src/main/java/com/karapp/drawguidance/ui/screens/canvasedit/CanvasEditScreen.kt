@@ -2,6 +2,8 @@ package com.karapp.drawguidance.ui.screens.canvasedit
 
 import androidx.compose.material.icons.filled.Straighten
 import androidx.compose.material.icons.filled.Functions
+import androidx.compose.material.icons.filled.ShowChart
+import androidx.compose.material.icons.filled.TableChart
 import androidx.compose.material.icons.filled.Draw
 import androidx.compose.ui.platform.testTag
 import androidx.compose.material.icons.filled.Link
@@ -291,6 +293,8 @@ fun CanvasEditScreen(
     val dirty by viewModel.dirty.collectAsState()
     val lastAddItem by viewModel.lastAddItem.collectAsState()
     val isFormulaPickerOpen by viewModel.isFormulaPickerOpen.collectAsState()
+    val shapePickerGraphsOnly by viewModel.shapePickerGraphsOnly.collectAsState()
+    val tableCreateOpen by viewModel.tables.createOpen.collectAsState()
     val formulaTemplate by viewModel.formulaTemplate.collectAsState()
     val selectedFormula by viewModel.selectedFormula.collectAsState()
     val formulaEditing by viewModel.formulaEditing.collectAsState()
@@ -691,6 +695,9 @@ fun CanvasEditScreen(
     val addItems = listOfNotNull(
         com.karapp.drawguidance.ui.screens.canvasedit.components.AddMenuItem("shape", stringResource(R.string.add_shape), Icons.Filled.Category) { viewModel.openShapePicker() },
         if (notes) com.karapp.drawguidance.ui.screens.canvasedit.components.AddMenuItem("formula", stringResource(R.string.add_formula), Icons.Filled.Functions) { viewModel.openFormulaPicker() } else null,
+        // v52 grafik ve tablo ayrı düğmelerde
+        if (notes) com.karapp.drawguidance.ui.screens.canvasedit.components.AddMenuItem("graph", stringResource(R.string.v52_add_graph), Icons.Filled.ShowChart) { viewModel.openGraphPicker() } else null,
+        if (notes) com.karapp.drawguidance.ui.screens.canvasedit.components.AddMenuItem("table", stringResource(R.string.v52_add_table), Icons.Filled.TableChart) { viewModel.tables.openCreate() } else null,
         com.karapp.drawguidance.ui.screens.canvasedit.components.AddMenuItem("text", stringResource(R.string.add_text), Icons.Filled.TextFields) { viewModel.startAction(EditMode.TEXT) },
         if (notes) com.karapp.drawguidance.ui.screens.canvasedit.components.AddMenuItem("diagram", stringResource(R.string.add_diagram), Icons.Filled.AccountTree) { viewModel.openDiagramPicker() } else null,
         // v45 not alma panelleri: çizim alanını çerçeveli bölümlere ayıran yerleşimler
@@ -998,6 +1005,9 @@ fun CanvasEditScreen(
         // v35 basit notta formül (bütün katalog) ve diyagram şeklin hemen ardında; arka plan her basit türde görünür yerde
         if (kind.isNotes) {
             add(com.karapp.drawguidance.ui.screens.canvasedit.components.SimpleTool("formula", Icons.Filled.Functions, simpleTexts.formula, mode == EditMode.FORMULA, viewModel::openFormulaPicker))
+            // v52 grafik (şekil penceresinden ayrıldı) ve tablo ayrı düğmelerde, formülün hemen ardında
+            add(com.karapp.drawguidance.ui.screens.canvasedit.components.SimpleTool("graph", Icons.Filled.ShowChart, stringResource(R.string.v52_graph_short), isShapePickerOpen && shapePickerGraphsOnly, viewModel::openGraphPicker))
+            add(com.karapp.drawguidance.ui.screens.canvasedit.components.SimpleTool("table", Icons.Filled.TableChart, stringResource(R.string.v52_table_short), tableCreateOpen, viewModel.tables::openCreate))
             add(com.karapp.drawguidance.ui.screens.canvasedit.components.SimpleTool("diagram", Icons.Filled.AccountTree, simpleTexts.diagram, mode == EditMode.DIAGRAM || mode == EditMode.DIAGRAM_EDIT, viewModel::openDiagramPicker))
             // v45 inmiş not paketlerinin şekilleri/diyagram resimleri basit notta da (gelişmiş not almadaki gibi; paket varsa)
             if (com.karapp.drawguidance.ui.screens.canvasedit.components.PackWindows.hasAny(installedPacks, kind.packMode())) add(com.karapp.drawguidance.ui.screens.canvasedit.components.SimpleTool("packs", Icons.Filled.Inventory2, stringResource(R.string.v43_add_packs), packsOpen, { packsOpen = true }))
@@ -2262,6 +2272,9 @@ fun CanvasEditScreen(
                 fillHex = shapeStyle.fillColorHex,
                 onFillChange = viewModel::setNewShapeFill,
                 // v25 3B şekiller artık Ekle menüsünde ayrı "3B şekil ekle" seçeneğinde
+                // v52 not almada grafikler ayrı "Grafik ekle" penceresinde
+                graphs = if (kind.isNotes) shapePickerGraphsOnly else null,
+                title = if (kind.isNotes && shapePickerGraphsOnly) stringResource(R.string.v52_add_graph) else null,
             )
         }
 
@@ -2507,6 +2520,15 @@ fun CanvasEditScreen(
                 onClear = { perspectiveOpen = false; viewModel.clearGuides() },
             )
         }
+
+        // v52 not almada tablo ekleme ve düzenleme
+        if (tableCreateOpen) {
+            com.karapp.drawguidance.ui.screens.canvasedit.components.TableCreateSheet(
+                onDismiss = viewModel.tables::closeCreate,
+                onCreate = { viewModel.tables.create(it) },
+            )
+        }
+        com.karapp.drawguidance.ui.screens.canvasedit.components.TableEditSheet(viewModel)
 
         if (isFormulaPickerOpen) {
             com.karapp.drawguidance.ui.screens.canvasedit.components.FormulaPickerModal(

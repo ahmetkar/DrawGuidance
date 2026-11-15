@@ -55,6 +55,9 @@ interface EditorHost {
     fun editShapeElsewhere(shape: com.karapp.drawguidance.data.model.Stroke): Boolean = false
     /** v52 şekil başka yerde düzenlenebilir mi ("Şekli düzenle" not almada da gösterilir). */
     val canEditShapeElsewhere: Boolean get() = false
+
+    /** v52 tablo düzenleme penceresini açar (not almada tablo). */
+    fun editTable(id: String): Boolean = false
     val scope: CoroutineScope
     fun emit(event: EditEvent)
 }

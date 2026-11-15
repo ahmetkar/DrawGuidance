@@ -68,6 +68,9 @@ open class DrawGuidanceApp : Application() {
         runCatching { com.karapp.drawguidance.diagnostics.SessionWatch.install(this) }
         // v18: sürüm ve bellek yetenekleri (sınırlar ve önbellekler buna göre)
         com.karapp.drawguidance.platform.DeviceCaps.init(this)
+        // v52 büyük tuval içeriği (uzun çizimde 2 MB'ı aşan satır) veritabanından okunurken Android 9+ "Row too big to
+        // fit into CursorWindow" ile çöküyordu (yarım saatlik çizimden sonra uygulamadan atma). Pencere büyütülür.
+        com.karapp.drawguidance.platform.CursorWindowFix.apply()
         // v18: tablet kalemi algılama ve kalem ayarları
         runCatching { com.karapp.drawguidance.platform.Stylus.init(this) }
         com.karapp.drawguidance.ui.drawing.FontRegistry.init(this)
@@ -184,13 +187,23 @@ open class DrawGuidanceApp : Application() {
         }, "dg-warmup").apply { priority = Thread.MIN_PRIORITY; isDaemon = true }.start()
     }
 
+    @Suppress("DEPRECATION")
+    override fun onLowMemory() {
+        super.onLowMemory()
+        runCatching { com.karapp.drawguidance.diagnostics.AppErrors.breadcrumb("bellek çok az (onLowMemory)") }
+        com.karapp.drawguidance.platform.DeviceCaps.trimMemory()
+    }
+
     /** v18: sistem bellek istediğinde (arka planda ya da bellek azken) resim önbellekleri bırakılır. */
     override fun onTrimMemory(level: Int) {
         super.onTrimMemory(level)
         // v42 bellek baskısı rapor izine yazılır (beklenmedik kapanmanın nedeni anlaşılsın)
         if (level >= 10) runCatching { com.karapp.drawguidance.diagnostics.AppErrors.breadcrumb("bellek baskısı: $level") }
         @Suppress("DEPRECATION")
-        if (level >= android.content.ComponentCallbacks2.TRIM_MEMORY_BACKGROUND || level == android.content.ComponentCallbacks2.TRIM_MEMORY_RUNNING_LOW) {
+        // v52 ön plandayken bellek azalmaya başlayınca (RUNNING_MODERATE) da önbellekler bırakılır: uzun kullanımda
+        // (30 dk+) sistemin uygulamayı kapatması önlenir
+        if (level >= android.content.ComponentCallbacks2.TRIM_MEMORY_BACKGROUND || level == android.content.ComponentCallbacks2.TRIM_MEMORY_RUNNING_LOW ||
+            level == android.content.ComponentCallbacks2.TRIM_MEMORY_RUNNING_MODERATE || level == android.content.ComponentCallbacks2.TRIM_MEMORY_RUNNING_CRITICAL) {
             com.karapp.drawguidance.platform.DeviceCaps.trimMemory()
         }
     }

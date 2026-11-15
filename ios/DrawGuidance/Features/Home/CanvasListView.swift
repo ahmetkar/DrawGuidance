@@ -32,6 +32,12 @@ enum CanvasCreator {
 }
 
 /// Tuvalin küçük resmi (Android `CanvasThumbnail`): arka planda küçük boyda çizilir.
+/// v52 tuval önizlemelerinin bellek önbelleği (bellek uyarısında sistem boşaltır).
+final class ThumbnailBox { let image: CGImage; init(_ i: CGImage) { image = i } }
+enum ThumbnailCache {
+    nonisolated(unsafe) static let shared: NSCache<NSString, ThumbnailBox> = { let c = NSCache<NSString, ThumbnailBox>(); c.totalCostLimit = 24 * 1024 * 1024; return c }()
+}
+
 struct CanvasThumbnail: View {
     let canvas: CanvasUi
     var side: CGFloat = 240
@@ -44,8 +50,13 @@ struct CanvasThumbnail: View {
         }
         .task(id: "\(canvas.localId)@\(canvas.updatedAt)") {
             let c = canvas
+            let key = "\(c.localId)@\(c.updatedAt)@\(Int(side))" as NSString
+            // v52 önizlemeler önbellekte: liste her göründüğünde bütün tuvaller yeniden çizilmez
+            if let cached = ThumbnailCache.shared.object(forKey: key) { image = cached.image; return }
             let scale = Float(side) * 2 / Float(max(c.width, c.height, 1))
-            image = await Task.detached(priority: .utility) { ImageExporter().render(c, scale: min(scale, 1)) }.value
+            let rendered = await Task.detached(priority: .utility) { ImageExporter().render(c, scale: min(scale, 1)) }.value
+            if let rendered { ThumbnailCache.shared.setObject(ThumbnailBox(rendered), forKey: key, cost: rendered.width * rendered.height * 4) }
+            image = rendered
         }
     }
 }

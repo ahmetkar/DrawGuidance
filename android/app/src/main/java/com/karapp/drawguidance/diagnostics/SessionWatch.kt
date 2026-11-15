@@ -95,6 +95,8 @@ object SessionWatch {
         val trace = buildString {
             appendLine("Önceki çalışma ön plandayken beklenmedik şekilde kapandı (yerel çökme, donma ya da bellek yetersizliği olabilir).")
             appendLine("Son ekran: ${lastScreen.ifBlank { "-" }}")
+            // v52 güvenlik denetiminin (freeRASP) kapattığı çalışma ayrıca belirtilir
+            com.karapp.drawguidance.security.TalsecGuard.takeLastExit(context)?.let { appendLine("Güvenlik kapatması: $it") }
             appendLine()
             appendLine("--- Bellek ---")
             appendLine(memoryInfo(context))

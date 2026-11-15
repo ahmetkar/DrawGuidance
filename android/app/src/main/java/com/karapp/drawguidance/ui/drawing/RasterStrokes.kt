@@ -41,9 +41,9 @@ internal object RasterStrokes {
         val bytes: Int get() = color.byteCount + mask.byteCount
     }
 
-    private val cache = object : android.util.LruCache<String, Entry>(CACHE_BYTES) {
+    private val cache = object : android.util.LruCache<String, Entry>(com.karapp.drawguidance.platform.DeviceCaps.secondaryCacheBytes(CACHE_BYTES)) {
         override fun sizeOf(key: String, value: Entry): Int = value.bytes
-    }
+    }.also { c -> com.karapp.drawguidance.platform.DeviceCaps.onTrim { synchronized(c) { c.evictAll() } } }
 
     private val addPaint = Paint(Paint.FILTER_BITMAP_FLAG).apply { xfermode = PorterDuffXfermode(PorterDuff.Mode.ADD) }
     private val clearPaint = Paint(Paint.FILTER_BITMAP_FLAG).apply { xfermode = PorterDuffXfermode(PorterDuff.Mode.DST_OUT) }

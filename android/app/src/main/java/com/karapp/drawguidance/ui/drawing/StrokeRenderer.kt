@@ -130,7 +130,7 @@ object StrokeRenderer {
     /** Kayıtlı izlerin toplam ağırlığı (nokta sayısı × motor katsayısı) sınırlıdır: eskiler atılır. */
     private val pictures = object : android.util.LruCache<String, StrokePicture>(PICTURE_BUDGET) {
         override fun sizeOf(key: String, value: StrokePicture): Int = pictureWeight(value.source)
-    }
+    }.also { c -> com.karapp.drawguidance.platform.DeviceCaps.onTrim { c.evictAll() } }
 
     private fun pictureWeight(stroke: Stroke): Int {
         val engine = stroke.brushType.style().engine

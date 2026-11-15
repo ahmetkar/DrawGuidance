@@ -56,9 +56,29 @@ class AdMobGateway : AdsGateway {
         )
     }
 
+    private val ready = AtomicBoolean(false)
+    private val waiting = java.util.concurrent.ConcurrentLinkedQueue<() -> Unit>()
+
     override fun initialize(context: Context, onComplete: () -> Unit) {
-        if (!initialized.compareAndSet(false, true)) { onComplete(); return }
-        MobileAds.initialize(context.applicationContext) { onComplete() }
+        if (ready.get()) { onComplete(); return }
+        waiting += onComplete
+        if (!initialized.compareAndSet(false, true)) return
+        // v52 MobileAds.initialize ana iş parçacığını uzun süre tutabiliyor (açılışta donma/ANR; Google arka planda
+        // başlatmayı öneriyor): arka planda başlatılır, sonuç ana iş parçacığına döner
+        val app = context.applicationContext
+        val main = android.os.Handler(android.os.Looper.getMainLooper())
+        Thread({
+            runCatching {
+                MobileAds.initialize(app) {
+                    main.post {
+                        ready.set(true)
+                        while (true) { val cb = waiting.poll() ?: break; cb() }
+                    }
+                }
+            }.onFailure {
+                main.post { ready.set(true); while (true) { val cb = waiting.poll() ?: break; cb() } }
+            }
+        }, "dg-ads-init").apply { isDaemon = true }.start()
     }
 
     override val interstitialReady: Boolean get() = interstitial != null

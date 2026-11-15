@@ -26,10 +26,15 @@ final class CanvasStore: ObservableObject {
     let files: CanvasFiles
     let saveQueue: CanvasSaveQueue
 
+    /// v52 liste ilk kez arka planda yüklendi mi (yüklenene kadar boş liste gösterilir).
+    @Published private(set) var loaded = false
+
     init(directory: URL? = nil) {
         files = directory.map { CanvasFiles(root: $0) } ?? .shared
         saveQueue = CanvasSaveQueue(files: files)
-        reload()
+        // v52 uygulamanın kendi deposu açılışta arka planda okunur: bütün tuvallerin içeriği ana iş parçacığında
+        // çözülüyordu (çok tuvalde açılışta donma). Testlerin geçici klasörleri eşzamanlı okunur.
+        if directory == nil { reloadInBackground() } else { reload(); loaded = true }
         saveQueue.onSaved = { [weak self] id in
             Task { @MainActor in self?.refresh(id) }
         }
@@ -118,6 +123,24 @@ final class CanvasStore: ObservableObject {
         }
         // v51 not almanın geçici resim tuvalleri listelerde görünmez
         canvases = ids.filter { !TempCanvases.isTemp($0) }.compactMap { id in files.queue.sync { files.load(id) } }.sorted { $0.updatedAt > $1.updatedAt }
+    }
+
+    /// v52 bütün tuvalleri arka planda okur; bu sırada eklenen/güncellenen tuvaller korunur (yenisi kazanır).
+    func reloadInBackground() {
+        let files = self.files
+        files.queue.async { [weak self] in
+            let ids = ((try? FileManager.default.contentsOfDirectory(at: files.root, includingPropertiesForKeys: nil)) ?? []).map(\.lastPathComponent)
+            let all = ids.compactMap { files.load($0) }
+            DispatchQueue.main.async {
+                guard let self else { return }
+                var byId = [String: CanvasUi]()
+                // Yükleme sürerken silinenler geri gelmesin
+                for c in all where !TempCanvases.isTemp(c.localId) && FileManager.default.fileExists(atPath: files.dir(c.localId).path) { byId[c.localId] = c }
+                for c in self.canvases { if let old = byId[c.localId], old.updatedAt > c.updatedAt { continue }; byId[c.localId] = c }
+                self.canvases = byId.values.sorted { $0.updatedAt > $1.updatedAt }
+                self.loaded = true
+            }
+        }
     }
 
     /// Kayıttan sonra listedeki tuvali yeniler.

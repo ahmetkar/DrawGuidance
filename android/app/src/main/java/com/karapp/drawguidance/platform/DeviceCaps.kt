@@ -118,6 +118,18 @@ object DeviceCaps {
             return bytes.toInt()
         }
 
+    /**
+     * v52 ikincil çizim önbelleklerinin (piksel fırça sonuçları, uyum işlenmiş resimler) bütçesi: düşük bellekli
+     * cihazlarda küçük. Eskiden sabit 64 MB + 32 MB'tı; 2-3 GB'lık cihazlarda uzun kullanımda bellek taşmasına katkı
+     * veriyordu.
+     */
+    fun secondaryCacheBytes(max: Int): Int {
+        var bytes = max.toLong()
+        if (lowRam) bytes = min(bytes, 12L * 1024 * 1024)
+        budget(0.06f)?.let { bytes = min(bytes, max(it, 8L * 1024 * 1024)) }
+        return bytes.toInt()
+    }
+
     /** Bellek yetersiz uyarısı gelince bırakılabilecek önbellekler bu dinleyicilerle temizlenir. */
     private val trimListeners = java.util.concurrent.CopyOnWriteArrayList<() -> Unit>()
 

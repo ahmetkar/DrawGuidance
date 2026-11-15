@@ -42,10 +42,12 @@ object TalsecGuard {
     )
 
     @Volatile private var started = false
+    @Volatile private var appContext: Context? = null
 
     fun start(context: Context) {
         if (started) return
         started = true
+        appContext = context.applicationContext
         // Robolectric/birim testlerinde yerel güvenlik kitaplığı (androidx.security.BNatives) yüklenemez;
         // freeRASP yalnız gerçek cihazda anlamlı olduğundan JVM testlerinde atlanır.
         if (android.os.Build.FINGERPRINT == "robolectric") return
@@ -69,6 +71,12 @@ object TalsecGuard {
     private fun fatal(reason: String) {
         AppLog.e(TAG, "Güvenlik tehdidi: $reason", null)
         if (BuildConfig.DEBUG) return
+        // v52 güvenlik kapatması kaydedilir (sessiz "uygulamadan atma" şikâyetinde nedeni sonraki açılışta görülsün)
+        runCatching {
+            appContext?.getSharedPreferences("security_exit", Context.MODE_PRIVATE)?.edit()
+                ?.putString("reason", reason)?.putLong("at", System.currentTimeMillis())?.commit()
+            com.karapp.drawguidance.diagnostics.AppErrors.breadcrumb("güvenlik kapatması: $reason")
+        }
         runCatching { android.os.Process.killProcess(android.os.Process.myPid()) }
         exitProcess(0)
     }
@@ -95,4 +103,12 @@ object TalsecGuard {
     }
 
     private const val TAG = "Talsec"
+
+    /** v52 önceki çalışma güvenlik denetimiyle kapatıldıysa nedeni (bir kez okunur). */
+    fun takeLastExit(context: Context): String? {
+        val p = context.getSharedPreferences("security_exit", Context.MODE_PRIVATE)
+        val reason = p.getString("reason", null) ?: return null
+        p.edit().clear().apply()
+        return reason
+    }
 }

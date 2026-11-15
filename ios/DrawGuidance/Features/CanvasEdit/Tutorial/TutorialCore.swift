@@ -243,7 +243,20 @@ final class TutorialController: ObservableObject {
         }
     }
 
-    func cancel() { job?.cancel(); job = nil; stop() }
+    func cancel() {
+        guard let j = job else { stop(); return }
+        job = nil
+        j.cancel()
+        ui = nil
+        live = TutorialLive()
+        // İptal edilen gösterim bir sonraki bekleme noktasında hızla biter; o ana dek yazdıkları deneme sayfasında kalsın
+        // diye sayfa gösterim bitince geri yüklenir (yoksa son çizgi kullanıcının tuvaline ve geri alma geçmişine düşüyordu)
+        Task { [weak self] in
+            await j.value
+            guard let self, self.ui == nil else { return }
+            self.stop()
+        }
+    }
 
     func finish() {
         guard let u = ui else { return }

@@ -121,6 +121,10 @@ import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.ui.semantics.selected
 import com.karapp.drawguidance.R
 import com.karapp.drawguidance.content.model3d.Brush3Kind
 import com.karapp.drawguidance.content.model3d.DrawPlane
@@ -408,6 +412,8 @@ private fun SceneArea(
             }
             if (!hintOn) NeuIconButton(Icons.Filled.HelpOutline, stringResource(R.string.model3d_hint_show), { hintOn = true }, size = 32.dp)
         }
+        // v52 düzenlemede eksen seçimi sağda: Serbest / X / Y / Z (taşı, döndür, ölçekle bu eksende)
+        if (mode == Mode3.SELECT || mode == Mode3.EDIT) AxisRail(vm, Modifier.align(Alignment.CenterEnd).padding(end = 8.dp))
         // v26 seçim çipi: neyin seçili olduğu (dokununca Parçalar paneli)
         SelectionChip(vm, selection, model, Modifier.align(Alignment.BottomCenter).padding(bottom = 10.dp))
         // v27 çizim önerisi: çizgiden sonra 1–3 cisim; dokununca çizimin yerine geçer
@@ -754,6 +760,32 @@ private fun ContextRow(vm: Model3DEditorViewModel, mode: Mode3, tool: Tool3, sel
                     Modifier.align(Alignment.CenterEnd).width(24.dp).height(ROW_H + 4.dp)
                         .background(androidx.compose.ui.graphics.Brush.horizontalGradient(listOf(bg.copy(alpha = 0f), bg))),
                 )
+            }
+        }
+    }
+}
+
+/** v52 sahnenin sağında dikey eksen seçimi (eksen renkleri: X kırmızı, Y yeşil, Z mavi). */
+@Composable
+private fun AxisRail(vm: Model3DEditorViewModel, modifier: Modifier = Modifier) {
+    val axis by vm.axis.collectAsState()
+    val colors = NeuTheme.colors
+    val free = stringResource(R.string.model3d_axis_free)
+    Column(
+        modifier.background(colors.background.copy(alpha = 0.9f), RoundedCornerShape(16.dp)).padding(5.dp).testTag("model3d_axis_rail"),
+        verticalArrangement = Arrangement.spacedBy(5.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
+        listOf(Triple(-1, "✥", colors.accent), Triple(0, "X", Color(0xFFE53935)), Triple(1, "Y", Color(0xFF43A047)), Triple(2, "Z", Color(0xFF1E88E5))).forEach { (a, label, tint) ->
+            val on = axis == a
+            val desc = if (a < 0) free else stringResource(R.string.model3d_axis_cycle, label)
+            Box(
+                Modifier.size(40.dp).clip(CircleShape).background(if (on) tint else tint.copy(alpha = 0.14f))
+                    .clickable(role = androidx.compose.ui.semantics.Role.RadioButton) { vm.setAxis(a) }
+                    .semantics { contentDescription = desc; selected = on }.testTag("model3d_axis_" + if (a < 0) "free" else label.lowercase()),
+                contentAlignment = Alignment.Center,
+            ) {
+                Text(label, color = if (on) Color.White else tint, fontWeight = FontWeight.Bold, fontSize = 15.sp, translate = false)
             }
         }
     }

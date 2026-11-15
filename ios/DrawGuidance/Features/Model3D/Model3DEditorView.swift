@@ -173,6 +173,10 @@ private struct SceneArea3: View {
     var body: some View {
         ZStack {
             Model3DViewport(vm: vm)
+            // v52 düzenlemede eksen seçimi sağda: Serbest / X / Y / Z
+            if vm.mode == .SELECT || vm.mode == .EDIT {
+                HStack { Spacer(); AxisRail3(vm: vm) }.padding(.trailing, 8)
+            }
             VStack {
                 HStack(alignment: .top) {
                     if hintOn {
@@ -643,5 +647,32 @@ private struct PanelFrame3: View {
         case .BRUSH: return "model3d_panel_brush"
         case .OPS: return "model3d_panel_ops"
         }
+    }
+}
+
+
+/// v52 sahnenin sağında dikey eksen seçimi (Android `AxisRail`): X kırmızı, Y yeşil, Z mavi.
+struct AxisRail3: View {
+    @ObservedObject var vm: Model3DEditorModel
+
+    var body: some View {
+        VStack(spacing: 5) {
+            ForEach([(-1, "✥", Color.accentColor), (0, "X", Color.red), (1, "Y", Color.green), (2, "Z", Color.blue)], id: \.0) { a, label, tint in
+                let on = vm.axis == a
+                Button { vm.setAxis(a) } label: {
+                    Text(label).font(.system(size: 15, weight: .bold))
+                        .foregroundStyle(on ? Color.white : tint)
+                        .frame(width: 40, height: 40)
+                        .background(Circle().fill(on ? tint : tint.opacity(0.14)))
+                }
+                .buttonStyle(.plain)
+                .accessibilityLabel(a < 0 ? L("model3d_axis_free") : L("model3d_axis_cycle", label))
+                .accessibilityAddTraits(on ? .isSelected : [])
+                .accessibilityIdentifier("model3d_axis_\(a < 0 ? "free" : label.lowercased())")
+            }
+        }
+        .padding(5)
+        .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 16))
+        .accessibilityIdentifier("model3d_axis_rail")
     }
 }

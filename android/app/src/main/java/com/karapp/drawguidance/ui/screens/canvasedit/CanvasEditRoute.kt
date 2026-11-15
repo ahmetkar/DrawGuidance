@@ -114,10 +114,29 @@ private fun androidx.compose.foundation.layout.BoxScope.LiveBroadcastBridge(canv
         share.resumeLive(canvasLocalId)
         vm.canvas.collect { c -> if (c != null) share.publishLive(c) }
     }
+    // v52 düzenleyiciden başka bir ekrana geçilince (ya da uygulama arka plana alınınca) yayına ara verilir; geri
+    // dönülünce yukarıdaki etki yayını sürdürür
+    androidx.compose.runtime.DisposableEffect(canvasLocalId) {
+        onDispose { share.pauseLive(canvasLocalId) }
+    }
+    val lifecycle = androidx.lifecycle.compose.LocalLifecycleOwner.current.lifecycle
+    androidx.compose.runtime.DisposableEffect(lifecycle, canvasLocalId) {
+        val observer = androidx.lifecycle.LifecycleEventObserver { _, e ->
+            when (e) {
+                androidx.lifecycle.Lifecycle.Event.ON_STOP -> share.pauseLive(canvasLocalId)
+                androidx.lifecycle.Lifecycle.Event.ON_START -> { share.resumeLive(canvasLocalId); vm.canvas.value?.let(share::publishLive) }
+                else -> Unit
+            }
+        }
+        lifecycle.addObserver(observer)
+        onDispose { lifecycle.removeObserver(observer) }
+    }
     val canvas by vm.canvas.collectAsState()
     com.karapp.drawguidance.ui.screens.share.LiveBroadcastBadge(
         canvasName = canvas?.name.orEmpty(),
         peerName = live.peerName,
+        paused = live.paused,
+        startedAt = live.startedAt,
         onStop = share::stopLive,
         modifier = androidx.compose.ui.Modifier.align(androidx.compose.ui.Alignment.BottomCenter)
             .navigationBarsPadding().padding(bottom = 6.dp),

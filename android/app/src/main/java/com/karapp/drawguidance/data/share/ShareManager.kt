@@ -44,7 +44,7 @@ data class SharePeer(
 data class ShareConnectionRequest(val key: String, val name: String, val platform: String, val code: String?)
 data class ShareIncomingOffer(val key: String, val peerName: String, val offer: ShareOffer)
 data class ShareTransferStatus(val peerName: String, val title: String, val sending: Boolean, val progress: Float? = null)
-data class ShareLiveOut(val canvasId: String, val peerKey: String, val peerName: String, val paused: Boolean = false)
+data class ShareLiveOut(val canvasId: String, val peerKey: String, val peerName: String, val paused: Boolean = false, val startedAt: Long = System.currentTimeMillis(), val sentFrames: Int = 0)
 data class ShareLiveIn(val canvasId: String, val peerKey: String, val peerName: String, val ended: Boolean = false, val paused: Boolean = false)
 
 sealed interface ShareEvent {

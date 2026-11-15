@@ -17,6 +17,9 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Cast
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.foundation.layout.widthIn
+import androidx.compose.material.icons.filled.Stop
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Inbox
@@ -204,16 +207,40 @@ private fun LiveCanvas(c: CanvasUi, modifier: Modifier) {
 
 /** v51 yayın yapılan tuvalin düzenleyicisinde küçük "Yayında" etiketi (dokununca yayın durdurulabilir). */
 @Composable
-fun LiveBroadcastBadge(canvasName: String, peerName: String, onStop: () -> Unit, modifier: Modifier = Modifier) {
+fun LiveBroadcastBadge(canvasName: String, peerName: String, onStop: () -> Unit, modifier: Modifier = Modifier, paused: Boolean = false, startedAt: Long = 0L) {
     val colors = NeuTheme.colors
     var confirm by remember { mutableStateOf(false) }
+    // v52 çizim ekranında yayının genel bilgileri küçük bir çubukta: durum (canlı / ara verildi), alıcı cihaz, süre,
+    // tuval adı ve durdurma düğmesi
+    val now by androidx.compose.runtime.produceState(System.currentTimeMillis(), startedAt) {
+        while (true) { value = System.currentTimeMillis(); kotlinx.coroutines.delay(1000) }
+    }
+    val secs = if (startedAt > 0L) ((now - startedAt) / 1000).coerceAtLeast(0) else 0
+    val elapsed = if (secs >= 3600) "%d:%02d:%02d".format(secs / 3600, secs / 60 % 60, secs % 60) else "%02d:%02d".format(secs / 60, secs % 60)
+    val pulse = androidx.compose.animation.core.rememberInfiniteTransition(label = "live")
+    val dotAlpha by pulse.animateFloat(1f, 0.25f, androidx.compose.animation.core.infiniteRepeatable(androidx.compose.animation.core.tween<Float>(800), androidx.compose.animation.core.RepeatMode.Reverse), label = "dot")
+    val bg = if (paused) Color(0xFF8D6E00) else Color(0xFFC62828)
     Row(
-        modifier.clip(RoundedCornerShape(50)).background(Color(0xFFE53935)).clickable { confirm = true }
-            .padding(horizontal = 10.dp, vertical = 4.dp).testTag("share_live_badge"),
+        modifier.clip(RoundedCornerShape(50)).background(bg.copy(alpha = 0.94f)).clickable { confirm = true }
+            .padding(start = 10.dp, end = 4.dp, top = 3.dp, bottom = 3.dp).testTag("share_live_badge"),
         verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp),
     ) {
-        Box(Modifier.size(7.dp).clip(CircleShape).background(Color.White))
-        Text(stringResource(R.string.v51_share_live_badge) + " · " + peerName, color = Color.White, style = MaterialTheme.typography.labelMedium, translate = false, maxLines = 1)
+        Box(Modifier.size(8.dp).clip(CircleShape).background(Color.White.copy(alpha = if (paused) 1f else dotAlpha)))
+        Text(
+            stringResource(if (paused) R.string.v52_live_paused_badge else R.string.v51_share_live_badge),
+            color = Color.White, style = MaterialTheme.typography.labelMedium, fontWeight = androidx.compose.ui.text.font.FontWeight.Bold, maxLines = 1,
+        )
+        Icon(Icons.Filled.Cast, null, tint = Color.White, modifier = Modifier.size(14.dp))
+        Text(peerName, color = Color.White, style = MaterialTheme.typography.labelMedium, translate = false, maxLines = 1,
+            modifier = Modifier.widthIn(max = 120.dp), overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis)
+        Text("· $elapsed", color = Color.White.copy(alpha = 0.9f), style = MaterialTheme.typography.labelMedium, translate = false, maxLines = 1,
+            modifier = Modifier.testTag("share_live_elapsed"))
+        if (canvasName.isNotBlank()) Text("· $canvasName", color = Color.White.copy(alpha = 0.85f), style = MaterialTheme.typography.labelSmall, translate = false, maxLines = 1,
+            modifier = Modifier.widthIn(max = 110.dp), overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis)
+        Box(
+            Modifier.size(24.dp).clip(CircleShape).background(Color.White.copy(alpha = 0.22f)).clickable { confirm = true }.testTag("share_live_stop"),
+            contentAlignment = Alignment.Center,
+        ) { Icon(Icons.Filled.Stop, stringResource(R.string.v51_share_live_stop), tint = Color.White, modifier = Modifier.size(14.dp)) }
     }
     if (confirm) AlertDialog(
         onDismissRequest = { confirm = false },

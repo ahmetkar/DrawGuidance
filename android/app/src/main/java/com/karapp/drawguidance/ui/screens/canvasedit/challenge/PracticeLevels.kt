@@ -188,6 +188,26 @@ object PracticeLevels {
         k("hand_open", PracticeKind.TRACE, PracticeGroup.FIGURES, reward = true),
         k("figure_walking", PracticeKind.TRACE, PracticeGroup.FIGURES),
         k("figure_sitting", C, PracticeGroup.FIGURES, reward = true),
+        // v52 ödüllü reklamla açılan yeni alıştırmalar (ilk beşi basit resimde de)
+        l("radial", S, PracticeGroup.BASICS, reward = true),
+        l("value_scale", F, PracticeGroup.BASICS, 0.86f, reward = true),
+        l("mandala", S, PracticeGroup.PATTERNS, reward = true),
+        l("honeycomb", S, PracticeGroup.PATTERNS, reward = true),
+        l("scales", C, PracticeGroup.PATTERNS, reward = true),
+        k("horse", PracticeKind.TRACE, PracticeGroup.OBSERVE, reward = true),
+        k("elephant", C, PracticeGroup.OBSERVE, reward = true),
+        k("dog", PracticeKind.TRACE, PracticeGroup.OBSERVE, reward = true),
+        k("rabbit", PracticeKind.TRACE, PracticeGroup.OBSERVE, reward = true),
+        k("turtle", C, PracticeGroup.OBSERVE, reward = true),
+        k("castle_tower", M, PracticeGroup.OBSERVE, reward = true),
+        k("train", C, PracticeGroup.OBSERVE, reward = true),
+        k("sports_car", PracticeKind.TRACE, PracticeGroup.OBSERVE, reward = true),
+        k("pineapple", M, PracticeGroup.OBSERVE, reward = true),
+        k("strawberry", C, PracticeGroup.OBSERVE, reward = true),
+        k("figure_running", PracticeKind.TRACE, PracticeGroup.FIGURES, reward = true),
+        k("face_child", M, PracticeGroup.FIGURES, reward = true),
+        k("hair_styles", PracticeKind.TRACE, PracticeGroup.FIGURES, reward = true),
+        k("figure_child", C, PracticeGroup.FIGURES, reward = true),
     )
 
     /** Tuval türünde sunulan alıştırmalar: basit resimde temel olanlar, gelişmiş resimde hepsi; ötekilerde yok. */

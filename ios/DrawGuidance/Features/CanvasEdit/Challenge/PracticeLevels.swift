@@ -124,6 +124,14 @@ enum PracticeLevels {
         k("eye_detail", .COPY, .FIGURES), k("nose_detail", .TRACE, .FIGURES, reward: true), k("lips_detail", .MIRROR, .FIGURES),
         k("ear_detail", .COPY, .FIGURES), k("face_three_quarter", .TRACE, .FIGURES, reward: true), k("face_profile", .COPY, .FIGURES),
         k("hand_open", .TRACE, .FIGURES, reward: true), k("figure_walking", .TRACE, .FIGURES), k("figure_sitting", .COPY, .FIGURES, reward: true),
+        // v52 ödüllü reklamla açılan yeni alıştırmalar (Android ile aynı sıra; ilk beşi basit resimde de)
+        l("radial", .TIMED, .BASICS, reward: true), l("value_scale", .FADE, .BASICS, 0.86, reward: true),
+        l("mandala", .TIMED, .PATTERNS, reward: true), l("honeycomb", .TIMED, .PATTERNS, reward: true), l("scales", .COPY, .PATTERNS, reward: true),
+        k("horse", .TRACE, .OBSERVE, reward: true), k("elephant", .COPY, .OBSERVE, reward: true), k("dog", .TRACE, .OBSERVE, reward: true),
+        k("rabbit", .TRACE, .OBSERVE, reward: true), k("turtle", .COPY, .OBSERVE, reward: true), k("castle_tower", .MIRROR, .OBSERVE, reward: true),
+        k("train", .COPY, .OBSERVE, reward: true), k("sports_car", .TRACE, .OBSERVE, reward: true), k("pineapple", .MIRROR, .OBSERVE, reward: true),
+        k("strawberry", .COPY, .OBSERVE, reward: true), k("figure_running", .TRACE, .FIGURES, reward: true), k("face_child", .MIRROR, .FIGURES, reward: true),
+        k("hair_styles", .TRACE, .FIGURES, reward: true), k("figure_child", .COPY, .FIGURES, reward: true),
     ]
 
     static func forCanvas(_ kind: CanvasKind?) -> [PracticeLevel] {

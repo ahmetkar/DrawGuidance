@@ -50,7 +50,7 @@ object TutorialScripts {
             val m48 = TutorialV48.advanced(kind).steps
             listOf(
                 merge("art_basics", kind, R.string.tut51_draw, R.string.tut51_draw_text, Icons.Filled.Brush, false,
-                    artBasics().steps, a46.take(1), listOf(a40[1], a40[6])),
+                    artBasics().steps, a46.take(1), listOf(a40[1], a40[6], m48[1])),
                 merge("art_add", kind, R.string.tut51_edit, R.string.tut51_edit_text, Icons.Filled.Category, false,
                     artAdd().steps, a46.drop(1), a40.take(1), listOf(m48[0], m48[2])),
                 merge("art_guides", kind, R.string.tut51_guides, R.string.tut51_guides_text, Icons.Filled.Straighten, false,
@@ -100,14 +100,16 @@ object TutorialScripts {
                     n40.subList(3, 5)),
             )
         }
-        // v37 çocuklar için maskot Boyacık araçları tanıtır; sonraki araçlar (cetvel, taşıma, görev, kalıp) tek grupta.
+        // v37 çocuklar için maskot Boyacık araçları tanıtır; sonraki araçlar (cetvel, taşıma, görev) tek grupta, kalıpla çizme ayrı.
         // Maskotun yüz ifadesi adım nesnesine bağlı olduğundan çocuk adımları sarılmaz (sayfa temizlenmez).
         CanvasKind.KIDS -> listOf(
             TutorialKids.intro,
             TutorialGroup(
                 "kids_v40", kind, R.string.tut51_kids_more, R.string.tut51_kids_more_text, Icons.Filled.Straighten, false,
-                TutorialKids.whatsNew.steps.drop(1) + TutorialV48.kids.steps + TutorialV50.kids.steps,
+                TutorialKids.whatsNew.steps.drop(1) + TutorialV48.kids.steps,
             ),
+            // Kalıpla çizme ayrı işlev (yenilikler de bu grup)
+            TutorialV50.kids,
         )
     }
 

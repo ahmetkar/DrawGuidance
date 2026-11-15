@@ -81,7 +81,7 @@ class V41PlayShotsTest : V32EditorBase() {
     }
 
     @Test fun art() = mode(CanvasKind.ART, "Gün batımı", "art_basics", "play-01-resim")
-    @Test fun notes() = mode(CanvasKind.NOTES, "Fizik notu", "notes_formula", "play-02-not")
+    @Test fun notes() = mode(CanvasKind.NOTES, "Fizik notu", "simple_notes_v46", "play-02-not")
     @Test fun comic() = mode(CanvasKind.COMIC, "Kahraman", "comic_panels", "play-03-cizgi-roman")
     @Test fun kids() = mode(CanvasKind.KIDS, "Boyacık", "kids_intro", "play-04-cocuk")
     @Test fun simpleArt() = mode(CanvasKind.SIMPLE_ART, "Ev", "simple_art_intro", "play-05-basit-resim")

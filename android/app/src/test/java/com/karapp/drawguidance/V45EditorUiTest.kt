@@ -778,9 +778,12 @@ class V45TabletPortraitWindowsTest : V45EditorBase() {
         // Araç satırı: sürüklenir
         val home = rectOf(node("tool_row_draw"))
         val slop = 40f
-        dragHandle("window_drag:top_menu", Offset(-150f, 400f))
+        // v51 menü başlığın altında kendi satırında (solda): yana boş yer olan tarafa sürüklenir
+        val menu = rectOf(node("tablet_top_menu"))
+        val dx = when { root().right - menu.right >= 150f -> 150f; menu.left >= 150f -> -150f; else -> 0f }
+        dragHandle("window_drag:top_menu", Offset(dx, 400f))
         val moved = rectOf(node("tool_row_draw"))
-        assertEquals(home.left - 150f, moved.left, slop)
+        assertEquals(home.left + dx, moved.left, slop)
         assertEquals(home.top + 400f, moved.top, slop)
         val store = WindowPositionStore(compose.activity)
         assertTrue("konum saklanır", store.load(TabletWindows.TOP_MENU) != Offset.Zero)
@@ -822,16 +825,12 @@ class V45TabletPortraitWindowsTest : V45EditorBase() {
         waitFor { abs(rectOf(node(panelTag)).left - panel.left) < 1f }
         compose.runOnIdle { vm().closePanel() }
 
-        // Açılan pencere (Arka plan): sürüklenebilir pencere
+        // v51 ekranı kaplaması gereken pencere (Arka plan) dikey ekranda tabletde de tam ekran (sürüklenebilir pencere
+        // yatay tablette: V45TabletLandscapeWindowsTest)
         clickIn("tool_row_draw", "Arka plan")
-        waitFor { exists("floating_sheet") && exists("background_sheet") }
-        val sheet = rectOf(node("floating_sheet"))
-        dragHandle("window_drag:sheet", Offset(-100f, -300f))
-        val sheetMoved = rectOf(node("floating_sheet"))
-        assertEquals(sheet.top - 300f, sheetMoved.top, slop)
-        assertEquals(sheet.left - 100f, sheetMoved.left, slop)
-        dragHandle("window_drag:sheet", Offset(0f, -9000f))
-        assertTrue(rectOf(node("floating_sheet")).top >= -1f)
+        waitFor { exists("background_sheet") }
+        assertFalse(exists("floating_sheet"))
+        assertFalse(exists("docked_sheet"))
         shot("v45-tablet-portrait")
     }
 }
@@ -859,6 +858,23 @@ class V45TabletLandscapeWindowsTest : V45EditorBase() {
         // Gruplar tablette de
         assertGrouped("tool_row_draw")
         assertGrouped("mode_selector", vertical = true)
+    }
+
+    /** Yatay tablette açılan pencere (Arka plan) sürüklenebilir pencere; ekranın dışına çıkmaz. */
+    @Test
+    fun sheetIsDraggableWindowInLandscape() {
+        openKind("Yatay pencere", CanvasKind.ART)
+        waitFor { exists("tool_row_draw") }
+        clickIn("tool_row_draw", "Arka plan")
+        waitFor { exists("floating_sheet") && exists("background_sheet") }
+        val slop = 40f
+        val sheet = rectOf(node("floating_sheet"))
+        dragHandle("window_drag:sheet", Offset(-100f, -300f))
+        val sheetMoved = rectOf(node("floating_sheet"))
+        assertEquals(sheet.top - 300f, sheetMoved.top, slop)
+        assertEquals(sheet.left - 100f, sheetMoved.left, slop)
+        dragHandle("window_drag:sheet", Offset(0f, -9000f))
+        assertTrue(rectOf(node("floating_sheet")).top >= -1f)
     }
 }
 

@@ -18,7 +18,7 @@ import org.robolectric.annotation.Config
 import org.robolectric.annotation.GraphicsMode
 
 /**
- * v40/v41 eğitimleri: her türün yenilikler grubu (gelişmiş türlerde "Yeni", basit resim ve basit notta tanıtım, çocukta
+ * v40/v41 eğitimleri (v51 işlev gruplarında): her türün cetvel/yardımcılar grubu (gelişmiş türlerde "Yeni", basit resim ve basit notta tanıtım, çocukta
  * yenilikler) baştan sona oynar; cetvel adımları ayrı Cetvel / Şekil kalıbı düğmelerini ve cetvelin yanındaki
  * tutamak düğmelerini gösterir; eğitim bitince tuval eski haline döner ve grup tamamlanmış sayılır.
  */
@@ -65,9 +65,9 @@ class V41TutorialsTest : V32EditorBase() {
         assertTrue("cetvel kapandı", !exists("ruler_overlay"))
     }
 
-    @Test fun artWhatsNew() = playGroup(CanvasKind.ART, "art_v40", "v41-tut-art")
-    @Test fun notesWhatsNew() = playGroup(CanvasKind.NOTES, "notes_v40", "v41-tut-notes")
-    @Test fun comicWhatsNew() = playGroup(CanvasKind.COMIC, "comic_v40", "v41-tut-comic")
+    @Test fun artWhatsNew() = playGroup(CanvasKind.ART, "art_guides", "v41-tut-art")
+    @Test fun notesWhatsNew() = playGroup(CanvasKind.NOTES, "simple_notes_guides", "v41-tut-notes")
+    @Test fun comicWhatsNew() = playGroup(CanvasKind.COMIC, "comic_guides", "v41-tut-comic")
     @Test fun simpleArtIntro() = playGroup(CanvasKind.SIMPLE_ART, "simple_art_intro", "v41-tut-simple-art")
     @Test fun simpleNotesIntro() = playGroup(CanvasKind.NOTES, "simple_notes_intro", "v41-tut-simple-notes")
     @Test fun kidsWhatsNew() = playGroup(CanvasKind.KIDS, "kids_v40", "v41-tut-kids")
@@ -79,10 +79,13 @@ class V41TutorialsTest : V32EditorBase() {
         for (kind in listOf(CanvasKind.ART, CanvasKind.NOTES, CanvasKind.COMIC, CanvasKind.KIDS)) {
             val fresh = TutorialScripts.whatsNew(kind)
             assertNotNull(kind.name, fresh)
-            assertTrue(kind.name, TutorialScripts.groups(kind).any { it.id == fresh!!.id })
+            // v51 yenilikler ya kendi grubu ya da adımları türün işlev gruplarında
+            val all = TutorialScripts.groups(kind).flatMap { it.steps }
+            assertTrue(kind.name, TutorialScripts.groups(kind).any { it.id == fresh!!.id } ||
+                fresh!!.steps.all { st -> all.any { it.title == st.title && it.anchor == st.anchor } })
         }
-        // v48 yenilikler yeni menü sistemini tanıtır (mod menüsü, Özellikler, Taşı/Genişlet)
-        val comic = TutorialScripts.groups(CanvasKind.COMIC).first { it.id == "v48_advanced_comic" }
+        // v48 yenilikler yeni menü sistemini tanıtır (mod menüsü, Özellikler, Taşı/Genişlet); v51 seçim ve yardımcılar grubunda
+        val comic = TutorialScripts.groups(CanvasKind.COMIC).first { it.id == "comic_guides" }
         assertTrue(comic.steps.any { it.anchor == com.karapp.drawguidance.ui.screens.canvasedit.tutorial.TutorialAnchor.BRUSH_SETTINGS })
         // Mekân arka planı eğitimi çizgi romanın tüm grupları arasında korunur
         assertTrue(TutorialScripts.groups(CanvasKind.COMIC).any { g -> g.steps.any { it.anchor == com.karapp.drawguidance.ui.screens.canvasedit.tutorial.TutorialAnchor.add("locations") } })

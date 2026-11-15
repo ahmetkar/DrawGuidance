@@ -177,7 +177,7 @@ abstract class V50StoreShotsBase : V32EditorBase() {
         shot(shotName("02-resim"))
     }
 
-    @Test fun notes() = tutorialShot(CanvasKind.NOTES, "notes_name", "notes_formula", "03-not")
+    @Test fun notes() = tutorialShot(CanvasKind.NOTES, "notes_name", "simple_notes_v46", "03-not")
     @Test fun kids() = tutorialShot(CanvasKind.KIDS, "kids_name", "kids_intro", "04-cocuk")
     @Test fun simpleArt() = tutorialShot(CanvasKind.SIMPLE_ART, "simple_name", "simple_art_intro", "05-basit-resim")
     @Test fun simpleNotes() = tutorialShot(CanvasKind.NOTES, "simple_notes_name", "simple_notes_intro", "07-basit-not")

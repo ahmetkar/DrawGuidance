@@ -1274,12 +1274,12 @@ fun CanvasEditScreen(
                         com.karapp.drawguidance.ui.components.LocalButtonLabels provides landscape,
                         com.karapp.drawguidance.ui.components.LocalInlineLabels provides (!landscape && !simple),
                     ) {
-                        Row(
-                            Modifier.fillMaxWidth().padding(horizontal = 16.dp).tabletWindow(topMenuWindow).testTag("tablet_top_menu"),
-                            verticalAlignment = Alignment.CenterVertically,
-                        ) {
-                            topMenuWindow?.let { com.karapp.drawguidance.ui.screens.canvasedit.components.WindowDragHandle(it) }
-                            Box(Modifier.weight(1f), contentAlignment = Alignment.CenterStart) { topRow(false) }
+                        // Pencere menünün kendisi kadar (tam genişlik olsaydı sürükleme ekran sınırına takılırdı)
+                        Box(Modifier.fillMaxWidth().padding(horizontal = 16.dp), contentAlignment = Alignment.CenterStart) {
+                            Row(Modifier.tabletWindow(topMenuWindow).testTag("tablet_top_menu"), verticalAlignment = Alignment.CenterVertically) {
+                                topMenuWindow?.let { com.karapp.drawguidance.ui.screens.canvasedit.components.WindowDragHandle(it) }
+                                topRow(false)
+                            }
                         }
                     }
                 } else {

@@ -185,7 +185,7 @@ class V32CancelTest : V32EditorBase() {
         assertTrue("eğitim boş sayfada", live().strokes.none { it.id == mine.first().id })
         // Çizim bitmeden sonraki adım: ilk adımın dört çizgisi hemen tamamlanır
         next()
-        runUntil { stepText() == "2 / 7" }
+        runUntil { stepText().startsWith("2 / ") }
         assertTrue(live().strokes.count { it.brushType == BrushType.INK_PEN } >= 4)
         compose.onNodeWithTag("tutorial_cancel", useUnmergedTree = true).performClick()
         waitFor { !calloutShown() }

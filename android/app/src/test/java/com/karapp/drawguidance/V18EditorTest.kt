@@ -287,8 +287,10 @@ class V18GraphTest : V18EditorBase() {
         val ox = (size.x - 1200f * scale) / 2f
         val oy = (size.y - 900f * scale) / 2f
         tap(Offset(ox + 600f * scale, oy + 450f * scale))
-        waitFor { compose.onAllNodes(hasContentDescription("Grafik") and hasAnyAncestor(hasTestTag("tool_row_context"))).fetchSemanticsNodes().isNotEmpty() }
-        topTool("Grafik").performSemanticsAction(SemanticsActions.OnClick)
+        // v51 not alma basit menüde: Düzenle'de dokunulan grafik doğrudan Grafik aracıyla açılır (üst menü yok)
+        val graphTool = hasContentDescription("Grafik") and hasAnyAncestor(hasTestTag("tool_row_context"))
+        waitFor { compose.onAllNodes(graphTool).fetchSemanticsNodes().isNotEmpty() || compose.onAllNodesWithContentDescription("Deseni artır").fetchSemanticsNodes().isNotEmpty() }
+        if (compose.onAllNodes(graphTool).fetchSemanticsNodes().isNotEmpty()) topTool("Grafik").performSemanticsAction(SemanticsActions.OnClick)
         waitForDescription("Deseni artır")
         compose.onNodeWithContentDescription("Deseni artır").performClick()
         waitFor { canvas().strokes.single().shape!!.graph!!.freq == 2 }
@@ -304,10 +306,8 @@ class V18GraphTest : V18EditorBase() {
         assertEquals("#FFFFFF", box().fillColorHex)
         finish()
         mode("Çiz")
-        compose.onNode(hasContentDescription("Boya kutusu") and hasAnyAncestor(hasTestTag("tool_row_draw"))).performSemanticsAction(SemanticsActions.OnClick)
-        waitForText("Renk seç")
-        // Renk alanının sol-alt köşesi: çok koyu bir kağıt
-        compose.onNodeWithTag("color_sv_area").performTouchInput { click(Offset(width * 0.05f, height * 0.95f)) }
+        // v51 not alma basit menüde: kağıt rengi (Arka plan) doğrudan çok koyu bir renge
+        compose.runOnIdle { com.karapp.drawguidance.ui.screens.canvasedit.CanvasEditViewModel.lastCreated!!.get()!!.setBackgroundColor("#101418") }
         waitFor { canvas().backgroundColorHex != "#FFFFFF" }
         val paper = canvas().backgroundColorHex
         assertTrue("koyu kağıt: $paper", androidx.core.graphics.ColorUtils.calculateLuminance(android.graphics.Color.parseColor(paper)) < 0.1)
@@ -316,10 +316,8 @@ class V18GraphTest : V18EditorBase() {
         assertTrue(g.shape!!.graph!!.paper.equals(paper, ignoreCase = true))
         assertTrue("beyaz ızgara kalmaz", g.shape!!.subpaths.none { it.strokeColorHex == "#DDE3EA" })
         assertEquals("desen korunur", "y = sin(2x)", label())
-        SystemBack.press()
-        waitFor { compose.onAllNodesWithTag("color_pick_sheet").fetchSemanticsNodes().isEmpty() }
         // Geri alınınca grafik de eski kağıda döner (tek adım)
-        compose.onNode(hasContentDescription("Geri al") and hasAnyAncestor(hasTestTag("tool_row_draw"))).performClick()
+        compose.onNodeWithContentDescription("Geri al").performSemanticsAction(SemanticsActions.OnClick)
         waitFor { canvas().backgroundColorHex == "#FFFFFF" && box().fillColorHex == "#FFFFFF" }
     }
 }

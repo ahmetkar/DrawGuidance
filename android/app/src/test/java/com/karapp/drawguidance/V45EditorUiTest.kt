@@ -365,15 +365,9 @@ class V45PortraitLabelsTest : V45EditorBase() {
 
     @Test
     fun notesAndComicAlsoLabelled() {
-        for (kind in listOf(CanvasKind.NOTES, CanvasKind.COMIC)) {
-            if (kind == CanvasKind.COMIC) {
-                compose.runOnIdle { compose.activity.onBackPressedDispatcher.onBackPressed() }
-                waitFor { !exists("drawing_canvas") }
-                runBlocking { repo().createCanvas("Ad $kind", 1000, 1000, "#FFFFFF", aiEnabled = false, kind = kind) }
-                waitForText("Ad $kind")
-                compose.onAllNodes(hasText("Ad $kind"))[0].performClick()
-                waitFor { exists("drawing_canvas") && vm().canvas.value?.kind == kind }
-            } else openKind("Ad $kind", kind)
+        // v51 not alma basit menüde (adlar zaten simgenin yanında): yalnız çizgi roman
+        for (kind in listOf(CanvasKind.COMIC)) {
+            openKind("Ad $kind", kind)
             waitFor { exists("tool_row_draw") }
             assertInlineLabels("tool_row_draw")
             compose.runOnIdle { vm().chooseMode(EditMode.ADD) }
@@ -420,12 +414,7 @@ class V45PortraitLabelsTest : V45EditorBase() {
         assertGrouped("mode_selector")
     }
 
-    @Test
-    fun notesAndComicKeepSelectThenAdd() {
-        openKind("Not sırası", CanvasKind.NOTES)
-        waitFor { exists("mode_selector") }
-        assertEquals(listOf("Seç", "Çiz", "Ekle", "Düzenle", "Elemanlar", "Katmanlar", "Özellikler"), rowButtons("mode_selector").map(::name))
-    }
+    // v51 not alma basit menüde: gelişmiş mod menüsü sırası yalnız resim ve çizgi romanda (yukarıdaki test)
 }
 
 /**
@@ -620,10 +609,10 @@ class V45CanvasMenusTest : V45EditorBase() {
         waitFor { exists("selection_menu_edit_list") }
         // Not tuvalinde şekilden ok çıkarma da Düzenle'de (eski bağlam menüsünden)
         assertTrue(compose.onAllNodes(hasText("Bu şekilden ok çıkar") and hasAnyAncestor(hasTestTag("selection_menu_edit_list"))).fetchSemanticsNodes().isNotEmpty())
-        compose.onNode(hasText("Şekli düzenle") and hasAnyAncestor(hasTestTag("selection_menu_edit_list"))).performClick()
-        waitFor { vm().mode.value == EditMode.SHAPE_EDIT }
-        assertFalse(exists("selection_menu"))
-        finish()
+        // v51 not almada düz şekil vektör düzenlemeye açılmaz: "Şekli düzenle" yok
+        assertTrue(compose.onAllNodes(hasText("Şekli düzenle") and hasAnyAncestor(hasTestTag("selection_menu_edit_list"))).fetchSemanticsNodes().isEmpty())
+        compose.runOnIdle { vm().clearSelection() }
+        compose.waitForIdle()
 
         // Yazı düzenleme: Düzenle → Metni Düzenle yazıyı tuvalde açar
         compose.runOnIdle { vm().setMode(EditMode.DRAW) }
@@ -946,9 +935,8 @@ class V45SharedFeaturesTest : V45EditorBase() {
         waitFor { vm().mode.value == EditMode.SHAPE_EDIT && compose.onAllNodesWithTag("param_controls", useUnmergedTree = true).fetchSemanticsNodes().isNotEmpty() }
         assertEquals(com.karapp.drawguidance.ui.screens.canvasedit.ShapeTool.PARAMS, vm().shapeTool.value)
         assertFalse(exists("selection_menu"))
-        // "Vektör düzenle" nokta düzenlemeye geçer
-        compose.onNodeWithTag("param_vector_edit", useUnmergedTree = true).performSemanticsAction(SemanticsActions.OnClick)
-        waitFor { vm().shapeTool.value == com.karapp.drawguidance.ui.screens.canvasedit.ShapeTool.NODES }
+        // v51 not almada vektör (nokta) düzenleme yok: "Vektör düzenle" düğmesi görünmez
+        assertTrue(compose.onAllNodesWithTag("param_vector_edit", useUnmergedTree = true).fetchSemanticsNodes().isEmpty())
     }
 
     @Test
@@ -975,31 +963,8 @@ class V45SharedFeaturesTest : V45EditorBase() {
     }
     @Test
     fun notesPanelButtonFallsIntoGroupsOfFour() {
-        openKind("Panel grupları", CanvasKind.NOTES)
-        compose.runOnIdle { vm().chooseMode(EditMode.ADD) }
-        waitFor { exists("tool_row_context") }
-        val names = rowButtons("tool_row_context").map(::name)
-        // Panel ekle not alma eklemelerinin (yazı, diyagram, formül, şekil) ardında; satır yine dörderli gruplu (ayraçlar
-        // yeni düğmeyi de sayar: düğme ikinci grupta, ayracın sağında)
-        val panel = names.indexOf("Panel ekle")
-        assertTrue("$names", panel > names.indexOf("Şekil ekle") && names.indexOf("Şekil ekle") > names.indexOf("Diyagram ekle"))
-        // v46 menü bölünebilir: Panel ekle'nin bulunduğu parçada sırası 4 ve sonrasıysa ayracın ardında
-        val part = rowParts("tool_row_context").first { p -> rowButtons(p).any { name(it) == "Panel ekle" } }
-        val inPart = rowButtons(part).map(::name).indexOf("Panel ekle")
-        if (inPart >= 4) {
-            val firstDivider = rectOf(dividers(part).first())
-            assertTrue("Panel ekle ayracın ardında: $part ${rowButtons(part).map { name(it) to rectOf(it).left }} ayraçlar ${dividers(part).map { rectOf(it).left }}",
-                rectOf(button(part, "Panel ekle")).left >= firstDivider.right - 0.5f)
-        }
-        val n = assertGrouped("tool_row_context")
-        assertEquals(names.size, n)
-        // v46 bölünmüş menüde ayraçlar parça başına
-        assertEquals(rowParts("tool_row_context").sumOf { ToolGroups.dividerCount(rowButtons(it).size) }, dividers("tool_row_context").size)
-        // Basit not menüsünde de: gruplar dörderli (Ekle modunda geri tuşu önce modu bitirir: Çiz'den çıkılır)
-        compose.runOnIdle { vm().finishAction(); vm().setMode(EditMode.DRAW) }
-        compose.waitForIdle()
-        compose.runOnIdle { compose.activity.onBackPressedDispatcher.onBackPressed() }
-        waitFor { !exists("drawing_canvas") }
+        // v51 not alma tek mod: Panel ekle basit menüde (gelişmiş Ekle satırı yok)
+        waitForText("Henüz bir tuvaliniz yok", substring = true)
         runBlocking { repo().createCanvas("Basit panel", 1000, 1000, "#FFFFFF", aiEnabled = false, kind = CanvasKind.NOTES) }
         waitForText("Basit panel")
         compose.onAllNodes(hasText("Basit panel"))[0].performClick()

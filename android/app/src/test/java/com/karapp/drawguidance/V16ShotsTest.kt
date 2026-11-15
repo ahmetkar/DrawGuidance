@@ -25,11 +25,11 @@ import org.robolectric.annotation.GraphicsMode
 /** v16 görsel kontrolü (DG_SHOTS verilince ekran görüntüsü): vektör düzenleme, formül üstünde düzenleme, yazı çubuğu. */
 abstract class V16ShotsBase : V15ShotsBase() {
 
-    private fun seed(name: String, vararg strokes: com.karapp.drawguidance.data.model.Stroke) {
+    private fun seed(name: String, vararg strokes: com.karapp.drawguidance.data.model.Stroke, kind: CanvasKind = CanvasKind.NOTES) {
         waitForText("Henüz bir tuvaliniz yok", substring = true)
         val repository = GlobalContext.get().get<CanvasRepository>()
         runBlocking {
-            val c = repository.createCanvas(name, 1240, 1754, "#FFFFFF", false, kind = CanvasKind.NOTES)
+            val c = repository.createCanvas(name, 1240, 1754, "#FFFFFF", false, kind = kind)
             repository.saveStrokes(c.localId, listOf(strokes.toList()))
         }
         waitForText(name)
@@ -37,7 +37,8 @@ abstract class V16ShotsBase : V15ShotsBase() {
     }
 
     protected fun vector(prefix: String) {
-        seed("Vektör", shape("h", "HEXAGON", 300f, 260f, 940f, 820f, 0), shape("c", "CIRCLE", 340f, 980f, 900f, 1540f, 1))
+        // v51 not almada vektör düzenleme yok: resim tuvalinde
+        seed("Vektör", shape("h", "HEXAGON", 300f, 260f, 940f, 820f, 0), shape("c", "CIRCLE", 340f, 980f, 900f, 1540f, 1), kind = CanvasKind.ART)
         mode("Seç")
         val size = canvasSize()
         fun at(p: Offset) = fit(size, 1240f, 1754f, p.x, p.y)

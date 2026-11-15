@@ -61,23 +61,8 @@ abstract class V10ShotsBase : WideLayoutTestBase() {
         shot("$prefix-2-paint-bucket")
         closeSheet("color_pick_sheet")
 
-        // Şekil düzenleme (v16): vektör noktaları; iki kenarın ortası arasına çizgi çiz, nokta seç
-        mode("Seç")
-        editButton("Şekli düzenle")
-        waitForText("Şekli Düzenle: Noktalar")
-        val pts = canvas().strokes.single().points
-        val l = pts.minOf { it.x }; val r = pts.maxOf { it.x }; val t = pts.minOf { it.y }; val btm = pts.maxOf { it.y }
-        compose.onNode(androidx.compose.ui.test.hasContentDescription("Çizgi çiz") and androidx.compose.ui.test.hasAnyAncestor(androidx.compose.ui.test.hasTestTag("node_tool_controls"))).performClick()
-        tap(map.toScreen(l, (t + btm) / 2f))
-        tap(map.toScreen(r, (t + btm) / 2f))
-        waitFor { canvas().strokes.single().shape!!.subpaths.size == 2 }
-        compose.waitForIdle()
-        shot("$prefix-3-shape-line")
-        compose.onNode(androidx.compose.ui.test.hasContentDescription("Noktalar") and androidx.compose.ui.test.hasAnyAncestor(androidx.compose.ui.test.hasTestTag("tool_row_context"))).performClick()
-        tap(map.toScreen(l, t))
-        compose.waitForIdle()
-        shot("$prefix-4-shape-part")
-        compose.onNodeWithContentDescription("Bitti").performClick()
+        // v51 not almada düz şekillerin nokta düzenlemesi yok (o adımlar kaldırıldı)
+        mode("Çiz")
         compose.waitForIdle()
 
         // Yazı: dolgu ve kenarlık (v17: düzenleme bitince seçim kalkar, Seç'e geçilir)
@@ -139,18 +124,7 @@ abstract class V10ShotsBase : WideLayoutTestBase() {
         compose.onNodeWithContentDescription("Bitti").performClick()
         compose.waitForIdle()
 
-        // Kılavuz ve perspektif ayrı; genel ayarlar çizim alanının altında
-        addMenu("Kılavuz çizgileri")
-        waitForText("Kılavuz Çizgileri")
-        compose.waitForIdle()
-        shot("$prefix-8-guide-type-sheet")
-        compose.onNodeWithText("Noktalı").performSemanticsAction(SemanticsActions.OnClick)
-        waitFor { compose.onAllNodesWithTag("guide_settings_bar").fetchSemanticsNodes().isNotEmpty() }
-        compose.waitForIdle()
-        shot("$prefix-9-guide-bar")
-        compose.onNodeWithText("Bitti").performClick()
-        // v27 not tuvalinde perspektif yok (yalnız kılavuz)
-        compose.waitForIdle()
+        // v51 not almada kılavuz çizgisi aracı yok (kılavuz adımları kaldırıldı)
 
         // Kaydetme penceresi (v42 not almada tek pencere: PDF öntanımlı, Resim dosyası sekmesi)
         compose.onNodeWithTag("header_save").performClick()

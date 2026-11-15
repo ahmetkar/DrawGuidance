@@ -739,6 +739,8 @@ class CanvasEditViewModel(
     }
 
     fun chooseMode(mode: EditMode) {
+        // v51 not almada kalem aracı (yol) yok
+        if (mode == EditMode.PEN && canvas.value?.kind?.isNotes == true) return
         // v45 boyama modunu seçmek kovayı seçer (boya fırçası [choosePaintBrush] ile)
         if (mode == EditMode.PAINT) _paintBrush.value = false
         when {
@@ -1208,6 +1210,8 @@ class CanvasEditViewModel(
     fun setRegionColor(hex: String?) = shapes.setRegionColor(hex)
     fun regionInk(): String = shapes.regionInk()
     fun editSelectedShape() = shapes.editSelected()
+    /** v51 not almada düz şekillerde "Şekli düzenle" gösterilmez (vektör düzenleme yok). */
+    fun canEditSelectedShape(): Boolean = shapes.canEditSelected()
     /** v45 parametreli şekillerin değer/formül düzenleyicisi ve tutamakları. */
     val paramShapes: com.karapp.drawguidance.ui.screens.canvasedit.state.ParamShapeController get() = shapes.paramShapes
     fun applyShapeTool(point: Offset, tolerance: Float = 12f) = shapes.applyTool(point, tolerance)
@@ -2164,7 +2168,8 @@ class CanvasEditViewModel(
 
     val penAnchors: StateFlow<List<PenAnchor>> get() = pen.anchors
     val penPending: StateFlow<PenAnchor?> get() = pen.pending
-    fun startPen() = pen.start()
+    /** v51 not almada kalem aracı (yol) yok. */
+    fun startPen() { if (canvas.value?.kind?.isNotes == true) return; pen.start() }
     fun penTap(point: Offset, tolerance: Float) = pen.tap(point, tolerance)
     fun penDrag(start: Offset, current: Offset, done: Boolean) = pen.drag(start, current, done)
     fun penUndo() = pen.undoAnchor()

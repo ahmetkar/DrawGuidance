@@ -187,128 +187,6 @@ class V45NotesPanelsUiTest : V45NotesComicUiBase() {
     }
 
     @Test
-    fun advancedNotesAddRowHasPanelButtonWithLabelHelpAndSheet() {
-        open("Panel düğmesi", CanvasKind.NOTES)
-        mode("Ekle")
-        val label = str(R.string.v45_panels_add)
-        assertEquals("Panel ekle", label)
-        val node = hasContentDescription(label) and hasAnyAncestor(hasTestTag("tool_row_context"))
-        waitFor { compose.onAllNodes(node).fetchSemanticsNodes().size == 1 }
-        // Açıklaması (2 sn basılı tutunca) Araç açıklamaları tablosunda
-        assertEquals(R.string.v45_help_panels_add, ToolDescriptions.pairs.toMap()[R.string.v45_panels_add])
-        // Yazı, diyagram ve formül menünün başında; Panel ekle diyagramdan sonra, şablonlardan önce sırada
-        val add = buttons("tool_row_context")
-        assertTrue(add.toString(), add.indexOf(label) > add.indexOf(str(R.string.add_diagram)))
-        runCatching { compose.onNode(node).performScrollTo() }
-        compose.onNode(node).performClick()
-        waitFor { exists("notes_panel_sheet") }
-        // Her yerleşimin alan sayısı yazılı
-        NotesPanels.layouts.forEach { l ->
-            assertTrue(l.id, compose.onAllNodes(hasText(str(R.string.v45_panel_count, l.areaCount)) and hasAnyAncestor(hasTestTag("notes_panel_layout_${l.id}")), useUnmergedTree = true)
-                .fetchSemanticsNodes().isNotEmpty())
-        }
-        shotAll("v45-notes-panels-sheet")
-        SystemBack.press()
-        waitFor { !exists("notes_panel_sheet") }
-        assertTrue("pencere kapanınca bir şey eklenmez", panels().isEmpty())
-        assertFalse(vm().v45.panelsOpen.value)
-    }
-
-    @Test
-    fun advancedNotesInsertSelectMoveDeleteAndReload() {
-        open("Panel gelişmiş", CanvasKind.NOTES)
-        addMenu("Panel ekle")
-        pickLayout("cornell")
-        waitFor { panels().size == 3 }
-        val added = panels()
-        // Alanlar yazıların/çizimlerin altında (en alt sıralar), eklenince seçili ve Taşı'da
-        assertEquals(listOf(0, 1, 2), added.map { it.order })
-        assertEquals(added.map { it.id }.toSet(), vm().selectedIds.value)
-        assertEquals(EditMode.MOVE, vm().mode.value)
-        assertGeometry("cornell", added, 1000f, 1400f)
-        added.forEach { s ->
-            assertEquals(NotesPanels.FRAME_COLOR, s.shape!!.style.strokeColorHex)
-            assertEquals(NotesPanels.TINT_COLOR, s.shape!!.style.fillColorHex)
-            assertEquals(1000f * NotesPanels.CORNER, s.shape!!.style.cornerRadius, 0.01f)
-        }
-        // Kaydedildi
-        waitFor { savedPanels().size == 3 }
-        shot("v45-notes-panels-cornell")
-
-        // Seç: özet şeridinin (3. alan) içine dokununca yalnız o seçilir
-        compose.runOnIdle { vm().chooseMode(EditMode.SELECT); vm().clearSelection() }
-        waitFor { vm().selectedIds.value.isEmpty() }
-        val summary = added.single { it.order == 2 }
-        val sb = box(summary)
-        tap(screenOf((sb[0] + sb[2]) / 2f, (sb[1] + sb[3]) / 2f))
-        waitFor { vm().selectedIds.value == setOf(summary.id) }
-        // Not alanına (2. alan) dokununca o seçilir
-        val keys = added.single { it.order == 1 }
-        val kb = box(keys)
-        // Seç'te dokunuş seçime ekler (art arda iki dokunuş çift dokunma sayılmasın)
-        compose.mainClock.advanceTimeBy(1000)
-        tap(screenOf((kb[0] + kb[2]) / 2f, (kb[1] + kb[3]) / 2f))
-        waitFor { vm().selectedIds.value == setOf(summary.id, keys.id) }
-        // Kenar boşluğuna (alan dışı) dokununca seçim kalkar; sonra yalnız not alanı seçilir
-        compose.mainClock.advanceTimeBy(1000)
-        tap(screenOf(15f, 15f))
-        waitFor { vm().selectedIds.value.isEmpty() }
-        compose.mainClock.advanceTimeBy(1000)
-        tap(screenOf((kb[0] + kb[2]) / 2f, (kb[1] + kb[3]) / 2f))
-        waitFor { vm().selectedIds.value == setOf(keys.id) }
-
-        // Taşı: sürükleyince yalnız seçili alan kayar (öteki iki alan yerinde)
-        mode("Taşı")
-        waitFor { vm().mode.value == EditMode.MOVE }
-        val view = canvasSize()
-        val scale = minOf((view.x - 48f * compose.density.density) / 1000f, (view.y - 48f * compose.density.density) / 1400f)
-        drag(screenOf((kb[0] + kb[2]) / 2f, (kb[1] + kb[3]) / 2f), Offset(0f, 150f * scale))
-        waitFor { abs(box(panels().single { it.id == keys.id })[1] - kb[1]) > 20f }
-        val moved = box(panels().single { it.id == keys.id })
-        assertEquals("aşağı ~150 birim", kb[1] + 150f, moved[1], 25f)
-        assertEquals("yatayda yerinde", kb[0], moved[0], 3f)
-        assertEquals("boyutu aynı", kb[3] - kb[1], moved[3] - moved[1], 0.6f)
-        panels().filter { it.id != keys.id }.forEach { s ->
-            val orig = box(added.single { it.id == s.id })
-            box(s).forEachIndexed { k, v -> assertEquals(orig[k], v, 0.01f) }
-        }
-        waitFor { savedPanels().single { it.id == keys.id }.let { abs(box(it)[1] - moved[1]) < 0.6f } }
-
-        // Sil: seçili alan silinir, ötekiler kalır; geri al geri getirir
-        compose.runOnIdle { vm().chooseMode(EditMode.SELECT) }
-        waitFor { vm().mode.value == EditMode.SELECT && vm().selectedIds.value == setOf(keys.id) }
-        val deleteNode = hasContentDescription(str(R.string.delete_selection)) and hasAnyAncestor(hasTestTag("tool_row_context"))
-        waitFor { compose.onAllNodes(deleteNode).fetchSemanticsNodes().isNotEmpty() }
-        compose.onAllNodes(deleteNode)[0].performScrollTo().performClick()
-        waitFor { panels().size == 2 }
-        assertTrue(panels().none { it.id == keys.id })
-        waitFor { savedPanels().size == 2 }
-        compose.runOnIdle { vm().undo() }
-        waitFor { panels().size == 3 }
-        compose.runOnIdle { vm().redo() }
-        waitFor { panels().size == 2 }
-
-        // Kayıt → yeniden aç: iki alan aynı yerde, aynı görünümle
-        val before = panels().associateBy { it.id }
-        reopen("Panel gelişmiş")
-        waitFor { panels().size == 2 }
-        panels().forEach { s ->
-            val b = before.getValue(s.id)
-            assertEquals(NotesPanels.KIND, s.shape!!.kind)
-            assertEquals(b.shape!!.style, s.shape!!.style)
-            box(b).zip(box(s)).forEach { (x, y) -> assertEquals(x, y, 0.6f) }
-            assertEquals(b.order, s.order)
-        }
-        // Yeniden açılınca da seçilir
-        compose.runOnIdle { vm().chooseMode(EditMode.SELECT); vm().clearSelection() }
-        compose.mainClock.advanceTimeBy(1000)
-        val target = panels().first()
-        val tb = box(target)
-        tap(screenOf((tb[0] + tb[2]) / 2f, (tb[1] + tb[3]) / 2f))
-        waitFor { vm().selectedIds.value == setOf(target.id) }
-    }
-
-    @Test
     fun simpleNotesTopMenuHasPanelButtonAndUniqueIcon() {
         open("Panel basit", CanvasKind.NOTES)
         waitFor { exists("simple_tool_panels") }
@@ -484,11 +362,8 @@ class V45SimpleNotesShapesUiTest : V45NotesComicUiBase() {
         waitFor { shapeEls().single().shape!!.params == mapOf("v" to "30", "theta" to "45") }
         assertFalse(has("param_error"))
         shot("v45-simple-notes-param-edit")
-        // Vektör düzenle → nokta düzenleme; değerler korunur
-        compose.onNodeWithTag("param_vector_edit").performSemanticsAction(SemanticsActions.OnClick)
-        waitFor { vm().shapeTool.value == ShapeTool.NODES }
-        waitFor { !has("param_controls") }
-        assertEquals(mapOf("v" to "30", "theta" to "45"), shapeEls().single().shape!!.params)
+        // v51 not almada vektör (nokta) düzenleme yok: "Vektör düzenle" düğmesi görünmez
+        assertFalse(has("param_vector_edit"))
         // Kayıtta değerler saklı
         // v45 kayıt gecikmeli olabilir: eleman kayda geçene kadar beklenir (yoksa koşul hemen istisna atardı)
         waitFor { canvas().strokes.singleOrNull { it.brushType == BrushType.SHAPE }?.shape?.params == mapOf("v" to "30", "theta" to "45") }

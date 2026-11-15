@@ -94,8 +94,11 @@ struct ModeToolRow: View {
                 vm.toggleCanvasPick(.EYEDROPPER)
             }
             ToolButton(icon: "cube", label: "3D", selected: store.canvas?.guide.draw3d == true, id: "draw3d") { vm.toggleDraw3d() }
-            ToolButton(icon: "scribble.variable", label: L("mode_pen"), selected: vm.mode == .PEN, id: "pen_tool") {
-                vm.chooseMode(vm.mode == .PEN ? .DRAW : .PEN)
+            if store.canvas?.kind.isNotes != true {
+                // v51 not almada kalem aracı (yol) yok
+                ToolButton(icon: "scribble.variable", label: L("mode_pen"), selected: vm.mode == .PEN, id: "pen_tool") {
+                    vm.chooseMode(vm.mode == .PEN ? .DRAW : .PEN)
+                }
             }
             if vm.mode == .PEN {
                 ToolButton(icon: "arrow.uturn.backward.circle", label: L("undo"), id: "pen_undo") { vm.pen.undoAnchor() }

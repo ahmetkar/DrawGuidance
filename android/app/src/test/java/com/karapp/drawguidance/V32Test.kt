@@ -252,34 +252,7 @@ class V32ArtAiTest : V32EditorBase() {
 @GraphicsMode(GraphicsMode.Mode.NATIVE)
 @Config(sdk = [34], application = TutorialTestApp::class, qualifiers = "w411dp-h891dp-xxhdpi")
 class V32NotesComicTest : V32EditorBase() {
-    @Test
-    fun notesHandwritingAndFormula() {
-        createNotesCanvasAndOpen("Fizik")
-        waitFor { offerShown() }
-        assertTrue(compose.onAllNodesWithText("Not alma moduna hoş geldin").fetchSemanticsNodes().isNotEmpty())
-        startGroup("notes_ai")
-        runUntil(40_000) { vm().tutorial.ui.value?.focus == TutorialAnchor.SUGGEST_TEXT }
-        shot("v32-notes-handwriting")
-        awaitDemo()
-        val texts = live().strokes.filter { it.brushType == BrushType.TEXT }
-        assertEquals("kuvvet", texts.single().text?.content)
-        compose.onNodeWithTag("tutorial_cancel", useUnmergedTree = true).performClick()
-        waitFor { !calloutShown() }
-        // Formül ve diyagram grubu
-        compose.onNodeWithContentDescription("Diğer seçenekler").performClick()
-        waitFor { exists("tutorial_menu_item") }
-        compose.onNodeWithTag("tutorial_menu_item").performClick()
-        startGroup("notes_formula")
-        repeat(3) { awaitDemo(); next() }
-        runUntil { stepText() == "4 / 4" }
-        awaitDemo()
-        val kinds = live().strokes.map { it.brushType }.toSet()
-        assertTrue(kinds.containsAll(setOf(BrushType.FORMULA, BrushType.DIAGRAM, BrushType.SHAPE)))
-        shot("v32-notes-final")
-        next()
-        waitFor { !calloutShown() }
-        assertTrue(live().strokes.isEmpty())
-    }
+    // v51 not alma tek mod: gelişmiş not alma eğitimleri (notes_ai, notes_formula) basit not eğitimleriyle değişti
 
     @Test
     fun comicPanelsHeroAndBalloons() {

@@ -395,6 +395,8 @@ final class EditorViewModel: ObservableObject, EditorHost {
     }
 
     func chooseMode(_ mode: EditMode) {
+        // v51 not almada kalem aracı (yol) yok
+        if mode == .PEN && store.canvas?.kind.isNotes == true { return }
         if mode == .PAINT { paintBrush = false }
         if mode == self.mode && mode.kind != .BASE { finishAction() }
         else if mode.kind == .BASE { setMode(mode) }

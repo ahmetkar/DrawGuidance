@@ -131,6 +131,8 @@ abstract class EditorTestBase {
 
     /** Ekle menüsünden bir öğe (Şekil ekle / Yazı ekle / Resim ekle). */
     protected fun addMenu(item: String) {
+        // v51 not alma basit menüde: eklenecekler Ekle menüsünde doğrudan
+        if (simpleRow() && clickSimple(item)) return
         if (compose.onAllNodesWithContentDescription("Ekle menüsü").fetchSemanticsNodes().isNotEmpty()) {
             compose.onNodeWithContentDescription("Ekle menüsü").performClick()
             waitForText(item)
@@ -217,7 +219,48 @@ abstract class EditorTestBase {
         waitForDescription("Seçili fırça: $label")
     }
 
+    /** v51 basit menü (basit resim, not alma, çocuk) açık mı. */
+    protected fun simpleRow(): Boolean =
+        compose.onAllNodesWithTag("simple_tool_row").fetchSemanticsNodes().isNotEmpty() &&
+            compose.onAllNodesWithTag("mode_selector").fetchSemanticsNodes().isEmpty()
+
+    /** v51 basit menüde [description] düğmesine dokunur; yoksa false. */
+    protected fun clickSimple(description: String): Boolean {
+        val node = androidx.compose.ui.test.hasContentDescription(description) and androidx.compose.ui.test.hasClickAction() and
+            androidx.compose.ui.test.hasAnyAncestor(androidx.compose.ui.test.hasTestTag("simple_tool_row"))
+        if (compose.onAllNodes(node).fetchSemanticsNodes().isEmpty()) return false
+        runCatching { compose.onAllNodes(node)[0].performScrollTo() }
+        compose.onAllNodes(node)[0].performSemanticsAction(SemanticsActions.OnClick)
+        compose.waitForIdle()
+        return true
+    }
+
+    /**
+     * v51 not alma basit menüde: gelişmiş modların mod menüsü (Seç, Çiz, Ekle, Düzenle) yok. Eski testlerin mod geçişi
+     * basit menüdeki düğmeyle ya da (menüde karşılığı yoksa) doğrudan moda geçerek yapılır.
+     */
+    private fun simpleMode(label: String): Boolean {
+        val target = when (label) {
+            "Çiz" -> com.karapp.drawguidance.ui.screens.canvasedit.EditMode.DRAW
+            "Seç" -> com.karapp.drawguidance.ui.screens.canvasedit.EditMode.SELECT
+            "Taşı" -> com.karapp.drawguidance.ui.screens.canvasedit.EditMode.MOVE
+            "Döndür" -> com.karapp.drawguidance.ui.screens.canvasedit.EditMode.ROTATE
+            "Ölçekle" -> com.karapp.drawguidance.ui.screens.canvasedit.EditMode.SCALE
+            "Kırp" -> com.karapp.drawguidance.ui.screens.canvasedit.EditMode.CROP
+            "Genişlet" -> com.karapp.drawguidance.ui.screens.canvasedit.EditMode.EXPAND
+            "Ekle" -> com.karapp.drawguidance.ui.screens.canvasedit.EditMode.ADD
+            "Düzenle" -> com.karapp.drawguidance.ui.screens.canvasedit.EditMode.EDIT_PICK
+            "Boya" -> com.karapp.drawguidance.ui.screens.canvasedit.EditMode.PAINT
+            else -> return clickSimple(label)
+        }
+        if (label == "Seç" && clickSimple(label)) return true
+        compose.runOnIdle { com.karapp.drawguidance.ui.screens.canvasedit.CanvasEditViewModel.lastCreated?.get()?.chooseMode(target) }
+        compose.waitForIdle()
+        return true
+    }
+
     protected fun mode(label: String) {
+        if (simpleRow() && simpleMode(label)) return
         // Önce mod menüsündeki düğme; yoksa (Döndür/Ölçekle üst menüde) herhangi bir düğme
         val inSelector = androidx.compose.ui.test.hasContentDescription(label) and
             androidx.compose.ui.test.hasAnyAncestor(androidx.compose.ui.test.hasTestTag("mode_selector"))
@@ -264,6 +307,21 @@ abstract class EditorTestBase {
     /** v18: Boya kutusu üst menüde; v34: yalnız Çiz satırında (Düzenle'de nokta/çizgi/alan boya): gerekirse Çiz'e geçilir. */
     protected fun clickFill() {
         compose.waitForIdle()
+        // v51 not alma basit menüde: seçili şeklin dolgusu seçim menüsünün Düzenle listesinde
+        if (simpleRow() && compose.onAllNodesWithTag("selection_menu_edit").fetchSemanticsNodes().isEmpty() &&
+            com.karapp.drawguidance.ui.screens.canvasedit.CanvasEditViewModel.lastCreated?.get()?.selectedIds?.value?.isNotEmpty() == true) {
+            mode("Seç")
+            waitFor { compose.onAllNodesWithTag("selection_menu_edit").fetchSemanticsNodes().isNotEmpty() }
+        }
+        if (simpleRow() && compose.onAllNodesWithTag("selection_menu_edit").fetchSemanticsNodes().isNotEmpty()) {
+            compose.onNodeWithTag("selection_menu_edit").performSemanticsAction(SemanticsActions.OnClick)
+            waitFor { compose.onAllNodesWithTag("selection_menu_edit_list").fetchSemanticsNodes().isNotEmpty() }
+            val item = androidx.compose.ui.test.hasText("Dolgu rengi") and
+                androidx.compose.ui.test.hasAnyAncestor(androidx.compose.ui.test.hasTestTag("selection_menu_edit_list"))
+            compose.onNode(item).performSemanticsAction(SemanticsActions.OnClick)
+            compose.waitForIdle()
+            return
+        }
         if (compose.onAllNodesWithContentDescription("Boya kutusu").fetchSemanticsNodes().isEmpty()) mode("Çiz")
         clickTool("Boya kutusu")
     }

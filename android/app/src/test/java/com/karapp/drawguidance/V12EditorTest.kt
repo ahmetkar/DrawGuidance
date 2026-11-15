@@ -47,10 +47,10 @@ class V12ViewModeTest : EditorTestBase() {
 
         // Geri al / Yinele
         compose.onNodeWithContentDescription("Yinele").assertIsNotEnabled()
-        compose.onNodeWithContentDescription("Geri al").performScrollTo().performClick()
+        compose.onNodeWithContentDescription("Geri al").performSemanticsAction(androidx.compose.ui.semantics.SemanticsActions.OnClick)
         waitFor { canvas().strokes.isEmpty() }
         compose.onNodeWithContentDescription("Yinele").assertIsEnabled()
-        compose.onNodeWithContentDescription("Yinele").performScrollTo().performClick()
+        compose.onNodeWithContentDescription("Yinele").performSemanticsAction(androidx.compose.ui.semantics.SemanticsActions.OnClick)
         waitFor { canvas().strokes.size == 1 }
         assertEquals("aynı çizim geri geldi", drawn.points, canvas().strokes.single().points)
         compose.onNodeWithContentDescription("Yinele").assertIsNotEnabled()
@@ -151,9 +151,9 @@ class V12DiagramSidesTest : EditorTestBase() {
             assertEquals(DiagramSide.RIGHT, it.toSide)
         }
         // Geri al / yinele ok yönünde de çalışır
-        compose.onNodeWithContentDescription("Geri al").performScrollTo().performClick()
+        compose.onNodeWithContentDescription("Geri al").performSemanticsAction(androidx.compose.ui.semantics.SemanticsActions.OnClick)
         waitFor { spec().edges.last().from == ids[2] }
-        compose.onNodeWithContentDescription("Yinele").performScrollTo().performClick()
+        compose.onNodeWithContentDescription("Yinele").performSemanticsAction(androidx.compose.ui.semantics.SemanticsActions.OnClick)
         waitFor { spec().edges.last().from == ids[0] }
 
         // 3) Adımın tutamağından sürükleyerek: Adım'ın altından Bitir'in üstüne

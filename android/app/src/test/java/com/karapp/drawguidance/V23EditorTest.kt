@@ -173,6 +173,7 @@ class V23BackgroundTest : V24EditorBase() {
 @GraphicsMode(GraphicsMode.Mode.NATIVE)
 @Config(sdk = [34], application = TestDrawGuidanceApp::class, qualifiers = "w411dp-h891dp-xxhdpi")
 class V23NotesTextBoxTest : V23EditorBase() {
+
     @Test
     fun formPatternTextMovesAndResizes() {
         waitForText("Henüz bir tuvaliniz yok", substring = true)
@@ -197,9 +198,11 @@ class V23NotesTextBoxTest : V23EditorBase() {
         val q = t.points
         val handle = screenOf((q[1].x + q[2].x) / 2f, (q[1].y + q[2].y) / 2f)
         val oldW = q[1].x - q[0].x
-        // v27 Taşı modunda kenardan sürüklemek yazı kutusunu yalnız taşır (boyutlanmaz)
+        // v27 Taşı modunda sürüklemek yazı kutusunu yalnız taşır (boyutlanmaz). v51 not alma basit menüde seçim menüsü
+        // seçimin sağ üst köşesinde durur: kenar yerine kutunun ortasından sürüklenir
+        val grab = screenOf((q[0].x + q[2].x) / 2f, (q[0].y + q[2].y) / 2f)
         compose.onNodeWithTag("drawing_canvas").performTouchInput {
-            down(handle)
+            down(grab)
             repeat(20) { moveBy(Offset(-12f, 0f)) }
             up()
         }

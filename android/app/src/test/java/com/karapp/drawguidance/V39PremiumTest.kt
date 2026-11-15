@@ -159,7 +159,8 @@ class V39EntitlementsTest {
         PremiumFeature.entries.filter { it !in anyKind }.forEach { assertFalse(it.name, kids.locked(it)) }
         assertTrue(kids.locked(PremiumFeature.KIDS_CHALLENGE_ADVANCED))
         assertEquals(FeatureKeys.KIDS_CHALLENGE_ADVANCED, PremiumFeature.KIDS_CHALLENGE_ADVANCED.key(CanvasKind.KIDS))
-        CanvasKind.entries.filter { it.simple }.forEach { k ->
+        // v51 not alma basit çizim altına geçti ama Premium özellikleri (eski gelişmiş not alma gibi) kilitli kalır
+        CanvasKind.entries.filter { it.simple && !it.isNotes }.forEach { k ->
             PremiumFeature.entries.filter { it !in anyKind }.forEach { assertNull("$k $it", it.key(k)) }
         }
         val premium = PremiumAccess(Entitlements.premium(), CanvasKind.COMIC) {}

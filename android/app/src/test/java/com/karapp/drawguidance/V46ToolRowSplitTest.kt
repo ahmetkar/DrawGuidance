@@ -107,8 +107,9 @@ class V46PortraitSplitTest : V46SplitBase() {
 
     @Test
     fun notesAndComicAlsoSplit() {
-        for (kind in listOf(CanvasKind.NOTES, CanvasKind.COMIC)) {
-            if (kind != CanvasKind.NOTES) {
+        // v51 not alma basit menüde (bölünen gelişmiş menü yok): yalnız çizgi roman
+        for (kind in listOf(CanvasKind.COMIC)) {
+            if (false) {
                 // Seç modundan çıkıp (geri tuşu önce modu kapatır) tuvalden çık
                 compose.runOnIdle { vm().chooseMode(EditMode.DRAW) }
                 compose.waitForIdle()

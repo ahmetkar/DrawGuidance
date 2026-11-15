@@ -112,9 +112,7 @@ class V11DiagramEdgeTest : EditorTestBase() {
         waitForText("Diyagram Türü")
         compose.onNodeWithText("Akış Diyagramı").performSemanticsAction(SemanticsActions.OnClick)
         waitForText("Diyagram: Akış Diyagramı")
-        // Diyagram ekleme modunda kalem ve silgi yok (v17: üst menüde eklenecekler)
-        assertTrue(compose.onAllNodesWithContentDescription("Fırça Seç").fetchSemanticsNodes().isEmpty())
-        assertTrue(compose.onAllNodesWithContentDescription("Silgi").fetchSemanticsNodes().isEmpty())
+        // v51 not alma basit menüde: kalem ve silgi her zaman menüde (gelişmiş menüde diyagram eklerken gizlenir)
 
         val size = canvasSize()
         val screen = Rect(size.x * 0.15f, size.y * 0.12f, size.x * 0.75f, size.y * 0.62f)
@@ -131,7 +129,7 @@ class V11DiagramEdgeTest : EditorTestBase() {
 
         editButton("Diyagramı düzenle")
         waitForText("Adım ekle")
-        assertTrue(compose.onAllNodesWithContentDescription("Fırça Seç").fetchSemanticsNodes().isEmpty())
+        // v51 not alma basit menüde kalem menüde kalır (gelişmiş menüde diyagram düzenlerken gizlenir)
 
         // Ok ekle: önce başlangıç (Karar), sonra hedef (Başla)
         compose.onNode(hasText("Ok ekle") and hasClickAction()).performClick()
@@ -155,13 +153,13 @@ class V11DiagramEdgeTest : EditorTestBase() {
         assertEquals(5, canvas().strokes.single().diagram!!.edges.size)
 
         // Her değişiklik ayrı geri alınır
-        compose.onNodeWithContentDescription("Geri al").performScrollTo().performClick()
+        compose.onNodeWithContentDescription("Geri al").performSemanticsAction(androidx.compose.ui.semantics.SemanticsActions.OnClick)
         waitFor { canvas().strokes.single().diagram!!.nodes.size == 4 }
         assertEquals("ok ve yazısı duruyor", "hayır", canvas().strokes.single().diagram!!.edges.last().label)
-        compose.onNodeWithContentDescription("Geri al").performScrollTo().performClick()
+        compose.onNodeWithContentDescription("Geri al").performSemanticsAction(androidx.compose.ui.semantics.SemanticsActions.OnClick)
         waitFor { canvas().strokes.single().diagram!!.edges.last().label == "" }
         assertEquals(4, canvas().strokes.single().diagram!!.edges.size)
-        compose.onNodeWithContentDescription("Geri al").performScrollTo().performClick()
+        compose.onNodeWithContentDescription("Geri al").performSemanticsAction(androidx.compose.ui.semantics.SemanticsActions.OnClick)
         waitFor { canvas().strokes.single().diagram!!.edges.size == 3 }
 
         // Bitti: Seç'e geçilir; Çiz'de kalem ve silgi yeniden etkin
@@ -181,9 +179,10 @@ class V11RecolorFillTest : EditorTestBase() {
 
     @Test
     fun recolorSetsTheFillAndThePaintBucketPaintsTheSelectedText() {
-        createNotesCanvasAndOpen("Renkler")
+        // v51 boya kutusu (seçime ya da tuvale) gelişmiş menüde; not alma basit menüde: resim tuvalinde
+        createCanvasAndOpen("Renkler")
         addMenu("Şekil ekle")
-        waitForText("Geometrik Cisimler")
+        waitForText("Kare")
         compose.onNodeWithText("Kare").performSemanticsAction(SemanticsActions.OnClick)
         waitForText("Şekil: Kare")
         val size = canvasSize()
@@ -215,8 +214,7 @@ class V11RecolorFillTest : EditorTestBase() {
         compose.onNode(hasSetTextAction() and hasAnyAncestor(hasTestTag("inline_text_editor"))).performTextInput("Not")
         compose.onNodeWithContentDescription("Yazıyı bitir").performSemanticsAction(SemanticsActions.OnClick)
         waitFor { canvas().strokes.any { it.text != null } }
-        // v23: not tuvalinde "Yazıyı bitir" eklenen yazıyı seçili bırakıp Taşı moduna geçer; Seç'e geçince seçim korunur
-        waitFor { compose.onAllNodesWithTag("mode_bar").fetchSemanticsNodes().isNotEmpty() }
+        // v51 resim tuvalinde: yazı bitince seçim kalkabilir (aşağıda gerekirse yazıya dokunulur)
         val background = canvas().backgroundColorHex
         val textBefore = canvas().strokes.first { it.text != null }.colorHex
         mode("Seç")
@@ -281,11 +279,11 @@ class V11PageUndoTest : EditorTestBase() {
         waitFor { canvas().currentPage == 0 }
 
         // Geri al: 2. sayfadaki çizim geri alınır ve o sayfa açılır
-        compose.onNodeWithContentDescription("Geri al").performScrollTo().performClick()
+        compose.onNodeWithContentDescription("Geri al").performSemanticsAction(androidx.compose.ui.semantics.SemanticsActions.OnClick)
         waitFor { canvas().currentPage == 1 && canvas().pages[1].isEmpty() }
         assertEquals("1. sayfa korunur", 1, canvas().pages[0].size)
         // Sayfa eklemeyi geri al: 1. sayfaya dönülür
-        compose.onNodeWithContentDescription("Geri al").performScrollTo().performClick()
+        compose.onNodeWithContentDescription("Geri al").performSemanticsAction(androidx.compose.ui.semantics.SemanticsActions.OnClick)
         waitFor { canvas().pageCount == 1 && canvas().currentPage == 0 }
         assertEquals(1, canvas().strokes.size)
     }

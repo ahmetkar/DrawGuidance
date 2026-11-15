@@ -418,7 +418,17 @@ fun CanvasEditScreen(
     var hideOpen by rememberSaveable { mutableStateOf(false) }
     // Başlıktaki ek düğmeler: Kaydet (otomatik kayıt kapalıyken), ⋮ (PDF, ayarlar); v19: Katmanlar üst menüde
     val headerActions: @Composable () -> Unit = { com.karapp.drawguidance.ui.screens.canvasedit.components.ToolHelpScope(toolHelp) {
-        if (!autosave) {
+        if (viewModel.isTempImageEdit) {
+            // v51 geçici resim tuvali: Kaydet resmi nota aktarır ve tuvali siler
+            NeuIconButton(
+                Icons.Filled.Save,
+                stringResource(R.string.v51_temp_image_save),
+                viewModel::saveNow,
+                Modifier.testTag("temp_image_save"),
+                tint = colors.accent,
+                selected = true,
+            )
+        } else if (!autosave) {
             NeuIconButton(
                 Icons.Filled.Save,
                 stringResource(if (dirty) R.string.save_now_dirty else R.string.save_now),
@@ -901,7 +911,8 @@ fun CanvasEditScreen(
             onRedo = viewModel::redo,
             items = toolItems,
             onBackground = { backgroundOpen = true },
-            onPen = { if (mode == EditMode.PEN) viewModel.finishAction() else viewModel.startPen() },
+            // v51 not almada kalem aracı (yol) yok
+            onPen = if (kind.isNotes) null else ({ if (mode == EditMode.PEN) viewModel.finishAction() else viewModel.startPen() }),
             penActive = mode == EditMode.PEN,
             onRuler = rulerActions.toggleRuler,
             rulerActive = rulerSession == com.karapp.drawguidance.ui.screens.canvasedit.ruler.GuideSession.RULER,
@@ -1455,7 +1466,7 @@ fun CanvasEditScreen(
                     SelectionKind.SHAPE -> listOfNotNull(
                         // v36 çizgi roman paneli: Şablonlar penceresi bu panel seçili açılır (v45 Düzenle'nin başında)
                         selectedPanelLeaf?.let { leaf -> action(R.string.templates_edit_panel, Icons.Filled.AutoAwesomeMosaic) { templatesLeaf = leaf; templatesOpen = true } },
-                        action(R.string.shape_edit_open, Icons.Filled.Edit) { viewModel.editSelectedShape() },
+                        if (!notes || viewModel.canEditSelectedShape()) action(R.string.shape_edit_open, Icons.Filled.Edit) { viewModel.editSelectedShape() } else null,
                         // v23 not tuvalinde şekilden ok çıkar
                         if (notes) action(R.string.arrow_from_shape, Icons.AutoMirrored.Filled.ArrowRightAlt) { viewModel.arrowFromSelection() } else null,
                         action(R.string.region_fill_open, Icons.Filled.FormatColorFill) { viewModel.editShapeRegions() },
@@ -2063,7 +2074,7 @@ fun CanvasEditScreen(
                                                     icon = Icons.Filled.AccountTree,
                                                 )
                                             }
-                                            if (selectedShape != null) {
+                                            if (selectedShape != null && (!kind.isNotes || viewModel.canEditSelectedShape())) {
                                                 com.karapp.drawguidance.ui.components.NeuButton(
                                                     stringResource(R.string.shape_edit_open), viewModel::editSelectedShape, Modifier.fillMaxWidth(),
                                                     icon = Icons.Filled.ContentCut,

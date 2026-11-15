@@ -103,6 +103,7 @@ struct CanvasEditScreen: View {
             NavigationStack { CanvasEditScreen(canvasLocalId: doc.id) }
         }
         .modifier(TempImageEditCloser(vm: vm))
+        .modifier(TableSheetsHost(ctl: vm.tables, store: vm.store, viewport: vm.viewport))
         .sheet(isPresented: $brushPickerOpen) { brushPicker }
         .sheet(item: $sheet) { s in
             switch s {
@@ -124,7 +125,9 @@ struct CanvasEditScreen: View {
             FormulaPickerSheet(vm: vm)
         }
         .sheet(isPresented: Binding(get: { vm.loaded && vm.shapes.isPickerOpen }, set: { if !$0 { vm.closeShapePicker() } })) {
-            ShapePickerView(kind: vm.store.canvas?.kind ?? .ART) { id in
+            let notes = vm.store.canvas?.kind.isNotes == true
+            ShapePickerView(kind: vm.store.canvas?.kind ?? .ART, graphs: notes ? vm.shapes.graphsOnly : nil,
+                            title: notes && vm.shapes.graphsOnly ? L("v52_add_graph") : nil) { id in
                 vm.selectShapeId(id)
                 vm.closeShapePicker()
                 if vm.mode != .SHAPE { vm.startAction(.SHAPE, target: []) }

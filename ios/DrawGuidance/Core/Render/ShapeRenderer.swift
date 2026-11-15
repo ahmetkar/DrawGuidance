@@ -265,11 +265,18 @@ enum ShapeRenderer {
                     a = alpha255(alpha * min(max(sub.alpha ?? 1, 0), 1))
                 }
                 let size = CGFloat(max(4, sub.labelSize))
-                let font = UIFont.systemFont(ofSize: size)
+                // v52 tablo hücresi: hizalama ve kalın yazı etiketin tanımında ("tbl:cb")
+                let cellTag = sub.tag.flatMap { $0.hasPrefix(TableShape.TAG) ? String($0.dropFirst(TableShape.TAG.count)) : nil }
+                let font = cellTag?.contains("b") == true ? UIFont.boldSystemFont(ofSize: size) : UIFont.systemFont(ofSize: size)
                 // Android'de taban çizgisi y + 0.82·boy; UIKit üst kenardan çizer
                 let baseline = CGFloat(p.y) + size * 0.82
                 let attrs: [NSAttributedString.Key: Any] = [.font: font, .foregroundColor: UIColor(cgColor: ArgbColor.cgColor(color, alpha: a))]
-                (text as NSString).draw(at: CGPoint(x: CGFloat(p.x), y: baseline - font.ascender), withAttributes: attrs)
+                var x = CGFloat(p.x)
+                if let first = cellTag?.first, first == "c" || first == "r" {
+                    let w = (text as NSString).size(withAttributes: attrs).width
+                    x -= first == "c" ? w / 2 : w
+                }
+                (text as NSString).draw(at: CGPoint(x: x, y: baseline - font.ascender), withAttributes: attrs)
             }
             start = end
         }

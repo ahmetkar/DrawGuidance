@@ -38,12 +38,14 @@ enum ShapeFactory {
 
     /// Kimlikten yeniden kurulabilir mi.
     static func canBuild(_ id: String) -> Bool {
+        if TableShape.isTable(id) { return true }
         if let k = builtin(id) { return !ShapeKind.legacyGraphs.contains(k) }
         if GraphShapes.isModernGraph(id) { return true }
         return isLibrary(id) && ShapeLibrary.shared.find(id) != nil
     }
 
     static func fit(_ id: String) -> ShapeFit {
+        if TableShape.isTable(id) { return .BOX }
         if let k = builtin(id) { return k.fit }
         if GraphShapes.isModernGraph(id) { return GraphShapes.fit(id) }
         guard let lib = ShapeLibrary.shared.find(id) else { return .BOX }
@@ -81,6 +83,8 @@ enum ShapeFactory {
 
     /// Kütüphane şeklinin parçaları (tuval koordinatlarında).
     static func paths(_ id: String, _ start: P, _ end: P, ink: Float = 4, graph: GraphSpec? = nil, params: [String: String]? = nil) -> [ShapePath] {
+        // v52 not almada tablo
+        if TableShape.isTable(id) { return TableShape.paths(start, end, ink: ink, params: params) }
         if let k = builtin(id) { return ShapeCatalog.paths(k, start, end, ink: ink, expandDashes: false) }
         if GraphShapes.isModernGraph(id) { return GraphShapes.paths(id, start, end, graph: graph) }
         guard let lib = ShapeLibrary.shared.find(id) else { return [] }

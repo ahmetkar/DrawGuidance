@@ -74,7 +74,11 @@ final class ShapeController: ObservableObject {
         return c + d * t + d / len * margin
     }
 
-    func openPicker() { isPickerOpen = true }
+    /// v52 not almada grafikler ayrı pencerede: açık seçici yalnız grafikleri mi gösteriyor.
+    @Published private(set) var graphsOnly = false
+
+    func openPicker() { graphsOnly = false; isPickerOpen = true }
+    func openGraphPicker() { graphsOnly = true; isPickerOpen = true }
     func closePicker() { isPickerOpen = false }
 
     func selectShape(_ id: String) {
@@ -174,6 +178,8 @@ final class ShapeController: ObservableObject {
 
     func editSelected() {
         guard let s = store.selectedStroke({ $0.shape != nil }) else { return }
+        // v52 tablo kendi düzenleme penceresinde açılır
+        if TableShape.isTable(s.shape?.kind) { _ = host.editTable(s.id); return }
         paramShapes.clearError()
         let next: ShapeTool
         if let spec = s.shape, GraphShapes.isGraph(spec.kind) && spec.graph != nil { next = .GRAPH }

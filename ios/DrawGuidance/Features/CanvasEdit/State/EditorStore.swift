@@ -17,6 +17,8 @@ protocol EditorHost: AnyObject {
     func editImageElsewhere(_ image: Stroke) -> Bool
     /// v52 not almada düz şekil gelişmiş çizim tuvalinde düzenlenir (true: orada açılıyor).
     func editShapeElsewhere(_ shape: Stroke) -> Bool
+    /// v52 tablo düzenleme penceresini açar (not almada tablo).
+    func editTable(_ id: String) -> Bool
 }
 
 extension EditorHost {
@@ -25,6 +27,7 @@ extension EditorHost {
     func onInk(_ stroke: Stroke) {}
     func editImageElsewhere(_ image: Stroke) -> Bool { false }
     func editShapeElsewhere(_ shape: Stroke) -> Bool { false }
+    func editTable(_ id: String) -> Bool { false }
 }
 
 /// Çizim ekranının tek doğruluk kaynağı (Android `EditorStore`): tuval (sayfalar), seçim, eleman dizini ve geri al /

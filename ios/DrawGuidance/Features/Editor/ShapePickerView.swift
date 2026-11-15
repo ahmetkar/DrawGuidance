@@ -80,12 +80,25 @@ enum ShapePicker {
 /// Şekil seçici: kategoriler sekmeli, şekiller ızgarada (Android `ShapePickerModal` sadeleştirilmiş).
 struct ShapePickerView: View {
     let kind: CanvasKind
+    /// v52 not almada grafikler ayrı pencerede: true yalnız grafikler, false grafikler hariç, nil hepsi.
+    var graphs: Bool? = nil
+    /// v52 başlık (nil: Şekiller).
+    var title: String? = nil
     let onPick: (String) -> Void
     @Environment(\.dismiss) private var dismiss
     @State private var selected: String?
     @State private var query = ""
 
-    private var cats: [PickerCategory] { ShapePicker.categories(kind) }
+    static let GRAPH_CATEGORIES: Set<String> = ["graphs", "curves"]
+
+    private var cats: [PickerCategory] {
+        let all = ShapePicker.categories(kind)
+        switch graphs {
+        case nil: return all
+        case true?: return all.filter { Self.GRAPH_CATEGORIES.contains($0.id) }
+        case false?: return all.filter { !Self.GRAPH_CATEGORIES.contains($0.id) }
+        }
+    }
 
     var body: some View {
         NavigationStack {
@@ -125,7 +138,7 @@ struct ShapePickerView: View {
                 }
             }
             .searchable(text: $query)
-            .navigationTitle(LocalizedStringKey("shapes.title"))
+            .navigationTitle(title.map { Text($0) } ?? Text(LocalizedStringKey("shapes.title")))
             .navigationBarTitleDisplayMode(.inline)
             .toolbar { ToolbarItem(placement: .cancellationAction) { Button(LocalizedStringKey("common.close")) { dismiss() } } }
         }

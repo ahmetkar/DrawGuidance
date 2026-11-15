@@ -32,6 +32,9 @@ struct SimpleToolbar: View {
         if notes {
             t += [
                 Tool(id: "formula", icon: "function", label: L("add_formula")) { vm.formulas.openPicker() },
+                // v52 grafik (şekil penceresinden ayrıldı) ve tablo ayrı düğmelerde
+                Tool(id: "graph", icon: "chart.xyaxis.line", label: L("v52_add_graph")) { vm.shapes.openGraphPicker() },
+                Tool(id: "table", icon: "tablecells", label: L("v52_add_table")) { vm.tables.openCreate() },
                 Tool(id: "diagram", icon: "point.3.connected.trianglepath.dotted", label: L("add_diagram")) { vm.diagrams.openPicker() },
                 Tool(id: "panels", icon: "rectangle.split.2x2", label: L("v45_panels_add")) { panelsOpen = true },
             ]

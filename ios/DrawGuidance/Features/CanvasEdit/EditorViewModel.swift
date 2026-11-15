@@ -74,6 +74,8 @@ final class EditorViewModel: ObservableObject, EditorHost {
     private(set) var v40: V40ExportController!
     private(set) var v45: V45NotesComicController!
     private(set) var formulas: FormulaController!
+    /// v52 not almada tablo ekleme ve düzenleme.
+    private(set) var tables: TableController!
     private(set) var pen: PenController!
     private(set) var scene: ObjectSceneController!
     private(set) var layers: LayerController!
@@ -162,6 +164,7 @@ final class EditorViewModel: ObservableObject, EditorHost {
         v40 = V40ExportController(store, images: deps.images, repository: repo)
         v45 = V45NotesComicController(store, self, pages)
         formulas = FormulaController(store, self) { [unowned self] in brush }
+        tables = TableController(store, self)
         pen = PenController(store, self) { [unowned self] in shapes.newShapeStyle() }
         scene = ObjectSceneController(store)
         layers = LayerController(store)
@@ -267,6 +270,8 @@ final class EditorViewModel: ObservableObject, EditorHost {
     }
 
     /// v52 notta seçili düz şekil gelişmiş çizim tuvalinde düzenlenir; kaydedilince nota döner. Yayın varsa ara verilir.
+    func editTable(_ id: String) -> Bool { tables.edit(id); return true }
+
     func editShapeElsewhere(_ shape: Stroke) -> Bool {
         guard let c = store.canvas, c.kind.isNotes, tempSession == nil else { return false }
         texts.commitOpenDraft()
@@ -487,6 +492,7 @@ final class EditorViewModel: ObservableObject, EditorHost {
     func afterContentReplaced() {
         handwriting.reset()
         formulas.onContentReplaced()
+        tables.onContentReplaced()
         diagrams.onContentReplaced()
         shapes.onContentReplaced()
         texts.onContentReplaced()

@@ -20,6 +20,8 @@ enum FormulaRenderer {
     private static let lock = NSLock()
     private static var fonts: [String: CTFont] = [:]
     private static var layouts: [String: FormulaLayout] = [:]
+    /// v53 düzenleyici kapanınca / bellek uyarısında.
+    static func trimCaches() { lock.lock(); layouts.removeAll(); lock.unlock() }
 
     static func font(_ style: GlyphStyle, _ size: Float) -> CTFont {
         let key = "\(style.rawValue)|\(size)"

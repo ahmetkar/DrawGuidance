@@ -31,6 +31,7 @@ object HarmonyRenderer {
     private val cache = object : LruCache<String, Processed>(com.karapp.drawguidance.platform.DeviceCaps.secondaryCacheBytes(32 * 1024 * 1024)) {
         override fun sizeOf(key: String, value: Processed): Int = value.bitmap.byteCount + value.alpha.byteCount
     }.also { c -> com.karapp.drawguidance.platform.DeviceCaps.onTrim { c.evictAll() } }
+    init { com.karapp.drawguidance.platform.DeviceCaps.cache(editor = true) { synchronized(cache) { cache.evictAll() } } }
 
     fun clear() = cache.evictAll()
 

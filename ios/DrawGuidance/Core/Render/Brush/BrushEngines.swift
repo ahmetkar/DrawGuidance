@@ -509,7 +509,12 @@ struct TubeBuilder {
 }
 
 extension BrushTextures {
-    private static let tinted = NSCache<NSString, CGImage>()
+    private static let tinted: NSCache<NSString, CGImage> = {
+        let c = NSCache<NSString, CGImage>()
+        c.countLimit = 48
+        MemoryHygiene.register(editor: true) { c.removeAllObjects() }
+        return c
+    }()
 
     /// Fırça renginde yumuşak damga (Android: beyaz damga + `SRC_IN` renk süzgeci).
     static func tintedSoftStamp(_ hardness: Float, _ color: UInt32) -> CGImage {

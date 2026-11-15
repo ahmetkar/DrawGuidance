@@ -50,6 +50,7 @@ object BrushPreviewCache {
     private val cache = object : LruCache<Key, ImageBitmap>(16 * 1024 * 1024) {
         override fun sizeOf(key: Key, value: ImageBitmap): Int = value.width * value.height * 4
     }
+    init { com.karapp.drawguidance.platform.DeviceCaps.cache(editor = false) { synchronized(cache) { cache.evictAll() } } }
     private val points = (0..40).map { i -> Offset(10f + i * 3f, 24f + sin(i / 40f * 2 * PI).toFloat() * 11f) }
 
     fun get(key: Key): ImageBitmap? = cache.get(key)

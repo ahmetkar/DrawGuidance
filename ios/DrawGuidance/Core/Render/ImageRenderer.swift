@@ -8,6 +8,7 @@ enum ImageRenderer {
     private static let warped: NSCache<NSString, CGImage> = {
         let c = NSCache<NSString, CGImage>()
         c.totalCostLimit = 32 * 1024 * 1024
+        MemoryHygiene.register(editor: true) { c.removeAllObjects() }
         return c
     }()
     private static let ci = CIContext(options: [.useSoftwareRenderer: false])

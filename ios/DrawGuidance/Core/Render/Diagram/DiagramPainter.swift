@@ -1109,6 +1109,8 @@ enum DiagramPainter {
     }
 
     private static var blockCache: [String: Block] = [:]
+    /// v53 düzenleyici kapanınca / bellek uyarısında.
+    static func trimCaches() { blockLock.lock(); blockCache.removeAll(); blockLock.unlock() }
     private static let blockLock = NSLock()
 
     static func measure(_ text: String, _ face: DiagramFace, _ size: Float, _ spacing: Float) -> Float {

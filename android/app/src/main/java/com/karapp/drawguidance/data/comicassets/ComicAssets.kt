@@ -250,6 +250,7 @@ object ComicThumbs {
     ) {
         override fun sizeOf(key: String, value: ImageBitmap): Int = value.width * value.height * 4
     }
+    init { com.karapp.drawguidance.platform.DeviceCaps.cache(editor = false) { synchronized(cache) { cache.evictAll() } } }
 
     fun cached(key: Pair<String, Int>): ImageBitmap? = cache.get("${key.first}|${key.second}")
 

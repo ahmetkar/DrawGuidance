@@ -130,6 +130,7 @@ private object Model3DThumbs {
     private val cache = object : android.util.LruCache<String, ImageBitmap>(8 shl 20) {
         override fun sizeOf(key: String, value: ImageBitmap): Int = value.width * value.height * 4
     }
+    init { com.karapp.drawguidance.platform.DeviceCaps.cache(editor = false) { synchronized(cache) { cache.evictAll() } } }
 
     fun get(key: String): ImageBitmap? = cache.get(key)
 

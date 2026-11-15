@@ -37,6 +37,9 @@ enum CanvasImageCache {
 
     static func contains(_ id: String) -> Bool { cache.object(forKey: id as NSString) != nil }
 
+    /// v53 bellek düzeni: tuval kapanınca ve bellek uyarısında.
+    static let registered: Bool = { MemoryHygiene.register(editor: true) { CanvasImageCache.clear() }; return true }()
+
     static func clear() { cache.removeAllObjects(); lock.lock(); version += 1; lock.unlock() }
 
     /// Yeni resim yüklendi (çizim yüzeyleri yeniden çizer).

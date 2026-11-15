@@ -116,6 +116,7 @@ final class EditorViewModel: ObservableObject, EditorHost {
     let structure = StructureGuideState()
     /// v53 not almada hızlı yazı kutusu.
     let quickText = QuickTextState()
+    private var hygieneClosed = false
 
     private var practiceActive: () -> Bool = { false }
 
@@ -141,6 +142,7 @@ final class EditorViewModel: ObservableObject, EditorHost {
     init(canvasLocalId: String, deps: EditorDependencies) {
         self.canvasLocalId = canvasLocalId
         self.deps = deps
+        MemoryHygiene.editorOpened()
         canvasPrefs = deps.prefs.canvas(canvasLocalId)
         tempSession = TempCanvases.session(canvasLocalId)
         lastAddItem = canvasPrefs.lastAddItem
@@ -378,6 +380,10 @@ final class EditorViewModel: ObservableObject, EditorHost {
 
     /// Ekran kapanırken: bekleyen kayıt yazılır, eğitim yarıda kaldıysa geri alınır.
     func close() {
+        // v53 kapanan tuvalin çizim önbellekleri bellekte tutulmaz (bkz. MemoryHygiene)
+        if !hygieneClosed { hygieneClosed = true; MemoryHygiene.editorClosed() }
+        structure.clear()
+        quickText.close()
         // v51 geçici resim tuvali kaydedilmeden kapanırsa silinir (hiç yazılmaz)
         if tempSession != nil {
             imageEdit.cancelTrace()

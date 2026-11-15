@@ -56,11 +56,11 @@ struct ChromeButton: View {
         case .below:
             VStack(spacing: 3) {
                 Image(systemName: icon).font(.system(size: 17, weight: .medium))
-                Text(label).font(.system(size: 10, weight: .semibold)).lineLimit(1).minimumScaleFactor(0.75)
+                Text(label).font(.system(size: 10, weight: .semibold)).lineLimit(1).minimumScaleFactor(0.6)
             }
             .foregroundStyle(fg)
-            .frame(minWidth: 48, maxWidth: 70, minHeight: 50)
-            .padding(.horizontal, 2)
+            .frame(minWidth: 0, maxWidth: 70, minHeight: 50)
+            .padding(.horizontal, 1)
             .background(ChromeChip(selected: selected, radius: 14))
         }
     }
@@ -245,7 +245,7 @@ struct AdvancedMenus: View {
                              labelStyle: .below, id: "mode_\(m)", anchor: TutorialAnchor.mode(m)) { vm.chooseMode(m) }
                     .frame(maxWidth: .infinity)
             }
-            Rectangle().fill(Color.primary.opacity(0.12)).frame(width: 1, height: 34).padding(.horizontal, 2)
+            Rectangle().fill(Color.primary.opacity(0.12)).frame(width: 1, height: 34)
             ForEach(Self.panelTabs, id: \.0) { tab in
                 ChromeButton(icon: tab.1, label: L(tab.2), selected: vm.panel == tab.0, labelStyle: .below,
                              id: "panel_btn_\(tab.0)", anchor: tab.3) { withAnimation(.snappy(duration: 0.25)) { vm.togglePanel(tab.0) } }

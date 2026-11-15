@@ -61,6 +61,7 @@ enum PaperLibrary {
     private static let images: NSCache<NSString, CGImage> = {
         let c = NSCache<NSString, CGImage>()
         c.totalCostLimit = 48 * 1024 * 1024
+        MemoryHygiene.register(editor: true) { c.removeAllObjects() }
         return c
     }()
     private static let lock = NSLock()
@@ -98,6 +99,7 @@ enum BackgroundRenderer {
     private static let tiles: NSCache<NSString, CGImage> = {
         let c = NSCache<NSString, CGImage>()
         c.totalCostLimit = 8 * 1024 * 1024
+        MemoryHygiene.register(editor: true) { c.removeAllObjects() }
         return c
     }()
 

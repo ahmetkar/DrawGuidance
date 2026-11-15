@@ -6,6 +6,7 @@ enum ComicThumbCache {
     private static let cache: NSCache<NSString, CGImage> = {
         let c = NSCache<NSString, CGImage>()
         c.totalCostLimit = 24 * 1024 * 1024
+        MemoryHygiene.register(editor: false) { c.removeAllObjects() }
         return c
     }()
 

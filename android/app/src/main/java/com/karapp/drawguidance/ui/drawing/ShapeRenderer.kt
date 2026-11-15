@@ -97,6 +97,7 @@ object ShapeRenderer {
     private val cache = object : LruCache<String, Cached>(MAX_CACHED_POINTS) {
         override fun sizeOf(key: String, value: Cached): Int = value.points.size + 32
     }
+    init { com.karapp.drawguidance.platform.DeviceCaps.cache(editor = true) { synchronized(cache) { cache.evictAll() } } }
     private const val MAX_CACHED_POINTS = 400_000
     private val clipRect = object : ThreadLocal<android.graphics.Rect>() { override fun initialValue() = android.graphics.Rect() }
 

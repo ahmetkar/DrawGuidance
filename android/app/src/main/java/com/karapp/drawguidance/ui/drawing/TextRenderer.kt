@@ -52,6 +52,7 @@ object TextRenderer {
     }
 
     private val layouts = LruCache<Key, StaticLayout>(64)
+    init { com.karapp.drawguidance.platform.DeviceCaps.cache(editor = true) { synchronized(layouts) { layouts.evictAll() } } }
 
     private val TR = java.util.Locale("tr", "TR")
 

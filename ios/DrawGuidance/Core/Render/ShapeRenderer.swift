@@ -78,6 +78,7 @@ enum ShapeRenderer {
     private static let cache: NSCache<NSString, Cached> = {
         let c = NSCache<NSString, Cached>()
         c.totalCostLimit = 400_000
+        MemoryHygiene.register(editor: true) { c.removeAllObjects() }
         return c
     }()
 

@@ -23,6 +23,8 @@ enum TextRenderer {
     }
 
     private static var layouts: [(spec: TextSpec, size: Float, layout: Layout)] = []
+    /// v53 düzenleyici kapanınca / bellek uyarısında.
+    static func trimCaches() { lock.lock(); layouts.removeAll(); lock.unlock() }
     private static let lock = NSLock()
 
     static func effectiveSize(_ spec: TextSpec, _ sizePx: Float) -> Float { sizePx * spec.paragraph.sizeFactor }

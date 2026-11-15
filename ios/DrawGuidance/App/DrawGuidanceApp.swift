@@ -11,6 +11,8 @@ struct DrawGuidanceApp: App {
         RaspGuard.start()
         // Tuval resimleri: önbellekten düşen resimler dosyadan yeniden çözülür
         CanvasAssetStore.shared.install()
+        // v53 bellek düzeni: bellek uyarısında ve tuval kapanınca çizim önbellekleri boşalır
+        MemoryHygiene.install()
         // v51 not almadan açılıp yarıda kalmış (12 saatten eski) geçici resim tuvalleri silinir
         TempImageEditor.cleanup(olderThanMs: 12 * 3_600_000, deps: .shared)
         // Google ve Apple ile giriş (GoogleService-Info.plist pakette varsa Firebase açılır)

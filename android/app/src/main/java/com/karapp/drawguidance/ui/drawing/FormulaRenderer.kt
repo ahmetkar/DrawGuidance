@@ -65,6 +65,7 @@ object FormulaRenderer {
     }
 
     private val layouts = object : LruCache<String, FormulaLayout>(256) {}
+    init { com.karapp.drawguidance.platform.DeviceCaps.cache(editor = true) { synchronized(layouts) { layouts.evictAll() } } }
 
     /** Kaynağın dizgisi (önbellekli). */
     fun layout(source: String): FormulaLayout {

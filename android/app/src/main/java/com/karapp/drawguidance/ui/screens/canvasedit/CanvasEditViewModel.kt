@@ -502,6 +502,8 @@ class CanvasEditViewModel(
     )
 
     init {
+        // v53 bellek düzeni: açık tuval sayısı (kapanınca çizim önbellekleri boşalır)
+        com.karapp.drawguidance.platform.DeviceCaps.editorOpened()
         // v21: şekil veritabanı arka planda hazırlanır (ilk açılışta şablonlar yazılır)
         shapeDb?.warmUp()
         brush = BrushController(store, this, paletteStore, shapes::setDrawingWidth, canvasPrefs)
@@ -694,6 +696,8 @@ class CanvasEditViewModel(
         imageEdit.cancelTrace()
         saveQueue.flushNow()
         if (store.canvas.value != null) runCatching { recent?.closed(canvasLocalId) }
+        // v53 kapanan tuvalin çizim önbellekleri (resimler, çizim resimleri, yazı düzenleri, tonlar) bellekte tutulmaz
+        com.karapp.drawguidance.platform.DeviceCaps.editorClosed()
         super.onCleared()
     }
 

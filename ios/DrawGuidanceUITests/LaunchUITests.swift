@@ -110,12 +110,9 @@ final class LaunchUITests: XCTestCase {
         XCTAssertTrue(menu.waitForExistence(timeout: 10))
         menu.tap()
         let marker = app.descendants(matching: .any)["brush_MARKER"].firstMatch
-        // v51 fırça ayarları çoğaldı: fırça listesi pencerede aşağıda kalabilir, görünene dek kaydırılır
-        let sheetList = app.descendants(matching: .any)["brush_size"].firstMatch
-        if sheetList.waitForExistence(timeout: 10) {
-            for _ in 0..<8 where !(marker.exists && marker.isHittable) { app.swipeUp() }
-        }
+        // v53 fırça penceresi yalnız fırça seçimidir (ayarlar Özellikler'de); kart aşağıdaysa kaydırılır
         XCTAssertTrue(marker.waitForExistence(timeout: 10))
+        for _ in 0..<6 where !marker.isHittable { app.swipeUp() }
         marker.tap()
 
         let canvas = app.descendants(matching: .any)["drawing_canvas"].firstMatch
@@ -268,5 +265,39 @@ final class LaunchUITests: XCTestCase {
             shot.lifetime = .keepAlways
             add(shot)
         }
+    }
+
+    /// v53: Özellikler sağdan açılan panelde; çizgi romanda Ekran tonları ayrı penceresinde.
+    func testV53SidePanelAndTones() throws {
+        let app = XCUIApplication()
+        app.launchArguments += ["-AppleLanguages", "(tr)", "-uiTesting"]
+        app.launch()
+        createCanvas(app, "COMIC")
+        let props = app.descendants(matching: .any)["panel_btn_BRUSH"].firstMatch
+        XCTAssertTrue(props.waitForExistence(timeout: 15))
+        props.tap()
+        XCTAssertTrue(app.descendants(matching: .any)["side_panel"].firstMatch.waitForExistence(timeout: 5))
+        let shot = XCTAttachment(screenshot: app.screenshot())
+        shot.name = "v53-side-panel"
+        shot.lifetime = .keepAlways
+        add(shot)
+        app.descendants(matching: .any)["side_panel_close"].firstMatch.tap()
+        app.descendants(matching: .any)["mode_ADD"].firstMatch.tap()
+        let tones = app.descendants(matching: .any)["add_tones"].firstMatch
+        XCTAssertTrue(tones.waitForExistence(timeout: 5))
+        for _ in 0..<6 where !tones.isHittable { app.descendants(matching: .any)["tool_row_context"].firstMatch.swipeLeft() }
+        tones.tap()
+        let card = app.descendants(matching: .any)["tone_soft_shadow"].firstMatch
+        XCTAssertTrue(card.waitForExistence(timeout: 5))
+        card.tap()
+        let insert = app.descendants(matching: .any)["tone_insert"].firstMatch
+        for _ in 0..<6 where !(insert.exists && insert.isHittable) { app.swipeUp() }
+        XCTAssertTrue(insert.waitForExistence(timeout: 5))
+        let shot2 = XCTAttachment(screenshot: app.screenshot())
+        shot2.name = "v53-tones"
+        shot2.lifetime = .keepAlways
+        add(shot2)
+        insert.tap()
+        XCTAssertTrue(app.descendants(matching: .any)["drawing_canvas"].firstMatch.waitForExistence(timeout: 5))
     }
 }

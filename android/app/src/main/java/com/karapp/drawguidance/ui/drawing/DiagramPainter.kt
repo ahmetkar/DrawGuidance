@@ -1160,6 +1160,7 @@ internal object DiagramPainter {
     }
 
     private val blockCache = object : android.util.LruCache<String, Block>(768) {}
+    init { com.karapp.drawguidance.platform.DeviceCaps.cache(editor = true) { synchronized(blockCache) { blockCache.evictAll() } } }
 
     fun measure(text: String, face: Typeface, size: Float, spacing: Float): Float {
         val t = tp

@@ -22,6 +22,7 @@ object ToneRenderer {
     private val cache = object : LruCache<Key, List<ComicTones.Prim>>(120_000) {
         override fun sizeOf(key: Key, value: List<ComicTones.Prim>): Int = value.size.coerceAtLeast(1)
     }
+    init { com.karapp.drawguidance.platform.DeviceCaps.cache(editor = true) { synchronized(cache) { cache.evictAll() } } }
 
     private val paints = object : ThreadLocal<Paint>() { override fun initialValue() = Paint(Paint.ANTI_ALIAS_FLAG) }
     private val paths = object : ThreadLocal<Path>() { override fun initialValue() = Path() }

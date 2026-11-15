@@ -33,6 +33,8 @@ object CanvasImageCache {
     init {
         // Bellek azalınca önbellek boşaltılır (resimler gerektiğinde yeniden yüklenir)
         com.karapp.drawguidance.platform.DeviceCaps.onTrim { cache.evictAll(); _version.update { it + 1 } }
+        // v53 kapanan tuvalin resimleri bellekte tutulmaz (açık tuval varsa gerektiğinde yeniden yüklenir)
+        com.karapp.drawguidance.platform.DeviceCaps.onEditorClosed { cache.evictAll(); _version.update { it + 1 } }
     }
 
     /**

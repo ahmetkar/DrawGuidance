@@ -40,6 +40,7 @@ enum RasterStrokes {
     private static let cache: NSCache<NSString, Entry> = {
         let c = NSCache<NSString, Entry>()
         c.totalCostLimit = 64 * 1024 * 1024
+        MemoryHygiene.register(editor: true) { c.removeAllObjects() }
         return c
     }()
 

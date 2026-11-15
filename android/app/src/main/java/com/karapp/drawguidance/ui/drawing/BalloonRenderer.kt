@@ -103,6 +103,7 @@ object BalloonRenderer {
      * önbellekte durur. Yollar önbellekten sonra değiştirilmez.
      */
     private val outlines = android.util.LruCache<OutlineKey, Pair<Path, Path?>>(48)
+    init { com.karapp.drawguidance.platform.DeviceCaps.cache(editor = true) { synchronized(outlines) { outlines.evictAll() } } }
 
     /** Gövde ve kuyruklar birleşik yol; düşünce balonunda kabarcıklar ikinci yol (önbellekli). */
     fun outline(b: BalloonSpec, w: Float, h: Float): Pair<Path, Path?> {

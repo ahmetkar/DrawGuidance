@@ -56,6 +56,8 @@ enum BalloonRenderer {
     }
 
     private static var cache: [String: (CGPath, CGPath?)] = [:]
+    /// v53 düzenleyici kapanınca / bellek uyarısında.
+    static func trimCaches() { lock.lock(); cache.removeAll(); lock.unlock() }
     private static let lock = NSLock()
 
     /// Gövde ve kuyruklar birleşik yol; düşünce balonunda kabarcıklar ikinci yol (önbellekli).

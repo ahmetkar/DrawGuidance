@@ -69,7 +69,12 @@ struct BrushPickerView: View {
 
 /// Seçicideki fırça önizlemesi: dalgalı örnek çizgi, gerçek fırça motoruyla.
 enum BrushPreview {
-    private static let cache = NSCache<NSString, UIImage>()
+    private static let cache: NSCache<NSString, UIImage> = {
+        let c = NSCache<NSString, UIImage>()
+        c.countLimit = 80
+        MemoryHygiene.register(editor: false) { c.removeAllObjects() }
+        return c
+    }()
 
     static func image(_ type: BrushType, color: UInt32) -> UIImage {
         let key = "\(type.rawValue)-\(color)" as NSString

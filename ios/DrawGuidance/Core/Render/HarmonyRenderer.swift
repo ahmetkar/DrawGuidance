@@ -18,6 +18,7 @@ enum HarmonyRenderer {
     private static let cache: NSCache<NSString, Processed> = {
         let c = NSCache<NSString, Processed>()
         c.totalCostLimit = 32 * 1024 * 1024
+        MemoryHygiene.register(editor: true) { c.removeAllObjects() }
         return c
     }()
 

@@ -88,6 +88,7 @@ object Thumbs {
     private val cache = object : android.util.LruCache<String, ImageBitmap>((Runtime.getRuntime().maxMemory() / 24).coerceIn(4L shl 20, 16L shl 20).toInt()) {
         override fun sizeOf(key: String, value: ImageBitmap): Int = value.width * value.height * 4
     }
+    init { com.karapp.drawguidance.platform.DeviceCaps.cache(editor = false) { synchronized(cache) { cache.evictAll() } } }
 
     fun cached(key: String): ImageBitmap? = cache.get(key)
 

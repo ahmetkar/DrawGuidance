@@ -49,7 +49,12 @@ enum ShapePicker {
         }
     }
 
-    private static let thumbs = NSCache<NSString, UIImage>()
+    private static let thumbs: NSCache<NSString, UIImage> = {
+        let c = NSCache<NSString, UIImage>()
+        c.countLimit = 240
+        MemoryHygiene.register(editor: false) { c.removeAllObjects() }
+        return c
+    }()
 
     /// Seçicideki küçük resim (koyu kalemle, dolgusuz).
     static func thumbnail(_ id: String, side: CGFloat = 64) -> UIImage? {

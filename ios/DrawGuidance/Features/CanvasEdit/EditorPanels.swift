@@ -280,7 +280,12 @@ struct FormulaPickerSheet: View {
 
 /// v53 seçicilerin küçük resimleri (gerçek çiziciyle; sınırlı önbellek, bellek uyarısında boşalır).
 enum PickerThumbs {
-    static let cache: NSCache<NSString, UIImage> = { let c = NSCache<NSString, UIImage>(); c.countLimit = 120; return c }()
+    static let cache: NSCache<NSString, UIImage> = {
+        let c = NSCache<NSString, UIImage>()
+        c.countLimit = 120
+        MemoryHygiene.register(editor: false) { c.removeAllObjects() }
+        return c
+    }()
 
     static func diagram(_ k: DiagramKind) -> UIImage? {
         let key = "d-\(k.rawValue)" as NSString

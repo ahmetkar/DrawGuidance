@@ -36,6 +36,7 @@ object SurfaceTextures {
 
     private const val SIZE = 128
     private val cache = LruCache<String, Bitmap>(24)
+    init { com.karapp.drawguidance.platform.DeviceCaps.cache(editor = true) { synchronized(cache) { cache.evictAll() } } }
 
     /** [kind] türünün [color] renginden tonlanmış karosu. */
     fun tile(kind: SurfaceKind, color: Int): Bitmap = synchronized(cache) {

@@ -95,6 +95,7 @@ object BackgroundRenderer {
     private val tiles = object : LruCache<String, Bitmap>(8 * 1024 * 1024) {
         override fun sizeOf(key: String, value: Bitmap): Int = value.byteCount
     }
+    init { com.karapp.drawguidance.platform.DeviceCaps.cache(editor = true) { synchronized(tiles) { tiles.evictAll() } } }
 
     init {
         com.karapp.drawguidance.platform.DeviceCaps.onTrim { tiles.evictAll() }

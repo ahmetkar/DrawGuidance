@@ -137,5 +137,30 @@ object DeviceCaps {
 
     fun trimMemory() { trimListeners.forEach { runCatching { it() } } }
 
+    /**
+     * v53 düzenleyici kapanınca boşaltılacak çizim önbellekleri: kapatılan tuvalin çizimleri, resimleri ve yazı
+     * düzenleri bellekte tutulmaz; yalnız açık olan tuvalin verileri bellekte kalır.
+     */
+    private val closeListeners = java.util.concurrent.CopyOnWriteArrayList<() -> Unit>()
+
+    fun onEditorClosed(listener: () -> Unit) { closeListeners += listener }
+
+    private val openEditors = java.util.concurrent.atomic.AtomicInteger(0)
+
+    fun editorOpened() { openEditors.incrementAndGet() }
+
+    /** Kayıt bitsin diye kısa bir süre sonra; o sırada başka tuval açık değilse boşaltılır. */
+    fun editorClosed() {
+        openEditors.updateAndGet { (it - 1).coerceAtLeast(0) }
+        val run = Runnable { if (openEditors.get() == 0) closeListeners.forEach { runCatching { it() } } }
+        runCatching { android.os.Handler(android.os.Looper.getMainLooper()).postDelayed(run, 2_000) }.onFailure { run.run() }
+    }
+
+    /** Önbelleği hem bellek uyarısına hem (çizim önbelleğiyse) düzenleyicinin kapanmasına bağlar. */
+    fun cache(editor: Boolean, evict: () -> Unit) {
+        onTrim(evict)
+        if (editor) onEditorClosed(evict)
+    }
+
     const val DEFAULT_EXPORT_SIDE = 4096
 }

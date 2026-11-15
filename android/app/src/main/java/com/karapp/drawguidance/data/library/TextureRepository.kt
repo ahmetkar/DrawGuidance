@@ -31,6 +31,7 @@ class TextureRepository(
     private val cache = object : LruCache<String, Texture>(24 * 1024 * 1024) {
         override fun sizeOf(key: String, value: Texture): Int = value.px.size * 4
     }
+    init { com.karapp.drawguidance.platform.DeviceCaps.cache(editor = false) { synchronized(cache) { cache.evictAll() } } }
     private val mutex = Mutex()
     @Volatile private var seeded = false
 

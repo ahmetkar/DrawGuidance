@@ -292,13 +292,15 @@ abstract class TemplateExportBase : V32EditorBase() {
             "comic_strips", "comic_blank_action",
             "notes_chemistry", "notes_physics", "notes_vocab", "notes_timeline",
             "simple_reading", "simple_shopping", "simple_exam",
+            // v53 dolu çizgi roman şablonları
+            "comic_story_school", "comic_story_chase", "comic_story_strip",
         )
 
         fun l(tr: String, en: String, ar: String, ja: String, ko: String, ru: String, zh: String) =
             mapOf("tr" to tr, "en" to en, "ar" to ar, "ja" to ja, "ko" to ko, "ru" to ru, "zh" to zh)
 
         /** Şablonların dillere göre adları ve kısa açıklamaları. */
-        val INFO: Map<String, Pair<Map<String, String>, Map<String, String>>> = V52TemplateInfo.INFO + V48TemplateInfo.INFO + V47TemplateInfo.INFO + mapOf(
+        val INFO: Map<String, Pair<Map<String, String>, Map<String, String>>> = V53TemplateInfo.INFO + V52TemplateInfo.INFO + V48TemplateInfo.INFO + V47TemplateInfo.INFO + mapOf(
             "notes_cornell" to (l("Cornell ders notu", "Cornell lecture notes", "ملاحظات كورنيل", "コーネル式ノート", "코넬 노트", "Конспект Корнелла", "康奈尔笔记") to
                 l("Anahtar sorular, not alanı ve özet; Newton yasaları örneği.", "Key questions, notes and summary; Newton's laws example.", "أسئلة رئيسية وملاحظات وملخص؛ مثال قوانين نيوتن.", "キークエスチョン・ノート・まとめ（ニュートンの法則の例）。", "핵심 질문, 노트, 요약(뉴턴 법칙 예시).", "Ключевые вопросы, записи и итог; пример — законы Ньютона.", "关键问题、笔记和总结（牛顿定律示例）。")),
             "notes_math" to (l("Matematik çalışma kâğıdı", "Math worksheet", "ورقة عمل رياضيات", "数学ワークシート", "수학 학습지", "Рабочий лист по математике", "数学练习页") to

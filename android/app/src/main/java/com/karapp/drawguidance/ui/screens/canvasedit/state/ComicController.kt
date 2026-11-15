@@ -55,28 +55,6 @@ class ComicController(
      * görünen sayfanın ortası). Eklenen balon seçilir. v36 [options] yazısı boşsa öntanımlı yazı hemen yazılmaya açılır;
      * yazı pencerede yazıldıysa balon o yazı, yazı tipi, boyut, renk, hizalama ve kuyrukla eklenir.
      */
-    /** v53 balonun türüne uygun yazı tipi (çizgi roman yazı tipleri). */
-    fun balloonFont(style: BalloonStyle): TextFont = when (style) {
-        BalloonStyle.SHOUT, BalloonStyle.ELECTRIC, BalloonStyle.FLASH, BalloonStyle.ROUGH, BalloonStyle.ICICLE, BalloonStyle.DRIP -> TextFont.BANGERS
-        BalloonStyle.THOUGHT, BalloonStyle.WAVY, BalloonStyle.HEART -> TextFont.SHANTELL
-        BalloonStyle.WHISPER -> TextFont.PATRICK_HAND
-        BalloonStyle.NARRATION -> TextFont.COMIC_RELIEF_BOLD
-        BalloonStyle.PHONE -> TextFont.SANS
-        else -> TextFont.COMIC_RELIEF
-    }
-
-    /** v53 balon yazısının varsayılan boyu: sayfanın kısa kenarına göre; bağırmada büyük, fısıltıda küçük. */
-    fun balloonTextSize(style: BalloonStyle, w: Float, h: Float): Float {
-        val base = (min(w, h) * 0.034f).coerceIn(18f, 64f)
-        val k = when (style) {
-            BalloonStyle.SHOUT, BalloonStyle.FLASH, BalloonStyle.ELECTRIC -> 1.25f
-            BalloonStyle.WHISPER -> 0.85f
-            BalloonStyle.NARRATION -> 0.9f
-            else -> 1f
-        }
-        return (base * k).coerceIn(TextController.MIN_TEXT_SIZE, TextController.MAX_TEXT_SIZE)
-    }
-
     fun insertBalloon(style: BalloonStyle, speakers: Int, center: Offset?, options: BalloonTextOptions = BalloonTextOptions()) {
         val current = store.canvas.value ?: return
         val typed = options.content.isNotBlank()
@@ -513,6 +491,28 @@ class ComicController(
     }
 
     companion object {
+        /** v53 balonun türüne uygun yazı tipi (çizgi roman yazı tipleri). */
+        fun balloonFont(style: BalloonStyle): TextFont = when (style) {
+            BalloonStyle.SHOUT, BalloonStyle.ELECTRIC, BalloonStyle.FLASH, BalloonStyle.ROUGH, BalloonStyle.ICICLE, BalloonStyle.DRIP -> TextFont.BANGERS
+            BalloonStyle.THOUGHT, BalloonStyle.WAVY, BalloonStyle.HEART -> TextFont.SHANTELL
+            BalloonStyle.WHISPER -> TextFont.PATRICK_HAND
+            BalloonStyle.NARRATION -> TextFont.COMIC_RELIEF_BOLD
+            BalloonStyle.PHONE -> TextFont.SANS
+            else -> TextFont.COMIC_RELIEF
+        }
+
+        /** v53 balon yazısının varsayılan boyu: sayfanın kısa kenarına göre; bağırmada büyük, fısıltıda küçük. */
+        fun balloonTextSize(style: BalloonStyle, w: Float, h: Float): Float {
+            val base = (min(w, h) * 0.034f).coerceIn(18f, 64f)
+            val k = when (style) {
+                BalloonStyle.SHOUT, BalloonStyle.FLASH, BalloonStyle.ELECTRIC -> 1.25f
+                BalloonStyle.WHISPER -> 0.85f
+                BalloonStyle.NARRATION -> 0.9f
+                else -> 1f
+            }
+            return (base * k).coerceIn(TextController.MIN_TEXT_SIZE, TextController.MAX_TEXT_SIZE)
+        }
+
         const val DEFAULT_TEXT = "Merhaba!"
         /** v36 telefon mesajı balonunun dolgu ve kenar rengi. */
         const val PHONE_FILL = "#3B82F6"

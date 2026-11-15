@@ -83,7 +83,12 @@ struct ThumbCard<Thumb: View>: View {
 // MARK: - Konuşma balonu
 
 enum BalloonThumbs {
-    private static let cache: NSCache<NSString, UIImage> = { let c = NSCache<NSString, UIImage>(); c.countLimit = 40; return c }()
+    private static let cache: NSCache<NSString, UIImage> = {
+        let c = NSCache<NSString, UIImage>()
+        c.countLimit = 40
+        MemoryHygiene.register(editor: false) { c.removeAllObjects() }
+        return c
+    }()
 
     /// Balonun küçük resmi (gerçek balon çizicisiyle).
     static func image(_ style: BalloonStyle) -> UIImage? {

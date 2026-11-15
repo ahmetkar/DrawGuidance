@@ -328,6 +328,7 @@ object ShapeThumbnails {
     ) {
         override fun sizeOf(key: String, value: ImageBitmap): Int = value.width * value.height * 4
     }
+    init { com.karapp.drawguidance.platform.DeviceCaps.cache(editor = false) { synchronized(cache) { cache.evictAll() } } }
 
     private fun key(id: String, w: Int, h: Int, ink: Int, fillHex: String?) = if (fillHex == null) "$id|$w|$h|$ink" else "$id|$w|$h|$ink|$fillHex"
 

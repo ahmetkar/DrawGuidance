@@ -128,6 +128,7 @@ object BrushTextures {
     }
 
     private val spheres = android.util.LruCache<Int, Bitmap>(12)
+    init { com.karapp.drawguidance.platform.DeviceCaps.cache(editor = true) { synchronized(spheres) { spheres.evictAll() } } }
 
     /**
      * 3B fırçanın damgası: [color] renginde, sol üstten ışık alan küre (koyu kenar, parlak ışık lekesi). Damgalar sık

@@ -200,7 +200,11 @@ final class ShapeController: ObservableObject {
         }
     }
 
-    var coarse: Bool { store.canvas?.kind.simple == true }
+    /// v52 basit resimde "Ayrıntılı noktalar": açıkken gelişmiş moddaki gibi tüm noktalar düzenlenir.
+    @Published var fineNodes = false
+    func setFineNodes(_ v: Bool) { guard fineNodes != v else { return }; fineNodes = v; reset() }
+
+    var coarse: Bool { store.canvas?.kind.simple == true && !fineNodes }
 
     private func graphOf(_ stroke: Stroke) -> VectorEdit.Graph { VectorEdit.graph(stroke, coarse: coarse) }
     private func graphOf(_ paths: [EditablePath]) -> VectorEdit.Graph {

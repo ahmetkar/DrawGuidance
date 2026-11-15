@@ -118,6 +118,7 @@ struct SimpleToolbar: View {
                 ForEach(drawTools) { pill($0) }
             }
             if ruler.session != .NONE { RulerBar(ruler: ruler).padding(.horizontal, 12) }
+            if !notes && (vm.mode == .IMAGE_EDIT || vm.mode == .SHAPE_EDIT) { SimpleVectorRow(vm: vm, store: store, shapes: vm.shapes) }
             menu("simple_menu_edit", fixed: []) {
                 ForEach(editTools) { pill($0) }
             }
@@ -184,6 +185,48 @@ struct SimpleToolbar: View {
         let v = vm.viewport
         let center = v.toCanvas(P(v.viewSize.w / 2, v.viewSize.h / 2))
         ruler.openRuler(center: center, visibleWidth: v.viewSize.w / max(v.scale, 0.01), thickness: GuideMetrics.THICKNESS / max(v.scale, 0.01))
+    }
+}
+
+/// v52 basit resimde vektörleştirme ve vektör düzenleme (Android `SimpleVectorControls`): resim seçiliyken kırp ve
+/// vektörleştir; vektör şekil düzenlenirken Noktalar / Çizgiler / Alan araçları ve "Ayrıntılı noktalar".
+struct SimpleVectorRow: View {
+    @ObservedObject var vm: EditorViewModel
+    @ObservedObject var store: EditorStore
+    @ObservedObject var shapes: ShapeController
+
+    var body: some View {
+        ScrollView(.horizontal, showsIndicators: false) {
+            HStack(spacing: 6) {
+                if vm.mode == .IMAGE_EDIT {
+                    ToolButton(icon: "crop", label: L("image_crop"), id: "simple_image_crop") { vm.startAction(.CROP, target: store.selection) }
+                    ToolButton(icon: "scribble.variable", label: L("vectorize_direct_auto"), selected: vm.imageEdit.tracing, id: "simple_vectorize_auto") {
+                        vm.imageEdit.vectorize(EdgeOptions(mode: .AUTO), lineWidth: 2.5, keepImage: true)
+                    }
+                    ToolButton(icon: "viewfinder", label: L("vectorize_direct_edges"), id: "simple_vectorize_edges") {
+                        vm.imageEdit.vectorize(EdgeOptions(mode: .EDGES), lineWidth: 2.5, keepImage: true)
+                    }
+                    ToolButton(icon: "point.topleft.down.to.point.bottomright.curvepath", label: L("vectorize_direct_lines"), id: "simple_vectorize_centerline") {
+                        vm.imageEdit.vectorize(EdgeOptions(mode: .CENTERLINE), lineWidth: 2.5, keepImage: true)
+                    }
+                } else {
+                    ForEach([ShapeTool.NODES, .LINES, .FILL], id: \.self) { t in
+                        ToolButton(icon: ShapeEditToolRow.icon(t), label: ShapeEditToolRow.label(t),
+                                   selected: t == .NODES ? shapes.tool.nodeFamily : shapes.tool == t, id: "simple_vector_\(t)") {
+                            shapes.selectTool(t)
+                        }
+                    }
+                    Toggle(L("v52_vector_fine_nodes"), isOn: Binding(get: { shapes.fineNodes }, set: { shapes.setFineNodes($0) }))
+                        .font(.caption.weight(.semibold)).fixedSize()
+                        .accessibilityIdentifier("simple_vector_fine")
+                }
+                ToolButton(icon: "checkmark", label: L("apply_button"), id: "simple_vector_done") { vm.finishAction() }
+            }
+            .padding(.horizontal, 8)
+        }
+        .padding(.vertical, 6)
+        .background(RoundedRectangle(cornerRadius: 16).fill(Color.primary.opacity(0.04)))
+        .accessibilityIdentifier("simple_vector_controls")
     }
 }
 

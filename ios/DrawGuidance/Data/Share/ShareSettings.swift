@@ -13,6 +13,10 @@ final class ShareSettings: ObservableObject {
     @Published private(set) var askBeforeReceive: Bool
     @Published private(set) var discoverable: Bool
     @Published private(set) var liveSmooth: Bool
+    /// v52 canlı yayın daveti için onay (tuval/resim alma ayarından ayrı).
+    @Published private(set) var askBeforeLive: Bool
+    /// v52 katılınan yayın kendiliğinden açılsın.
+    @Published private(set) var liveAutoOpen: Bool
 
     init(defaults: UserDefaults = .standard) {
         self.defaults = defaults
@@ -25,6 +29,8 @@ final class ShareSettings: ObservableObject {
         askBeforeReceive = defaults.object(forKey: Self.KEY_ASK) as? Bool ?? true
         discoverable = defaults.object(forKey: Self.KEY_VISIBLE) as? Bool ?? true
         liveSmooth = defaults.object(forKey: Self.KEY_SMOOTH) as? Bool ?? true
+        askBeforeLive = defaults.object(forKey: Self.KEY_ASK_LIVE) as? Bool ?? true
+        liveAutoOpen = defaults.object(forKey: Self.KEY_LIVE_OPEN) as? Bool ?? true
     }
 
     func setDeviceName(_ name: String) {
@@ -35,6 +41,8 @@ final class ShareSettings: ObservableObject {
     func setAskBeforeReceive(_ on: Bool) { askBeforeReceive = on; defaults.set(on, forKey: Self.KEY_ASK) }
     func setDiscoverable(_ on: Bool) { discoverable = on; defaults.set(on, forKey: Self.KEY_VISIBLE) }
     func setLiveSmooth(_ on: Bool) { liveSmooth = on; defaults.set(on, forKey: Self.KEY_SMOOTH) }
+    func setAskBeforeLive(_ on: Bool) { askBeforeLive = on; defaults.set(on, forKey: Self.KEY_ASK_LIVE) }
+    func setLiveAutoOpen(_ on: Bool) { liveAutoOpen = on; defaults.set(on, forKey: Self.KEY_LIVE_OPEN) }
 
     /// Yayın karelerinin aralığı (saniye).
     var liveInterval: TimeInterval { liveSmooth ? 0.25 : 0.9 }
@@ -44,6 +52,8 @@ final class ShareSettings: ObservableObject {
     static let KEY_ASK = "share.ask_before_receive"
     static let KEY_VISIBLE = "share.discoverable"
     static let KEY_SMOOTH = "share.live_smooth"
+    static let KEY_ASK_LIVE = "share.ask_before_live"
+    static let KEY_LIVE_OPEN = "share.live_auto_open"
 
     /// iOS 16'dan beri cihaz adı izinsiz okunamaz ("iPhone"); model adı kullanılır.
     static func defaultName() -> String {

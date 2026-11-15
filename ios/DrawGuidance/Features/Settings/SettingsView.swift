@@ -70,6 +70,8 @@ struct SettingsView: View {
         }
         // v51 cihazlar arası paylaşım
         ShareSettingsSection()
+        // v52 canlı yayın ayrı bölüm
+        LiveSettingsSection()
         Section(L("v40_theme_mode_title")) {
             Picker(L("v40_theme_mode_title"), selection: $theme) {
                 ForEach(ThemeMode.allCases, id: \.rawValue) { Text(L($0.labelKey)).tag($0.rawValue) }

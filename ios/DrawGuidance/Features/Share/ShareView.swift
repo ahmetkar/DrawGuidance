@@ -2,7 +2,11 @@ import SwiftUI
 
 /// v51 paylaşım sayfası (Android `ShareScreen`): bu cihazın adı ve görünürlüğü, aynı Wi-Fi ağındaki cihazlar
 /// (tuval gönder, resim gönder, yayın başlat), aktarım durumu, yayın kartları ve paylaşım ayarları.
+/// v52 sayfa türü: tuval/resim paylaşımı ya da canlı tuval yayını (ayrı sayfalar, ayrı ayarlar).
+enum ShareMode { case send, live }
+
 struct ShareView: View {
+    var mode: ShareMode = .send
     @ObservedObject private var share = ShareManager.shared
     @ObservedObject private var settings = ShareSettings.shared
     @EnvironmentObject private var store: CanvasStore
@@ -28,7 +32,7 @@ struct ShareView: View {
                         .buttonStyle(.borderless)
                         .accessibilityIdentifier("share_rename")
                 }
-                Text(L("v51_share_how")).font(.footnote).foregroundStyle(.secondary)
+                Text(L(mode == .live ? "v52_share_live_how" : "v52_share_send_how")).font(.footnote).foregroundStyle(.secondary)
                 if let e = share.error {
                     Text(L("v51_share_error", e)).font(.footnote).foregroundStyle(.orange)
                         .onTapGesture { share.clearError() }
@@ -46,7 +50,7 @@ struct ShareView: View {
                 }
             }
 
-            if let out = share.liveOut {
+            if mode == .live, let out = share.liveOut {
                 Section {
                     LiveCard(text: L("v51_share_live_out", store.canvases.first { $0.localId == out.canvasId }?.name ?? "", out.peerName),
                              tint: .red) {
@@ -55,7 +59,7 @@ struct ShareView: View {
                     }
                 }
             }
-            if let inn = share.liveIn {
+            if mode == .live, let inn = share.liveIn {
                 Section {
                     LiveCard(text: inn.ended ? L("v51_share_live_ended")
                                  : L("v51_share_live_in", inn.peerName, share.liveCanvas?.name ?? ""), tint: inn.ended ? .gray : .indigo) {
@@ -74,14 +78,14 @@ struct ShareView: View {
                     .padding(.vertical, 6)
                 } else {
                     ForEach(share.peers) { p in
-                        PeerRow(peer: p, onPick: { pick = Pick(peer: p, kind: $0) }, onDisconnect: { share.disconnect(p) })
+                        PeerRow(peer: p, mode: mode, onPick: { pick = Pick(peer: p, kind: $0) }, onDisconnect: { share.disconnect(p) })
                     }
                 }
             } header: { Text(L("v51_share_nearby_title")) }
 
-            ShareSettingsSection(showOpenLink: false)
+            if mode == .live { LiveSettingsSection(showOpenLink: false) } else { ShareSettingsSection(showOpenLink: false) }
         }
-        .navigationTitle(L("v51_share_title"))
+        .navigationTitle(L(mode == .live ? "v52_share_live_title" : "v52_share_send_title"))
         .onAppear { share.pageOpened() }
         .onDisappear { share.pageClosed() }
         .alert(L("v51_share_device_name"), isPresented: $renaming) {
@@ -102,7 +106,7 @@ struct ShareView: View {
             }
         }
         .accessibilityElement(children: .contain)
-        .accessibilityIdentifier("share_screen")
+        .accessibilityIdentifier(mode == .live ? "share_live_screen" : "share_screen")
     }
 }
 
@@ -122,6 +126,7 @@ private struct LiveCard<Actions: View>: View {
 
 private struct PeerRow: View {
     let peer: SharePeer
+    var mode: ShareMode = .send
     let onPick: (ShareView.PickKind) -> Void
     let onDisconnect: () -> Void
 
@@ -152,13 +157,17 @@ private struct PeerRow: View {
                         .accessibilityIdentifier("share_disconnect")
                 }
             }
+            // v52 gönderme sayfasında tuval/resim, yayın sayfasında yalnız yayın başlatma
             HStack(spacing: 8) {
-                Button { onPick(.canvas) } label: { Label(L("v51_share_send_canvas"), systemImage: "square.and.arrow.up") }
-                    .accessibilityIdentifier("share_send_canvas")
-                Button { onPick(.image) } label: { Label(L("v51_share_send_image"), systemImage: "photo") }
-                    .accessibilityIdentifier("share_send_image")
-                Button { onPick(.live) } label: { Label(L("v51_share_start_live"), systemImage: "dot.radiowaves.left.and.right") }
-                    .accessibilityIdentifier("share_start_live")
+                if mode == .send {
+                    Button { onPick(.canvas) } label: { Label(L("v51_share_send_canvas"), systemImage: "square.and.arrow.up") }
+                        .accessibilityIdentifier("share_send_canvas")
+                    Button { onPick(.image) } label: { Label(L("v51_share_send_image"), systemImage: "photo") }
+                        .accessibilityIdentifier("share_send_image")
+                } else {
+                    Button { onPick(.live) } label: { Label(L("v51_share_start_live"), systemImage: "dot.radiowaves.left.and.right") }
+                        .accessibilityIdentifier("share_start_live")
+                }
             }
             .buttonStyle(.bordered)
             .font(.caption)
@@ -179,7 +188,7 @@ struct ShareSettingsSection: View {
     var body: some View {
         Section {
             if showOpenLink {
-                NavigationLink { ShareView() } label: { Label(L("v51_share_open_page"), systemImage: "antenna.radiowaves.left.and.right") }
+                NavigationLink { ShareView(mode: .send) } label: { Label(L("v52_share_send_open"), systemImage: "square.and.arrow.up") }
                     .accessibilityIdentifier("settings_share")
             }
             Toggle(isOn: Binding(get: { settings.discoverable }, set: { share.setDiscoverable($0) })) {
@@ -192,10 +201,48 @@ struct ShareSettingsSection: View {
             Toggle(isOn: Binding(get: { settings.askBeforeReceive }, set: { settings.setAskBeforeReceive($0) })) {
                 VStack(alignment: .leading, spacing: 2) {
                     Text(L("v51_share_ask"))
-                    Text(L("v51_share_ask_hint")).font(.caption).foregroundStyle(.secondary)
+                    Text(L("v52_share_ask_hint")).font(.caption).foregroundStyle(.secondary)
                 }
             }
             .accessibilityIdentifier("share_ask")
+        } header: { Text(L(showOpenLink ? "v52_share_send_title" : "v51_share_settings_title")) } footer: {
+            if showOpenLink { Text(L("v52_share_send_hint")) }
+        }
+    }
+}
+
+/// v52 canlı tuval yayını ayarları (yayın sayfasında ve Ayarlar'da; tuval paylaşımından ayrı).
+struct LiveSettingsSection: View {
+    @ObservedObject private var share = ShareManager.shared
+    @ObservedObject private var settings = ShareSettings.shared
+    var showOpenLink = true
+
+    var body: some View {
+        Section {
+            if showOpenLink {
+                NavigationLink { ShareView(mode: .live) } label: { Label(L("v52_share_live_open"), systemImage: "dot.radiowaves.left.and.right") }
+                    .accessibilityIdentifier("settings_live")
+            }
+            Toggle(isOn: Binding(get: { settings.discoverable }, set: { share.setDiscoverable($0) })) {
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(L("v51_share_discoverable"))
+                    Text(L("v51_share_discoverable_hint")).font(.caption).foregroundStyle(.secondary)
+                }
+            }
+            Toggle(isOn: Binding(get: { settings.askBeforeLive }, set: { settings.setAskBeforeLive($0) })) {
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(L("v52_live_ask"))
+                    Text(L("v52_live_ask_hint")).font(.caption).foregroundStyle(.secondary)
+                }
+            }
+            .accessibilityIdentifier("live_ask")
+            Toggle(isOn: Binding(get: { settings.liveAutoOpen }, set: { settings.setLiveAutoOpen($0) })) {
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(L("v52_live_auto_open"))
+                    Text(L("v52_live_auto_open_hint")).font(.caption).foregroundStyle(.secondary)
+                }
+            }
+            .accessibilityIdentifier("live_auto_open")
             Toggle(isOn: Binding(get: { settings.liveSmooth }, set: { settings.setLiveSmooth($0) })) {
                 VStack(alignment: .leading, spacing: 2) {
                     Text(L("v51_share_smooth"))
@@ -203,8 +250,8 @@ struct ShareSettingsSection: View {
                 }
             }
             .accessibilityIdentifier("share_smooth")
-        } header: { Text(L(showOpenLink ? "v51_share_title" : "v51_share_settings_title")) } footer: {
-            if showOpenLink { Text(L("v51_share_settings_hint")) }
+        } header: { Text(L(showOpenLink ? "v52_share_live_title" : "v52_share_live_settings_title")) } footer: {
+            if showOpenLink { Text(L("v52_share_live_hint")) }
         }
     }
 }

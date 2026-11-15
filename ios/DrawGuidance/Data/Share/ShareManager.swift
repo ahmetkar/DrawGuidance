@@ -267,7 +267,9 @@ final class ShareManager: ObservableObject {
             setState(id, .connected, name: h.name, platform: h.platform)
         case ShareWire.OFFER:
             let o = try m.header(ShareOffer.self)
-            if settings.askBeforeReceive { offer = ShareIncomingOffer(peerId: id, peerName: peerName(id), offer: o) }
+            // v52 canlı yayın daveti kendi ayarıyla
+            let ask = o.type == ShareWire.TYPE_LIVE ? settings.askBeforeLive : settings.askBeforeReceive
+            if ask { offer = ShareIncomingOffer(peerId: id, peerName: peerName(id), offer: o) }
             else { reply(id, o, true) }
         case ShareWire.ACCEPT:
             let r = try m.header(ShareReply.self)
@@ -295,7 +297,8 @@ final class ShareManager: ObservableObject {
             liveIn = ShareLiveIn(canvasId: canvasId, peerId: id, peerName: peerName(id))
             status = nil
             refreshLiveCanvas(canvasId)
-            showLive = true
+            // v52 kapalıysa yayın, Canlı yayın sayfasındaki karttan açılır
+            if settings.liveAutoOpen { showLive = true }
         case ShareWire.LIVE_UPDATE:
             guard let inn = liveIn, inn.peerId == id, !inn.ended else { return }
             let pkg = try SharePackage.decode(m)

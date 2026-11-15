@@ -117,8 +117,13 @@ struct CanvasListView: View {
             }
             // v51 paylaşım sayfası (sağ üst köşe)
             ToolbarItem(placement: .primaryAction) {
-                NavigationLink { ShareView() } label: { Label(L("v51_share_open"), systemImage: "antenna.radiowaves.left.and.right") }
+                NavigationLink { ShareView(mode: .send) } label: { Label(L("v52_share_send_title"), systemImage: "square.and.arrow.up") }
                     .accessibilityIdentifier("canvas_list_share")
+            }
+            // v52 canlı yayın ayrı düğme
+            ToolbarItem(placement: .primaryAction) {
+                NavigationLink { ShareView(mode: .live) } label: { Label(L("v52_share_live_title"), systemImage: "dot.radiowaves.left.and.right") }
+                    .accessibilityIdentifier("canvas_list_live")
             }
         }
         .overlay(alignment: .bottom) {

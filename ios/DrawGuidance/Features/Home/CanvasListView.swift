@@ -55,7 +55,7 @@ struct CanvasThumbnail: View {
             if let cached = ThumbnailCache.shared.object(forKey: key) { image = cached.image; return }
             let scale = Float(side) * 2 / Float(max(c.width, c.height, 1))
             let rendered = await Task.detached(priority: .utility) { ImageExporter().render(c, scale: min(scale, 1)) }.value
-            if let rendered { ThumbnailCache.shared.setObject(ThumbnailBox(rendered), forKey: key, cost: rendered.width * rendered.height * 4) }
+            ThumbnailCache.shared.setObject(ThumbnailBox(rendered), forKey: key, cost: rendered.width * rendered.height * 4)
             image = rendered
         }
     }

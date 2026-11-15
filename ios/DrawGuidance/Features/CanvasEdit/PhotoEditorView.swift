@@ -347,7 +347,7 @@ private struct PhotoCanvasView: View {
             let rect = fitRect(size)
             ZStack {
                 ZStack {
-                    Checker().frame(width: rect.width, height: rect.height).position(x: rect.midX, y: rect.midY)
+                    PhotoChecker().frame(width: rect.width, height: rect.height).position(x: rect.midX, y: rect.midY)
                     Image(decorative: image, scale: 1).resizable().interpolation(.high)
                         .frame(width: rect.width, height: rect.height).position(x: rect.midX, y: rect.midY)
                     if cropOverlay { CropFrame(crop: photo.edit.crop, rect: rect, scale: scale).accessibilityIdentifier("photo_crop_frame") }
@@ -484,7 +484,7 @@ private struct PhotoCanvasView: View {
     }
 }
 
-private struct Checker: View {
+private struct PhotoChecker: View {
     var body: some View {
         Canvas { ctx, size in
             let cell: CGFloat = 10

@@ -97,7 +97,7 @@ struct CanvasEditScreen: View {
         // v51 notta resim düzenleme: geçici basit resim tuvali tam ekran açılır; kapanınca resim nota aktarılmış olur
         .fullScreenCover(item: $vm.tempEditRequest, onDismiss: {
             // v52 nota dönüldü: ara verilen yayın sürer, son hali hemen gider
-            ShareManager.shared.resumeLive(canvasLocalId)
+            ShareManager.shared.resumeLive(vm.canvasLocalId)
             if let c = vm.store.canvas { ShareManager.shared.publishLive(c) }
         }) { doc in
             NavigationStack { CanvasEditScreen(canvasLocalId: doc.id) }

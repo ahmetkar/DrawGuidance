@@ -131,6 +131,12 @@ private fun androidx.compose.foundation.layout.BoxScope.LiveBroadcastBridge(canv
         lifecycle.addObserver(observer)
         onDispose { lifecycle.removeObserver(observer) }
     }
+    // v52 foto düzenleme açıkken (tam ekran ayrı düzenleyici) yayına ara verilir, kapanınca sürer
+    val photoOpen by vm.photo.open.collectAsState()
+    androidx.compose.runtime.LaunchedEffect(photoOpen != null) {
+        if (photoOpen != null) share.pauseLive(canvasLocalId)
+        else { share.resumeLive(canvasLocalId); vm.canvas.value?.let(share::publishLive) }
+    }
     val canvas by vm.canvas.collectAsState()
     com.karapp.drawguidance.ui.screens.share.LiveBroadcastBadge(
         canvasName = canvas?.name.orEmpty(),

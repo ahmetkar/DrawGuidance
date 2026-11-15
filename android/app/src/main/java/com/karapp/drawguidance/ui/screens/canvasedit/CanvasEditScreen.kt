@@ -89,6 +89,7 @@ import androidx.compose.material.icons.filled.Image
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Crop
+import androidx.compose.material.icons.filled.PhotoFilter
 import androidx.compose.material.icons.filled.Polyline
 import androidx.compose.material.icons.filled.CropFree
 import androidx.compose.material.icons.automirrored.filled.Undo
@@ -592,6 +593,8 @@ fun CanvasEditScreen(
                 EditEvent.PaintMiss -> context.getString(R.string.paint_miss)
                 EditEvent.TempImageApplied -> context.getString(R.string.v51_temp_image_saved)
                 EditEvent.TempShapeApplied -> context.getString(R.string.v52_temp_shape_saved)
+                EditEvent.PhotoSaved -> context.getString(R.string.v52_photo_saved)
+                EditEvent.PhotoFailed -> context.getString(R.string.v52_photo_failed)
             }
             // Yeni bildirim eskisini beklemeden onun yerine geçer
             snackbar.currentSnackbarData?.dismiss()
@@ -868,6 +871,7 @@ fun CanvasEditScreen(
                 rotateTool, scaleTool, viewModel::cropSelectedImage,
                 vectorizeMode.takeIf { vectorizeOpen }, { m -> vectorizeMode = m; vectorizeOpen = true },
                 filterOpen, { filterOpen = true }, bgRemoveOpen, { bgRemoveOpen = true }, effectsOpen, { effectsOpen = true },
+                viewModel::openPhotoEditor,
             ) + sceneTools
             EditMode.DIAGRAM_EDIT -> listOf(
                 ToolItem(Icons.Filled.Palette, themeText, { diagramThemeOpen = true }),
@@ -1172,6 +1176,7 @@ fun CanvasEditScreen(
         // v17: resim düzenleme araçları (Kırp, Vektörleştir, Kalem) üst menüde. v52 basit menüde Düzenle satırı yok:
         // Vektörleştir, Kırp ve Döndür mod çubuğunda
         EditMode.IMAGE_EDIT -> if (!simple || kind.isNotes) listOf(done) else listOf(
+            com.karapp.drawguidance.ui.screens.canvasedit.components.ModeAction(stringResource(R.string.v52_photo_open), Icons.Filled.PhotoFilter, viewModel::openPhotoEditor),
             com.karapp.drawguidance.ui.screens.canvasedit.components.ModeAction(vectorizeText, Icons.Filled.Polyline, { vectorizeMode = null; vectorizeOpen = true }),
             com.karapp.drawguidance.ui.screens.canvasedit.components.ModeAction(cropText, Icons.Filled.Crop, viewModel::cropSelectedImage),
             com.karapp.drawguidance.ui.screens.canvasedit.components.ModeAction(rotateText, Icons.AutoMirrored.Filled.RotateRight, { viewModel.chooseMode(EditMode.ROTATE) }),
@@ -2530,6 +2535,17 @@ fun CanvasEditScreen(
         }
         com.karapp.drawguidance.ui.screens.canvasedit.components.TableEditSheet(viewModel)
 
+        // v52 resim düzenlemenin yeri (not alma, çizgi roman) ve foto düzenleme modu
+        val imageEditChoice by viewModel.imageEditChoice.collectAsState()
+        if (imageEditChoice != null) {
+            com.karapp.drawguidance.ui.screens.canvasedit.components.ImageEditChoiceSheet(
+                comic = kind == com.karapp.drawguidance.data.model.CanvasKind.COMIC,
+                onPick = viewModel::chooseImageEdit,
+                onDismiss = viewModel::dismissImageEditChoice,
+            )
+        }
+        com.karapp.drawguidance.ui.screens.canvasedit.components.PhotoEditorHost(viewModel.photo)
+
         if (isFormulaPickerOpen) {
             com.karapp.drawguidance.ui.screens.canvasedit.components.FormulaPickerModal(
                 selected = if (mode == EditMode.FORMULA) formulaTemplate?.id else null,
@@ -2921,13 +2937,15 @@ private fun imageEditTools(
     rotateTool: ToolItem, scaleTool: ToolItem, onCrop: () -> Unit,
     vectorizing: com.karapp.drawguidance.content.trace.EdgeMode?, onVectorize: (com.karapp.drawguidance.content.trace.EdgeMode) -> Unit,
     filterOpen: Boolean, onFilter: () -> Unit, bgRemoveOpen: Boolean, onBgRemove: () -> Unit, effectsOpen: Boolean, onEffects: () -> Unit,
+    onPhotoEdit: () -> Unit,
 ): List<ToolItem> {
     val modes = listOf(
         Triple(com.karapp.drawguidance.content.trace.EdgeMode.AUTO, Icons.Filled.Polyline, R.string.vectorize_direct_auto),
         Triple(com.karapp.drawguidance.content.trace.EdgeMode.EDGES, Icons.Filled.CropFree, R.string.vectorize_direct_edges),
         Triple(com.karapp.drawguidance.content.trace.EdgeMode.CENTERLINE, Icons.Filled.Timeline, R.string.vectorize_direct_lines),
     )
-    return listOf(rotateTool, scaleTool, ToolItem(Icons.Filled.Crop, stringResource(R.string.image_crop), onCrop)) +
+    // v52 Foto düzenle: bütün raster düzenlemeleri menülere ayrılmış tam ekran düzenleyicide
+    return listOf(ToolItem(Icons.Filled.PhotoFilter, stringResource(R.string.v52_photo_open), onPhotoEdit, tag = "image_photo_edit"), rotateTool, scaleTool, ToolItem(Icons.Filled.Crop, stringResource(R.string.image_crop), onCrop)) +
         modes.map { (m, icon, label) ->
             ToolItem(icon, stringResource(label), { onVectorize(m) }, selected = vectorizing == m, tag = "vectorize_${m.name.lowercase()}")
         } + listOf(

@@ -100,6 +100,9 @@ enum class PanelTab { BRUSH, ELEMENTS, LAYERS }
  * araç menüsündedir — araç menüsü modun ailesine ([rowKind]) göre değişir. Yakınlaştırma her modda iki parmakla
  * yapılır.
  */
+/** v52 resim düzenlemenin yapılacağı yer (not alma ve çizgi roman). */
+enum class ImageEditChoice { ADVANCED, PHOTO, HERE }
+
 enum class EditMode { DRAW, SELECT, MOVE, ROTATE, SCALE, EXPAND, CROP, SHAPE, TEXT, DIAGRAM, SHAPE_EDIT, GUIDE, PERSPECTIVE, DIAGRAM_EDIT,
     /** v15: formül yerleştirme (dokun ya da sürükle). */
     FORMULA,
@@ -284,6 +287,9 @@ sealed interface EditEvent {
     data object TempImageApplied : EditEvent
     /** v52 gelişmiş tuvalde düzenlenen şekil nota aktarıldı. */
     data object TempShapeApplied : EditEvent
+    /** v52 foto düzenlemede düzenlenen resim yerine kondu / düzenlenemedi. */
+    data object PhotoSaved : EditEvent
+    data object PhotoFailed : EditEvent
     /** v17 Alan boya: dokunulan yer çizgilerle çevrili kapalı bir alan değil. */
     data object RegionOpen : EditEvent
     /** v17: seçili çizim için düzeltme bulunamadı. */
@@ -424,6 +430,8 @@ class CanvasEditViewModel(
     private val pages = PageController(store, ::beforePageChange, onLimit = { emit(EditEvent.PageLimit(it)) })
     private val guides = GuideController(store, this, repository)
     private val images = ImageController(store, this, assetStore, imageImporter, imagesRepository)
+    /** v52 foto düzenleme modu. */
+    val photo = com.karapp.drawguidance.ui.screens.canvasedit.state.PhotoEditController(store, this, assetStore)
     /** v40 sayfa ayarları (numara, üst/alt bilgi) ve CBZ dışa aktarma. */
     val v40 = com.karapp.drawguidance.ui.screens.canvasedit.state.V40ExportController(store, this, imagesRepository) { id, settings -> repository.savePageSettings(id, settings) }
     /** v45 çizgi roman kapağı (Kapak ekle) ve not alma panelleri (Panel ekle). */
@@ -559,7 +567,7 @@ class CanvasEditViewModel(
             else if (handoff != null) practice.open(handoff) else fitted?.let { tutorialOrNull?.maybeOffer(it.kind) }
             if (fitted != null) drawing.cleanOnOpen(fitted)
             // v51 notta: geçici tuvalde düzenlenen resimler nota aktarılır, açık kalmamış geçici tuvaller silinir
-            if (fitted != null && fitted.kind.isNotes && tempSession == null && tempImages != null) {
+            if (fitted != null && (fitted.kind.isNotes || fitted.kind == com.karapp.drawguidance.data.model.CanvasKind.COMIC) && tempSession == null && tempImages != null) {
                 viewModelScope.launch {
                     com.karapp.drawguidance.data.notes.TempCanvases.resultFlow.collect { if (it.sourceId == canvasLocalId) applyTempResult(it) }
                 }
@@ -569,17 +577,47 @@ class CanvasEditViewModel(
         }
     }
 
-    /** v51 notta seçili resim geçici basit resim tuvalinde düzenlenir (not almada resim düzenleme araçları yok). */
+    private val _imageEditChoice = MutableStateFlow<String?>(null)
+    /** v52 not almada ve çizgi romanda resim düzenlemenin nerede yapılacağı sorulur (resim elemanının kimliği). */
+    val imageEditChoice: StateFlow<String?> = _imageEditChoice.asStateFlow()
+    fun dismissImageEditChoice() { _imageEditChoice.value = null }
+
+    /** v52 seçim penceresi: gelişmiş çizimde, foto düzenlemede ya da (çizgi romanda) burada düzenle. */
+    fun chooseImageEdit(choice: ImageEditChoice) {
+        val id = _imageEditChoice.value ?: return
+        _imageEditChoice.value = null
+        val image = store.canvas.value?.strokes?.firstOrNull { it.id == id && it.brushType == BrushType.IMAGE } ?: return
+        when (choice) {
+            ImageEditChoice.ADVANCED -> startTempImage(image)
+            ImageEditChoice.PHOTO -> photo.open(image.id)
+            ImageEditChoice.HERE -> { store.select(setOf(image.id)); startAction(EditMode.IMAGE_EDIT, setOf(image.id)) }
+        }
+    }
+
+    /** v52 gelişmiş/basit çizimde Resmi düzenle satırındaki Foto düzenle. */
+    fun openPhotoEditor() = photo.open()
+
+    /** v52 geçici tuvalde düzenleme not almada ve çizgi romanda var. */
+    private val tempEditKind: Boolean get() = store.canvas.value?.kind?.let { it.isNotes || it == com.karapp.drawguidance.data.model.CanvasKind.COMIC } == true
+
+    /**
+     * v51 notta seçili resim geçici gelişmiş çizim tuvalinde düzenlenir. v52 not almada ve çizgi romanda önce nerede
+     * düzenleneceği sorulur (gelişmiş çizim / foto düzenleme / çizgi romanda burada).
+     */
     override fun editImageElsewhere(image: Stroke): Boolean {
-        val c = store.canvas.value ?: return false
-        val editor = tempImages ?: return false
-        if (!c.kind.isNotes || tempSession != null) return false
+        if (tempImages == null || tempSession != null || !tempEditKind) return false
+        _imageEditChoice.value = image.id
+        return true
+    }
+
+    private fun startTempImage(image: Stroke) {
+        val editor = tempImages ?: return
+        if (tempSession != null) return
         viewModelScope.launch {
             // Not önce yazılır (düzenleyiciye dönülünce eski içerik yüklenmesin)
             if (store.autosave) saveQueue.flushNow()
             _tempCanvasRequest.value = editor.start(canvasLocalId, image) ?: ""
         }
-        return true
     }
 
     override val canEditShapeElsewhere: Boolean get() = tempImages != null && tempSession == null && store.canvas.value?.kind?.isNotes == true

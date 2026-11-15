@@ -28,8 +28,16 @@
 ## Teslim dosyaları
 - `DrawGuidance-v52.apk` (test / doğrudan kurulum, upload anahtarıyla imzalı, R8) ve `DrawGuidance-v52.aab` (Play Console), `DrawGuidance-v52-mapping.txt.gz`.
 - `DrawGuidance-v52-ios-unsigned.ipa` (Device Farm, 1.10.0 / 52; CI çalıştırması 108).
-- İmzalı iOS .ipa için Apple Distribution sertifikası (.p12 + parolası) ve App Store provisioning profili gerekir; gelince CI'a gizli değişken olarak eklenip imzalı derleme alınır.
+- `DrawGuidance-v52-ios-signed.ipa` (App Store imzalı): CI `ios.yml` → `signed=true` (TestFlight'a göndermek için `upload=true`). Sertifika ve App Store profili App Store Connect API ile CI'da otomatik hazırlanır (`ios/tools/signing/asc_signing.py`). Gerekli GitHub Secrets: `SIGN_ASC_KEY_ID`, `SIGN_ASC_ISSUER_ID`, `SIGN_ASC_KEY_P8` (AuthKey_T4SPAHTFAT.p8 içeriği) ve `SIGN_DIST_KEY` (`yayin-anahtari\ios-dagitim-anahtari.pem` içeriği). Uygulama içi satın alma için olan `ASC_*` değişkenlerine dokunulmaz.
 - `DrawGuidance-v52-degisen-dosyalar.zip`: v49'dan (`16bbbc2`) bu yana değişen bütün dosyalar.
+
+## Yayın öncesi düzeltmeler (v52 son)
+- **Google ile giriş APK'da çalışmıyordu:** bulut derlemesinde `google-services.json` yoktu (depoya konmaz), bu yüzden `default_web_client_id` üretilmiyordu. Dosya PC'den alınıp derlendi; yeni APK/AAB'de var. PC'de derlerken `android/app/google-services.json` dosyasının yerinde olduğundan emin ol.
+- **Donmalar:**
+  - Ana sayfadan alıştırmalara girerken bütün alıştırma küçük resimleri ana iş parçacığında hesaplanıyordu. Artık arka planda hesaplanıp önbelleğe alınıyor (Android `PracticeUi.kt`, iOS `PracticeUi.swift`).
+  - Gelişmiş çizimde piksel fırça (boya/yardımcı fırça) izleri her değişiklikte ana iş parçacığında yeniden hesaplanıyordu. Artık tek bir arka plan işçisinde hesaplanıyor, o sırada eski sonuç gösteriliyor, bitince yeniden çiziliyor (Android `RasterStrokes.kt` + `DrawingCanvas.kt`, iOS `RasterStrokes.swift` + `EditorCanvasView.swift`).
+  - Android'e donma izleyici eklendi (`diagnostics/MainThreadWatchdog.kt`): ana iş parçacığı 2,5 sn'den uzun kilitlenirse o anki yığın hata kaydına "freeze" olarak gönderilir; böylece kalan donmalar sunucu kayıtlarından bulunabilir.
+- Tablo aracına yardım metni eklendi; çocuk modu arka plan penceresi ortak alt pencere bileşenine geçirildi.
 
 ## Ödüllü reklam neden bazen gelmiyordu
 1. Yükleme bayrağı takılı kalıyordu: bir istek yarıda kalınca sonraki istekler hemen "başarısız" dönüyordu. Düzeltildi (zaman aşımı + bayrak sıfırlama).

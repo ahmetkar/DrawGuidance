@@ -110,6 +110,11 @@ final class LaunchUITests: XCTestCase {
         XCTAssertTrue(menu.waitForExistence(timeout: 10))
         menu.tap()
         let marker = app.descendants(matching: .any)["brush_MARKER"].firstMatch
+        // v51 fırça ayarları çoğaldı: fırça listesi pencerede aşağıda kalabilir, görünene dek kaydırılır
+        let sheetList = app.descendants(matching: .any)["brush_size"].firstMatch
+        if sheetList.waitForExistence(timeout: 10) {
+            for _ in 0..<8 where !(marker.exists && marker.isHittable) { app.swipeUp() }
+        }
         XCTAssertTrue(marker.waitForExistence(timeout: 10))
         marker.tap()
 

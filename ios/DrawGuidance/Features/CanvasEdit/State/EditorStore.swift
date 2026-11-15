@@ -15,6 +15,8 @@ protocol EditorHost: AnyObject {
     func emit(_ event: EditEvent)
     /// v51 resim başka yerde düzenlenecekse (not alma: geçici basit resim tuvali) true döner.
     func editImageElsewhere(_ image: Stroke) -> Bool
+    /// v52 not almada düz şekil gelişmiş çizim tuvalinde düzenlenir (true: orada açılıyor).
+    func editShapeElsewhere(_ shape: Stroke) -> Bool
 }
 
 extension EditorHost {
@@ -22,6 +24,7 @@ extension EditorHost {
     func endAction() { setMode(.SELECT) }
     func onInk(_ stroke: Stroke) {}
     func editImageElsewhere(_ image: Stroke) -> Bool { false }
+    func editShapeElsewhere(_ shape: Stroke) -> Bool { false }
 }
 
 /// Çizim ekranının tek doğruluk kaynağı (Android `EditorStore`): tuval (sayfalar), seçim, eleman dizini ve geri al /

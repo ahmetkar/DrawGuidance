@@ -180,7 +180,8 @@ final class ShapeController: ObservableObject {
         else if paramShapes.model(s) != nil { next = .PARAMS }
         else { next = .NODES }
         // v51 not almada düz şekiller vektör düzenlemeye açılmaz (değerli şekiller ve grafikler açılır)
-        if !vectorEditAllowed && isVectorTool(next) { return }
+        // v52 onun yerine şekil gelişmiş çizim tuvalinde açılır, kaydedilince nota döner
+        if !vectorEditAllowed && isVectorTool(next) { _ = host.editShapeElsewhere(s); return }
         tool = next
         setSelection(VectorSelection(), s)
         host.startAction(.SHAPE_EDIT, target: [s.id])

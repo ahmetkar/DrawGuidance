@@ -17,6 +17,10 @@ enum TempCanvases {
         var width: Int
         var height: Int
         var createdAt: Int64
+        /// v52 şekil düzenleme: geçici tuvalden nota kayma (resimde 0).
+        var shape: Bool? = nil
+        var dx: Float? = nil
+        var dy: Float? = nil
     }
 
     struct Result: Codable, Equatable {
@@ -28,6 +32,8 @@ enum TempCanvases {
         var height: Int
         /// Geçici tuvalin oranı değişti: nottaki resmin çerçevesi yeni orana uydurulur.
         var reshaped: Bool
+        /// v52 şekil düzenlemesinin sonucu: şeklin yerine geçecek elemanlar (ContentCodec, base64; resimde nil).
+        var strokes: String? = nil
     }
 
     private struct State: Codable {
@@ -71,7 +77,9 @@ enum TempCanvases {
     }
 
     static func pending(for sourceId: String) -> [Result] { state.results.values.filter { $0.sourceId == sourceId } }
-    static func pendingAssetIds(_ sourceId: String) -> [String] { pending(for: sourceId).map(\.assetId) }
+    static func pendingAssetIds(_ sourceId: String) -> [String] {
+        pending(for: sourceId).flatMap { r in [r.assetId].filter { !$0.isEmpty } + (r.strokes.map { TempShapeGeometry.decode($0).compactMap(\.assetId) } ?? []) }
+    }
     static func consumed(_ r: Result) { if state.results.removeValue(forKey: r.tempId) != nil { persist() } }
 
     static func setActive(_ id: String, _ on: Bool) { if on { active.insert(id) } else { active.remove(id) } }
@@ -82,6 +90,44 @@ enum TempCanvases {
 }
 
 /// v51 nottaki resim elemanının yeni resimle güncellenmesi (saf; birim testli).
+/// v52 notta şekil düzenleme (Android `TempShapeGeometry`): şekil gelişmiş tuvale kenar payıyla taşınır, kaydedilince
+/// tuvaldeki bütün elemanlar aynı kaymayla nota döner ve nottaki şeklin yerine konur.
+enum TempShapeGeometry {
+    static let MIN_SIDE = 600
+    static let MARGIN: Float = 0.25
+
+    struct Frame: Equatable { let width: Int; let height: Int; let dx: Float; let dy: Float }
+
+    static func frame(_ left: Float, _ top: Float, _ right: Float, _ bottom: Float) -> Frame {
+        let w = max(right - left, 1), h = max(bottom - top, 1)
+        let m = max(w, h) * MARGIN
+        let cw = max(Float(MIN_SIDE), w + 2 * m), ch = max(Float(MIN_SIDE), h + 2 * m)
+        return Frame(width: Int(cw.rounded()), height: Int(ch.rounded()), dx: left - (cw - w) / 2, dy: top - (ch - h) / 2)
+    }
+
+    static func shift(_ s: Stroke, _ dx: Float, _ dy: Float) -> Stroke { ElementOps.translate([s], [s.id], dx, dy).first ?? s }
+
+    static func encode(_ strokes: [Stroke]) -> String { ContentCodec.encode(strokes).base64EncodedString() }
+    static func decode(_ data: String) -> [Stroke] {
+        guard let d = Data(base64Encoded: data) else { return [] }
+        return (try? ContentCodec.decode(d)) ?? []
+    }
+
+    static func replace(_ note: [Stroke], _ strokeId: String, _ edited: [Stroke]) -> [Stroke] {
+        guard let i = note.firstIndex(where: { $0.id == strokeId }) else { return note }
+        let old = note[i]
+        var taken = Set(note.map(\.id)); taken.remove(strokeId)
+        let fresh = edited.map { e -> Stroke in
+            var x = e
+            if taken.contains(x.id) { x.id = UUID().uuidString.lowercased() }
+            x.layerId = old.layerId
+            if edited.count == 1 { x.groupId = old.groupId }
+            return x
+        }
+        return Array(note[..<i]) + fresh + Array(note[(i + 1)...])
+    }
+}
+
 enum TempImageGeometry {
     static let MAX_SIDE = 2400
 
@@ -148,9 +194,41 @@ enum TempImageEditor {
         return tempId
     }
 
+    /// v52 notun [shape] şekli için geçici gelişmiş çizim tuvali (şekil vektör olarak taşınır).
+    static func startShape(sourceId: String, shape: Stroke, deps: EditorDependencies) -> String? {
+        guard !shape.points.isEmpty else { return nil }
+        let f = TempShapeGeometry.frame(shape.points.map(\.x).min()!, shape.points.map(\.y).min()!, shape.points.map(\.x).max()!, shape.points.map(\.y).max()!)
+        let tempId = UUID().uuidString.lowercased()
+        TempCanvases.register(TempCanvases.Session(tempId: tempId, sourceId: sourceId, strokeId: shape.id, width: f.width, height: f.height,
+                                                   createdAt: CanvasStore.nowMs(), shape: true, dx: f.dx, dy: f.dy))
+        var moved = TempShapeGeometry.shift(shape, -f.dx, -f.dy)
+        moved.order = 0; moved.layerId = nil; moved.groupId = nil
+        let now = CanvasStore.nowMs()
+        let c = CanvasUi(localId: tempId, name: L("v52_temp_shape_name"), width: f.width, height: f.height, backgroundColorHex: "#FFFFFF",
+                         aiEnabled: false, pages: [[moved]], createdAt: now, updatedAt: now, kind: .ART)
+        deps.canvases.save(c)
+        return tempId
+    }
+
     /// Geçici tuvali resme çevirip nota aktarır (sonuç `TempCanvases.results` ile gelir) ve geçici tuvali siler.
     static func commit(_ tempId: String, canvas: CanvasUi, deps: EditorDependencies) {
         guard let s = TempCanvases.session(tempId) else { return }
+        if s.shape == true {
+            // v52 şekil: tuvaldeki elemanlar nottaki konuma kaydırılır, resimleri nota kopyalanır
+            var copied: [String: String] = [:]
+            let out = canvas.pages.flatMap { $0 }.filter { !$0.hidden }.map { st -> Stroke in
+                var m = TempShapeGeometry.shift(st, s.dx ?? 0, s.dy ?? 0)
+                if let a = st.assetId {
+                    if copied[a] == nil { copied[a] = deps.assets.copyTo(a, s.sourceId) }
+                    if let n = copied[a] { m.assetId = n }
+                }
+                return m
+            }
+            TempCanvases.putResult(TempCanvases.Result(tempId: tempId, sourceId: s.sourceId, strokeId: s.strokeId, assetId: "",
+                                                       width: 0, height: 0, reshaped: false, strokes: TempShapeGeometry.encode(out)))
+            delete(tempId, deps: deps)
+            return
+        }
         deps.assets.ensureLoaded(canvas)
         let image = ImageExporter().render(canvas, scale: 1, includeGuides: false)
         if let data = try? ImageExporter.encode(image, .PNG, 100) {

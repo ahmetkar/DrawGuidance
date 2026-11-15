@@ -89,7 +89,11 @@ struct CanvasEditScreen: View {
             if !temp { AdsCoordinator.shared.onCanvasClosed(vm.store.canvas?.kind) }
         }
         // v51 notta resim düzenleme: geçici basit resim tuvali tam ekran açılır; kapanınca resim nota aktarılmış olur
-        .fullScreenCover(item: $vm.tempEditRequest) { doc in
+        .fullScreenCover(item: $vm.tempEditRequest, onDismiss: {
+            // v52 nota dönüldü: ara verilen yayın sürer, son hali hemen gider
+            ShareManager.shared.resumeLive(canvasLocalId)
+            if let c = vm.store.canvas { ShareManager.shared.publishLive(c) }
+        }) { doc in
             NavigationStack { CanvasEditScreen(canvasLocalId: doc.id) }
         }
         .modifier(TempImageEditCloser(vm: vm))
@@ -191,7 +195,7 @@ private struct EditorTopBar: View {
                 Spacer()
                 if vm.isTempImageEdit {
                     // v51 geçici resim tuvali: Kaydet resmi nota aktarır ve tuvali siler
-                    Button { vm.commitTempImage() } label: { Label(L("v51_temp_image_save"), systemImage: "checkmark.circle.fill") }
+                    Button { vm.commitTempImage() } label: { Label(L(vm.isTempShapeEdit ? "v52_temp_shape_save" : "v51_temp_image_save"), systemImage: "checkmark.circle.fill") }
                         .font(.subheadline.weight(.semibold))
                         .buttonStyle(.borderedProminent)
                         .accessibilityIdentifier("temp_image_save")
@@ -323,7 +327,7 @@ private struct TempImageEditCloser: ViewModifier {
         if vm.isTempImageEdit {
             content
                 .onChange(of: vm.tempClosed) { _, closed in if closed { dismiss() } }
-                .onAppear { vm.emit(.message(L("v51_temp_image_hint"))) }
+                .onAppear { vm.emit(.message(L(vm.isTempShapeEdit ? "v52_temp_shape_hint" : "v51_temp_image_hint"))) }
         } else {
             content
         }

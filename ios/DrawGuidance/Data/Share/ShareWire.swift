@@ -19,6 +19,9 @@ enum ShareWire {
     static let LIVE_START: UInt8 = 10
     static let LIVE_UPDATE: UInt8 = 11
     static let LIVE_STOP: UInt8 = 12
+    /// v52 yayına ara verildi / sürüyor (gönderen başka tuvalde düzenliyor).
+    static let LIVE_PAUSE: UInt8 = 13
+    static let LIVE_RESUME: UInt8 = 14
     static let BYE: UInt8 = 20
 
     static let TYPE_CANVAS = "canvas"

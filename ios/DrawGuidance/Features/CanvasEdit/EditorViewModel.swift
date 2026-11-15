@@ -42,6 +42,8 @@ final class EditorViewModel: ObservableObject, EditorHost {
     /// v51 bu tuval nottaki bir resmin geçici düzenleme tuvali mi (otomatik kayıt kapalı; Kaydet resmi nota aktarır).
     let tempSession: TempCanvases.Session?
     var isTempImageEdit: Bool { tempSession != nil }
+    /// v52 geçici tuval nottaki bir şekil için.
+    var isTempShapeEdit: Bool { tempSession?.shape == true }
     /// v51 geçici tuval kaydedildi ya da bırakıldı: ekran kapanır.
     @Published private(set) var tempClosed = false
     /// v51 notta açılacak geçici resim tuvali.
@@ -253,9 +255,24 @@ final class EditorViewModel: ObservableObject, EditorHost {
         texts.commitOpenDraft()
         store.saveNow()
         if let id = TempImageEditor.start(sourceId: canvasLocalId, image: image, deps: deps) {
+            ShareManager.shared.pauseLive(canvasLocalId)
             tempEditRequest = TempEditDoc(id: id)
         } else {
             emit(.message(L("v51_temp_image_failed")))
+        }
+        return true
+    }
+
+    /// v52 notta seçili düz şekil gelişmiş çizim tuvalinde düzenlenir; kaydedilince nota döner. Yayın varsa ara verilir.
+    func editShapeElsewhere(_ shape: Stroke) -> Bool {
+        guard let c = store.canvas, c.kind.isNotes, tempSession == nil else { return false }
+        texts.commitOpenDraft()
+        store.saveNow()
+        if let id = TempImageEditor.startShape(sourceId: canvasLocalId, shape: shape, deps: deps) {
+            ShareManager.shared.pauseLive(canvasLocalId)
+            tempEditRequest = TempEditDoc(id: id)
+        } else {
+            emit(.message(L("v52_temp_edit_failed")))
         }
         return true
     }
@@ -268,6 +285,17 @@ final class EditorViewModel: ObservableObject, EditorHost {
             store.showPage(page)
             guard let shown = store.canvas else { return }
             c = shown
+        }
+        if let data = r.strokes {
+            // v52 şekil: geçici tuvaldeki elemanlar şeklin yerine geçer
+            let edited = TempShapeGeometry.decode(data)
+            for a in edited.compactMap(\.assetId) where !CanvasImageCache.contains(a) {
+                if let d = deps.assets.bytes(a), let img = CanvasImageCache.decode(d) { CanvasImageCache.put(a, img) }
+            }
+            store.commit(TempShapeGeometry.replace(c.strokes, r.strokeId, edited))
+            TempCanvases.consumed(r)
+            emit(.message(L("v52_temp_shape_saved")))
+            return
         }
         if !CanvasImageCache.contains(r.assetId), let data = deps.assets.bytes(r.assetId), let img = CanvasImageCache.decode(data) {
             CanvasImageCache.put(r.assetId, img)

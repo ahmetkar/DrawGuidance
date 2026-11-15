@@ -25,8 +25,8 @@ struct ShareTransferStatus: Equatable {
     var progress: Double?
 }
 
-struct ShareLiveOut: Equatable { let canvasId: String; let peerId: String; let peerName: String }
-struct ShareLiveIn: Equatable { let canvasId: String; let peerId: String; let peerName: String; var ended = false }
+struct ShareLiveOut: Equatable { let canvasId: String; let peerId: String; let peerName: String; var paused = false }
+struct ShareLiveIn: Equatable { let canvasId: String; let peerId: String; let peerName: String; var ended = false; var paused = false }
 
 /// Alınan içerik bildirimi ("Tuvali aç" düğmeli pencere).
 struct ShareReceived: Identifiable, Equatable {
@@ -195,8 +195,24 @@ final class ShareManager: ObservableObject {
 
     /// Düzenleyici yayın yapılan tuvalin her değişikliğini bildirir; en son hali ayarlanan sıklıkta gönderilir.
     func publishLive(_ canvas: CanvasUi) {
-        guard liveOut?.canvasId == canvas.localId else { return }
+        guard liveOut?.canvasId == canvas.localId, liveOut?.paused != true else { return }
         liveFrame = canvas
+    }
+
+    /// v52 yayına ara ver (yayın yapılan notta şekil/resim başka tuvalde düzenleniyor); izleyene bildirilir.
+    func pauseLive(_ canvasId: String) {
+        guard var out = liveOut, out.canvasId == canvasId, !out.paused else { return }
+        out.paused = true
+        liveOut = out
+        send(out.peerId, ShareWire.encode(ShareWire.LIVE_PAUSE, Data("{}".utf8)))
+    }
+
+    /// v52 ara verilen yayın sürer (düzenleyici son hali [publishLive] ile gönderir).
+    func resumeLive(_ canvasId: String) {
+        guard var out = liveOut, out.canvasId == canvasId, out.paused else { return }
+        out.paused = false
+        liveOut = out
+        send(out.peerId, ShareWire.encode(ShareWire.LIVE_RESUME, Data("{}".utf8)))
     }
 
     func isBroadcasting(_ canvasId: String) -> Bool { liveOut?.canvasId == canvasId }
@@ -306,6 +322,8 @@ final class ShareManager: ObservableObject {
             liveSeqIn = pkg.header.seq
             _ = try packages.install(pkg, ids: &liveIds, existingId: inn.canvasId)
             refreshLiveCanvas(inn.canvasId)
+        case ShareWire.LIVE_PAUSE, ShareWire.LIVE_RESUME:
+            if liveIn?.peerId == id, liveIn?.ended == false { liveIn?.paused = m.type == ShareWire.LIVE_PAUSE }
         case ShareWire.LIVE_STOP:
             if liveIn?.peerId == id { liveIn?.ended = true }
             if liveOut?.peerId == id { liveOut = nil; liveTask?.cancel(); liveTask = nil }

@@ -386,7 +386,7 @@ struct LiveCanvasView: View {
             }
             .safeAreaInset(edge: .bottom) {
                 if let inn = share.liveIn {
-                    Text(inn.ended ? L("v51_share_live_ended") : L("v51_share_live_in", inn.peerName, share.liveCanvas?.name ?? ""))
+                    Text(inn.ended ? L("v51_share_live_ended") : inn.paused ? L("v52_live_paused") : L("v51_share_live_in", inn.peerName, share.liveCanvas?.name ?? ""))
                         .font(.footnote.weight(.semibold)).foregroundStyle(.white)
                         .padding(.horizontal, 14).padding(.vertical, 8)
                         .background(Capsule().fill(inn.ended ? Color.gray : Color.red))

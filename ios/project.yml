@@ -31,6 +31,10 @@ settings:
     # Google girişinin geri dönüş adresi: GoogleService-Info.plist'teki REVERSED_CLIENT_ID
     # (com.googleusercontent.apps.…). CI bunu plist'ten okuyup verir; boşsa Google düğmesi kapalı kalır.
     DG_GOOGLE_URL_SCHEME: ""
+    # AdMob: hata ayıklamada Google'ın deneme kimlikleri; gerçek kimlikler yalnız Release'te (aşağıda)
+    DG_ADMOB_APP_ID: "ca-app-pub-3940256099942544~1458002511"
+    DG_ADMOB_INTERSTITIAL: "ca-app-pub-3940256099942544/4411468910"
+    DG_ADMOB_REWARDED: "ca-app-pub-3940256099942544/1712485313"
 targets:
   DrawGuidance:
     type: application
@@ -73,6 +77,10 @@ targets:
         DG_RASP_ENFORCE: "NO"
       configs:
         Release:
+          # v51 gerçek AdMob kimlikleri (iOS uygulaması, geçiş ve ödüllü reklam birimleri)
+          DG_ADMOB_APP_ID: "ca-app-pub-4962587185426397~5716509800"
+          DG_ADMOB_INTERSTITIAL: "ca-app-pub-4962587185426397/8360799106"
+          DG_ADMOB_REWARDED: "ca-app-pub-4962587185426397/2072778264"
           # iOS'ta R8 karşılığı: sembolleri sil, ölü kodu at, dSYM ayrı dursun
           STRIP_INSTALLED_PRODUCT: YES
           DEPLOYMENT_POSTPROCESSING: YES

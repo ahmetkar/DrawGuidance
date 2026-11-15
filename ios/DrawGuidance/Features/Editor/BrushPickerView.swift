@@ -15,48 +15,55 @@ struct BrushPickerView: View {
     @Environment(\.dismiss) private var dismiss
 
     var body: some View {
+        // v53 fırça penceresi yalnız fırça seçimi içindir: fırçalar kategorilerde, örnek iziyle kart olarak; boy, akış,
+        // örtücülük ve gelişmiş ayarlar Özellikler panelinde
         NavigationStack {
-            List {
-                Section {
-                    LabeledContent(L("brush_size_label")) {
-                        Slider(value: $size, in: 1...200).frame(width: 180).accessibilityIdentifier("brush_size")
-                    }
-                    LabeledContent(L("brush_flow_label")) {
-                        Slider(value: $flow, in: 0.02...1).frame(width: 180).accessibilityIdentifier("brush_flow")
-                    }
-                    LabeledContent(L("brush_opacity_label")) {
-                        Slider(value: $opacity, in: 0.05...1).frame(width: 180).accessibilityIdentifier("brush_opacity")
-                    }
-                }
-                // v51 gelişmiş fırça ayarları (yalnız gelişmiş çizim modunda)
-                if let controller, !kind.simple {
-                    BrushAdvancedSections(brush: controller)
-                }
-                ForEach(BrushCategory.forKind(kind), id: \.self) { cat in
-                    Section(L(cat.titleKey)) {
-                        ForEach(cat.brushes, id: \.self) { type in
-                            Button {
-                                brush = type
-                                size = Double(type.defaultSize)
-                                dismiss()
-                            } label: {
-                                HStack {
-                                    Image(uiImage: BrushPreview.image(type, color: color))
-                                        .resizable().frame(width: 120, height: 36)
-                                    Text(L(type.titleKey)).foregroundStyle(.primary)
-                                    Spacer()
-                                    if type == brush { Image(systemName: "checkmark") }
-                                }
+            ScrollView {
+                VStack(alignment: .leading, spacing: 16) {
+                    Label(L("v53_brush_settings_in_properties"), systemImage: "slider.horizontal.3")
+                        .font(.footnote).foregroundStyle(.secondary)
+                    ForEach(BrushCategory.forKind(kind), id: \.self) { cat in
+                        VStack(alignment: .leading, spacing: 8) {
+                            Text(L(cat.titleKey)).font(.subheadline.weight(.semibold))
+                            LazyVGrid(columns: [GridItem(.adaptive(minimum: 150), spacing: 10)], spacing: 10) {
+                                ForEach(cat.brushes, id: \.self) { type in card(type) }
                             }
-                            .accessibilityIdentifier("brush_\(type.rawValue)")
                         }
                     }
                 }
+                .padding(16)
             }
             .navigationTitle(L("brush_picker_title"))
             .navigationBarTitleDisplayMode(.inline)
-            .toolbar { ToolbarItem(placement: .confirmationAction) { Button(L("common.close")) { dismiss() } } }
+            .toolbar { ToolbarItem(placement: .confirmationAction) { Button(L("close")) { dismiss() } } }
         }
+        .presentationDetents([.medium, .large])
+    }
+
+    private func card(_ type: BrushType) -> some View {
+        let selected = type == brush
+        return Button {
+            brush = type
+            size = Double(type.defaultSize)
+            dismiss()
+        } label: {
+            VStack(alignment: .leading, spacing: 6) {
+                Image(uiImage: BrushPreview.image(type, color: color))
+                    .resizable().aspectRatio(240 / 72, contentMode: .fit)
+                    .frame(maxWidth: .infinity)
+                HStack {
+                    Text(L(type.titleKey)).font(.footnote.weight(.medium)).foregroundStyle(.primary).lineLimit(1)
+                    Spacer(minLength: 2)
+                    if selected { Image(systemName: "checkmark.circle.fill").foregroundStyle(Color.accentColor) }
+                }
+            }
+            .padding(10)
+            .background(RoundedRectangle(cornerRadius: 14, style: .continuous)
+                .fill(selected ? Color.accentColor.opacity(0.14) : Color(uiColor: .secondarySystemGroupedBackground)))
+            .overlay(RoundedRectangle(cornerRadius: 14, style: .continuous).stroke(selected ? Color.accentColor : .clear, lineWidth: 1.5))
+        }
+        .buttonStyle(.plain)
+        .accessibilityIdentifier("brush_\(type.rawValue)")
     }
 }
 

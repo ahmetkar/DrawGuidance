@@ -276,6 +276,23 @@ final class TextController: ObservableObject {
         onAdded(stroke.id)
     }
 
+    /// v53 hızlı yazı kutusu (not alma): yazı taslak açılmadan, geçerli yazı ayarlarıyla doğrudan arka plansız eklenir.
+    /// Eklenen yazının alt kenarı döner (sonraki kutu onun altında açılır).
+    @discardableResult
+    func insertQuick(_ content: String, at anchor: P, width: Float?) -> Float? {
+        guard let current = store.canvas, !content.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else { return nil }
+        let s = settings
+        let d = TextDraft(anchor: anchor, editingId: nil, content: content, boxWidth: width)
+        var spec = newSpec(d, s, content)
+        spec.box = nil
+        if let width { spec.box = TextBox(width: width) }
+        let points = quantized(TextRenderer.quadAt(spec, s.sizePx, anchor.x, anchor.y - s.sizePx * 0.7))
+        let stroke = Stroke(id: UUID().uuidString.lowercased(), points: points, colorHex: brush().inkColor(), brushType: .TEXT,
+                            sizePx: s.sizePx, opacity: 1, order: current.strokes.count, text: spec)
+        store.commit(current.strokes + [stroke])
+        return points.map(\.y).max()
+    }
+
     func updateSettings(_ value: TextSettings, before: TextSettings? = nil) {
         let bf = before ?? settings
         let after = TextSettings(spec: Self.normalize(value.spec), sizePx: value.sizePx.coerceIn(Self.MIN_TEXT_SIZE, Self.MAX_TEXT_SIZE))

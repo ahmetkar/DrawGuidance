@@ -593,12 +593,15 @@ final class EditorCanvasView: UIView {
         let liveVisible = live.isActive && !(live.finished && cacheVersion == vm.store.visualVersion)
         let moving = visible.filter { excluded.contains($0.id) }
 
+        // v53 seçili eleman öteki elemanlardan soyutlanır: seçim varken öteki elemanlar soluk, seçili olanlar üstte tam renkli
+        let isolate = SelectionIsolation.active(mode: mode, kind: c.kind, selected: selected)
         g.saveGState()
         g.clip(to: paperCG)
         g.beginTransparencyLayer(auxiliaryInfo: nil)
         if let img = cacheImage, let k = cacheKey {
             let f = CGFloat(scale / k.scale)
             g.saveGState()
+            if isolate { g.setAlpha(SelectionIsolation.DIM) }
             g.translateBy(x: CGFloat(offset.x) - CGFloat(k.offset.x) * f, y: CGFloat(offset.y) - CGFloat(k.offset.y) * f)
             g.scaleBy(x: f, y: f)
             Bitmaps.drawUpright(g, img, in: CGRect(x: 0, y: 0, width: CGFloat(k.w), height: CGFloat(k.h)))
@@ -607,7 +610,14 @@ final class EditorCanvasView: UIView {
         g.saveGState()
         g.translateBy(x: CGFloat(offset.x), y: CGFloat(offset.y))
         g.scaleBy(x: CGFloat(scale), y: CGFloat(scale))
+        if isolate { g.setAlpha(SelectionIsolation.DIM) }
         for s in pending where !(liveVisible && s.id == live.strokeId) { StrokeRenderer.drawStroke(g, s) }
+        if isolate {
+            g.setAlpha(1)
+            if !mode.transformsSelection {
+                for s in target where selected.contains(s.id) && s.brushType != .ERASER && !s.brushType.isHelper { StrokeRenderer.drawStroke(g, s) }
+            }
+        }
         drawPreviewShapes(g, ap, scale, accent)
         if !moving.isEmpty { drawMoving(g, moving, ap) }
         if overlay.formulaSlots, let f = c.strokes.first(where: { selected.contains($0.id) && $0.brushType == .FORMULA }) {
@@ -1099,5 +1109,14 @@ extension EditorCanvasView: UIPencilInteractionDelegate {
         case .began, .changed: self.squeeze = 1
         default: self.squeeze = 0
         }
+    }
+}
+
+/// v53 seçim soyutlama: seçim varken (Seç ve dönüştürme modlarında) öteki elemanlar soluk çizilir.
+enum SelectionIsolation {
+    static let DIM: CGFloat = 0.28
+
+    static func active(mode: EditMode, kind: CanvasKind, selected: Set<String>) -> Bool {
+        !selected.isEmpty && kind != .KIDS && (mode == .SELECT || mode.transformsSelection)
     }
 }

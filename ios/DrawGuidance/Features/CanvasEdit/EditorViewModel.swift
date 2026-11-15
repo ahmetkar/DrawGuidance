@@ -112,6 +112,10 @@ final class EditorViewModel: ObservableObject, EditorHost {
     /// v50 yetişkin alıştırması sürüyor mu (sürerken çizim önerisi verilmez).
     /// v52 çizim yardımcıları (kompozisyon kılavuzu, kontrol önizlemesi; yalnız görünüm).
     let helpers = DrawHelpersState()
+    /// v53 canlı, nesne ve eşya yapı kılavuzları (yalnız görünüm, tuvale yazılmaz).
+    let structure = StructureGuideState()
+    /// v53 not almada hızlı yazı kutusu.
+    let quickText = QuickTextState()
 
     private var practiceActive: () -> Bool = { false }
 
@@ -540,6 +544,9 @@ final class EditorViewModel: ObservableObject, EditorHost {
     }
 
     // MARK: Fırça
+
+    /// v53 silgi seçiliyken fırça düğmesinde gösterilecek son çizim fırçası.
+    var lastDrawingBrush: BrushType { canvasPrefs.lastBrush.flatMap { BrushType(rawValue: $0) }.flatMap { $0 == .ERASER ? nil : $0 } ?? .INK_PEN }
 
     func selectBrush(_ type: BrushType) {
         brush.select(type)

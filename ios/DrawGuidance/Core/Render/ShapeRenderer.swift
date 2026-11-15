@@ -222,6 +222,10 @@ enum ShapeRenderer {
                         ctx.fillPath()
                     }
                 }
+                // v53 çizgi roman ekran tonu / deseni: dolgunun üstünde, parçanın kapalı alanına kırpılarak
+                if !coverage, item.ownFill == nil, let tone = style.tone {
+                    ToneRenderer.draw(ctx, clip: item.path, tone, l: cached.left, t: cached.top, r: cached.right, b: cached.bottom, alpha: alpha * item.alpha)
+                }
             }
             if item.widthScale <= 0 { continue }
             let width = baseWidth * item.widthScale

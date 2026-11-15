@@ -83,7 +83,9 @@ final class ComicController {
     func balloonStroke(_ style: BalloonStyle, speakers: Int, center: P?, content: String, options: BalloonTextOptions? = nil) -> Stroke? {
         guard let current = store.canvas else { return nil }
         let settings = texts.defaults
-        let size = options?.sizePx?.coerceIn(TextController.MIN_TEXT_SIZE, TextController.MAX_TEXT_SIZE) ?? settings.sizePx
+        // v53 varsayılan yazı boyutu ve tipi balonun türüne ve sayfanın boyuna göre
+        let size = options?.sizePx?.coerceIn(TextController.MIN_TEXT_SIZE, TextController.MAX_TEXT_SIZE)
+            ?? Self.balloonTextSize(style, Float(current.width), Float(current.height))
         let c = center ?? P(Float(current.width) / 2, Float(current.height) / 2)
         let width = (Float(min(current.width, current.height)) * 0.36).coerceIn(size * 6, size * 14)
         let tails: [BalloonTail]
@@ -96,13 +98,40 @@ final class ComicController {
         balloon.tails = tails
         balloon.fillHex = style == .NARRATION ? "#FFF59D" : style == .PHONE ? Self.PHONE_FILL : "#FFFFFF"
         balloon.strokeHex = style == .PHONE ? Self.PHONE_BORDER : "#111111"
-        let font = options?.font ?? (settings.spec.font.group == .COMIC ? settings.spec.font : .COMIC_RELIEF)
-        let spec = TextSpec(content: content, font: font, align: options?.align ?? .CENTER,
+        let font = options?.font ?? Self.balloonFont(style)
+        var spec = TextSpec(content: content, font: font, align: options?.align ?? .CENTER,
                             box: TextBox(width: width, balloon: balloon, effects: settings.spec.box?.effects))
+        if options?.font == nil && (style == .SHOUT || style == .FLASH || style == .ELECTRIC) { spec.bold = true }
+        if options?.font == nil && style == .WHISPER { spec.italic = true }
         let (w, h) = TextRenderer.measure(spec, size)
         let points = qp(TextRenderer.quadAt(spec, size, c.x - w / 2, c.y - h / 2))
         let ink = options?.colorHex?.uppercased() ?? (style == .PHONE ? "#FFFFFF" : "#111111")
         return Stroke(id: Self.newId(), points: points, colorHex: ink, brushType: .TEXT, sizePx: size, opacity: 1, order: current.strokes.count, text: spec)
+    }
+
+    /// v53 balonun türüne uygun yazı tipi (çizgi roman yazı tipleri).
+    static func balloonFont(_ style: BalloonStyle) -> TextFont {
+        switch style {
+        case .SHOUT, .ELECTRIC, .FLASH, .ROUGH, .ICICLE, .DRIP: return .BANGERS
+        case .THOUGHT, .WAVY, .HEART: return .SHANTELL
+        case .WHISPER: return .PATRICK_HAND
+        case .NARRATION: return .COMIC_RELIEF_BOLD
+        case .PHONE: return .SANS
+        default: return .COMIC_RELIEF
+        }
+    }
+
+    /// v53 balon yazısının varsayılan boyu: sayfanın kısa kenarına göre, bağırmada büyük, fısıltıda küçük.
+    static func balloonTextSize(_ style: BalloonStyle, _ w: Float, _ h: Float) -> Float {
+        let base = (min(w, h) * 0.034).coerceIn(18, 64)
+        let k: Float
+        switch style {
+        case .SHOUT, .FLASH, .ELECTRIC: k = 1.25
+        case .WHISPER: k = 0.85
+        case .NARRATION: k = 0.9
+        default: k = 1
+        }
+        return (base * k).coerceIn(TextController.MIN_TEXT_SIZE, TextController.MAX_TEXT_SIZE)
     }
 
     func updateBalloonText(content: String? = nil, font: TextFont? = nil, sizePx: Float? = nil, colorHex: String? = nil, align: TextAlignKind? = nil) {

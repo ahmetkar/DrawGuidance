@@ -249,6 +249,10 @@ object ShapeRenderer {
                     canvas.drawPath(item.path, paint)
                     paint.shader = null
                 }
+                // v53 çizgi roman ekran tonu / deseni: dolgunun üstünde, parçanın kapalı alanına kırpılarak
+                if (!coverage && item.ownFill == null) style.tone?.let {
+                    ToneRenderer.draw(canvas, item.path, it, cached.left, cached.top, cached.right, cached.bottom, alpha * item.alpha)
+                }
             }
             val width = baseWidth * item.widthScale
             if (item.widthScale <= 0f) return@forEach

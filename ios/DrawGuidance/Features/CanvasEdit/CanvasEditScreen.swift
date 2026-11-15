@@ -9,6 +9,7 @@ struct CanvasEditScreen: View {
     @State private var actions: CanvasActions?
     @State private var brushPickerOpen = false
     @State private var sheet: EditorSheet?
+    @StateObject private var addUi = AddWindows()
     @Environment(\.dismiss) private var dismiss
 
     /// v51 başka bir tuvale geç (yeni alıştırma yeni tuvalde; bkz. [CanvasEditHost]).
@@ -21,14 +22,16 @@ struct CanvasEditScreen: View {
 
     var body: some View {
         VStack(spacing: 0) {
-            EditorTopBar(vm: vm, store: vm.store, brush: vm.brush, brushPickerOpen: $brushPickerOpen, sheet: $sheet)
+            // v53 başlıkta yalnız tuval adı, Eğitim, Kaydet ve Diğer; öteki düğmeler alttaki menülerde
+            EditorHeaderBar(vm: vm, store: vm.store, sheet: $sheet)
             if vm.loaded {
                 if vm.store.canvas?.kind == .KIDS {
                     KidsToolbar(vm: vm, store: vm.store, brush: vm.brush, shapes: vm.shapes, challengeUi: challengeUi)
                 } else if vm.store.canvas?.kind.simple == true {
-                    SimpleToolbar(vm: vm, store: vm.store, brush: vm.brush, ruler: vm.ruler, sheet: $sheet, brushPickerOpen: $brushPickerOpen)
+                    SimpleToolbar(vm: vm, store: vm.store, brush: vm.brush, ruler: vm.ruler, sheet: $sheet, brushPickerOpen: $brushPickerOpen, addUi: addUi)
                 } else {
-                    ModeToolRow(vm: vm, store: vm.store, ruler: vm.ruler)
+                    AdvancedMenus(vm: vm, store: vm.store, brush: vm.brush, ruler: vm.ruler, shapes: vm.shapes, sheet: $sheet,
+                                  brushPickerOpen: $brushPickerOpen, addUi: addUi)
                 }
             }
             ZStack {
@@ -48,6 +51,14 @@ struct CanvasEditScreen: View {
                         CheckPreview(helpers: vm.helpers, canvas: c)
                             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
                     }
+                    if let c = vm.store.canvas, c.kind == .ART || c.kind == .SIMPLE_ART || c.kind == .COMIC {
+                        // v53 canlı, nesne ve eşya yapı kılavuzu (yalnız görünüm)
+                        StructureOverlay(state: vm.structure, viewport: vm.viewport)
+                    }
+                    if vm.store.canvas?.kind.isNotes == true {
+                        // v53 hızlı yazı kutusu
+                        QuickTextOverlay(vm: vm, qt: vm.quickText, viewport: vm.viewport, texts: vm.texts)
+                    }
                     if PracticeLevels.available(vm.store.canvas?.kind) {
                         PracticeLayer(ctl: vm.practice, viewport: vm.viewport, tutorial: vm.inTutorial())
                     }
@@ -63,11 +74,15 @@ struct CanvasEditScreen: View {
             .tutorialAnchor(TutorialAnchor.CANVAS)
             .overlay { if vm.loaded { TutorialLiveLayer(ctl: vm.tutorial, viewport: vm.viewport) } }
             .overlay(alignment: .bottom) { if vm.loaded { TextDraftBar(vm: vm, texts: vm.texts) } }
+            // v53 balon yazısı doğrudan balonun üstünde
+            .overlay { if vm.loaded { BalloonInlineEditor(vm: vm, texts: vm.texts, store: vm.store, viewport: vm.viewport) } }
             .overlay(alignment: .top) { if vm.loaded { ParamControlsHost(vm: vm, shapes: vm.shapes) } }
             .overlay(alignment: .bottom) { if vm.loaded { Draw3dHost(vm: vm, store: vm.store) } }
             .overlay(alignment: .bottom) { if vm.loaded { SuggestionLayer(vm: vm, hw: vm.handwriting, texts: vm.texts, ctl: vm.challenge) } }
             // v51 canlı yayın: bu tuval yayındaysa değişiklikler karşı cihaza gider
             .overlay(alignment: .bottom) { if vm.loaded { LiveBroadcastBridge(store: vm.store, canvasLocalId: vm.canvasLocalId) } }
+            // v53 Elemanlar, Katmanlar ve Özellikler sağdan açılan panelde
+            .overlay { if vm.loaded && vm.store.canvas?.kind != .KIDS { EditorSidePanelHost(vm: vm, store: vm.store, brushPickerOpen: $brushPickerOpen) } }
         }
         .background(Color(uiColor: CanvasColors.background))
         .overlay { EditorToastHost(events: vm.events) }
@@ -106,10 +121,12 @@ struct CanvasEditScreen: View {
         .modifier(TableSheetsHost(ctl: vm.tables, store: vm.store, viewport: vm.viewport))
         .modifier(PhotoEditorHost(vm: vm, photo: vm.photo))
         .sheet(isPresented: $brushPickerOpen) { brushPicker }
+        .modifier(AddWindowsHost(vm: vm, addUi: addUi))
+        .sheet(isPresented: Binding(get: { vm.structure.sheet }, set: { vm.structure.sheet = $0 })) {
+            StructureGuideSheet(state: vm.structure, canvas: vm.store.canvas)
+        }
         .sheet(item: $sheet) { s in
             switch s {
-            case .elements: ElementsPanel(vm: vm, store: vm.store)
-            case .layers: LayersPanel(vm: vm, store: vm.store)
             case .save: SaveSheet(vm: vm, images: vm.images, v40: vm.v40)
             case .guide: GuideSheet(vm: vm, store: vm.store)
             case .background: BackgroundSheet(vm: vm, store: vm.store)
@@ -184,107 +201,6 @@ private struct EditorCanvasHost: View {
     }
 }
 
-/// Üst satır: geri, geri al / yinele, modlar, fırça, renk ve silgi.
-private struct EditorTopBar: View {
-    @ObservedObject var vm: EditorViewModel
-    @ObservedObject var store: EditorStore
-    @ObservedObject var brush: BrushController
-    @Binding var brushPickerOpen: Bool
-    @Binding var sheet: EditorSheet?
-    @Environment(\.dismiss) private var dismiss
-
-    private let modes: [(EditMode, String, String)] = [
-        (.DRAW, "pencil.tip", "mode_draw"), (.SELECT, "hand.tap", "mode_select"), (.MOVE, "arrow.up.and.down.and.arrow.left.and.right", "mode_move"),
-        (.ROTATE, "rotate.right", "mode_rotate"), (.SCALE, "arrow.up.left.and.arrow.down.right", "mode_scale"),
-        (.SHAPE, "square.on.circle", "mode_shape"), (.TEXT, "textformat", "mode_text"), (.PEN, "pencil.and.outline", "mode_pen"),
-        (.PAINT, "paintbrush.fill", "mode_paint"), (.EXPAND, "aspectratio", "mode_expand"), (.CROP, "crop", "mode_crop"),
-    ]
-
-    var body: some View {
-        VStack(spacing: 6) {
-            HStack(spacing: 14) {
-                Button { if vm.tutorial.active { vm.tutorial.cancel() }; vm.close(); dismiss() } label: { Image(systemName: "chevron.backward") }
-                    .accessibilityIdentifier("editor_back")
-                Text(store.canvas?.name ?? "").font(.headline).lineLimit(1)
-                Spacer()
-                if vm.isTempImageEdit {
-                    // v51 geçici resim tuvali: Kaydet resmi nota aktarır ve tuvali siler
-                    Button { vm.commitTempImage() } label: { Label(L(vm.isTempShapeEdit ? "v52_temp_shape_save" : "v51_temp_image_save"), systemImage: "checkmark.circle.fill") }
-                        .font(.subheadline.weight(.semibold))
-                        .buttonStyle(.borderedProminent)
-                        .accessibilityIdentifier("temp_image_save")
-                }
-                if !vm.tutorial.groups(store.canvas?.kind ?? .ART).isEmpty {
-                    Button { vm.tutorial.openOffer() } label: { Image(systemName: "graduationcap") }
-                        .accessibilityLabel(L("tut_menu")).accessibilityIdentifier("tutorial_menu").tutorialAnchor(TutorialAnchor.MORE)
-                }
-                Button { sheet = .elements } label: { Image(systemName: "list.bullet.rectangle") }.accessibilityIdentifier("elements_button").tutorialAnchor(TutorialAnchor.ELEMENTS)
-                Button { sheet = .layers } label: { Image(systemName: "square.3.layers.3d") }.accessibilityIdentifier("layers_button").tutorialAnchor(TutorialAnchor.LAYERS)
-                Button { sheet = .save } label: { Image(systemName: "square.and.arrow.down") }.accessibilityIdentifier("save_button").tutorialAnchor(TutorialAnchor.SAVE)
-                Button { vm.undo() } label: { Image(systemName: "arrow.uturn.backward") }
-                    .disabled(!store.canUndo).accessibilityLabel(L("undo")).accessibilityIdentifier("undo").tutorialAnchor(TutorialAnchor.UNDO)
-                Button { vm.redo() } label: { Image(systemName: "arrow.uturn.forward") }
-                    .disabled(!store.canRedo).accessibilityLabel(L("redo")).accessibilityIdentifier("redo").tutorialAnchor(TutorialAnchor.REDO)
-                if !vm.isTempImageEdit {
-                    // v52 Diğer menüsü: paylaşım, canlı yayın ve çizim yardımcıları
-                    Menu {
-                        if store.canvas?.kind == .ART || store.canvas?.kind == .SIMPLE_ART {
-                            Button { sheet = .helpers } label: { Label(L("v52_helpers_title"), systemImage: "squareshape.split.3x3") }
-                                .accessibilityIdentifier("helpers_menu_item")
-                        }
-                        Button { sheet = .share } label: { Label(L("v52_share_send_title"), systemImage: "square.and.arrow.up") }
-                            .accessibilityIdentifier("share_menu_item")
-                        if ShareManager.liveAllowed(store.canvas?.kind) {
-                            Button { sheet = .live } label: { Label(L("v52_share_live_title"), systemImage: "dot.radiowaves.left.and.right") }
-                                .accessibilityIdentifier("live_menu_item")
-                        }
-                    } label: { Image(systemName: "ellipsis.circle") }
-                    .accessibilityLabel(L("more_options")).accessibilityIdentifier("editor_more")
-                }
-            }
-            .font(.title3)
-            if store.canvas?.kind.simple != true {
-            ScrollView(.horizontal, showsIndicators: false) {
-                HStack(spacing: 8) {
-                    ForEach(modes, id: \.2) { m in
-                        Button { vm.chooseMode(m.0) } label: {
-                            Label(L(m.2), systemImage: m.1).labelStyle(.iconOnly).frame(width: 36, height: 36)
-                                .background(RoundedRectangle(cornerRadius: 10).fill(vm.mode == m.0 ? Color.accentColor.opacity(0.2) : .clear))
-                        }
-                        .accessibilityIdentifier("mode_\(m.0)")
-                        .tutorialAnchor(TutorialAnchor.mode(m.0))
-                    }
-                    Divider().frame(height: 28)
-                    ToolButton(icon: "grid", label: L("add_guide"), id: "guide_button") { sheet = .guide }
-                    ToolButton(icon: "photo.on.rectangle", label: L("add_background"), id: "background_button", anchor: TutorialAnchor.BACKGROUND) { sheet = .background }
-                    Button { brushPickerOpen = true } label: {
-                        Image(systemName: "paintbrush.pointed").frame(width: 36, height: 36)
-                    }
-                    .accessibilityIdentifier("brush_button")
-                    .tutorialAnchor(TutorialAnchor.BRUSH)
-                    Button { brush.toggleEraser() } label: {
-                        Image(systemName: "eraser").frame(width: 36, height: 36)
-                            .background(RoundedRectangle(cornerRadius: 10).fill(brush.settings.brushType == .ERASER ? Color.accentColor.opacity(0.2) : .clear))
-                    }
-                    .accessibilityIdentifier("eraser_button")
-                    .tutorialAnchor(TutorialAnchor.ERASER)
-                    ColorPicker(L("brush_color_label"), selection: Binding(
-                        get: { Color(hex: brush.settings.colorHex) ?? .black },
-                        set: { brush.updateColor($0.hexRGB) }), supportsOpacity: false)
-                        .labelsHidden()
-                        .accessibilityIdentifier("color_button")
-                        .tutorialAnchor(TutorialAnchor.BRUSH_SETTINGS)
-                }
-                .padding(.horizontal, 12)
-            }
-            }
-        }
-        .padding(.top, 8)
-        .padding(.horizontal, 12)
-        .padding(.bottom, 6)
-    }
-}
-
 /// Parametreli şekil düzenlenirken (Değerler aracı) tuvalin üstündeki değer/formül çubuğu.
 private struct ParamControlsHost: View {
     @ObservedObject var vm: EditorViewModel
@@ -344,7 +260,7 @@ private struct TutorialOfferHost: View {
 }
 
 enum EditorSheet: String, Identifiable {
-    case elements, layers, save, guide, background, share, live, helpers
+    case save, guide, background, share, live, helpers
     var id: String { rawValue }
 }
 

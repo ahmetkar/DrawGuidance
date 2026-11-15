@@ -906,7 +906,22 @@ data class SubPath(
     @EncodeDefault(EncodeDefault.Mode.NEVER) val nodes: List<Int>? = null,
 )
 
+/**
+ * v53 çizgi roman ekran tonu ya da deseni (content.comic.ComicTones): [id] tür, [density] koyuluk (0..1), [scale]
+ * sıklık çarpanı, [angle] açı (derece), [colorHex] mürekkep rengi. Şeklin kapalı alanına kırpılarak çizilir.
+ */
+@OptIn(ExperimentalSerializationApi::class)
+@Serializable
+data class ToneFill(
+    val id: String,
+    @EncodeDefault(EncodeDefault.Mode.NEVER) val density: Float = 0.3f,
+    @EncodeDefault(EncodeDefault.Mode.NEVER) val scale: Float = 1f,
+    @EncodeDefault(EncodeDefault.Mode.NEVER) val angle: Float = 45f,
+    @EncodeDefault(EncodeDefault.Mode.NEVER) val colorHex: String = "#111111",
+)
+
 /** Şeklin görünümü: kenar rengi/kalınlığı, dolgu rengi ve köşe yuvarlaklığı (tuval birimi). */
+@OptIn(ExperimentalSerializationApi::class)
 @Serializable
 data class ShapeStyle(
     val strokeColorHex: String = "#1E1E1E",
@@ -916,6 +931,8 @@ data class ShapeStyle(
     val cornerRadius: Float = 0f,
     /** v27 gradyan dolgu (şeklin kutusuna göre; [fillColorHex] yerine). */
     val fillGradient: GradientSpec? = null,
+    /** v53 çizgi roman ekran tonu / deseni (dolgunun üstünde, şeklin içine kırpılarak; yoksa yazılmaz). */
+    @EncodeDefault(EncodeDefault.Mode.NEVER) val tone: ToneFill? = null,
 )
 
 /** Grafiklerde eksen etiketleri ve çizilecek formül (ör. y = x^2 / z = sin(x)+cos(y)). */

@@ -1026,6 +1026,31 @@ struct SubPath: Codable, Equatable {
 }
 
 /// Şeklin görünümü.
+/// v53 çizgi roman ekran tonu ya da deseni (Android `ToneFill`; `ComicTones`): şeklin kapalı alanına kırpılarak çizilir.
+struct ToneFill: Codable, Equatable, Hashable {
+    var id: String
+    var density: Float = 0.3
+    var scale: Float = 1
+    var angle: Float = 45
+    var colorHex = "#111111"
+
+    init(id: String, density: Float = 0.3, scale: Float = 1, angle: Float = 45, colorHex: String = "#111111") {
+        self.id = id; self.density = density; self.scale = scale; self.angle = angle; self.colorHex = colorHex
+    }
+
+    init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: AnyKey.self)
+        id = c.v("id", "tone_dot"); density = c.v("density", 0.3); scale = c.v("scale", 1); angle = c.v("angle", 45)
+        colorHex = c.v("colorHex", "#111111")
+    }
+
+    func encode(to encoder: Encoder) throws {
+        var c = encoder.container(keyedBy: AnyKey.self)
+        try c.e(id, "id", ""); try c.e(density, "density", 0.3); try c.e(scale, "scale", 1); try c.e(angle, "angle", 45)
+        try c.e(colorHex, "colorHex", "#111111")
+    }
+}
+
 struct ShapeStyle: Codable, Equatable {
     var strokeColorHex = "#1E1E1E"
     var strokeWidth: Float = 4
@@ -1033,24 +1058,27 @@ struct ShapeStyle: Codable, Equatable {
     var fillOpacity: Float = 1
     var cornerRadius: Float = 0
     var fillGradient: GradientSpec? = nil
+    /// v53 ekran tonu / desen (dolgunun üstünde; yoksa yazılmaz).
+    var tone: ToneFill? = nil
 
     init(strokeColorHex: String = "#1E1E1E", strokeWidth: Float = 4, fillColorHex: String? = nil, fillOpacity: Float = 1,
-         cornerRadius: Float = 0, fillGradient: GradientSpec? = nil) {
+         cornerRadius: Float = 0, fillGradient: GradientSpec? = nil, tone: ToneFill? = nil) {
         self.strokeColorHex = strokeColorHex; self.strokeWidth = strokeWidth; self.fillColorHex = fillColorHex
-        self.fillOpacity = fillOpacity; self.cornerRadius = cornerRadius; self.fillGradient = fillGradient
+        self.fillOpacity = fillOpacity; self.cornerRadius = cornerRadius; self.fillGradient = fillGradient; self.tone = tone
     }
 
     init(from decoder: Decoder) throws {
         let c = try decoder.container(keyedBy: AnyKey.self)
         strokeColorHex = c.v("strokeColorHex", "#1E1E1E"); strokeWidth = c.v("strokeWidth", 4); fillColorHex = c.o("fillColorHex")
         fillOpacity = c.v("fillOpacity", 1); cornerRadius = c.v("cornerRadius", 0); fillGradient = c.o("fillGradient")
+        tone = c.o("tone")
     }
 
     func encode(to encoder: Encoder) throws {
         var c = encoder.container(keyedBy: AnyKey.self)
         try c.e(strokeColorHex, "strokeColorHex", "#1E1E1E"); try c.e(strokeWidth, "strokeWidth", 4)
         try c.o(fillColorHex, "fillColorHex"); try c.e(fillOpacity, "fillOpacity", 1); try c.e(cornerRadius, "cornerRadius", 0)
-        try c.o(fillGradient, "fillGradient")
+        try c.o(fillGradient, "fillGradient"); try c.o(tone, "tone")
     }
 }
 

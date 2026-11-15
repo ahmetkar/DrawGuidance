@@ -1,117 +1,6 @@
 import PhotosUI
 import SwiftUI
 
-/// Elemanlar paneli (Android `EditorSidePanel` elemanlar sekmesi): en son çizilen en üstte; dokununca seçime eklenir/çıkarılır.
-struct ElementsPanel: View {
-    @ObservedObject var vm: EditorViewModel
-    @ObservedObject var store: EditorStore
-    @Environment(\.dismiss) private var dismiss
-
-    var body: some View {
-        NavigationStack {
-            let rows = ElementOps.rows(store.elements)
-            List {
-                if rows.isEmpty {
-                    Text(L("elements_empty")).foregroundStyle(.secondary)
-                } else {
-                    Section(footer: Text(L("elements_select_hint"))) {
-                        ForEach(Array(rows.enumerated()), id: \.offset) { _, row in rowView(row) }
-                    }
-                }
-            }
-            .navigationTitle("Elements")
-            .toolbar {
-                ToolbarItem(placement: .confirmationAction) { Button(L("close")) { dismiss() } }
-            }
-        }
-        .dockedEditorSheet()
-    }
-
-    @ViewBuilder private func rowView(_ row: ElementRow) -> some View {
-        switch row {
-        case let .single(e):
-            elementButton(e, indent: false)
-        case let .group(groupId, number, members):
-            let selected = members.allSatisfy { m in m.strokeIds.allSatisfy(store.selectedIds.contains) }
-            Button { vm.selection.toggleGroup(groupId) } label: {
-                HStack {
-                    Image(systemName: "square.stack.3d.up")
-                    Text("Grup \(number)")
-                    Spacer()
-                    if selected { Image(systemName: "checkmark") }
-                }
-            }
-            ForEach(members) { m in elementButton(m, indent: true) }
-        }
-    }
-
-    private func elementButton(_ e: Element, indent: Bool) -> some View {
-        let selected = e.strokeIds.allSatisfy(store.selectedIds.contains)
-        return Button { vm.selection.toggleElement(e.id) } label: {
-            HStack {
-                Circle().fill(Color(hex: e.colorHex) ?? .gray).frame(width: 14, height: 14)
-                Text("\(L(e.brushType.titleKey)) \(e.number)")
-                    .foregroundStyle(e.hidden ? .secondary : .primary)
-                if e.hidden { Image(systemName: "eye.slash").foregroundStyle(.secondary) }
-                Spacer()
-                if selected { Image(systemName: "checkmark").foregroundStyle(Color.accentColor) }
-            }
-            .padding(.leading, indent ? 20 : 0)
-        }
-        .accessibilityIdentifier("element_\(e.number)")
-    }
-}
-
-/// Katmanlar paneli: etkin katman, görünürlük, kilit, sıra, ad ve seçimi katmana taşıma.
-struct LayersPanel: View {
-    @ObservedObject var vm: EditorViewModel
-    @ObservedObject var store: EditorStore
-    @Environment(\.dismiss) private var dismiss
-    @State private var renaming: Layer?
-    @State private var newName = ""
-
-    var body: some View {
-        NavigationStack {
-            List {
-                Section(footer: Text(L("layers_hint"))) {
-                    ForEach((store.canvas?.layers ?? [Layer.Default]).reversed()) { layer in
-                        HStack(spacing: 14) {
-                            Button { vm.layers.setActive(layer.id) } label: {
-                                Image(systemName: store.activeLayer == layer.id ? "largecircle.fill.circle" : "circle")
-                            }
-                            Text(layer.name).onTapGesture(count: 2) { renaming = layer; newName = layer.name }
-                            Spacer()
-                            Button { vm.layers.toggleVisible(layer.id) } label: { Image(systemName: layer.visible ? "eye" : "eye.slash") }
-                            Button { vm.layers.toggleLocked(layer.id) } label: { Image(systemName: layer.locked ? "lock" : "lock.open") }
-                        }
-                        .buttonStyle(.borderless)
-                        .swipeActions {
-                            if layer.id != Layer.BASE { Button(role: .destructive) { vm.layers.remove(layer.id) } label: { Image(systemName: "trash") } }
-                            Button { vm.layers.move(layer.id, 1) } label: { Image(systemName: "arrow.up") }
-                            Button { vm.layers.move(layer.id, -1) } label: { Image(systemName: "arrow.down") }
-                        }
-                        .contextMenu {
-                            if !store.selectedIds.isEmpty {
-                                Button { vm.layers.moveSelectionTo(layer.id) } label: { Label("→ \(layer.name)", systemImage: "square.and.arrow.down.on.square") }
-                            }
-                        }
-                    }
-                }
-            }
-            .navigationTitle("Layers")
-            .toolbar {
-                ToolbarItem(placement: .primaryAction) { Button { _ = vm.layers.add() } label: { Image(systemName: "plus") } }
-                ToolbarItem(placement: .confirmationAction) { Button(L("close")) { dismiss() } }
-            }
-            .alert("", isPresented: Binding(get: { renaming != nil }, set: { if !$0 { renaming = nil } })) {
-                TextField("", text: $newName)
-                Button(L("apply_button")) { if let r = renaming { vm.layers.rename(r.id, newName) }; renaming = nil }
-            }
-        }
-        .dockedEditorSheet()
-    }
-}
-
 /// Birleşik kaydetme penceresi (Android `UnifiedSaveSheet`): resim (PNG/JPEG, ölçek, tüm sayfalar), PDF ve CBZ; bitince paylaşma.
 struct SaveSheet: View {
     @ObservedObject var vm: EditorViewModel
@@ -314,148 +203,116 @@ struct DiagramPickerSheet: View {
     @ObservedObject var vm: EditorViewModel
     @Environment(\.dismiss) private var dismiss
 
-    private static func title(_ k: DiagramKind) -> String {
+    static func title(_ k: DiagramKind) -> String {
         let key = "diagram_" + k.rawValue.lowercased()
         let t = L(key)
         return t == key ? k.rawValue.replacingOccurrences(of: "_", with: " ").capitalized : t
     }
 
     var body: some View {
+        // v53 diyagramlar küçük resimleri ve adlarıyla ızgarada (Android `DiagramPicker`)
         NavigationStack {
-            List(DiagramKind.allCases, id: \.self) { k in
-                Button(Self.title(k)) {
-                    vm.selectDiagram(k)
-                    vm.closeDiagramPicker()
-                    if vm.mode != .DIAGRAM { vm.startAction(.DIAGRAM, target: []) }
-                    dismiss()
+            ScrollView {
+                LazyVGrid(columns: [GridItem(.adaptive(minimum: 104), spacing: 10)], spacing: 10) {
+                    ForEach(DiagramKind.allCases, id: \.self) { k in
+                        Button {
+                            vm.selectDiagram(k)
+                            vm.closeDiagramPicker()
+                            if vm.mode != .DIAGRAM { vm.startAction(.DIAGRAM, target: []) }
+                            dismiss()
+                        } label: {
+                            ThumbCard(title: Self.title(k)) {
+                                if let img = PickerThumbs.diagram(k) { Image(uiImage: img).resizable().scaledToFit() }
+                            }
+                        }
+                        .buttonStyle(.plain)
+                        .accessibilityIdentifier("diagram_\(k.rawValue)")
+                    }
                 }
+                .padding(16)
             }
+            .background(Color(uiColor: .systemGroupedBackground))
             .navigationTitle(L("add_diagram"))
+            .navigationBarTitleDisplayMode(.inline)
             .toolbar { ToolbarItem(placement: .cancellationAction) { Button(L("close")) { vm.closeDiagramPicker(); dismiss() } } }
         }
     }
 }
 
-/// Hazır formül seçici (kategoriler).
+/// Hazır formül seçici: kategoriler, formüller dizilmiş haliyle (küçük resim) ve adıyla.
 struct FormulaPickerSheet: View {
     @ObservedObject var vm: EditorViewModel
     @Environment(\.dismiss) private var dismiss
 
     var body: some View {
         NavigationStack {
-            List {
-                ForEach(FormulaCatalog.categories, id: \.id) { cat in
-                    Section(cat.title) {
-                        ForEach(cat.templates, id: \.id) { t in
-                            Button(t.title) {
-                                vm.selectFormula(t)
-                                vm.closeFormulaPicker()
-                                if vm.mode != .FORMULA { vm.startAction(.FORMULA, target: []) }
-                                dismiss()
+            ScrollView {
+                VStack(alignment: .leading, spacing: 14) {
+                    ForEach(FormulaCatalog.categories, id: \.id) { cat in
+                        Text(cat.title).font(.subheadline.weight(.semibold))
+                        LazyVGrid(columns: [GridItem(.adaptive(minimum: 140), spacing: 10)], spacing: 10) {
+                            ForEach(cat.templates, id: \.id) { t in
+                                Button {
+                                    vm.selectFormula(t)
+                                    vm.closeFormulaPicker()
+                                    if vm.mode != .FORMULA { vm.startAction(.FORMULA, target: []) }
+                                    dismiss()
+                                } label: {
+                                    ThumbCard(title: t.title) {
+                                        if let img = PickerThumbs.formula(t) { Image(uiImage: img).resizable().scaledToFit().padding(4) }
+                                    }
+                                }
+                                .buttonStyle(.plain)
+                                .accessibilityIdentifier("formula_\(t.id)")
                             }
                         }
                     }
                 }
+                .padding(16)
             }
+            .background(Color(uiColor: .systemGroupedBackground))
             .navigationTitle(L("add_formula"))
+            .navigationBarTitleDisplayMode(.inline)
             .toolbar { ToolbarItem(placement: .cancellationAction) { Button(L("close")) { vm.closeFormulaPicker(); dismiss() } } }
         }
     }
 }
 
-/// v27/v36 çizgi roman ekleme penceresi: konuşma balonları, sayfa şablonları, efektler ve efekt yazıları.
-struct ComicInsertSheet: View {
-    enum Tab: String, CaseIterable { case balloons, templates, images, lines, effects, sfx }
-    @ObservedObject var vm: EditorViewModel
-    @State var tab: Tab = .balloons
-    @Environment(\.dismiss) private var dismiss
-    @ObservedObject private var sub = SubscriptionStore.shared
-    @State private var premiumOpen = false
+/// v53 seçicilerin küçük resimleri (gerçek çiziciyle; sınırlı önbellek, bellek uyarısında boşalır).
+enum PickerThumbs {
+    static let cache: NSCache<NSString, UIImage> = { let c = NSCache<NSString, UIImage>(); c.countLimit = 120; return c }()
 
-    private var tabs: [(Tab, String)] {
-        var t: [(Tab, String)] = [(.balloons, L("add_balloon")), (.templates, L("add_templates"))]
-        if !ComicAssets.catalog.effects.isEmpty { t.append((.images, L("effects_tab_effects"))) }
-        t += [(.lines, L("effects_tab_lines")), (.effects, L("add_effects")), (.sfx, "SFX")]
-        return t
-    }
-
-    private static func linesTitle(_ k: ComicLinesKind) -> String { L("lines_" + k.rawValue.lowercased()) }
-
-    private static func balloonTitle(_ s: BalloonStyle) -> String {
-        let key = "balloon_" + s.rawValue.lowercased()
-        let t = L(key)
-        return t == key ? s.rawValue.capitalized : t
-    }
-
-    var body: some View {
-        NavigationStack {
-            VStack(spacing: 0) {
-                ScrollView(.horizontal, showsIndicators: false) {
-                    HStack(spacing: 8) {
-                        ForEach(tabs, id: \.0) { item in
-                            let t = item.0
-                            Button { tab = t } label: {
-                                Text(item.1).font(.subheadline.weight(tab == t ? .semibold : .regular)).lineLimit(1)
-                                    .padding(.horizontal, 12).padding(.vertical, 7)
-                                    .foregroundStyle(tab == t ? Color.accentColor : Color.primary)
-                                    .background(Capsule().fill(tab == t ? Color.accentColor.opacity(0.18) : Color.primary.opacity(0.06)))
-                            }
-                            .buttonStyle(.plain)
-                            .accessibilityIdentifier("comic_tab_\(t.rawValue)")
-                        }
-                    }
-                    .padding(.horizontal, 16).padding(.vertical, 10)
-                }
-                if tab == .images {
-                    ScrollView {
-                        VStack(alignment: .leading, spacing: 10) {
-                            Text(L("v42_fx_images_hint")).font(.footnote).foregroundStyle(.secondary).padding(.horizontal, 16)
-                            ComicPropsBrowser(kind: .EFFECT, tag: "fximg") { p in vm.insertComicProp(.EFFECT, p); dismiss() }
-                        }
-                    }
-                } else {
-                    List { content }
-                }
-            }
-            .navigationTitle(L("add_balloon"))
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar { ToolbarItem(placement: .cancellationAction) { Button(L("close")) { dismiss() } } }
+    static func diagram(_ k: DiagramKind) -> UIImage? {
+        let key = "d-\(k.rawValue)" as NSString
+        if let hit = cache.object(forKey: key) { return hit }
+        let W: Float = 220
+        let aspect = DiagramCatalog.aspect(k) ?? 1.3
+        let H = W / max(min(aspect, 2.4), 0.6)
+        let nodes = DiagramRenderer.layout(k, DiagramRenderer.defaultNodes(k))
+        let edges = DiagramRenderer.defaultEdges(k, nodes)
+        let spec = DiagramSpec(kind: k, nodes: nodes, edges: edges, style: ShapeStyle(strokeColorHex: "#37474F", strokeWidth: 2))
+        let stroke = Stroke(id: "thumb-d-\(k.rawValue)", points: [StrokePoint(4, 4), StrokePoint(W - 4, 4), StrokePoint(W - 4, H - 4), StrokePoint(4, H - 4)],
+                            colorHex: "#37474F", brushType: .DIAGRAM, sizePx: 2, opacity: 1, order: 0, diagram: spec)
+        let img = UIGraphicsImageRenderer(size: CGSize(width: CGFloat(W), height: CGFloat(H))).image { r in
+            DiagramRenderer.draw(r.cgContext, stroke, labels: false)
         }
-        .fullEditorSheet()
-        .sheet(isPresented: $premiumOpen) { PremiumRequiredSheet() }
+        cache.setObject(img, forKey: key)
+        return img
     }
 
-    @ViewBuilder private var content: some View {
-        switch tab {
-        case .balloons:
-            Section(footer: Text(L("balloon_hint"))) {
-                ForEach(BalloonStyle.allCases, id: \.self) { s in
-                    Button(Self.balloonTitle(s)) { vm.insertBalloon(s, speakers: 1); dismiss() }
-                }
-            }
-        case .templates:
-            ForEach(ComicTemplates.all) { t in
-                Button(t.title) { let ids = vm.comic.insertTemplate(t.id); vm.inserted(ids); dismiss() }
-            }
-        case .images:
-            EmptyView()
-        case .lines:
-            // v50 çizgi roman / manga bölümleri; her tür kendi ayarlarıyla (ortak ayar yok). BURST'ten sonrakiler Premium
-            // (Android `PremiumRules.isAdvancedLines`).
-            LinesInsertSection(onInsert: { k, o in vm.comic.insertLines(k, o); dismiss() },
-                               locked: { k in k.ordinal > ComicLinesKind.BURST.ordinal && !sub.allows(.COMIC_EFFECTS, .COMIC) },
-                               onLocked: { premiumOpen = true })
-        case .effects:
-            ForEach(ComicEffects.all) { e in
-                Button(e.title) { vm.insertEffect(e, options: EffectOptions()); dismiss() }
-            }
-        case .sfx:
-            ForEach(Array(ComicSfx.presets.enumerated()), id: \.offset) { _, p in
-                Button { vm.insertSfx(p); dismiss() } label: {
-                    Text(p.text).font(.title3.weight(.heavy)).foregroundStyle(Color(hex: p.colors.first ?? "#000000") ?? .primary)
-                }
-            }
+    static func formula(_ t: FormulaTemplate) -> UIImage? {
+        let key = "f-\(t.id)" as NSString
+        if let hit = cache.object(forKey: key) { return hit }
+        let size: Float = 26
+        let quad = FormulaRenderer.quadAt(t.source, size, 4, 4)
+        let w = (quad.map(\.x).max() ?? 100) + 4, h = (quad.map(\.y).max() ?? 40) + 4
+        let stroke = Stroke(id: "thumb-f-\(t.id)", points: quad, colorHex: "#1E1E1E", brushType: .FORMULA, sizePx: size, opacity: 1, order: 0,
+                            formula: FormulaSpec(source: Formula.atomize(t.source), templateId: t.id))
+        let img = UIGraphicsImageRenderer(size: CGSize(width: CGFloat(w), height: CGFloat(h))).image { r in
+            FormulaRenderer.draw(r.cgContext, stroke, color: ArgbColor.hex("#1E1E1E"))
         }
+        cache.setObject(img, forKey: key)
+        return img
     }
 }
 

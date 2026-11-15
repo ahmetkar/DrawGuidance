@@ -13,9 +13,8 @@ struct SimpleToolbar: View {
     @ObservedObject var ruler: RulerController
     @Binding var sheet: EditorSheet?
     @Binding var brushPickerOpen: Bool
+    @ObservedObject var addUi: AddWindows
     @State private var photo: PhotosPickerItem?
-    @State private var panelsOpen = false
-    @State private var models3dOpen = false
 
     struct Tool: Identifiable {
         let id: String; let icon: String; let label: String; var selected = false; var enabled = true; let run: () -> Void
@@ -36,10 +35,12 @@ struct SimpleToolbar: View {
                 Tool(id: "graph", icon: "chart.xyaxis.line", label: L("v52_add_graph")) { vm.shapes.openGraphPicker() },
                 Tool(id: "table", icon: "tablecells", label: L("v52_add_table")) { vm.tables.openCreate() },
                 Tool(id: "diagram", icon: "point.3.connected.trianglepath.dotted", label: L("add_diagram")) { vm.diagrams.openPicker() },
-                Tool(id: "panels", icon: "rectangle.split.2x2", label: L("v45_panels_add")) { panelsOpen = true },
+                Tool(id: "panels", icon: "rectangle.split.2x2", label: L("v45_panels_add")) { addUi.open = .panels },
+                // v53 hızlı yazı kutusu
+                Tool(id: "textbox", icon: "character.textbox", label: L("v53_quick_text"), selected: vm.quickText.active) { vm.toggleQuickText() },
             ]
         }
-        t.append(Tool(id: "model3d", icon: "cube.transparent", label: L("add_model3d")) { models3dOpen = true })
+        t.append(Tool(id: "model3d", icon: "cube.transparent", label: L("add_model3d")) { addUi.open = .model3d })
         t.append(Tool(id: "background", icon: "photo.on.rectangle", label: L("add_background")) { sheet = .background })
         return t
     }
@@ -47,8 +48,9 @@ struct SimpleToolbar: View {
     private var drawTools: [Tool] {
         let drawing = vm.mode == .DRAW
         var t: [Tool] = [
-            Tool(id: "brush", icon: "pencil.tip", label: L("mode_draw"), selected: drawing && !erasing) {
-                vm.chooseMode(.DRAW); if erasing { brush.toggleEraser() }
+            // v53 çizerken kaleme yeniden dokununca fırça penceresi açılır (fırça orada seçilir)
+            Tool(id: "brush", icon: BrushSymbols.of(erasing ? vm.lastDrawingBrush : brush.settings.brushType), label: L("mode_draw"), selected: drawing && !erasing) {
+                if drawing && !erasing { brushPickerOpen = true } else { vm.chooseMode(.DRAW); if erasing { brush.toggleEraser() } }
             },
             Tool(id: "eraser", icon: "eraser", label: L("brush_eraser"), selected: drawing && erasing) {
                 vm.chooseMode(.DRAW); if !erasing { brush.toggleEraser() }
@@ -74,6 +76,8 @@ struct SimpleToolbar: View {
             t.append(Tool(id: "practice", icon: "figure.strengthtraining.traditional", label: L("v50_practice"), selected: vm.practice.active) { vm.practice.listOpen = true })
             // v52 çizim yardımcıları
             t.append(Tool(id: "helpers", icon: "squareshape.split.3x3", label: L("v52_helpers_short"), selected: vm.helpers.active) { sheet = .helpers })
+            // v53 canlı, nesne ve eşya yapı kılavuzları
+            t.append(Tool(id: "structure", icon: "figure.stand", label: L("v53_struct_short"), selected: vm.structure.active) { vm.structure.sheet = true })
         }
         return t
     }
@@ -93,9 +97,10 @@ struct SimpleToolbar: View {
             },
             Tool(id: "expand", icon: "aspectratio", label: L("mode_expand"), selected: vm.mode == .EXPAND,
                  enabled: !has || vm.mode == .EXPAND) { vm.chooseMode(.EXPAND) },
-            Tool(id: "elements", icon: "list.bullet.rectangle", label: L("tab_elements")) { sheet = .elements },
-            Tool(id: "layers", icon: "square.3.layers.3d", label: L("tab_layers")) { sheet = .layers },
-            Tool(id: "brush_settings", icon: "slider.horizontal.3", label: L("brush_settings_toggle")) { brushPickerOpen = true },
+            // v53 Elemanlar, Katmanlar ve Özellikler sağdan açılan panelde
+            Tool(id: "elements", icon: "square.grid.2x2", label: L("tab_elements"), selected: vm.panel == .ELEMENTS) { withAnimation(.snappy(duration: 0.25)) { vm.togglePanel(.ELEMENTS) } },
+            Tool(id: "layers", icon: "square.3.layers.3d", label: L("tab_layers"), selected: vm.panel == .LAYERS) { withAnimation(.snappy(duration: 0.25)) { vm.togglePanel(.LAYERS) } },
+            Tool(id: "brush_settings", icon: "slider.horizontal.3", label: L("tab_brush"), selected: vm.panel == .BRUSH) { withAnimation(.snappy(duration: 0.25)) { vm.togglePanel(.BRUSH) } },
         ]
         if notes && (store.canvas?.guide.kind ?? .NONE) != .NONE {
             // v51 not almada kılavuz aracı yok: eski notlarda kalan kılavuz çizgileri buradan kaldırılır
@@ -122,7 +127,8 @@ struct SimpleToolbar: View {
             ]) {
                 ForEach(drawTools) { pill($0) }
             }
-            if ruler.session != .NONE { RulerBar(ruler: ruler).padding(.horizontal, 12) }
+            // v53 seçili aracın ayarları menülerin altında (cetvel, fırça boyu, ekleme modlarında Bitti)
+            ToolOptionsStrip(vm: vm, store: store, brush: brush, ruler: ruler, shapes: vm.shapes)
             if !notes && (vm.mode == .IMAGE_EDIT || vm.mode == .SHAPE_EDIT) { SimpleVectorRow(vm: vm, store: store, shapes: vm.shapes) }
             menu("simple_menu_edit", fixed: []) {
                 ForEach(editTools) { pill($0) }
@@ -132,12 +138,6 @@ struct SimpleToolbar: View {
         .padding(.bottom, 6)
         .accessibilityElement(children: .contain)
         .accessibilityIdentifier("simple_tool_row")
-        .sheet(isPresented: $models3dOpen) {
-            if let repo = EditorDependencies.shared.models3d {
-                Model3DPickerSheet(vm: vm, repository: repo, kind: store.canvas?.kind ?? .SIMPLE_ART)
-            }
-        }
-        .sheet(isPresented: $panelsOpen) { NotesPanelsSheet { id in vm.v45.insertPanels(id); panelsOpen = false } }
         .sheet(isPresented: Binding(get: { ruler.libraryOpen }, set: { ruler.libraryOpen = $0 })) {
             ShapePickerView(kind: store.canvas?.kind ?? .SIMPLE_ART) { id in
                 let v = vm.viewport
@@ -165,21 +165,27 @@ struct SimpleToolbar: View {
                 HStack(spacing: 6) { content() }
             }
         }
-        .padding(.horizontal, 8).padding(.vertical, 6)
-        .background(RoundedRectangle(cornerRadius: 16).fill(Color.primary.opacity(0.04)))
+        .padding(.horizontal, 6).padding(.vertical, 4)
+        .background(
+            RoundedRectangle(cornerRadius: 16, style: .continuous)
+                .fill(Color(uiColor: .secondarySystemGroupedBackground))
+                .shadow(color: .black.opacity(0.06), radius: 5, y: 2)
+        )
         .accessibilityElement(children: .contain)
         .accessibilityIdentifier(tag)
     }
 
     private func pill(_ t: Tool) -> some View {
         Button(action: t.run) {
-            Label(t.label, systemImage: t.icon)
-                .font(.caption.weight(.semibold)).lineLimit(1)
-                .padding(.horizontal, 10).padding(.vertical, 7)
-                .foregroundStyle(t.selected ? Color.accentColor : Color.primary)
-                .background(Capsule().fill(t.selected ? Color.accentColor.opacity(0.18) : Color.primary.opacity(0.06)))
+            HStack(spacing: 5) {
+                Image(systemName: t.icon).font(.system(size: 14, weight: .medium))
+                Text(t.label).font(.caption.weight(.semibold)).lineLimit(1).fixedSize()
+            }
+            .padding(.horizontal, 10).frame(height: 34)
+            .foregroundStyle(t.selected ? Color.accentColor : Color.primary.opacity(0.85))
+            .background(ChromeChip(selected: t.selected, radius: 11))
         }
-        .buttonStyle(.plain)
+        .buttonStyle(ChromePressStyle())
         .disabled(!t.enabled)
         .opacity(t.enabled ? 1 : 0.4)
         .accessibilityIdentifier("simple_tool_\(t.id)")

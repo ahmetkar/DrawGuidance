@@ -422,7 +422,7 @@ fun CanvasEditScreen(
             // v51 geçici resim tuvali: Kaydet resmi nota aktarır ve tuvali siler
             NeuIconButton(
                 Icons.Filled.Save,
-                stringResource(R.string.v51_temp_image_save),
+                stringResource(if (viewModel.isTempShapeEdit) R.string.v52_temp_shape_save else R.string.v51_temp_image_save),
                 viewModel::saveNow,
                 Modifier.testTag("temp_image_save"),
                 tint = colors.accent,
@@ -578,6 +578,7 @@ fun CanvasEditScreen(
                 is EditEvent.PageLimit -> context.getString(R.string.page_limit_reached, event.max)
                 EditEvent.PaintMiss -> context.getString(R.string.paint_miss)
                 EditEvent.TempImageApplied -> context.getString(R.string.v51_temp_image_saved)
+                EditEvent.TempShapeApplied -> context.getString(R.string.v52_temp_shape_saved)
             }
             // Yeni bildirim eskisini beklemeden onun yerine geçer
             snackbar.currentSnackbarData?.dismiss()

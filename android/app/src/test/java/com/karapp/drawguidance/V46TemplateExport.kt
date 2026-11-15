@@ -267,7 +267,8 @@ abstract class TemplateExportBase : V32EditorBase() {
         val file = File(out!!, "catalog.json")
         val old = if (file.exists()) CanvasTemplates.parseCatalog(file.readText()).templates else emptyList()
         val info = INFO.getValue(id)
-        val entry = TemplateEntry(id, kind.name, info.first, info.second, pages, w, h)
+        val kindName = if (id in V52TemplateInfo.SIMPLE || id.startsWith("simple_")) CanvasKind.SIMPLE_NOTES.name else kind.name
+        val entry = TemplateEntry(id, kindName, info.first, info.second, pages, w, h)
         val merged = (old.filter { it.id != id } + entry).sortedBy { ORDER.indexOf(it.id) }
         file.writeText(CanvasTemplates.encodeCatalog(TemplateCatalog(1, merged)))
     }
@@ -287,13 +288,17 @@ abstract class TemplateExportBase : V32EditorBase() {
             "comic_blank_pages", "comic_blank_manga", "comic_blank_webtoon",
             "notes_cornell", "notes_math", "notes_lab", "notes_meeting", "notes_mindmap",
             "simple_lesson", "simple_todo", "simple_week",
+            // v52
+            "comic_strips", "comic_blank_action",
+            "notes_chemistry", "notes_physics", "notes_vocab", "notes_timeline",
+            "simple_reading", "simple_shopping", "simple_exam",
         )
 
         fun l(tr: String, en: String, ar: String, ja: String, ko: String, ru: String, zh: String) =
             mapOf("tr" to tr, "en" to en, "ar" to ar, "ja" to ja, "ko" to ko, "ru" to ru, "zh" to zh)
 
         /** Şablonların dillere göre adları ve kısa açıklamaları. */
-        val INFO: Map<String, Pair<Map<String, String>, Map<String, String>>> = V48TemplateInfo.INFO + V47TemplateInfo.INFO + mapOf(
+        val INFO: Map<String, Pair<Map<String, String>, Map<String, String>>> = V52TemplateInfo.INFO + V48TemplateInfo.INFO + V47TemplateInfo.INFO + mapOf(
             "notes_cornell" to (l("Cornell ders notu", "Cornell lecture notes", "ملاحظات كورنيل", "コーネル式ノート", "코넬 노트", "Конспект Корнелла", "康奈尔笔记") to
                 l("Anahtar sorular, not alanı ve özet; Newton yasaları örneği.", "Key questions, notes and summary; Newton's laws example.", "أسئلة رئيسية وملاحظات وملخص؛ مثال قوانين نيوتن.", "キークエスチョン・ノート・まとめ（ニュートンの法則の例）。", "핵심 질문, 노트, 요약(뉴턴 법칙 예시).", "Ключевые вопросы, записи и итог; пример — законы Ньютона.", "关键问题、笔记和总结（牛顿定律示例）。")),
             "notes_math" to (l("Matematik çalışma kâğıdı", "Math worksheet", "ورقة عمل رياضيات", "数学ワークシート", "수학 학습지", "Рабочий лист по математике", "数学练习页") to

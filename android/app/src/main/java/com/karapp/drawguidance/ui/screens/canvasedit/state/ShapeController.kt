@@ -252,15 +252,16 @@ class ShapeController(
     /** v51 seçili şekil düzenleyicide açılabilir mi (not almada düz şekiller açılmaz: "Şekli düzenle" gösterilmez). */
     fun canEditSelected(): Boolean {
         val shape = store.selectedStroke { it.shape != null } ?: return false
-        return vectorEditAllowed || !isVectorTool(editToolFor(shape))
+        return vectorEditAllowed || !isVectorTool(editToolFor(shape)) || host.canEditShapeElsewhere
     }
 
     fun editSelected() {
         val shape = store.selectedStroke { it.shape != null } ?: return
         paramShapes.clearError()
         val tool = editToolFor(shape)
-        // v51 not almada düz şekiller vektör düzenlemeye açılmaz (değerli şekiller ve grafikler açılır)
-        if (!vectorEditAllowed && isVectorTool(tool)) return
+        // v51 not almada düz şekiller vektör düzenlemeye açılmaz (değerli şekiller ve grafikler açılır);
+        // v52 onun yerine şekil gelişmiş çizim tuvalinde açılır, kaydedilince nota döner
+        if (!vectorEditAllowed && isVectorTool(tool)) { host.editShapeElsewhere(shape); return }
         _tool.value = tool
         setSelection(VectorSelection(), shape)
         // Düzenlenirken yalnızca bu şekil seçili (önceki seçim kalkar); bitince İncele moduna geçilir

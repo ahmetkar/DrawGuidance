@@ -289,4 +289,56 @@ class V48TemplateExport : TemplateExportBase() {
         narration(r[1].at(0.74f, 0.9f), short, s)
         export("comic_blank_webtoon", CanvasKind.COMIC, landing = 0, coverPage = 0)
     }
+
+    // ================================================================ v52 yeni çizgi roman şablonları
+
+    /** Panel sayısı bilinmeyen şablon: eklenir, paneller okuma sırasıyla döner. */
+    private fun panelsAny(template: String): List<Rect> {
+        val before = vm().comicPanelRects().size
+        compose.runOnIdle { vm().insertTemplate(template) }
+        waitFor { vm().comicPanelRects().size > before }
+        settleFor(300)
+        compose.runOnIdle { vm().clearSelection() }
+        return readingOrder(false).map { it.second }
+    }
+
+    /** Her panelde sırayla balon: ilk panelde anlatı, sonra konuşma / düşünce / cevap. */
+    private fun fill(r: List<Rect>, s: Float, pad: Float = 0.05f) {
+        r.forEachIndexed { i, p ->
+            when {
+                i == 0 -> { caption(p, false, s, pad = pad); single(p, false, s, short, x = 0.66f, v = 0.34f, t = TailDirection.BOTTOM_RIGHT, pad = pad) }
+                i % 3 == 1 -> dialogue(p, false, s, medium, short, pad = pad)
+                i % 3 == 2 -> single(p, false, s, short, BalloonStyle.THOUGHT, x = 0.45f, v = 0.22f, pad = pad)
+                else -> single(p, false, s, medium, x = 0.55f, v = 0.2f, t = TailDirection.BOTTOM_RIGHT, pad = pad)
+            }
+        }
+    }
+
+    @Test
+    fun comicStrips() {
+        open("Gazete şeritleri", CanvasKind.COMIC, 1200, 1800, pages = 4, cover = false)
+        page(0); fill(panelsAny("three_rows"), 30f)
+        page(1); fill(panelsAny("four_grid"), 28f)
+        page(2); fill(panelsAny("two_rows"), 32f)
+        page(3); fill(panelsAny("comedy"), 26f)
+        export("comic_strips", CanvasKind.COMIC, landing = 0, coverPage = 0)
+    }
+
+    @Test
+    fun comicBlankAction() {
+        open("Aksiyon sayfaları", CanvasKind.COMIC, 1200, 1800, pages = 4, cover = false)
+        page(0)
+        val splash = panelsAny("single")
+        caption(splash[0], false, 34f)
+        single(splash[0], false, 36f, long, BalloonStyle.SHOUT, x = 0.62f, v = 0.3f, t = TailDirection.BOTTOM_RIGHT)
+        page(1); fill(panelsAny("three_big_bottom"), 30f)
+        page(2); fill(panelsAny("six_grid"), 24f)
+        page(3)
+        val act = panelsAny("action")
+        act.forEachIndexed { i, p ->
+            single(p, false, if (i < 3) 30f else 22f, short, if (i % 2 == 0) BalloonStyle.SHOUT else BalloonStyle.SPEECH,
+                x = 0.48f, v = 0.28f, t = if (i % 2 == 0) TailDirection.BOTTOM_LEFT else TailDirection.BOTTOM_RIGHT, pad = 0.13f)
+        }
+        export("comic_blank_action", CanvasKind.COMIC, landing = 0, coverPage = 0)
+    }
 }

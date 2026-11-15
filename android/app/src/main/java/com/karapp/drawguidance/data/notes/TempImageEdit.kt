@@ -49,6 +49,10 @@ object TempCanvases {
         val width: Int,
         val height: Int,
         val createdAt: Long,
+        /** v52 şekil düzenleme: geçici tuvaldeki konumdan nottaki konuma kayma (resimde 0). */
+        val shape: Boolean = false,
+        val dx: Float = 0f,
+        val dy: Float = 0f,
     )
 
     /** Kaydedilen düzenlemenin sonucu: notun resim elemanının yeni resim verisi. */
@@ -61,6 +65,8 @@ object TempCanvases {
         val height: Int,
         /** Geçici tuvalin boyutu (oranı) değişti: nottaki resmin çerçevesi yeni orana uydurulur. */
         val reshaped: Boolean,
+        /** v52 şekil düzenlemesinin sonucu: nottaki şeklin yerine geçecek elemanlar (ContentCodec, base64; resimde null). */
+        val strokes: String? = null,
     )
 
     private const val PREFS = "v51_temp_canvases"
@@ -84,14 +90,16 @@ object TempCanvases {
             JSONArray(p.getString(KEY_SESSIONS, "[]")).let { arr ->
                 for (i in 0 until arr.length()) {
                     val o = arr.getJSONObject(i)
-                    val s = Session(o.getString("t"), o.getString("s"), o.getString("e"), o.optInt("w"), o.optInt("h"), o.optLong("c"))
+                    val s = Session(o.getString("t"), o.getString("s"), o.getString("e"), o.optInt("w"), o.optInt("h"), o.optLong("c"),
+                        o.optBoolean("sh"), o.optDouble("dx", 0.0).toFloat(), o.optDouble("dy", 0.0).toFloat())
                     sessions[s.tempId] = s
                 }
             }
             JSONArray(p.getString(KEY_RESULTS, "[]")).let { arr ->
                 for (i in 0 until arr.length()) {
                     val o = arr.getJSONObject(i)
-                    val r = Result(o.getString("t"), o.getString("s"), o.getString("e"), o.getString("a"), o.optInt("w"), o.optInt("h"), o.optBoolean("r"))
+                    val r = Result(o.getString("t"), o.getString("s"), o.getString("e"), o.optString("a"), o.optInt("w"), o.optInt("h"), o.optBoolean("r"),
+                        o.optString("k").takeIf { it.isNotEmpty() })
                     results[r.tempId] = r
                 }
             }
@@ -123,7 +131,9 @@ object TempCanvases {
     fun pendingFor(sourceId: String): List<Result> = results.values.filter { it.sourceId == sourceId }
 
     /** Notun kullanılmayan resim verileri temizlenirken korunacaklar (henüz aktarılmamış sonuçların resimleri). */
-    fun pendingAssetIds(sourceId: String): List<String> = pendingFor(sourceId).map { it.assetId }
+    fun pendingAssetIds(sourceId: String): List<String> = pendingFor(sourceId).flatMap { r ->
+        listOf(r.assetId).filter { it.isNotEmpty() } + (r.strokes?.let { TempShapeGeometry.decode(it).mapNotNull { s -> s.assetId } } ?: emptyList())
+    }
 
     /** Sonuç nota aktarıldı (ya da resim artık yok): saklanmaz. */
     fun consumed(result: Result) {
@@ -141,11 +151,13 @@ object TempCanvases {
         val p = prefs ?: return
         val s = JSONArray()
         sessions.values.forEach {
-            s.put(JSONObject().put("t", it.tempId).put("s", it.sourceId).put("e", it.strokeId).put("w", it.width).put("h", it.height).put("c", it.createdAt))
+            s.put(JSONObject().put("t", it.tempId).put("s", it.sourceId).put("e", it.strokeId).put("w", it.width).put("h", it.height).put("c", it.createdAt)
+                .put("sh", it.shape).put("dx", it.dx.toDouble()).put("dy", it.dy.toDouble()))
         }
         val r = JSONArray()
         results.values.forEach {
-            r.put(JSONObject().put("t", it.tempId).put("s", it.sourceId).put("e", it.strokeId).put("a", it.assetId).put("w", it.width).put("h", it.height).put("r", it.reshaped))
+            r.put(JSONObject().put("t", it.tempId).put("s", it.sourceId).put("e", it.strokeId).put("a", it.assetId).put("w", it.width).put("h", it.height).put("r", it.reshaped)
+                .put("k", it.strokes ?: ""))
         }
         p.edit().putString(KEY_SESSIONS, s.toString()).putString(KEY_RESULTS, r.toString()).apply()
     }
@@ -153,6 +165,49 @@ object TempCanvases {
     /** Testler için. */
     internal fun clearForTest() {
         sessions.clear(); results.clear(); active.clear()
+    }
+}
+
+/**
+ * v52 notta şekil düzenleme (saf; birim testli): şekil gelişmiş çizim tuvaline kenar payıyla taşınır, kaydedilince tuvaldeki
+ * bütün elemanlar aynı kaymayla nota döner ve nottaki şeklin yerine (aynı sırada) konur.
+ */
+object TempShapeGeometry {
+    /** Geçici tuvalin en küçük kenarı ve şeklin çevresindeki pay (uzun kenara oran). */
+    const val MIN_SIDE = 600
+    const val MARGIN = 0.25f
+
+    data class Frame(val width: Int, val height: Int, val dx: Float, val dy: Float)
+
+    /** Şeklin kutusu → geçici tuvalin boyutu ve nottan tuvale kayma (tuval = not − d). */
+    fun frame(left: Float, top: Float, right: Float, bottom: Float): Frame {
+        val w = (right - left).coerceAtLeast(1f)
+        val h = (bottom - top).coerceAtLeast(1f)
+        val m = max(w, h) * MARGIN
+        val cw = max(MIN_SIDE.toFloat(), w + 2 * m)
+        val ch = max(MIN_SIDE.toFloat(), h + 2 * m)
+        val dx = left - (cw - w) / 2f
+        val dy = top - (ch - h) / 2f
+        return Frame(cw.roundToInt(), ch.roundToInt(), dx, dy)
+    }
+
+    fun shift(s: Stroke, dx: Float, dy: Float): Stroke =
+        com.karapp.drawguidance.ui.screens.canvasedit.editor.ElementOps.translate(listOf(s), setOf(s.id), dx, dy).first()
+
+    fun encode(strokes: List<Stroke>): String = android.util.Base64.encodeToString(ContentCodec.encode(strokes), android.util.Base64.NO_WRAP)
+    fun decode(data: String): List<Stroke> = runCatching { ContentCodec.decode(android.util.Base64.decode(data, android.util.Base64.NO_WRAP)) }.getOrDefault(emptyList())
+
+    /** Nottaki [strokeId] şeklinin yerine [edited] elemanlar (aynı sırada); şekil yoksa değişmez. */
+    fun replace(note: List<Stroke>, strokeId: String, edited: List<Stroke>): List<Stroke> {
+        val i = note.indexOfFirst { it.id == strokeId }
+        if (i < 0) return note
+        val old = note[i]
+        val taken = note.mapTo(HashSet()) { it.id } - strokeId
+        val fresh = edited.map { e ->
+            val id = if (e.id in taken) UUID.randomUUID().toString() else e.id
+            e.copy(id = id, layerId = old.layerId, groupId = if (edited.size > 1) e.groupId else old.groupId)
+        }
+        return note.subList(0, i) + fresh + note.subList(i + 1, note.size)
     }
 }
 
@@ -249,10 +304,50 @@ class TempImageEditor(
         }
     }
 
+    /** v52 notun [shape] şekli için geçici gelişmiş çizim tuvali oluşturur (şekil vektör olarak taşınır). */
+    suspend fun startShape(sourceId: String, shape: Stroke): String? = withContext(Dispatchers.Default) {
+        if (shape.points.isEmpty()) return@withContext null
+        val f = TempShapeGeometry.frame(shape.points.minOf { it.x }, shape.points.minOf { it.y }, shape.points.maxOf { it.x }, shape.points.maxOf { it.y })
+        val tempId = UUID.randomUUID().toString()
+        TempCanvases.register(TempCanvases.Session(tempId, sourceId, shape.id, f.width, f.height, System.currentTimeMillis(), shape = true, dx = f.dx, dy = f.dy))
+        try {
+            repository.createCanvas(
+                name = appContext.getString(R.string.v52_temp_shape_name), width = f.width, height = f.height,
+                backgroundColorHex = "#FFFFFF", aiEnabled = false, kind = CanvasKind.ART, localId = tempId,
+            )
+            val moved = TempShapeGeometry.shift(shape, -f.dx, -f.dy).copy(order = 0, layerId = null, groupId = null)
+            repository.saveStrokes(tempId, listOf(listOf(moved)))
+            tempId
+        } catch (e: Exception) {
+            com.karapp.drawguidance.diagnostics.AppLog.e("TempShape", "Geçici şekil tuvali oluşturulamadı", e)
+            deleteNow(tempId)
+            null
+        }
+    }
+
+    /** v52 şekil düzenlemesini nota aktarır: tuvaldeki elemanlar nottaki konuma kaydırılır, resimleri nota kopyalanır. */
+    private suspend fun commitShape(session: TempCanvases.Session, canvas: CanvasUi) {
+        val all = canvas.pages.flatten().filter { !it.hidden }
+        val copied = HashMap<String, String?>()
+        val out = all.map { s ->
+            val moved = TempShapeGeometry.shift(s, session.dx, session.dy)
+            val a = s.assetId ?: return@map moved
+            val n = copied.getOrPut(a) { runCatching { assetStore.copyTo(a, session.sourceId) }.getOrNull() }
+            if (n != null) moved.copy(assetId = n) else moved
+        }
+        TempCanvases.putResult(TempCanvases.Result(session.tempId, session.sourceId, session.strokeId, "", 0, 0, false, TempShapeGeometry.encode(out)))
+    }
+
     /** Geçici tuvali resme çevirip nota aktarır (sonuç [TempCanvases.resultFlow] ile gelir) ve geçici tuvali siler. */
     fun commit(tempId: String, canvas: CanvasUi) {
         val session = TempCanvases.session(tempId) ?: return
         scope.launch {
+            if (session.shape) {
+                try { commitShape(session, canvas) } catch (e: Throwable) {
+                    com.karapp.drawguidance.diagnostics.AppLog.e("TempShape", "Düzenlenen şekil nota aktarılamadı", e, userVisible = true)
+                } finally { deleteNow(tempId) }
+                return@launch
+            }
             try {
                 // Kağıt beyaz ve desensizse saydam kalır (resmin saydam yerleri nota beyaz kutu olarak gelmesin)
                 val plain = canvas.backgroundColorHex.equals("#FFFFFF", ignoreCase = true) && canvas.background.isEmpty && !canvas.hasPageBackgrounds

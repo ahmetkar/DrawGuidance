@@ -19,4 +19,11 @@
     <string name="v52_home_practice">Упражнения</string>
     <string name="v52_home_practice_simple_hint">Пошаговые упражнения в простом рисовании</string>
     <string name="v52_home_practice_advanced_hint">Все упражнения в расширенном рисовании</string>
+    <string name="v52_temp_shape_name">Редактирование фигуры (временно)</string>
+    <string name="v52_temp_shape_hint">Вы редактируете фигуру в расширенном режиме. Нажмите «Сохранить», и всё на этом холсте заменит фигуру в заметке; без сохранения изменения отменятся.</string>
+    <string name="v52_temp_shape_save">Сохранить и вернуть в заметку</string>
+    <string name="v52_temp_shape_saved">Фигура возвращена в заметку</string>
+    <string name="v52_temp_edit_failed">Не удалось открыть для редактирования</string>
+    <string name="v52_live_paused">Трансляция на паузе: отправитель редактирует</string>
+    <string name="v52_live_paused_badge">Трансляция на паузе</string>
 </resources>

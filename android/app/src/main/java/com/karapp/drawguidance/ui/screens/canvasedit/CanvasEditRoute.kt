@@ -47,11 +47,16 @@ fun CanvasEditRoute(
     val context = LocalContext.current
     // v51 notta resim düzenleme: geçici tuval açılır (açılamazsa bildirilir)
     val tempRequest by vm.tempCanvasRequest.collectAsState()
+    val liveShare = koinInject<com.karapp.drawguidance.data.share.ShareManager>()
     androidx.compose.runtime.LaunchedEffect(tempRequest) {
         val id = tempRequest ?: return@LaunchedEffect
         vm.consumeTempCanvasRequest()
-        if (id.isEmpty()) vm.emit(com.karapp.drawguidance.ui.screens.canvasedit.EditEvent.Message(context.getString(com.karapp.drawguidance.R.string.v51_temp_image_failed)))
-        else onOpenCanvas(id)
+        if (id.isEmpty()) vm.emit(com.karapp.drawguidance.ui.screens.canvasedit.EditEvent.Message(context.getString(com.karapp.drawguidance.R.string.v52_temp_edit_failed)))
+        else {
+            // v52 yayın yapılan notta resim/şekil başka tuvalde düzenlenirken yayına ara verilir; nota dönülünce sürer
+            liveShare.pauseLive(canvasLocalId)
+            onOpenCanvas(id)
+        }
     }
     // v51 geçici resim tuvali: Kaydet'le (resim nota aktarılır) ya da çıkışta (değişiklikler atılır) kapanır; reklam yok
     val temp = vm.isTempImageEdit
@@ -67,7 +72,7 @@ fun CanvasEditRoute(
     if (temp) {
         val closed by vm.tempClosed.collectAsState()
         androidx.compose.runtime.LaunchedEffect(closed) { if (closed) leave() }
-        val hint = androidx.compose.ui.res.stringResource(com.karapp.drawguidance.R.string.v51_temp_image_hint)
+        val hint = androidx.compose.ui.res.stringResource(if (vm.isTempShapeEdit) com.karapp.drawguidance.R.string.v52_temp_shape_hint else com.karapp.drawguidance.R.string.v51_temp_image_hint)
         androidx.compose.runtime.LaunchedEffect(Unit) { vm.emit(com.karapp.drawguidance.ui.screens.canvasedit.EditEvent.Message(hint)) }
     }
     // v40 tuvalde geçirilen etkin süre (Ana sayfa: en çok vakit geçirdiklerin)
@@ -100,6 +105,8 @@ private fun androidx.compose.foundation.layout.BoxScope.LiveBroadcastBridge(canv
     val liveOut by share.liveOut.collectAsState()
     val live = liveOut?.takeIf { it.canvasId == canvasLocalId } ?: return
     androidx.compose.runtime.LaunchedEffect(canvasLocalId, live.peerKey) {
+        // v52 düzenleyiciye dönüldü: ara verilen yayın sürer (son hali hemen gönderilir)
+        share.resumeLive(canvasLocalId)
         vm.canvas.collect { c -> if (c != null) share.publishLive(c) }
     }
     val canvas by vm.canvas.collectAsState()

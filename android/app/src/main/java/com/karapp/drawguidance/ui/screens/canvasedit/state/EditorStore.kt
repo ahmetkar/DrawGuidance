@@ -51,6 +51,10 @@ interface EditorHost {
      * düzenleme orada açılır; false ise resim bu tuvalin resim düzenleme modunda açılır.
      */
     fun editImageElsewhere(image: com.karapp.drawguidance.data.model.Stroke): Boolean = false
+    /** v52 not almada düz şekil gelişmiş çizim tuvalinde düzenlenir (true: orada açılıyor). */
+    fun editShapeElsewhere(shape: com.karapp.drawguidance.data.model.Stroke): Boolean = false
+    /** v52 şekil başka yerde düzenlenebilir mi ("Şekli düzenle" not almada da gösterilir). */
+    val canEditShapeElsewhere: Boolean get() = false
     val scope: CoroutineScope
     fun emit(event: EditEvent)
 }

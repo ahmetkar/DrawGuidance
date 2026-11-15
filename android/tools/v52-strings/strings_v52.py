@@ -58,6 +58,21 @@ s("v52_home_practice_simple_hint", "Basit çizimle adım adım çizim alıştır
 s("v52_home_practice_advanced_hint", "Gelişmiş çizimde tüm alıştırmalar", "All practices with advanced drawing",
   "جميع التمارين في الرسم المتقدم", "高度な描画ですべての練習", "고급 그리기의 모든 연습", "Все упражнения в расширенном рисовании", "高级绘图中的全部练习")
 
+# --- Not almada şekli gelişmiş tuvalde düzenleme, yayına ara verme
+s("v52_temp_shape_name", "Şekil düzenleme (geçici)", "Shape editing (temporary)", "تحرير الشكل (مؤقت)", "図形の編集（一時）", "도형 편집(임시)", "Редактирование фигуры (временно)", "编辑形状（临时）")
+s("v52_temp_shape_hint", "Şekli gelişmiş çizim modunda düzenliyorsun. Kaydet'e dokununca tuvaldeki her şey nottaki şeklin yerine geçer; kaydetmeden çıkarsan değişiklikler atılır.",
+  "You are editing the shape in advanced drawing mode. Tap Save to put everything on this canvas in place of the shape in your note; leave without saving to discard changes.",
+  "أنت تحرر الشكل في وضع الرسم المتقدم. اضغط حفظ ليحل كل ما في هذه اللوحة محل الشكل في ملاحظتك؛ وإذا خرجت دون حفظ تُلغى التغييرات.",
+  "高度な描画モードで図形を編集中です。保存をタップするとこのキャンバスの内容がノートの図形と置き換わります。保存せずに戻ると変更は破棄されます。",
+  "고급 그리기 모드에서 도형을 편집 중입니다. 저장을 누르면 이 캔버스의 모든 것이 노트의 도형을 대신합니다. 저장하지 않고 나가면 변경이 취소됩니다.",
+  "Вы редактируете фигуру в расширенном режиме. Нажмите «Сохранить», и всё на этом холсте заменит фигуру в заметке; без сохранения изменения отменятся.",
+  "正在高级绘图模式中编辑形状。点“保存”后，此画布上的全部内容将替换笔记中的形状；不保存就退出则放弃更改。")
+s("v52_temp_shape_save", "Kaydet ve nota aktar", "Save and return to note", "حفظ وإعادة إلى الملاحظة", "保存してノートに戻す", "저장하고 노트로 돌려보내기", "Сохранить и вернуть в заметку", "保存并放回笔记")
+s("v52_temp_shape_saved", "Şekil nota aktarıldı", "Shape returned to the note", "أُعيد الشكل إلى الملاحظة", "図形をノートに戻しました", "도형을 노트로 돌려보냈습니다", "Фигура возвращена в заметку", "形状已放回笔记")
+s("v52_temp_edit_failed", "Düzenlemeye açılamadı", "Couldn't open for editing", "تعذر الفتح للتحرير", "編集用に開けませんでした", "편집용으로 열 수 없습니다", "Не удалось открыть для редактирования", "无法打开进行编辑")
+s("v52_live_paused", "Yayına ara verildi: gönderen düzenliyor", "Broadcast paused: the sender is editing", "البث متوقف مؤقتًا: المرسل يحرر", "配信を一時停止中：送信者が編集中", "방송 일시 중지: 보내는 사람이 편집 중", "Трансляция на паузе: отправитель редактирует", "直播已暂停：发送方正在编辑")
+s("v52_live_paused_badge", "Yayına ara verildi", "Broadcast paused", "البث متوقف مؤقتًا", "配信を一時停止中", "방송 일시 중지", "Трансляция на паузе", "直播已暂停")
+
 def xml_escape(t):
     t = escape(t).replace("'", "\\'").replace('"', '\\"')
     return t

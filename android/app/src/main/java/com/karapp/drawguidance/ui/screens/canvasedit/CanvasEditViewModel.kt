@@ -282,6 +282,8 @@ sealed interface EditEvent {
     data object Saved : EditEvent
     /** v51 geçici tuvalde düzenlenen resim nota aktarıldı. */
     data object TempImageApplied : EditEvent
+    /** v52 gelişmiş tuvalde düzenlenen şekil nota aktarıldı. */
+    data object TempShapeApplied : EditEvent
     /** v17 Alan boya: dokunulan yer çizgilerle çevrili kapalı bir alan değil. */
     data object RegionOpen : EditEvent
     /** v17: seçili çizim için düzeltme bulunamadı. */
@@ -367,6 +369,8 @@ class CanvasEditViewModel(
     private val tempSession = com.karapp.drawguidance.data.notes.TempCanvases.session(canvasLocalId)
     /** Bu tuval nottaki bir resmin geçici düzenleme tuvali mi. */
     val isTempImageEdit: Boolean get() = tempSession != null
+    /** v52 geçici tuval nottaki bir şekil için (resim değil). */
+    val isTempShapeEdit: Boolean get() = tempSession?.shape == true
     private val tempAutosaveOff: StateFlow<Boolean> = MutableStateFlow(false).asStateFlow()
     private var tempFinished = false
     private val _tempClosed = MutableStateFlow(false)
@@ -576,6 +580,19 @@ class CanvasEditViewModel(
         return true
     }
 
+    override val canEditShapeElsewhere: Boolean get() = tempImages != null && tempSession == null && store.canvas.value?.kind?.isNotes == true
+
+    /** v52 notta seçili düz şekil gelişmiş çizim tuvalinde düzenlenir; kaydedilince nota döner. */
+    override fun editShapeElsewhere(shape: Stroke): Boolean {
+        if (!canEditShapeElsewhere) return false
+        val editor = tempImages ?: return false
+        viewModelScope.launch {
+            if (store.autosave) saveQueue.flushNow()
+            _tempCanvasRequest.value = editor.startShape(canvasLocalId, shape) ?: ""
+        }
+        return true
+    }
+
     /** v51 geçici tuvalde düzenlenen resim nottaki resmin yerine geçer (tek geri alma adımı). */
     private fun applyTempResult(result: com.karapp.drawguidance.data.notes.TempCanvases.Result) {
         if (!appliedTempResults.add(result.tempId)) return
@@ -589,6 +606,17 @@ class CanvasEditViewModel(
             if (page != c.currentPage) {
                 store.showPage(page)
                 c = store.canvas.value ?: return@launch
+            }
+            val shapeData = result.strokes
+            if (shapeData != null) {
+                // v52 şekil: geçici tuvaldeki elemanlar şeklin yerine geçer
+                val edited = com.karapp.drawguidance.data.notes.TempShapeGeometry.decode(shapeData)
+                val assets = edited.mapNotNull { it.assetId }
+                if (assets.isNotEmpty()) assetStore.ensureLoaded(emptyList(), assets)
+                store.commit(com.karapp.drawguidance.data.notes.TempShapeGeometry.replace(c.strokes, result.strokeId, edited))
+                com.karapp.drawguidance.data.notes.TempCanvases.consumed(result)
+                emit(EditEvent.TempShapeApplied)
+                return@launch
             }
             assetStore.ensureLoaded(emptyList(), listOf(result.assetId))
             store.commit(c.strokes.map { if (it.id == result.strokeId) com.karapp.drawguidance.data.notes.TempImageGeometry.replace(it, result) else it })

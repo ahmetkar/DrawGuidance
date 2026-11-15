@@ -145,16 +145,16 @@ class AdsCoordinator(
             val e = loadedEntitlements()
             if (e.adFree(clock())) { onResult(RewardOutcome.FREE); return@launch }
             if (!gateway.available || rewardedUnitId.isBlank()) { onResult(RewardOutcome.UNAVAILABLE); return@launch }
-            if (AdsPolicy.isChild(user.value)) { onResult(RewardOutcome.UNAVAILABLE); return@launch }
+            if (AdsPolicy.isChild(user.value)) { AppLog.i("Ads", "ödüllü reklam: çocuk kullanıcı"); onResult(RewardOutcome.UNAVAILABLE); return@launch }
             val go: (Boolean) -> Unit = { ok ->
                 consent = consent || ok
-                if (!ok) onResult(RewardOutcome.UNAVAILABLE) else {
+                if (!ok) { AppLog.w("Ads", "ödüllü reklam: reklam onayı alınamadı"); onResult(RewardOutcome.UNAVAILABLE) } else {
                     gateway.setRequestConfiguration(childDirected = false, underAgeOfConsent = false)
                     gateway.initialize(app) {
                         var done = false
                         val timeout = scope.launch {
-                            kotlinx.coroutines.delay(12_000)
-                            if (!done) { done = true; onResult(RewardOutcome.UNAVAILABLE) }
+                            kotlinx.coroutines.delay(20_000)
+                            if (!done) { done = true; AppLog.w("Ads", "ödüllü reklam 20 sn'de yüklenmedi"); onResult(RewardOutcome.UNAVAILABLE) }
                         }
                         gateway.loadRewarded(app, rewardedUnitId) { loaded ->
                             if (done) return@loadRewarded

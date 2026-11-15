@@ -119,14 +119,16 @@ final class AdsCoordinator: NSObject, GADFullScreenContentDelegate {
             if disabled { done(.UNAVAILABLE); return }
             let go = { [weak self] in
                 guard let self else { return }
-                guard self.consent else { done(.UNAVAILABLE); return }
+                guard self.consent else { AppLog.w("Ads", "ödüllü reklam: reklam onayı yok"); done(.UNAVAILABLE); return }
                 if !self.started { self.started = true; GADMobileAds.sharedInstance().start(completionHandler: nil) }
                 var finished = false
                 let timeout = Task { @MainActor in
-                    try? await Task.sleep(nanoseconds: 12_000_000_000)
-                    if !finished { finished = true; done(.UNAVAILABLE) }
+                    try? await Task.sleep(nanoseconds: 20_000_000_000)
+                    if !finished { finished = true; AppLog.w("Ads", "ödüllü reklam 20 sn'de yüklenmedi"); done(.UNAVAILABLE) }
                 }
-                GADRewardedAd.load(withAdUnitID: self.rewardedUnitId, request: GADRequest()) { ad, _ in
+                GADRewardedAd.load(withAdUnitID: self.rewardedUnitId, request: GADRequest()) { ad, error in
+                    // v52 neden kaydı (kod 1 = envanter yok / yeni birim, 2 = ağ, 8 = uygulama kimliği hatalı)
+                    if let error { AppLog.w("Ads", "ödüllü reklam yüklenemedi: kod=\((error as NSError).code) \(error.localizedDescription)") }
                     Task { @MainActor in
                         guard !finished else { return }
                         finished = true

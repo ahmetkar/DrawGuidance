@@ -35,6 +35,9 @@ object ShareWire {
     const val LIVE_START = 10
     const val LIVE_UPDATE = 11
     const val LIVE_STOP = 12
+    /** v52 yayına ara verildi / sürüyor (gönderen başka tuvalde düzenliyor). */
+    const val LIVE_PAUSE = 13
+    const val LIVE_RESUME = 14
     const val BYE = 20
 
     // Teklif / paket türleri

@@ -19,4 +19,11 @@
     <string name="v52_home_practice">التمارين</string>
     <string name="v52_home_practice_simple_hint">تمارين رسم خطوة بخطوة بالرسم البسيط</string>
     <string name="v52_home_practice_advanced_hint">جميع التمارين في الرسم المتقدم</string>
+    <string name="v52_temp_shape_name">تحرير الشكل (مؤقت)</string>
+    <string name="v52_temp_shape_hint">أنت تحرر الشكل في وضع الرسم المتقدم. اضغط حفظ ليحل كل ما في هذه اللوحة محل الشكل في ملاحظتك؛ وإذا خرجت دون حفظ تُلغى التغييرات.</string>
+    <string name="v52_temp_shape_save">حفظ وإعادة إلى الملاحظة</string>
+    <string name="v52_temp_shape_saved">أُعيد الشكل إلى الملاحظة</string>
+    <string name="v52_temp_edit_failed">تعذر الفتح للتحرير</string>
+    <string name="v52_live_paused">البث متوقف مؤقتًا: المرسل يحرر</string>
+    <string name="v52_live_paused_badge">البث متوقف مؤقتًا</string>
 </resources>

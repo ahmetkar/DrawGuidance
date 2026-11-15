@@ -116,25 +116,41 @@ class AdMobGateway : AdsGateway {
 
     @Volatile private var rewarded: RewardedAd? = null
     @Volatile private var rewardedLoading = false
+    /** v52 yükleme sürerken gelen istekler beklemeye alınır (eskiden hemen "yüklenemedi" dönüyordu). */
+    private val rewardWaiters = ArrayList<(Boolean) -> Unit>()
+
+    private fun flushRewarded(ok: Boolean) {
+        val list = synchronized(rewardWaiters) { rewardedLoading = false; rewardWaiters.toList().also { rewardWaiters.clear() } }
+        list.forEach { it(ok) }
+    }
 
     override fun loadRewarded(context: Context, adUnitId: String, onResult: (Boolean) -> Unit) {
         if (rewarded != null) { onResult(true); return }
-        if (rewardedLoading) { onResult(false); return }
-        rewardedLoading = true
+        synchronized(rewardWaiters) {
+            rewardWaiters += onResult
+            if (rewardedLoading) return
+            rewardedLoading = true
+        }
+        com.karapp.drawguidance.diagnostics.AppLog.i("Ads", "ödüllü reklam yükleniyor: birim=${adUnitId.takeLast(10)}")
         RewardedAd.load(context, adUnitId, AdRequest.Builder().build(), object : RewardedAdLoadCallback() {
             override fun onAdLoaded(ad: RewardedAd) {
-                rewardedLoading = false
                 rewarded = ad
-                onResult(true)
+                com.karapp.drawguidance.diagnostics.AppLog.i("Ads", "ödüllü reklam yüklendi")
+                flushRewarded(true)
             }
 
             override fun onAdFailedToLoad(error: LoadAdError) {
-                rewardedLoading = false
                 rewarded = null
-                onResult(false)
+                // v52 neden kaydı: 3 = envanter yok (yeni birimde ilk saatler / onaysız uygulama), 2 = ağ, 1 = geçersiz istek, 0 = iç hata
+                com.karapp.drawguidance.diagnostics.AppLog.w("Ads", "ödüllü reklam yüklenemedi: kod=${error.code} ${error.message} (${error.domain}) yanıt=${error.responseInfo?.responseId}")
+                lastRewardError = error.code
+                flushRewarded(false)
             }
         })
     }
+
+    /** v52 son ödüllü reklam yükleme hatasının kodu (yoksa null). */
+    @Volatile var lastRewardError: Int? = null
 
     override fun showRewarded(activity: Activity, onFinished: (Boolean) -> Unit) {
         val ad = rewarded ?: run { onFinished(false); return }

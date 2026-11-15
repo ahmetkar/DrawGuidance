@@ -266,6 +266,224 @@
             },
             "width": 1240,
             "height": 1754
+        },
+        {
+            "id": "comic_strips",
+            "kind": "COMIC",
+            "names": {
+                "tr": "Gazete şeritleri",
+                "en": "Newspaper strips",
+                "ar": "شرائط الصحف المصورة",
+                "ja": "新聞の4コマ・コマ漫画",
+                "ko": "신문 연재 만화",
+                "ru": "Газетные стрипы",
+                "zh": "报纸连环画"
+            },
+            "hints": {
+                "tr": "4 sayfa kısa şerit: 4 kare, 3 kare, 2 kare ve 4'lü ızgara; balonlar okuma sırasında.",
+                "en": "4 pages of short strips: 4 panels, 3 panels, 2 panels and a 2×2 grid; balloons in reading order.",
+                "ar": "4 صفحات من الشرائط القصيرة: 4 لوحات و3 و2 وشبكة 2×2؛ الفقاعات بترتيب القراءة.",
+                "ja": "短いコマ漫画4ページ：4コマ、3コマ、2コマ、2×2。フキダシは読み順に配置。",
+                "ko": "짧은 연재 4페이지: 4칸, 3칸, 2칸, 2×2 격자. 말풍선은 읽는 순서로.",
+                "ru": "4 страницы коротких стрипов: 4, 3 и 2 панели и сетка 2×2; баллоны по порядку чтения.",
+                "zh": "4页短篇条漫：4格、3格、2格和2×2网格；气泡按阅读顺序排列。"
+            },
+            "pages": 4,
+            "width": 1200,
+            "height": 1800
+        },
+        {
+            "id": "comic_blank_action",
+            "kind": "COMIC",
+            "names": {
+                "tr": "Aksiyon sayfaları",
+                "en": "Action pages",
+                "ar": "صفحات أكشن",
+                "ja": "アクションのページ",
+                "ko": "액션 페이지",
+                "ru": "Страницы экшена",
+                "zh": "动作页面"
+            },
+            "hints": {
+                "tr": "4 sayfa: tam sayfa açılış, büyük altta, altılı ızgara ve eğik aksiyon panelleri; bağırma balonları.",
+                "en": "4 pages: a full-page splash, big bottom panel, six-panel grid and slanted action panels; shout balloons.",
+                "ar": "4 صفحات: لوحة افتتاحية كاملة، ولوحة كبيرة بالأسفل، وشبكة سداسية، ولوحات أكشن مائلة؛ فقاعات صراخ.",
+                "ja": "4ページ：見開き風の大ゴマ、下に大ゴマ、6コマ、斜めのアクションコマ。叫びのフキダシ。",
+                "ko": "4페이지: 한 페이지 오프닝, 아래 큰 칸, 6칸 격자, 사선 액션 칸. 외침 말풍선.",
+                "ru": "4 страницы: разворот на всю страницу, большая нижняя панель, сетка 6 и косые панели; крики.",
+                "zh": "4页：整页开场、下方大格、六格网格和斜切动作格；喊叫气泡。"
+            },
+            "pages": 4,
+            "width": 1200,
+            "height": 1800
+        },
+        {
+            "id": "notes_chemistry",
+            "kind": "NOTES",
+            "names": {
+                "tr": "Kimya: tepkimeler ve moleküller",
+                "en": "Chemistry: reactions and molecules",
+                "ar": "الكيمياء: التفاعلات والجزيئات",
+                "ja": "化学：反応と分子",
+                "ko": "화학: 반응과 분자",
+                "ru": "Химия: реакции и молекулы",
+                "zh": "化学：反应与分子"
+            },
+            "hints": {
+                "tr": "Formülden çizilen moleküller (H₂O, CO₂, glikoz), denkleştirilmiş tepkime, mol hesabı ve laboratuvar şekilleri.",
+                "en": "Molecules drawn from formulas (H₂O, CO₂, glucose), a balanced reaction, a mole calculation and lab shapes.",
+                "ar": "جزيئات مرسومة من الصيغ (H₂O وCO₂ والجلوكوز)، ومعادلة موزونة، وحساب المول، وأشكال المختبر.",
+                "ja": "化学式から描いた分子（H₂O、CO₂、グルコース）、係数をそろえた反応式、モル計算、実験器具。",
+                "ko": "화학식으로 그린 분자(H₂O, CO₂, 포도당), 균형 맞춘 반응식, 몰 계산, 실험 기구.",
+                "ru": "Молекулы по формулам (H₂O, CO₂, глюкоза), уравненная реакция, расчёт молей и лабораторная посуда.",
+                "zh": "由化学式绘制的分子（H₂O、CO₂、葡萄糖）、配平的反应式、摩尔计算和实验器材。"
+            },
+            "width": 1240,
+            "height": 1754
+        },
+        {
+            "id": "notes_physics",
+            "kind": "NOTES",
+            "names": {
+                "tr": "Fizik: elektrik ve hareket",
+                "en": "Physics: electricity and motion",
+                "ar": "الفيزياء: الكهرباء والحركة",
+                "ja": "物理：電気と運動",
+                "ko": "물리: 전기와 운동",
+                "ru": "Физика: электричество и движение",
+                "zh": "物理：电与运动"
+            },
+            "hints": {
+                "tr": "Ohm yasası, değerden çizilen devre grafiği, eğik atış ve çözümlü hesap örnekleri.",
+                "en": "Ohm's law, a circuit graph drawn from values, projectile motion and worked calculations.",
+                "ar": "قانون أوم، ورسم دائرة من القيم، والمقذوفات، وأمثلة حسابية محلولة.",
+                "ja": "オームの法則、値から描くグラフ、斜方投射、計算の解答例。",
+                "ko": "옴의 법칙, 값으로 그리는 그래프, 포물선 운동, 풀이 예제.",
+                "ru": "Закон Ома, график по значениям, движение тела под углом и решённые задачи.",
+                "zh": "欧姆定律、由数值绘制的图像、斜抛运动和计算例题。"
+            },
+            "width": 1240,
+            "height": 1754
+        },
+        {
+            "id": "notes_vocab",
+            "kind": "NOTES",
+            "names": {
+                "tr": "Kelime defteri",
+                "en": "Vocabulary notebook",
+                "ar": "دفتر المفردات",
+                "ja": "単語ノート",
+                "ko": "단어장",
+                "ru": "Словарная тетрадь",
+                "zh": "单词本"
+            },
+            "hints": {
+                "tr": "Kelime, anlam ve örnek cümle sütunları; tekrar kutuları.",
+                "en": "Columns for word, meaning and example sentence; review boxes.",
+                "ar": "أعمدة للكلمة والمعنى والجملة المثال؛ ومربعات للمراجعة.",
+                "ja": "単語・意味・例文の欄と復習チェック。",
+                "ko": "단어, 뜻, 예문 칸과 복습 체크.",
+                "ru": "Колонки: слово, значение, пример; отметки повторения.",
+                "zh": "单词、释义和例句栏；复习勾选框。"
+            },
+            "width": 1240,
+            "height": 1754
+        },
+        {
+            "id": "notes_timeline",
+            "kind": "NOTES",
+            "names": {
+                "tr": "Tarih zaman çizelgesi",
+                "en": "History timeline",
+                "ar": "خط زمني تاريخي",
+                "ja": "歴史年表",
+                "ko": "역사 연표",
+                "ru": "Историческая лента времени",
+                "zh": "历史时间轴"
+            },
+            "hints": {
+                "tr": "Olaylar zaman çizelgesi, neden-sonuç diyagramı ve özet; Sanayi Devrimi örneği.",
+                "en": "Event timeline, a cause-and-effect diagram and summary; Industrial Revolution example.",
+                "ar": "خط زمني للأحداث، ومخطط السبب والنتيجة، وملخص؛ مثال الثورة الصناعية.",
+                "ja": "出来事の年表、因果関係の図、まとめ（産業革命の例）。",
+                "ko": "사건 연표, 원인과 결과 도표, 요약(산업 혁명 예시).",
+                "ru": "Лента событий, схема причин и следствий и итог; пример — промышленная революция.",
+                "zh": "事件时间轴、因果图和总结（工业革命示例）。"
+            },
+            "width": 1240,
+            "height": 1754
+        },
+        {
+            "id": "simple_reading",
+            "kind": "SIMPLE_NOTES",
+            "names": {
+                "tr": "Okuma günlüğü",
+                "en": "Reading log",
+                "ar": "سجل القراءة",
+                "ja": "読書記録",
+                "ko": "독서 기록",
+                "ru": "Дневник чтения",
+                "zh": "阅读日志"
+            },
+            "hints": {
+                "tr": "Kitap bilgisi, karakterler, sevdiğim bölüm ve puan.",
+                "en": "Book details, characters, favourite part and rating.",
+                "ar": "معلومات الكتاب والشخصيات والجزء المفضل والتقييم.",
+                "ja": "本の情報、登場人物、好きな場面、評価。",
+                "ko": "책 정보, 등장인물, 좋아하는 부분, 평점.",
+                "ru": "О книге, герои, любимый эпизод и оценка.",
+                "zh": "书籍信息、人物、喜欢的部分和评分。"
+            },
+            "width": 1240,
+            "height": 1754
+        },
+        {
+            "id": "simple_shopping",
+            "kind": "SIMPLE_NOTES",
+            "names": {
+                "tr": "Alışveriş listesi",
+                "en": "Shopping list",
+                "ar": "قائمة التسوق",
+                "ja": "買い物リスト",
+                "ko": "장보기 목록",
+                "ru": "Список покупок",
+                "zh": "购物清单"
+            },
+            "hints": {
+                "tr": "Manav, market ve diğer bölümleriyle işaretlenebilir liste.",
+                "en": "Checkable list with produce, grocery and other sections.",
+                "ar": "قائمة قابلة للتأشير بأقسام الخضار والبقالة وغيرها.",
+                "ja": "青果・食料品・その他に分かれたチェックリスト。",
+                "ko": "채소·식료품·기타로 나뉜 체크 목록.",
+                "ru": "Список с отметками: овощи, продукты и прочее.",
+                "zh": "分为果蔬、杂货和其他的勾选清单。"
+            },
+            "width": 1240,
+            "height": 1754
+        },
+        {
+            "id": "simple_exam",
+            "kind": "SIMPLE_NOTES",
+            "names": {
+                "tr": "Sınav çalışma planı",
+                "en": "Exam study plan",
+                "ar": "خطة المذاكرة للامتحان",
+                "ja": "試験勉強プラン",
+                "ko": "시험 공부 계획",
+                "ru": "План подготовки к экзамену",
+                "zh": "考试复习计划"
+            },
+            "hints": {
+                "tr": "Konular, gün gün plan, tekrar listesi ve hedef.",
+                "en": "Topics, a day-by-day plan, a review list and a goal.",
+                "ar": "المواضيع وخطة يومية وقائمة مراجعة وهدف.",
+                "ja": "範囲、日ごとの計画、復習リスト、目標。",
+                "ko": "범위, 날짜별 계획, 복습 목록, 목표.",
+                "ru": "Темы, план по дням, список повторения и цель.",
+                "zh": "考点、每日计划、复习清单和目标。"
+            },
+            "width": 1240,
+            "height": 1754
         }
     ]
 }

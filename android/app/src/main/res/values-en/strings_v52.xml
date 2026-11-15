@@ -19,4 +19,11 @@
     <string name="v52_home_practice">Practices</string>
     <string name="v52_home_practice_simple_hint">Step-by-step drawing practices with simple drawing</string>
     <string name="v52_home_practice_advanced_hint">All practices with advanced drawing</string>
+    <string name="v52_temp_shape_name">Shape editing (temporary)</string>
+    <string name="v52_temp_shape_hint">You are editing the shape in advanced drawing mode. Tap Save to put everything on this canvas in place of the shape in your note; leave without saving to discard changes.</string>
+    <string name="v52_temp_shape_save">Save and return to note</string>
+    <string name="v52_temp_shape_saved">Shape returned to the note</string>
+    <string name="v52_temp_edit_failed">Couldn\'t open for editing</string>
+    <string name="v52_live_paused">Broadcast paused: the sender is editing</string>
+    <string name="v52_live_paused_badge">Broadcast paused</string>
 </resources>

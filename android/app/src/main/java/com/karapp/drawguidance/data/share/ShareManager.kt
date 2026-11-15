@@ -44,8 +44,8 @@ data class SharePeer(
 data class ShareConnectionRequest(val key: String, val name: String, val platform: String, val code: String?)
 data class ShareIncomingOffer(val key: String, val peerName: String, val offer: ShareOffer)
 data class ShareTransferStatus(val peerName: String, val title: String, val sending: Boolean, val progress: Float? = null)
-data class ShareLiveOut(val canvasId: String, val peerKey: String, val peerName: String)
-data class ShareLiveIn(val canvasId: String, val peerKey: String, val peerName: String, val ended: Boolean = false)
+data class ShareLiveOut(val canvasId: String, val peerKey: String, val peerName: String, val paused: Boolean = false)
+data class ShareLiveIn(val canvasId: String, val peerKey: String, val peerName: String, val ended: Boolean = false, val paused: Boolean = false)
 
 sealed interface ShareEvent {
     data class Received(val type: String, val title: String, val from: String, val canvasId: String?) : ShareEvent
@@ -241,7 +241,22 @@ class ShareManager(
 
     /** Düzenleyici yayın yapılan tuvalin her değişikliğini bildirir (en son hali, ayarlanan sıklıkta gönderilir). */
     fun publishLive(canvas: CanvasUi) {
-        if (_liveOut.value?.canvasId == canvas.localId) liveFrames.trySend(canvas)
+        val out = _liveOut.value ?: return
+        if (out.canvasId == canvas.localId && !out.paused) liveFrames.trySend(canvas)
+    }
+
+    /** v52 yayına ara ver (yayın yapılan notta şekil/resim başka tuvalde düzenleniyor); izleyene bildirilir. */
+    fun pauseLive(canvasId: String) {
+        val out = _liveOut.value?.takeIf { it.canvasId == canvasId && !it.paused } ?: return
+        _liveOut.value = out.copy(paused = true)
+        send(out.peerKey, ShareWire.encode(ShareWire.LIVE_PAUSE, "{}"))
+    }
+
+    /** v52 ara verilen yayın sürer (düzenleyici son hali [publishLive] ile gönderir). */
+    fun resumeLive(canvasId: String) {
+        val out = _liveOut.value?.takeIf { it.canvasId == canvasId && it.paused } ?: return
+        _liveOut.value = out.copy(paused = false)
+        send(out.peerKey, ShareWire.encode(ShareWire.LIVE_RESUME, "{}"))
     }
 
     fun isBroadcasting(canvasId: String): Boolean = _liveOut.value?.canvasId == canvasId
@@ -371,6 +386,9 @@ class ShareManager(
                 liveSeqIn = pkg.header.seq
                 installLock.withLock { packages.install(pkg, liveIds, existingId = inn.canvasId) }
                 refreshLiveCanvas(inn.canvasId)
+            }
+            ShareWire.LIVE_PAUSE, ShareWire.LIVE_RESUME -> {
+                _liveIn.value?.takeIf { it.peerKey == key && !it.ended }?.let { _liveIn.value = it.copy(paused = m.type == ShareWire.LIVE_PAUSE) }
             }
             ShareWire.LIVE_STOP -> {
                 _liveIn.value?.takeIf { it.peerKey == key }?.let { _liveIn.value = it.copy(ended = true) }

@@ -19,4 +19,11 @@
     <string name="v52_home_practice">练习</string>
     <string name="v52_home_practice_simple_hint">用简单绘图逐步练习</string>
     <string name="v52_home_practice_advanced_hint">高级绘图中的全部练习</string>
+    <string name="v52_temp_shape_name">编辑形状（临时）</string>
+    <string name="v52_temp_shape_hint">正在高级绘图模式中编辑形状。点“保存”后，此画布上的全部内容将替换笔记中的形状；不保存就退出则放弃更改。</string>
+    <string name="v52_temp_shape_save">保存并放回笔记</string>
+    <string name="v52_temp_shape_saved">形状已放回笔记</string>
+    <string name="v52_temp_edit_failed">无法打开进行编辑</string>
+    <string name="v52_live_paused">直播已暂停：发送方正在编辑</string>
+    <string name="v52_live_paused_badge">直播已暂停</string>
 </resources>

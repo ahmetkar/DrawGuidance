@@ -19,4 +19,11 @@
     <string name="v52_home_practice">연습</string>
     <string name="v52_home_practice_simple_hint">간단한 그리기로 단계별 연습</string>
     <string name="v52_home_practice_advanced_hint">고급 그리기의 모든 연습</string>
+    <string name="v52_temp_shape_name">도형 편집(임시)</string>
+    <string name="v52_temp_shape_hint">고급 그리기 모드에서 도형을 편집 중입니다. 저장을 누르면 이 캔버스의 모든 것이 노트의 도형을 대신합니다. 저장하지 않고 나가면 변경이 취소됩니다.</string>
+    <string name="v52_temp_shape_save">저장하고 노트로 돌려보내기</string>
+    <string name="v52_temp_shape_saved">도형을 노트로 돌려보냈습니다</string>
+    <string name="v52_temp_edit_failed">편집용으로 열 수 없습니다</string>
+    <string name="v52_live_paused">방송 일시 중지: 보내는 사람이 편집 중</string>
+    <string name="v52_live_paused_badge">방송 일시 중지</string>
 </resources>

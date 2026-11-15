@@ -160,10 +160,11 @@ fun LiveCanvasScreen(canvasId: String, onBack: () -> Unit, onEdit: (String) -> U
     ) { padding ->
         Column(Modifier.fillMaxSize().padding(padding).padding(16.dp).testTag("share_live_screen"), verticalArrangement = Arrangement.spacedBy(12.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                Box(Modifier.size(10.dp).clip(CircleShape).background(if (ended) colors.contentMuted else Color(0xFFE53935)))
+                Box(Modifier.size(10.dp).clip(CircleShape).background(if (ended) colors.contentMuted else if (live?.paused == true) Color(0xFFF59E0B) else Color(0xFFE53935)))
                 Text(
-                    stringResource(if (ended) R.string.v51_share_live_ended else R.string.v51_share_live_badge),
-                    style = MaterialTheme.typography.labelLarge, color = if (ended) colors.contentMuted else colors.content,
+                    stringResource(if (ended) R.string.v51_share_live_ended else if (live?.paused == true) R.string.v52_live_paused else R.string.v51_share_live_badge),
+                    style = MaterialTheme.typography.labelLarge, color = if (ended || live?.paused == true) colors.contentMuted else colors.content,
+                    modifier = Modifier.testTag("share_live_state"),
                 )
                 canvas?.takeIf { it.pageCount > 1 }?.let {
                     Text("· ${it.currentPage + 1}/${it.pageCount}", style = MaterialTheme.typography.labelLarge, color = colors.contentMuted, translate = false)

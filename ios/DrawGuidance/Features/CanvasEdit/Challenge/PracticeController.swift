@@ -31,6 +31,8 @@ final class PracticePrefs: ObservableObject {
 /// v51 yeni alıştırma yeni tuvalde açılırken aktarılan sıra (Android `PracticeHandoff`).
 @MainActor
 enum PracticeHandoff {
+    /// v52 ana sayfadan gelindi: alıştırma listesi açılır.
+    static let LIST = -1
     private static var pending: (String, Int)?
     static func put(_ canvasLocalId: String, _ index: Int) { pending = (canvasLocalId, index) }
     static func take(_ canvasLocalId: String) -> Int? {
@@ -212,7 +214,7 @@ final class PracticeController: ObservableObject {
         let kind = run.level.kind
         let lines = KidsChallengeController.drawnLines(mine)
         let parts = ChallengeScore.outlineParts(lines, run.target.lines, near: kind.near, far: kind.far,
-                                                alignedFactor: kind == .COPY ? 1 : ChallengeScore.ALIGNED)
+                                                alignedFactor: kind == .COPY ? 1 : PracticeScore.ALIGNED)
         let box = run.target.box
         let smooth = PracticeScore.smoothness(lines, diag: hypot(box.width, box.height))
         let speed: Int? = kind == .TIMED ? PracticeScore.speed(elapsedMs: now - (run.startedAt ?? now), limitMs: Int64(run.target.seconds) * 1000) : nil

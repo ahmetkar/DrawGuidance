@@ -22,12 +22,26 @@ struct PracticeScore: Equatable {
         if parts.score <= 0 {
             return PracticeScore(total: 0, outline: 0, accuracy: 0, coverage: 0, smoothness: 0, speed: speed, hints: hints)
         }
-        let raw: Float = speed == nil ? 0.8 * Float(parts.score) + 0.2 * Float(smoothness)
-            : 0.7 * Float(parts.score) + 0.15 * Float(smoothness) + 0.15 * Float(speed!)
-        let capped = min(Int(raw.rounded()), parts.score + SMOOTH_BONUS_MAX)
-        let total = min(max(capped - hints * PracticeLevels.HINT_PENALTY, 0), 100)
+        let total = min(max(strict(parts, speed: speed) - hints * PracticeLevels.HINT_PENALTY, 0), 100)
         return PracticeScore(total: total, outline: parts.score, accuracy: parts.precision, coverage: parts.recall,
                              smoothness: smoothness, speed: speed, hints: hints)
+    }
+
+    /// v52 sıkı doğruluk puanı (Android `PracticeScore.strict`): akıcılık toplamı etkilemez; F1 üs 2 ile
+    /// sıkılaştırılır, isabet ile kapsama farkı 15'i geçerse fazlasının yarısı düşer; süreli çizimde %85 + %15 hız
+    /// (hız doğruluğu geçiremez).
+    static let STRICT_CURVE: Float = 2
+    /// v52 kılavuzun üstünden çizimde kaydırılmış çizimin çarpanı.
+    static let ALIGNED: Float = 0.82
+    static let BALANCE_FREE = 15
+    static func strict(_ parts: ChallengeScore.OutlineParts, speed: Int?) -> Int {
+        let f = min(max(Float(parts.score) / 100, 0), 1)
+        var acc = 100 * pow(f, STRICT_CURVE)
+        let gap = abs(parts.precision - parts.recall) - BALANCE_FREE
+        if gap > 0 { acc -= Float(gap) * 0.5 }
+        acc = min(max(acc, 0), 100)
+        let raw = speed.map { min(acc, 0.85 * acc + 0.15 * Float($0)) } ?? acc
+        return Int(raw.rounded())
     }
 
     /// Süreli çizimde hız: sürenin yarısında 100, sonunda 50.

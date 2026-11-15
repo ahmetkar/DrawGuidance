@@ -74,7 +74,9 @@ struct CanvasEditScreen: View {
         .onChange(of: vm.loaded) { _, loaded in
             guard loaded, let c = vm.store.canvas else { return }
             // v51 önceki tuvalden yeni alıştırmayla gelindiyse alıştırma hemen açılır (eğitim önerisi yerine)
-            if let i = PracticeHandoff.take(c.localId) { vm.practice.open(i) } else { vm.tutorial.maybeOffer(c.kind) }
+            if let i = PracticeHandoff.take(c.localId) {
+                if i == PracticeHandoff.LIST { vm.practice.listOpen = true } else { vm.practice.open(i) }
+            } else { vm.tutorial.maybeOffer(c.kind) }
         }
         .onChange(of: vm.switchToCanvas) { _, id in if let id { onSwitchCanvas(id) } }
         .modifier(TutorialOfferPresenter(vm: vm, ctl: vm.tutorial))

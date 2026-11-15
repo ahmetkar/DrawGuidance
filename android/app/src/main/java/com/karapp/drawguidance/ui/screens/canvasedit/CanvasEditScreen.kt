@@ -893,6 +893,10 @@ fun CanvasEditScreen(
     val practiceUi = com.karapp.drawguidance.ui.screens.canvasedit.challenge.rememberPracticeUi()
     val practiceShown = com.karapp.drawguidance.ui.screens.canvasedit.challenge.PracticeLevels.available(kind)
     val practiceRun by viewModel.practice.run.collectAsState()
+    val openPracticeList by viewModel.openPracticeList.collectAsState()
+    androidx.compose.runtime.LaunchedEffect(openPracticeList) {
+        if (openPracticeList) { practiceUi.sheet = true; viewModel.openPracticeList.value = false }
+    }
     val toolRow: @Composable (Boolean) -> Unit = { fill ->
         com.karapp.drawguidance.ui.screens.canvasedit.components.ToolHelpScope(toolHelp) {
         EditorToolRow(

@@ -549,7 +549,8 @@ class CanvasEditViewModel(
             // v32 bu türe ilk girişte eğitim önerilir
             // v51 önceki tuvalden yeni alıştırmayla gelindiyse alıştırma hemen açılır (eğitim önerisi yerine)
             val handoff = fitted?.let { com.karapp.drawguidance.ui.screens.canvasedit.challenge.PracticeHandoff.take(canvasLocalId) }
-            if (handoff != null) practice.open(handoff) else fitted?.let { tutorialOrNull?.maybeOffer(it.kind) }
+            if (handoff == com.karapp.drawguidance.ui.screens.canvasedit.challenge.PracticeHandoff.LIST) openPracticeList.value = true
+            else if (handoff != null) practice.open(handoff) else fitted?.let { tutorialOrNull?.maybeOffer(it.kind) }
             if (fitted != null) drawing.cleanOnOpen(fitted)
             // v51 notta: geçici tuvalde düzenlenen resimler nota aktarılır, açık kalmamış geçici tuvaller silinir
             if (fitted != null && fitted.kind.isNotes && tempSession == null && tempImages != null) {
@@ -1289,6 +1290,9 @@ class CanvasEditViewModel(
         )
     }
     /** v50 yetişkin çizim alıştırmaları (basit ve gelişmiş resim): alıştırma kurulurken çizim moduna geçilir. */
+    /** v52 ana sayfadaki Alıştırmalar ile açıldı: ekran alıştırma listesini açar ve bunu sıfırlar. */
+    val openPracticeList = kotlinx.coroutines.flow.MutableStateFlow(false)
+
     val practice by lazy {
         practiceCreated = true
         com.karapp.drawguidance.ui.screens.canvasedit.challenge.PracticeController(

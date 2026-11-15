@@ -22,13 +22,14 @@ import kotlin.math.min
  */
 
 enum class PracticeKind(@StringRes val label: Int, @StringRes val intro: Int, val near: Float, val far: Float) {
-    TRACE(R.string.v50_practice_kind_trace, R.string.v50_practice_intro_trace, 0.022f, 0.07f),
-    FADE(R.string.v50_practice_kind_fade, R.string.v50_practice_intro_fade, 0.035f, 0.10f),
-    MIRROR(R.string.v50_practice_kind_mirror, R.string.v50_practice_intro_mirror, 0.03f, 0.09f),
+    // v52 daha sıkı: tam puan ve sıfır puan uzaklıkları daraldı (çizim doğruluğu daha çok önemli)
+    TRACE(R.string.v50_practice_kind_trace, R.string.v50_practice_intro_trace, 0.010f, 0.036f),
+    FADE(R.string.v50_practice_kind_fade, R.string.v50_practice_intro_fade, 0.016f, 0.052f),
+    MIRROR(R.string.v50_practice_kind_mirror, R.string.v50_practice_intro_mirror, 0.014f, 0.048f),
     /** v51 Bakarak çiz: örnek köşede küçük durur, şekil boş alana (çerçeveye) bakarak çizilir; yer ve boy serbest. */
-    COPY(R.string.v51_practice_kind_copy, R.string.v51_practice_intro_copy, 0.04f, 0.11f),
+    COPY(R.string.v51_practice_kind_copy, R.string.v51_practice_intro_copy, 0.020f, 0.060f),
     /** v51 Süreli çizim: kılavuzun üstünden süre bitmeden çizilir; hız da puanlanır. */
-    TIMED(R.string.v51_practice_kind_timed, R.string.v51_practice_intro_timed, 0.026f, 0.08f),
+    TIMED(R.string.v51_practice_kind_timed, R.string.v51_practice_intro_timed, 0.012f, 0.042f),
 }
 
 enum class PracticeGroup(@StringRes val title: Int) {

@@ -16,4 +16,7 @@
     <string name="v52_live_ask_hint">Если выключено, к трансляциям подключённых устройств вы подключаетесь без вопроса</string>
     <string name="v52_live_auto_open">Открывать трансляцию автоматически</string>
     <string name="v52_live_auto_open_hint">Если выключено, трансляция открывается с карточки на странице трансляции</string>
+    <string name="v52_home_practice">Упражнения</string>
+    <string name="v52_home_practice_simple_hint">Пошаговые упражнения в простом рисовании</string>
+    <string name="v52_home_practice_advanced_hint">Все упражнения в расширенном рисовании</string>
 </resources>

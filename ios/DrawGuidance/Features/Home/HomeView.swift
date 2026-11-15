@@ -193,6 +193,14 @@ private struct HomeTab: View {
                     ForEach(g == .simple ? CanvasKind.Simple : CanvasKind.Advanced, id: \.self) { k in
                         kindRow(k.label, L(Self.kindHintKey(k)), k.systemImage, "new_\(k.rawValue)") { createKind = k; expanded = nil }
                     }
+                    // v52 alıştırmalara doğrudan geçiş: alıştırma tuvali oluşturulur, alıştırma listesi açık gelir
+                    kindRow(L("v52_home_practice"), L(g == .simple ? "v52_home_practice_simple_hint" : "v52_home_practice_advanced_hint"),
+                            "figure.strengthtraining.traditional", "new_practice_\(g == .simple ? "SIMPLE" : "ADVANCED")") {
+                        let c = store.create(kind: g == .simple ? .SIMPLE_ART : .ART, name: L("v50_practice"))
+                        PracticeHandoff.put(c.localId, PracticeHandoff.LIST)
+                        expanded = nil
+                        onOpen(c)
+                    }
                     if g == .advanced {
                         kindRow(L("home_new_3d"), L("v40_home_kind_3d"), "cube", "new_3d") { new3d = true; expanded = nil }
                     }

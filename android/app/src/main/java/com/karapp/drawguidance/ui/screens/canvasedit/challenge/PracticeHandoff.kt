@@ -5,6 +5,9 @@ package com.karapp.drawguidance.ui.screens.canvasedit.challenge
  * bağlı; bir kez alınır).
  */
 object PracticeHandoff {
+    /** v52 ana sayfadan gelindi: belirli bir alıştırma değil, alıştırma listesi açılır. */
+    const val LIST = -1
+
     @Volatile private var pending: Pair<String, Int>? = null
 
     fun put(canvasLocalId: String, index: Int) {

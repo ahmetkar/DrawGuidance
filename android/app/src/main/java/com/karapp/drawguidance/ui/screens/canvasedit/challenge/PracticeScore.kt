@@ -17,9 +17,10 @@ import kotlin.math.roundToInt
  *    [SMOOTH_ZERO] radyanda sıfır puan.
  *  - **Hız** ([speed], yalnız süreli çizimde): sürenin yarısında bitirmek tam puan, sürenin sonunda 50.
  *
- * Toplam: süresizde %80 çizgi puanı (F1) + %20 akıcılık; süreli çizimde %70 + %15 + %15 hız. Toplam çizgi puanını en çok
- * [SMOOTH_BONUS_MAX] puan geçebilir (düzgün ama yanlış yere çizilen çizgi yüksek puan almasın). Her ipucu
- * [PracticeLevels.HINT_PENALTY] düşer.
+ * v52 daha sıkı ve yalnız çizim doğruluğuna dayalı: akıcılık toplamı etkilemez ve sonuç ekranında gösterilmez.
+ * Doğruluk = isabet ve kapsamanın uyumlu ortası (F1), [STRICT_CURVE] üssüyle sıkılaştırılır (90 → 81, 70 → 49, 50 → 25);
+ * isabet ile kapsama arasındaki fark büyükse (yalnız bir kısmı çizmek ya da taşırmak) ek olarak düşer. Süreli çizimde
+ * %85 doğruluk + %15 hız, ama hız doğruluk puanını geçiremez. Her ipucu [PracticeLevels.HINT_PENALTY] düşer.
  */
 data class PracticeScore(
     val total: Int,
@@ -43,10 +44,27 @@ data class PracticeScore(
 
         fun of(parts: ChallengeScore.OutlineParts, smoothness: Int, speed: Int?, hints: Int): PracticeScore {
             if (parts.score <= 0) return ZERO.copy(hints = hints, speed = speed)
-            val raw = if (speed == null) 0.8f * parts.score + 0.2f * smoothness else 0.7f * parts.score + 0.15f * smoothness + 0.15f * speed
-            val capped = minOf(raw.roundToInt(), parts.score + SMOOTH_BONUS_MAX)
-            val total = (capped - hints * PracticeLevels.HINT_PENALTY).coerceIn(0, 100)
+            val total = (strict(parts, speed) - hints * PracticeLevels.HINT_PENALTY).coerceIn(0, 100)
             return PracticeScore(total, parts.score, parts.precision, parts.recall, smoothness, speed, hints)
+        }
+
+        const val STRICT_CURVE = 2f
+
+        /** v52 kılavuzun üstünden çizimde yer de önemli: kaydırılmış çizim (kutuya uydurma) bu oranla çarpılır. */
+        const val ALIGNED = 0.82f
+
+        /** İsabet ile kapsama arasındaki farkın bu kadarından sonrası puandan düşer (her puan için yarım puan). */
+        const val BALANCE_FREE = 15
+
+        /** v52 sıkı doğruluk puanı (ipucu cezası hariç). */
+        fun strict(parts: ChallengeScore.OutlineParts, speed: Int?): Int {
+            val f = (parts.score / 100f).coerceIn(0f, 1f)
+            var acc = 100f * Math.pow(f.toDouble(), STRICT_CURVE.toDouble()).toFloat()
+            val gap = abs(parts.precision - parts.recall) - BALANCE_FREE
+            if (gap > 0) acc -= gap * 0.5f
+            acc = acc.coerceIn(0f, 100f)
+            val raw = if (speed == null) acc else minOf(acc, 0.85f * acc + 0.15f * speed)
+            return raw.roundToInt()
         }
 
         /** Süreli çizimde hız puanı: [elapsedMs] / [limitMs] ≤ 0,5 ise 100, 1'de 50 (arası doğrusal). */

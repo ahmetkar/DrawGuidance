@@ -16,4 +16,7 @@
     <string name="v52_live_ask_hint">عند الإيقاف يتم الانضمام إلى البث الذي تبدؤه الأجهزة المتصلة دون سؤال</string>
     <string name="v52_live_auto_open">فتح البث تلقائيًا</string>
     <string name="v52_live_auto_open_hint">عند الإيقاف يُفتح البث من البطاقة في صفحة بث اللوحة المباشر</string>
+    <string name="v52_home_practice">التمارين</string>
+    <string name="v52_home_practice_simple_hint">تمارين رسم خطوة بخطوة بالرسم البسيط</string>
+    <string name="v52_home_practice_advanced_hint">جميع التمارين في الرسم المتقدم</string>
 </resources>

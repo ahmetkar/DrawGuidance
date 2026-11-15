@@ -335,7 +335,6 @@ private struct PracticeResultCard: View {
                 VStack(spacing: 7) {
                     bar(L("v51_practice_accuracy"), result.detail.accuracy)
                     bar(L("v51_practice_coverage"), result.detail.coverage)
-                    bar(L("v51_practice_smoothness"), result.detail.smoothness)
                     if let sp = result.detail.speed { bar(L("v51_practice_speed"), sp) }
                 }
                 .padding(.horizontal, 20)

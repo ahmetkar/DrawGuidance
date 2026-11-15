@@ -16,4 +16,7 @@
     <string name="v52_live_ask_hint">끄면 연결된 기기가 시작한 방송에 묻지 않고 참여합니다</string>
     <string name="v52_live_auto_open">방송 자동으로 열기</string>
     <string name="v52_live_auto_open_hint">끄면 참여한 방송은 라이브 방송 페이지의 카드에서 엽니다</string>
+    <string name="v52_home_practice">연습</string>
+    <string name="v52_home_practice_simple_hint">간단한 그리기로 단계별 연습</string>
+    <string name="v52_home_practice_advanced_hint">고급 그리기의 모든 연습</string>
 </resources>

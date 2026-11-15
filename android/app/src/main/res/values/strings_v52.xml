@@ -16,4 +16,7 @@
     <string name="v52_live_ask_hint">Kapalıysa bağlı cihazların başlattığı yayına sormadan katılınır</string>
     <string name="v52_live_auto_open">Yayını kendiliğinden aç</string>
     <string name="v52_live_auto_open_hint">Kapalıysa katılınan yayın Canlı tuval yayını sayfasındaki karttan açılır</string>
+    <string name="v52_home_practice">Alıştırmalar</string>
+    <string name="v52_home_practice_simple_hint">Basit çizimle adım adım çizim alıştırmaları</string>
+    <string name="v52_home_practice_advanced_hint">Gelişmiş çizimde tüm alıştırmalar</string>
 </resources>

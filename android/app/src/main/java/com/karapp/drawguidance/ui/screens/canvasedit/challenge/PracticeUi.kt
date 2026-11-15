@@ -509,7 +509,6 @@ private fun PracticeResultDialog(
             Column(Modifier.fillMaxWidth().padding(horizontal = 20.dp, vertical = 12.dp), verticalArrangement = Arrangement.spacedBy(7.dp)) {
                 ScoreBar(stringResource(R.string.v51_practice_accuracy), d.accuracy, "practice_part_accuracy")
                 ScoreBar(stringResource(R.string.v51_practice_coverage), d.coverage, "practice_part_coverage")
-                ScoreBar(stringResource(R.string.v51_practice_smoothness), d.smoothness, "practice_part_smoothness")
                 d.speed?.let { ScoreBar(stringResource(R.string.v51_practice_speed), it, "practice_part_speed") }
             }
             Text(stringResource(R.string.v50_practice_best, result.best), color = colors.contentMuted, fontSize = 13.sp)

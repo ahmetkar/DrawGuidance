@@ -269,7 +269,7 @@ class PracticeController(
             if (mine.none { it.brushType != BrushType.ERASER }) return PracticeScore.ZERO.copy(hints = hints)
             val kind = run.level.kind
             val lines = KidsChallengeController.drawnLines(mine)
-            val aligned = if (kind == PracticeKind.COPY) 1f else ChallengeScore.ALIGNED
+            val aligned = if (kind == PracticeKind.COPY) 1f else PracticeScore.ALIGNED
             val parts = ChallengeScore.outlineParts(lines, run.target.lines, kind.near, kind.far, aligned)
             val box = run.target.box
             val smooth = PracticeScore.smoothness(lines, hypot(box.width, box.height))

@@ -23,8 +23,9 @@ enum PracticeKind: String {
         }
     }
     /// Tam puan ve sıfır puan uzaklığı (hedef köşegenine oran).
-    var near: Float { switch self { case .TRACE: return 0.022; case .FADE: return 0.035; case .MIRROR: return 0.03; case .COPY: return 0.04; case .TIMED: return 0.026 } }
-    var far: Float { switch self { case .TRACE: return 0.07; case .FADE: return 0.10; case .MIRROR: return 0.09; case .COPY: return 0.11; case .TIMED: return 0.08 } }
+    /// v52 daha sıkı (Android ile aynı).
+    var near: Float { switch self { case .TRACE: return 0.010; case .FADE: return 0.016; case .MIRROR: return 0.014; case .COPY: return 0.020; case .TIMED: return 0.012 } }
+    var far: Float { switch self { case .TRACE: return 0.036; case .FADE: return 0.052; case .MIRROR: return 0.048; case .COPY: return 0.060; case .TIMED: return 0.042 } }
 }
 
 enum PracticeGroup: CaseIterable {

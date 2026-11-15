@@ -20,6 +20,7 @@ import androidx.compose.material.icons.filled.AutoStories
 import androidx.compose.material.icons.filled.Brush
 import androidx.compose.material.icons.filled.ChildCare
 import androidx.compose.material.icons.filled.EditNote
+import androidx.compose.material.icons.filled.FitnessCenter
 import androidx.compose.material.icons.filled.Gesture
 import androidx.compose.material.icons.filled.StickyNote2
 import androidx.compose.material.icons.filled.ViewInAr
@@ -132,6 +133,8 @@ fun DrawingGroupList(
     onPick: (CanvasKind) -> Unit,
     onNew3d: () -> Unit,
     modifier: Modifier = Modifier,
+    /** v52 alıştırmalara doğrudan geçiş (true: basit çizim alıştırmaları, false: gelişmiş). */
+    onPractice: ((simple: Boolean) -> Unit)? = null,
 ) {
     val colors = NeuTheme.colors
     // Kapanırken son grubun listesi görünmeye devam eder (animasyon bitene kadar)
@@ -160,6 +163,11 @@ fun DrawingGroupList(
                     kinds.forEach { k ->
                         KindRow(canvasKindLabel(k), homeKindHint(k), canvasKindIcon(k), canvasKindTint(k), "new_kind_${k.name}") { onPick(k) }
                     }
+                    if (onPractice != null) KindRow(
+                        stringResource(R.string.v52_home_practice),
+                        stringResource(if (current == DrawingGroup.SIMPLE) R.string.v52_home_practice_simple_hint else R.string.v52_home_practice_advanced_hint),
+                        Icons.Filled.FitnessCenter, Color(0xFF10B981), "new_practice_${current.name}",
+                    ) { onPractice(current == DrawingGroup.SIMPLE) }
                     if (current == DrawingGroup.ADVANCED) KindRow(
                         stringResource(R.string.canvas_kind_3d), stringResource(R.string.v40_home_kind_3d),
                         Icons.Filled.ViewInAr, Model3dTint, "new_kind_3D", onNew3d,

@@ -16,4 +16,7 @@
     <string name="v52_live_ask_hint">When off, broadcasts started by connected devices are joined without asking</string>
     <string name="v52_live_auto_open">Open broadcast automatically</string>
     <string name="v52_live_auto_open_hint">When off, a joined broadcast is opened from the card on the Live canvas broadcast page</string>
+    <string name="v52_home_practice">Practices</string>
+    <string name="v52_home_practice_simple_hint">Step-by-step drawing practices with simple drawing</string>
+    <string name="v52_home_practice_advanced_hint">All practices with advanced drawing</string>
 </resources>

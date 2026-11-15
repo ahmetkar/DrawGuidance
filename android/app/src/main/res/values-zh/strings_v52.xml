@@ -16,4 +16,7 @@
     <string name="v52_live_ask_hint">关闭后，将直接加入已连接设备开始的直播</string>
     <string name="v52_live_auto_open">自动打开直播</string>
     <string name="v52_live_auto_open_hint">关闭后，从画布直播页面的卡片打开已加入的直播</string>
+    <string name="v52_home_practice">练习</string>
+    <string name="v52_home_practice_simple_hint">用简单绘图逐步练习</string>
+    <string name="v52_home_practice_advanced_hint">高级绘图中的全部练习</string>
 </resources>

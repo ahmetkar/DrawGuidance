@@ -118,6 +118,7 @@ fun HomeScreen(
     // v44 çocuk kilidi: yalnız çocuk çizimi (kart kapatılamaz), çizim görevi ve çocuk tuvalleri
     val kidsLocked = com.karapp.drawguidance.ui.kids.LocalKidsLocked.current
     val showKids = kidsLocked || (!kidsDismissed && com.karapp.drawguidance.data.settings.KidsPrefs.isChild(deviceUser?.takeIf { it.signedIn }?.birthDate))
+    val practiceName = stringResource(R.string.v50_practice)
     val toggleGroup: (com.karapp.drawguidance.ui.components.DrawingGroup) -> Unit = { g -> expanded = if (expanded == g) null else g }
     val now = remember(state) { System.currentTimeMillis() }
     // v39 görev kartı (13 yaşından küçük girişli) ve Premium kartı (Premium değilse)
@@ -216,6 +217,16 @@ fun HomeScreen(
                         onPick = { k -> createKind = k; expanded = null },
                         onNew3d = { new3dOpen = true; expanded = null },
                         modifier = Modifier.padding(top = 12.dp),
+                        // v52 alıştırmalar: alıştırma tuvali oluşturulur ve alıştırma listesi açık gelir
+                        onPractice = { simple ->
+                            expanded = null
+                            val k = if (simple) CanvasKind.SIMPLE_ART else CanvasKind.ART
+                            val size = k.defaultSize
+                            listViewModel.createCanvas(practiceName, size.width, size.height, "#FFFFFF", aiEnabled = true, kind = k, onCreated = { id ->
+                                com.karapp.drawguidance.ui.screens.canvasedit.challenge.PracticeHandoff.put(id, com.karapp.drawguidance.ui.screens.canvasedit.challenge.PracticeHandoff.LIST)
+                                onOpenCanvas(id)
+                            })
+                        },
                     )
                 }
                 if (leftOff.isNotEmpty()) item {

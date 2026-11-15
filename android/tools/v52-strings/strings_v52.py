@@ -51,6 +51,13 @@ s("v52_live_auto_open_hint", "Kapalıysa katılınan yayın Canlı tuval yayın�
   "عند الإيقاف يُفتح البث من البطاقة في صفحة بث اللوحة المباشر", "オフにすると、参加した配信はライブ配信ページのカードから開きます", "끄면 참여한 방송은 라이브 방송 페이지의 카드에서 엽니다",
   "Если выключено, трансляция открывается с карточки на странице трансляции", "关闭后，从画布直播页面的卡片打开已加入的直播")
 
+# --- Madde 7: ana sayfadan alıştırmalara doğrudan geçiş
+s("v52_home_practice", "Alıştırmalar", "Practices", "التمارين", "練習", "연습", "Упражнения", "练习")
+s("v52_home_practice_simple_hint", "Basit çizimle adım adım çizim alıştırmaları", "Step-by-step drawing practices with simple drawing",
+  "تمارين رسم خطوة بخطوة بالرسم البسيط", "シンプル描画でステップごとの練習", "간단한 그리기로 단계별 연습", "Пошаговые упражнения в простом рисовании", "用简单绘图逐步练习")
+s("v52_home_practice_advanced_hint", "Gelişmiş çizimde tüm alıştırmalar", "All practices with advanced drawing",
+  "جميع التمارين في الرسم المتقدم", "高度な描画ですべての練習", "고급 그리기의 모든 연습", "Все упражнения в расширенном рисовании", "高级绘图中的全部练习")
+
 def xml_escape(t):
     t = escape(t).replace("'", "\\'").replace('"', '\\"')
     return t

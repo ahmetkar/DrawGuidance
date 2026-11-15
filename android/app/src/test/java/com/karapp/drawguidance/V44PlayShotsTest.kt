@@ -184,7 +184,7 @@ abstract class V44PlayShotsBase : V32EditorBase() {
         shot("$device-02-resim")
     }
 
-    @Test fun notes() = tutorialShot(CanvasKind.NOTES, "Fizik notu", "notes_formula", "03-not")
+    @Test fun notes() = tutorialShot(CanvasKind.NOTES, "Fizik notu", "simple_notes_v46", "03-not")
     @Test fun kids() = tutorialShot(CanvasKind.KIDS, "Boyacık", "kids_intro", "04-cocuk")
     @Test fun simpleArt() = tutorialShot(CanvasKind.SIMPLE_ART, "Ev", "simple_art_intro", "05-basit-resim")
 

@@ -110,10 +110,15 @@ class V32ArtBasicsTest : V32EditorBase() {
     fun stepsBelowToolsAndCanvasRestored() {
         createCanvasAndOpen("Manzara")
         startGroup("art_basics")
-        assertEquals("1 / 7", stepText())
-        val anchors = listOf(TutorialAnchor.BRUSH, TutorialAnchor.BRUSH_SETTINGS, TutorialAnchor.FILL, TutorialAnchor.ERASER, TutorialAnchor.PEN, TutorialAnchor.UNDO, TutorialAnchor.LAYERS)
+        // v51 "Çizim" işlev grubu: v32 temel araçlar başta, ardından aynı işi anlatan sonraki sürümlerin adımları
+        val group = com.karapp.drawguidance.ui.screens.canvasedit.tutorial.TutorialScripts.groups(com.karapp.drawguidance.data.model.CanvasKind.ART).first { it.id == "art_basics" }
+        val n = group.steps.size
+        assertEquals("1 / $n", stepText())
+        assertEquals(listOf(TutorialAnchor.BRUSH, TutorialAnchor.BRUSH_SETTINGS, TutorialAnchor.FILL, TutorialAnchor.ERASER, TutorialAnchor.PEN, TutorialAnchor.UNDO, TutorialAnchor.LAYERS),
+            group.steps.take(7).map { it.anchor })
+        val anchors = group.steps.map { it.anchor }
         for ((i, anchor) in anchors.withIndex()) {
-            runUntil { stepText() == "${i + 1} / 7" }
+            runUntil { stepText() == "${i + 1} / $n" }
             assertEquals(anchor, vm().tutorial.ui.value?.step?.anchor)
             awaitDemo()
             advanceMain(300)
@@ -286,21 +291,26 @@ class V32NotesComicTest : V32EditorBase() {
         createComicCanvasAndOpen("Kahraman")
         waitFor { offerShown() }
         startGroup("comic_panels")
+        // v51 "Sayfa ve paneller" işlev grubu: v32 panel/kahraman adımları başta, ardından sonraki sürümlerin panel adımları
+        val panels = com.karapp.drawguidance.ui.screens.canvasedit.tutorial.TutorialScripts.groups(com.karapp.drawguidance.data.model.CanvasKind.COMIC).first { it.id == "comic_panels" }.steps.size
         repeat(3) { awaitDemo(); next() }
-        runUntil { stepText() == "4 / 4" }
+        runUntil { stepText() == "4 / $panels" }
         awaitDemo()
         val strokes = live().strokes
         assertEquals(3, strokes.count { it.brushType == BrushType.SHAPE })
         assertTrue(strokes.count { it.brushType == BrushType.INK_PEN } > 20)
         shot("v32-comic-panels")
+        for (i in 5..panels) { next(); runUntil(60_000) { stepText() == "$i / $panels" }; awaitDemo(60_000) }
         next()
         waitFor { !calloutShown() }
         compose.onNodeWithContentDescription("Diğer seçenekler").performClick()
         waitFor { exists("tutorial_menu_item") }
         compose.onNodeWithTag("tutorial_menu_item").performClick()
         startGroup("comic_text")
-        repeat(2) { awaitDemo(); next() }
-        runUntil { stepText() == "3 / 3" }
+        // v51 "Karakterler ve yazı" grubunda v32 balon ve efekt yazısı adımları en sonda (kendi temiz sayfasında)
+        val text = com.karapp.drawguidance.ui.screens.canvasedit.tutorial.TutorialScripts.groups(com.karapp.drawguidance.data.model.CanvasKind.COMIC).first { it.id == "comic_text" }.steps.size
+        repeat(text - 1) { awaitDemo(60_000); next(); advanceMain(200) }
+        runUntil(60_000) { stepText() == "$text / $text" }
         awaitDemo()
         val balloons = live().strokes.filter { it.text?.box?.balloon != null }
         assertEquals(2, balloons.size)
@@ -332,15 +342,15 @@ class V32ShotsTest : V32EditorBase() {
         org.junit.Assume.assumeTrue(System.getenv("DG_SHOTS") != null)
         createCanvasAndOpen("Vektör")
         startGroup("art_add")
-        playAll("v32-artadd", 6, setOf(2, 3))
+        playAll("v32-artadd", com.karapp.drawguidance.ui.screens.canvasedit.tutorial.TutorialScripts.groups(com.karapp.drawguidance.data.model.CanvasKind.ART).first { it.id == "art_add" }.steps.size, setOf(2, 3))
     }
 
     @Test
     fun notesWriteShots() {
         org.junit.Assume.assumeTrue(System.getenv("DG_SHOTS") != null)
         createNotesCanvasAndOpen("Not")
-        startGroup("notes_write")
-        playAll("v32-noteswrite", 4, setOf(3))
+        startGroup("simple_notes_intro")
+        playAll("v32-noteswrite", com.karapp.drawguidance.ui.screens.canvasedit.tutorial.TutorialScripts.groups(com.karapp.drawguidance.data.model.CanvasKind.NOTES).first { it.id == "simple_notes_intro" }.steps.size, setOf(3))
     }
 
     @Test

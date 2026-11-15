@@ -186,13 +186,26 @@ class V46LandscapeSplitTest : V46SplitBase() {
 class V46TutorialsTest : V32EditorBase() {
     private fun repo() = org.koin.core.context.GlobalContext.get().get<com.karapp.drawguidance.data.repository.CanvasRepository>()
 
-    private fun play(kind: CanvasKind, id: String, check: (List<com.karapp.drawguidance.data.model.Stroke>) -> Unit) {
+    private fun play(kind: CanvasKind, id: String, check: (List<com.karapp.drawguidance.data.model.Stroke>) -> Unit) =
+        play(kind, com.karapp.drawguidance.ui.screens.canvasedit.tutorial.TutorialScripts.groups(kind).first { it.id == id }, check)
+
+    /** Adımlar (başlık + yer) türün işlev gruplarından birinde var: v51 sürüm grupları işlev gruplarına dağıldı. */
+    private fun covered(kind: CanvasKind, g: com.karapp.drawguidance.ui.screens.canvasedit.tutorial.TutorialGroup): Boolean {
+        val all = com.karapp.drawguidance.ui.screens.canvasedit.tutorial.TutorialScripts.groups(kind).flatMap { it.steps }
+        return g.steps.all { st -> all.any { it.title == st.title && it.anchor == st.anchor } }
+    }
+
+    /**
+     * v51 eski sürüm grubunun gösterimleri işlev gruplarının içinde (her dizi kendi temiz sayfasında) oynar; sonuç
+     * çizimini doğrulamak için dizi kendi başına oynatılır.
+     */
+    private fun play(kind: CanvasKind, group: com.karapp.drawguidance.ui.screens.canvasedit.tutorial.TutorialGroup, check: (List<com.karapp.drawguidance.data.model.Stroke>) -> Unit) {
+        val id = group.id
         waitForText("Henüz bir tuvaliniz yok", substring = true)
         kotlinx.coroutines.runBlocking { repo().createCanvas("Eğitim $id", 1000, 1414, "#FFFFFF", aiEnabled = false, kind = kind) }
         waitForText("Eğitim $id")
         compose.onAllNodes(androidx.compose.ui.test.hasText("Eğitim $id"))[0].performClick()
         waitFor { exists("drawing_canvas") && vm().canvas.value?.kind == kind }
-        val group = com.karapp.drawguidance.ui.screens.canvasedit.tutorial.TutorialScripts.groups(kind).first { it.id == id }
         val before = live().strokes.size
         compose.runOnIdle { vm().tutorial.fast = true; vm().tutorial.start(group) }
         waitFor { calloutShown() }
@@ -213,39 +226,38 @@ class V46TutorialsTest : V32EditorBase() {
 
     @Test fun whatsNewIsV48Everywhere() {
         val s = com.karapp.drawguidance.ui.screens.canvasedit.tutorial.TutorialScripts
-        // v48 eğitim sürümü: yenilikler artık yeni menü sistemini tanıtır
-        // v51 not alma tek mod (basit çizim altında): yenilikler basit menüler
-        // v50 eğitim sürümü: çizim modlarında yenilikler "Resimden çizim", not türlerinde v48 menüleri
+        // v50 eğitim sürümü: çizim modlarında yenilikler "Resimden çizim", not almada v48 basit menüler
+        // v51 not alma tek mod (basit çizim altında); gruplar sürüme göre değil işleve göre
         assertEquals(50, s.VERSION)
         for ((kind, id) in listOf(CanvasKind.ART to "v50_trace_art", CanvasKind.COMIC to "v50_trace_comic",
             CanvasKind.SIMPLE_ART to "v50_trace_simple_art", CanvasKind.NOTES to "v48_simple_notes", CanvasKind.KIDS to "v50_trace_kids")) {
-            assertEquals(id, s.whatsNew(kind)!!.id)
-            assertTrue(s.groups(kind).any { it.id == id })
+            val fresh = s.whatsNew(kind)!!
+            assertEquals(id, fresh.id)
+            assertTrue("$kind yenilikleri listede", s.groups(kind).any { it.id == id } || covered(kind, fresh))
         }
-        // v48 menü yenilikleri listede tarihçe olarak kalır
-        for ((kind, id) in listOf(CanvasKind.ART to "v48_advanced_art", CanvasKind.COMIC to "v48_advanced_comic",
-            CanvasKind.SIMPLE_ART to "v48_simple_simple_art", CanvasKind.KIDS to "v48_kids")) assertTrue(id, s.groups(kind).any { it.id == id })
-        // v46 yenilikler grubu listede tarihçe olarak kalır
-        assertTrue(s.groups(CanvasKind.ART).any { it.id == "art_v46" })
+        // v46/v48 yenilik grupları artık ayrı değil: adımları işlev gruplarında
+        assertTrue(s.groups(CanvasKind.ART).none { it.id == "art_v46" || it.id == "v48_advanced_art" || it.id == "art_v40" })
+        assertTrue(covered(CanvasKind.ART, com.karapp.drawguidance.ui.screens.canvasedit.tutorial.TutorialV46.art))
+        assertTrue(covered(CanvasKind.ART, com.karapp.drawguidance.ui.screens.canvasedit.tutorial.TutorialV48.advanced(CanvasKind.ART)))
+        assertTrue(covered(CanvasKind.COMIC, com.karapp.drawguidance.ui.screens.canvasedit.tutorial.TutorialV46.comic))
+        assertTrue(covered(CanvasKind.COMIC, com.karapp.drawguidance.ui.screens.canvasedit.tutorial.TutorialV48.advanced(CanvasKind.COMIC)))
+        assertTrue(covered(CanvasKind.SIMPLE_ART, com.karapp.drawguidance.ui.screens.canvasedit.tutorial.TutorialV46.simpleArt))
+        assertTrue(covered(CanvasKind.SIMPLE_ART, com.karapp.drawguidance.ui.screens.canvasedit.tutorial.TutorialV48.simple(CanvasKind.SIMPLE_ART)))
+        assertTrue(covered(CanvasKind.KIDS, com.karapp.drawguidance.ui.screens.canvasedit.tutorial.TutorialV48.kids))
+        assertTrue(covered(CanvasKind.NOTES, com.karapp.drawguidance.ui.screens.canvasedit.tutorial.TutorialV46.simpleNotes))
+        assertTrue(covered(CanvasKind.NOTES, com.karapp.drawguidance.ui.screens.canvasedit.tutorial.TutorialV48.simple(CanvasKind.NOTES)))
         // Çocuk tanıtımında v45 boya fırçası
         assertTrue(com.karapp.drawguidance.ui.screens.canvasedit.tutorial.TutorialKids.intro.steps.any { it.anchor == com.karapp.drawguidance.ui.screens.canvasedit.tutorial.TutorialAnchor.simple("paint_brush") })
     }
 
-    @Test fun art() = play(CanvasKind.ART, "art_v46") { s ->
+    @Test fun art() = play(CanvasKind.ART, com.karapp.drawguidance.ui.screens.canvasedit.tutorial.TutorialV46.art) { s ->
         assertTrue(s.any { it.shape?.kind == "CIRCLE" } && s.count { it.shape?.kind == "TRIANGLE" } >= 2)
         assertTrue("kuşlar kopyalandı", s.count { it.brushType == com.karapp.drawguidance.data.model.BrushType.INK_PEN } >= 3)
     }
 
-    @Test fun notes() = play(CanvasKind.NOTES, "notes_v46") { s ->
-        assertEquals(3, s.count { com.karapp.drawguidance.ui.screens.canvasedit.state.NotesPanels.isNotesPanel(it) })
-        val fb = s.first { it.shape?.kind == "lib.sci.phys.free_body" }
-        assertEquals("40", fb.shape!!.params!!["F"])
-        assertEquals("30", fb.shape!!.params!!["alpha"])
-        assertEquals("17", s.first { it.shape?.kind == "lib.sci.chem.bohr_atom" }.shape!!.params!!["z"])
-        assertTrue(s.any { it.brushType == com.karapp.drawguidance.data.model.BrushType.FORMULA })
-    }
+    // v51 gelişmiş not alma yok (not alma basit tek menülü): eski gelişmiş not eğitimi (panel, bilim şekilleri) sunulmaz
 
-    @Test fun comic() = play(CanvasKind.COMIC, "comic_v46") { s ->
+    @Test fun comic() = play(CanvasKind.COMIC, com.karapp.drawguidance.ui.screens.canvasedit.tutorial.TutorialV46.comic) { s ->
         assertEquals(3, s.count { com.karapp.drawguidance.ui.screens.canvasedit.state.PanelSets.isPanel(it) })
         assertEquals("3 mekân + 3 karakter", 6, s.count { it.brushType == com.karapp.drawguidance.data.model.BrushType.IMAGE })
         // Mekânlar panellerin arkasında
@@ -254,7 +266,7 @@ class V46TutorialsTest : V32EditorBase() {
         assertTrue(s.count { it.text?.box?.balloon != null } >= 3)
     }
 
-    @Test fun simpleArt() = play(CanvasKind.SIMPLE_ART, "simple_art_v46") { s -> assertTrue(s.any { it.shape?.kind == "HOUSE" }) }
+    @Test fun simpleArt() = play(CanvasKind.SIMPLE_ART, com.karapp.drawguidance.ui.screens.canvasedit.tutorial.TutorialV46.simpleArt) { s -> assertTrue(s.any { it.shape?.kind == "HOUSE" }) }
 
     @Test fun simpleNotes() = play(CanvasKind.NOTES, "simple_notes_v46") { s ->
         val lever = s.first { it.shape?.kind == "lib.sci.phys.lever" }

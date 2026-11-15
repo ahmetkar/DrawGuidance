@@ -24,7 +24,7 @@ enum TutorialScripts {
         case .ART:
             let a40 = TutorialV40.art.steps, a46 = TutorialV46.art.steps, m48 = TutorialV48.advanced(kind).steps
             return [
-                merge("art_basics", kind, "tut51_draw", "tut51_draw_text", "paintbrush", [artBasics.steps, Array(a46.prefix(1)), [a40[1], a40[6]]]),
+                merge("art_basics", kind, "tut51_draw", "tut51_draw_text", "paintbrush", [artBasics.steps, Array(a46.prefix(1)), [a40[1], a40[6], m48[1]]]),
                 merge("art_add", kind, "tut51_edit", "tut51_edit_text", "square.on.circle", [artAdd.steps, Array(a46.dropFirst()), Array(a40.prefix(1)), [m48[0], m48[2]]]),
                 merge("art_guides", kind, "tut51_guides", "tut51_guides_text", "ruler", [Array(a40[2..<6])]),
                 TutorialV50.advanced(kind),
@@ -59,7 +59,9 @@ enum TutorialScripts {
             return [
                 TutorialKids.intro,
                 TutorialGroup(id: "kids_v40", kind: kind, title: "tut51_kids_more", summary: "tut51_kids_more_text", icon: "ruler", ai: false,
-                              steps: Array(TutorialKids.whatsNew.steps.dropFirst()) + TutorialV48.kids.steps + TutorialV50.kids.steps),
+                              steps: Array(TutorialKids.whatsNew.steps.dropFirst()) + TutorialV48.kids.steps),
+                // Kalıpla çizme ayrı işlev (yenilikler de bu grup)
+                TutorialV50.kids,
             ]
         }
     }

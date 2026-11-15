@@ -157,6 +157,7 @@ struct SettingsView: View {
     // MARK: Gelişmiş
 
     @ViewBuilder private var advanced: some View {
+        ShareLinksSection()
         if UMPConsentInformation.sharedInstance.privacyOptionsRequirementStatus == .required {
             Section {
                 Button(NSLocalizedString("ios.privacy.options", comment: "")) {

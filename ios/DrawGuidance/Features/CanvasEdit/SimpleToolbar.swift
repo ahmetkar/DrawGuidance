@@ -69,6 +69,8 @@ struct SimpleToolbar: View {
         if store.canvas?.kind == .SIMPLE_ART {
             // v50 yetişkin çizim alıştırmaları
             t.append(Tool(id: "practice", icon: "figure.strengthtraining.traditional", label: L("v50_practice"), selected: vm.practice.active) { vm.practice.listOpen = true })
+            // v52 çizim yardımcıları
+            t.append(Tool(id: "helpers", icon: "squareshape.split.3x3", label: L("v52_helpers_short"), selected: vm.helpers.active) { sheet = .helpers })
         }
         return t
     }

@@ -42,6 +42,12 @@ struct CanvasEditScreen: View {
                         LocationPlaceOverlay(background: b, panels: vm.comicPanelRects(), viewport: vm.viewport,
                                              onPlace: { vm.placeLocation($0) }, onCancel: { vm.placingLocation = nil })
                     }
+                    if let c = vm.store.canvas, c.kind == .ART || c.kind == .SIMPLE_ART {
+                        // v52 çizim yardımcıları: kompozisyon çizgileri ve köşede kontrol önizlemesi
+                        CompositionOverlay(helpers: vm.helpers, canvas: c, viewport: vm.viewport)
+                        CheckPreview(helpers: vm.helpers, canvas: c)
+                            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+                    }
                     if PracticeLevels.available(vm.store.canvas?.kind) {
                         PracticeLayer(ctl: vm.practice, viewport: vm.viewport, tutorial: vm.inTutorial())
                     }
@@ -105,6 +111,10 @@ struct CanvasEditScreen: View {
             case .save: SaveSheet(vm: vm, images: vm.images, v40: vm.v40)
             case .guide: GuideSheet(vm: vm, store: vm.store)
             case .background: BackgroundSheet(vm: vm, store: vm.store)
+            // v52 paylaşım ve yayın çizim sayfasının Diğer menüsünden
+            case .share: NavigationStack { ShareView(mode: .send).toolbar { ToolbarItem(placement: .cancellationAction) { Button(L("close")) { sheet = nil } } } }
+            case .live: NavigationStack { ShareView(mode: .live).toolbar { ToolbarItem(placement: .cancellationAction) { Button(L("close")) { sheet = nil } } } }
+            case .helpers: DrawHelpersSheet(helpers: vm.helpers)
             }
         }
         .sheet(isPresented: Binding(get: { vm.loaded && vm.diagrams.isPickerOpen }, set: { if !$0 { vm.closeDiagramPicker() } })) {
@@ -211,6 +221,22 @@ private struct EditorTopBar: View {
                     .disabled(!store.canUndo).accessibilityLabel(L("undo")).accessibilityIdentifier("undo").tutorialAnchor(TutorialAnchor.UNDO)
                 Button { vm.redo() } label: { Image(systemName: "arrow.uturn.forward") }
                     .disabled(!store.canRedo).accessibilityLabel(L("redo")).accessibilityIdentifier("redo").tutorialAnchor(TutorialAnchor.REDO)
+                if !vm.isTempImageEdit {
+                    // v52 Diğer menüsü: paylaşım, canlı yayın ve çizim yardımcıları
+                    Menu {
+                        if store.canvas?.kind == .ART || store.canvas?.kind == .SIMPLE_ART {
+                            Button { sheet = .helpers } label: { Label(L("v52_helpers_title"), systemImage: "squareshape.split.3x3") }
+                                .accessibilityIdentifier("helpers_menu_item")
+                        }
+                        Button { sheet = .share } label: { Label(L("v52_share_send_title"), systemImage: "square.and.arrow.up") }
+                            .accessibilityIdentifier("share_menu_item")
+                        if ShareManager.liveAllowed(store.canvas?.kind) {
+                            Button { sheet = .live } label: { Label(L("v52_share_live_title"), systemImage: "dot.radiowaves.left.and.right") }
+                                .accessibilityIdentifier("live_menu_item")
+                        }
+                    } label: { Image(systemName: "ellipsis.circle") }
+                    .accessibilityLabel(L("more_options")).accessibilityIdentifier("editor_more")
+                }
             }
             .font(.title3)
             if store.canvas?.kind.simple != true {
@@ -314,7 +340,7 @@ private struct TutorialOfferHost: View {
 }
 
 enum EditorSheet: String, Identifiable {
-    case elements, layers, save, guide, background
+    case elements, layers, save, guide, background, share, live, helpers
     var id: String { rawValue }
 }
 

@@ -104,6 +104,9 @@ final class EditorViewModel: ObservableObject, EditorHost {
     }()
 
     /// v50 yetişkin alıştırması sürüyor mu (sürerken çizim önerisi verilmez).
+    /// v52 çizim yardımcıları (kompozisyon kılavuzu, kontrol önizlemesi; yalnız görünüm).
+    let helpers = DrawHelpersState()
+
     private var practiceActive: () -> Bool = { false }
 
     /// v50 yetişkin çizim alıştırmaları (basit ve gelişmiş resim).

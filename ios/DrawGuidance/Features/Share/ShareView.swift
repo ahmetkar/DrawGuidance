@@ -96,7 +96,8 @@ struct ShareView: View {
         .sheet(item: $pick) { p in
             switch p.kind {
             case .canvas, .live:
-                CanvasPickSheet(title: L(p.kind == .live ? "v51_share_pick_live" : "v51_share_pick_canvas")) { c in
+                CanvasPickSheet(title: L(p.kind == .live ? "v51_share_pick_live" : "v51_share_pick_canvas"),
+                                filter: p.kind == .live ? { ShareManager.liveAllowed($0.kind) } : { _ in true }) { c in
                     if p.kind == .live { share.startLive(p.peer.id, c) } else { share.sendCanvas(p.peer.id, c) }
                 }
             case .image:
@@ -179,6 +180,18 @@ private struct PeerRow: View {
     }
 }
 
+/// v52 paylaşım ve yayın sayfalarına kısa bağlantılar (Ayarlar > Gelişmiş).
+struct ShareLinksSection: View {
+    var body: some View {
+        Section {
+            NavigationLink { ShareView(mode: .send) } label: { Label(L("v52_share_send_title"), systemImage: "square.and.arrow.up") }
+                .accessibilityIdentifier("settings_links_share")
+            NavigationLink { ShareView(mode: .live) } label: { Label(L("v52_share_live_title"), systemImage: "dot.radiowaves.left.and.right") }
+                .accessibilityIdentifier("settings_links_live")
+        } header: { Text(L("v52_share_links_title")) } footer: { Text(L("v52_share_links_hint")) }
+    }
+}
+
 /// Paylaşım ayarları (paylaşım sayfasında ve Ayarlar > Genel'de).
 struct ShareSettingsSection: View {
     @ObservedObject private var share = ShareManager.shared
@@ -258,6 +271,7 @@ struct LiveSettingsSection: View {
 
 private struct CanvasPickSheet: View {
     let title: String
+    var filter: (CanvasUi) -> Bool = { _ in true }
     let onPick: (CanvasUi) -> Void
     @EnvironmentObject private var store: CanvasStore
     @Environment(\.dismiss) private var dismiss
@@ -265,8 +279,9 @@ private struct CanvasPickSheet: View {
     var body: some View {
         NavigationStack {
             List {
-                if store.canvases.isEmpty { Text(L("v51_share_no_canvases")).foregroundStyle(.secondary) }
-                ForEach(store.canvases) { c in
+                let list = store.canvases.filter(filter)
+                if list.isEmpty { Text(L("v51_share_no_canvases")).foregroundStyle(.secondary) }
+                ForEach(list) { c in
                     Button { dismiss(); onPick(c) } label: {
                         HStack(spacing: 12) {
                             CanvasThumbnail(canvas: c, side: 56).frame(width: 56, height: 56).clipShape(RoundedRectangle(cornerRadius: 8))

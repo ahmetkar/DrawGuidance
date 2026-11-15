@@ -163,7 +163,12 @@ final class ShareManager: ObservableObject {
     }
 
     /// Yayın teklifi: karşı taraf kabul edince tuval ona açılır ve bu tuvaldeki değişiklikler ona akar.
+    /// v52 canlı yayına açık tuval türleri.
+    nonisolated static func liveAllowed(_ kind: CanvasKind?) -> Bool { kind != nil && kind != .KIDS }
+
     func startLive(_ peerId: String, _ canvas: CanvasUi) {
+        // v52 yayın yalnız çizim modları, not alma ve çizgi romanda (çocuk modunda yok)
+        guard Self.liveAllowed(canvas.kind) else { return }
         stopLive()
         offerOut(peerId, type: ShareWire.TYPE_LIVE, title: canvas.name, canvasId: canvas.localId, image: nil,
                  bytes: packages.canvasSize(canvas.localId), kind: canvas.kind.rawValue)

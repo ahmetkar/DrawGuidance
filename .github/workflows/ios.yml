@@ -215,14 +215,16 @@ jobs:
           brew install xcodegen
           xcodegen generate
 
-      - name: Arşivle (otomatik imzalama)
+      # Arşiv yerel (ad-hoc) imzayla alınır: otomatik imzalama arşivde geliştirme profili ister, o da kayıtlı cihaz
+      # gerektirir. Dağıtım sertifikası ve App Store profili dışa aktarmada API anahtarıyla oluşturulur.
+      - name: Arşivle
         run: |
           mkdir -p build
           xcodebuild archive -project DrawGuidance.xcodeproj -scheme DrawGuidance -configuration Release \
             -destination "generic/platform=iOS" -archivePath build/DrawGuidance.xcarchive \
             -allowProvisioningUpdates \
             -authenticationKeyPath "$ASC_KEY_PATH" -authenticationKeyID "$ASC_KEY_ID" -authenticationKeyIssuerID "$ASC_ISSUER_ID" \
-            CODE_SIGN_STYLE=Automatic DEVELOPMENT_TEAM="$TEAM_ID" \
+            CODE_SIGN_STYLE=Manual CODE_SIGN_IDENTITY="-" PROVISIONING_PROFILE_SPECIFIER="" DEVELOPMENT_TEAM="$TEAM_ID" \
             DG_GOOGLE_URL_SCHEME="$DG_GOOGLE_URL_SCHEME" > build/archive.log 2>&1 \
             || { grep -E "error:|Provisioning|signing" build/archive.log | sort -u | head -100; tail -30 build/archive.log; exit 1; }
           tail -3 build/archive.log

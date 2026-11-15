@@ -13,7 +13,7 @@ on:
         type: boolean
         default: false
       signed:
-        description: "İmzalı App Store .ipa (ASC_KEY_ID, ASC_ISSUER_ID, ASC_KEY_P8 gizli değişkenleri gerekir; testler atlanır)"
+        description: "İmzalı App Store .ipa (SIGN_ASC_KEY_ID, SIGN_ASC_ISSUER_ID, SIGN_ASC_KEY_P8 gizli değişkenleri gerekir; testler atlanır)"
         type: boolean
         default: false
       upload:
@@ -184,12 +184,12 @@ jobs:
 
       - name: Gizli değişkenleri denetle
         env:
-          ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
-          ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
-          ASC_KEY_P8: ${{ secrets.ASC_KEY_P8 }}
+          ASC_KEY_ID: ${{ secrets.SIGN_ASC_KEY_ID }}
+          ASC_ISSUER_ID: ${{ secrets.SIGN_ASC_ISSUER_ID }}
+          ASC_KEY_P8: ${{ secrets.SIGN_ASC_KEY_P8 }}
         run: |
           for v in ASC_KEY_ID ASC_ISSUER_ID ASC_KEY_P8; do
-            if [ -z "${!v}" ]; then echo "::error::$v gizli değişkeni yok"; exit 1; fi
+            if [ -z "${!v}" ]; then echo "::error::SIGN_$v gizli değişkeni yok"; exit 1; fi
           done
           mkdir -p "$RUNNER_TEMP/asc"
           printf '%s\n' "$ASC_KEY_P8" > "$RUNNER_TEMP/asc/AuthKey.p8"

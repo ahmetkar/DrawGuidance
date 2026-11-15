@@ -558,6 +558,7 @@ final class EditorCanvasView: UIView {
         let paper = viewport.toScreen(paperCanvas)
         let paperCG = paper.cg
         let paperColor = BackgroundRenderer.parseColor(c.pagePaperHex, ArgbColor.white)
+        RasterStrokes.paperArgb = paperColor | 0xFF00_0000
 
         // Kağıt ve gölgesi
         g.saveGState()

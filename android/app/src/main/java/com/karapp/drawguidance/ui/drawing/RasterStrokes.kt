@@ -50,6 +50,16 @@ internal object RasterStrokes {
     private val plainPaint = Paint(Paint.FILTER_BITMAP_FLAG)
 
     /**
+     * v52 düzenleyicideki sayfanın kağıt rengi (ARGB; 0 = yok). Yardımcı fırçalar (klon, onarma, karıştırıcı, bulanıklaştırma…)
+     * alttaki içeriği kağıdın üstünde okur: boş kağıttan klonlanan yer kağıt rengini alır, karıştırıcı kağıtla karışır.
+     * Eskiden kağıt saydam okunuyordu; klon/karıştırıcı boş alanlarda "etkisiz" görünüyor, klon çizimi siliyordu.
+     */
+    @Volatile var paperArgb: Int = 0
+    /** Dışa aktarma/küçük resim çiziminde o çizimin kağıdı (iş parçacığına özel; düzenleyicinin değerini ezmez). */
+    val paperOverride = ThreadLocal<Int?>()
+    private fun paperNow(): Int = paperOverride.get() ?: paperArgb
+
+    /**
      * İzi çizer. [context] izden önce çizilen aynı katman içeriği (null: bağlam yok, ör. fırça önizlemesi ya da bekleyen
      * çizim): boya fırçaları boş zemine çizilir, yardımcı fırçalar hiçbir şey çizmez.
      */
@@ -89,7 +99,8 @@ internal object RasterStrokes {
     private fun entryFor(stroke: Stroke, context: List<Stroke>?): Entry? {
         val region = region(stroke) ?: return null
         val relevant = context?.filter { !it.hidden && StrokeRenderer.paintBounds(it)?.overlaps(region) == true }
-        var key = if (relevant == null) -1L else 17L
+        val paper = if (relevant == null || !stroke.brushType.isHelper) 0 else paperNow()
+        var key = if (relevant == null) -1L else 17L + paper
         relevant?.forEach { key = key * 31 + System.identityHashCode(it) }
         synchronized(cache) {
             cache.get(stroke.id)?.let { if (it.contextKey == key && sameLook(it.stroke, stroke)) return it }
@@ -100,7 +111,7 @@ internal object RasterStrokes {
         val w = max(1, ceil(rw * scale).toInt()); val h = max(1, ceil(rh * scale).toInt())
         val left = floor(region.left); val top = floor(region.top)
         val patch = RasterBrush.Patch(left, top, scale, w, h)
-        if (!relevant.isNullOrEmpty()) renderBase(relevant, patch)
+        if (relevant != null && (relevant.isNotEmpty() || (paper ushr 24) != 0)) renderBase(relevant, patch, paper)
         val n = stroke.points.size
         val xs = FloatArray(n) { stroke.points[it].x }
         val ys = FloatArray(n) { stroke.points[it].y }
@@ -130,8 +141,10 @@ internal object RasterStrokes {
     }
 
     /** Alttaki içeriği (aynı katmanın önceki çizimleri) bölgenin pikseline çizer ve ön çarpımlı RGBA'ya çevirir. */
-    private fun renderBase(strokes: List<Stroke>, patch: RasterBrush.Patch) {
+    private fun renderBase(strokes: List<Stroke>, patch: RasterBrush.Patch, paper: Int = 0) {
         val bitmap = Bitmap.createBitmap(patch.w, patch.h, Bitmap.Config.ARGB_8888)
+        // v52 kağıt rengi zemin (yardımcı fırçalar boş kağıdı da okur)
+        if ((paper ushr 24) != 0) bitmap.eraseColor(paper)
         val native = Canvas(bitmap)
         native.scale(patch.scale, patch.scale)
         native.translate(-patch.left, -patch.top)

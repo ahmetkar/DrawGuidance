@@ -292,6 +292,13 @@ final class BrushController: ObservableObject {
             cloneSourcePicking = false
             return true
         }
+        // v52 kaynak hiç seçilmediyse ilk dokunuş/boyama kaynak olur (eskiden sabit, yakın bir kayma kullanılıyordu ve
+        // fırça etkisiz görünüyordu)
+        if cloneSource == nil && settings.tuning.fx.srcDx == nil {
+            cloneSource = first
+            host.emit(.cloneSourceSet)
+            return true
+        }
         guard let src = cloneSource else { return false }
         cloneSource = nil
         updateTuning { t in var n = t; n.fx.srcDx = src.x - first.x; n.fx.srcDy = src.y - first.y; return n }

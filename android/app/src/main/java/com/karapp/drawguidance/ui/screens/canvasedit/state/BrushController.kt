@@ -85,6 +85,13 @@ class BrushController(
             _cloneSourcePicking.value = false
             return true
         }
+        // v52 kaynak hiç seçilmediyse ilk dokunuş/boyama kaynak olur (eskiden yakın, sabit bir kayma kullanılıyordu ve
+        // fırça etkisiz görünüyordu)
+        if (_cloneSource.value == null && _settings.value.tuning.fx.srcDx == null) {
+            _cloneSource.value = first
+            host.emit(com.karapp.drawguidance.ui.screens.canvasedit.EditEvent.CloneSourceSet)
+            return true
+        }
         val src = _cloneSource.value ?: return false
         _cloneSource.value = null
         updateTuning { it.copy(fx = it.fx.copy(srcDx = src.x - first.x, srcDy = src.y - first.y)) }

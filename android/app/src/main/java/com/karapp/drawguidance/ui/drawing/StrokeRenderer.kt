@@ -275,7 +275,10 @@ object StrokeRenderer {
             BackgroundRenderer.drawCanvasBackground(it.nativeCanvas, decor, 0f, 0f, canvasWidth, canvasHeight, 1f, background.toArgb(), vector = true)
         }
         underlay?.invoke(this)
-        withStrokeLayer(bounds) { drawStrokeList(strokes) }
+        // v52 piksel fırçaları bu çizimin kağıdını okur
+        val previousPaper = RasterStrokes.paperOverride.get()
+        RasterStrokes.paperOverride.set(background.toArgb())
+        try { withStrokeLayer(bounds) { drawStrokeList(strokes) } } finally { RasterStrokes.paperOverride.set(previousPaper) }
     }
 
     /** [bounds] o anki (dönüştürülmüş) koordinat sistemindeki katman sınırıdır. */

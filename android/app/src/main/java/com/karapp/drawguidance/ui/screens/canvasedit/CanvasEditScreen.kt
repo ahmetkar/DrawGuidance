@@ -543,6 +543,7 @@ fun CanvasEditScreen(
     val topMenuWindow = com.karapp.drawguidance.ui.screens.canvasedit.components.rememberTabletWindow(com.karapp.drawguidance.ui.screens.canvasedit.components.TabletWindows.TOP_MENU)
     val modeMenuWindow = com.karapp.drawguidance.ui.screens.canvasedit.components.rememberTabletWindow(com.karapp.drawguidance.ui.screens.canvasedit.components.TabletWindows.MODE_MENU)
     val sidePanelWindow = com.karapp.drawguidance.ui.screens.canvasedit.components.rememberTabletWindow(com.karapp.drawguidance.ui.screens.canvasedit.components.TabletWindows.SIDE_PANEL)
+    val cloneSourceSetText = stringResource(R.string.v51_fx_source_wait)
     LaunchedEffect(Unit) {
         viewModel.events.collect { event ->
             val message = when (event) {
@@ -552,6 +553,7 @@ fun CanvasEditScreen(
                 EditEvent.CommandNeedsSelection -> needsSelectionText
                 EditEvent.NoGapsFound -> noGapsText
                 EditEvent.LayerLocked -> layerLockedText
+                EditEvent.CloneSourceSet -> cloneSourceSetText
                 EditEvent.Saved -> savedText
                 EditEvent.RegionOpen -> regionOpenText
                 EditEvent.NoCorrection -> noCorrectionText

@@ -12,12 +12,29 @@ enum RasterStrokes {
     private final class Entry {
         let stroke: Stroke
         let context: [Stroke]?
+        var paper: UInt32 = 0
         let rect: CGRect
         let color: CGImage
         let mask: CGImage
         init(stroke: Stroke, context: [Stroke]?, rect: CGRect, color: CGImage, mask: CGImage) {
             self.stroke = stroke; self.context = context; self.rect = rect; self.color = color; self.mask = mask
         }
+    }
+
+    /// v52 düzenleyicideki sayfanın kağıt rengi (ARGB; 0 = yok). Yardımcı fırçalar alttaki içeriği kağıdın üstünde okur:
+    /// boş kağıttan klonlanan yer kağıt rengini alır, karıştırıcı kağıtla karışır (eskiden kağıt saydam okunuyordu).
+    nonisolated(unsafe) static var paperArgb: UInt32 = 0
+    private static let paperKey = "dg.raster.paper"
+    /// Dışa aktarma/küçük resim çiziminde o çizimin kağıdı (iş parçacığına özel).
+    static func withPaper<T>(_ paper: UInt32, _ body: () -> T) -> T {
+        let d = Thread.current.threadDictionary
+        let old = d[paperKey]
+        d[paperKey] = NSNumber(value: paper)
+        defer { d[paperKey] = old }
+        return body()
+    }
+    private static func paperNow() -> UInt32 {
+        (Thread.current.threadDictionary[paperKey] as? NSNumber)?.uint32Value ?? paperArgb
     }
 
     private static let cache: NSCache<NSString, Entry> = {
@@ -62,8 +79,9 @@ enum RasterStrokes {
             guard !s.hidden, let b = StrokeRenderer.paintBounds(s) else { return false }
             return b.intersects(region)
         }
+        let paper: UInt32 = (relevant == nil || !stroke.brushType.isHelper) ? 0 : paperNow()
         let key = stroke.id as NSString
-        if let e = cache.object(forKey: key), e.stroke == stroke, e.context == relevant { return e }
+        if let e = cache.object(forKey: key), e.stroke == stroke, e.context == relevant, e.paper == paper { return e }
 
         let rw = Float(region.width), rh = Float(region.height)
         if rw <= 0 || rh <= 0 { return nil }
@@ -71,7 +89,7 @@ enum RasterStrokes {
         let w = max(1, Int(ceil(rw * scale))), h = max(1, Int(ceil(rh * scale)))
         let left = Float(floor(region.minX)), top = Float(floor(region.minY))
         let patch = RasterBrush.Patch(left: left, top: top, scale: scale, w: w, h: h)
-        if let relevant, !relevant.isEmpty { renderBase(relevant, patch) }
+        if let relevant, !relevant.isEmpty || (paper >> 24) != 0 { renderBase(relevant, patch, paper: paper) }
         let xs = stroke.points.map(\.x), ys = stroke.points.map(\.y)
         let d = BrushPainter.dynamicsOf(stroke.points)
         let result = RasterBrush.render(patch, type: stroke.brushType, color: ArgbColor.hex(stroke.colorHex), sizePx: stroke.sizePx,
@@ -99,6 +117,7 @@ enum RasterStrokes {
         guard let colorImage = image(colors, w, h), let maskImage = image(masks, w, h) else { return nil }
         let rect = CGRect(x: CGFloat(left), y: CGFloat(top), width: CGFloat(Float(w) / scale), height: CGFloat(Float(h) / scale))
         let e = Entry(stroke: stroke, context: relevant, rect: rect, color: colorImage, mask: maskImage)
+        e.paper = paper
         cache.setObject(e, forKey: key, cost: n * 8)
         return e
     }
@@ -111,10 +130,15 @@ enum RasterStrokes {
     }
 
     /// Alttaki içeriği (aynı katmanın önceki çizimleri) bölgenin pikseline çizer ve ön çarpımlı RGBA'ya (0..1) çevirir.
-    private static func renderBase(_ strokes: [Stroke], _ patch: RasterBrush.Patch) {
+    private static func renderBase(_ strokes: [Stroke], _ patch: RasterBrush.Patch, paper: UInt32 = 0) {
         let w = patch.w, h = patch.h
         guard let ctx = CGContext(data: nil, width: w, height: h, bitsPerComponent: 8, bytesPerRow: w * 4, space: Bitmaps.space,
                                   bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue) else { return }
+        // v52 kağıt rengi zemin (yardımcı fırçalar boş kağıdı da okur)
+        if (paper >> 24) != 0 {
+            ctx.setFillColor(ArgbColor.cgColor(paper))
+            ctx.fill(CGRect(x: 0, y: 0, width: w, height: h))
+        }
         ctx.translateBy(x: 0, y: CGFloat(h))
         ctx.scaleBy(x: 1, y: -1)
         ctx.scaleBy(x: CGFloat(patch.scale), y: CGFloat(patch.scale))

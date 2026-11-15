@@ -269,6 +269,8 @@ sealed interface ImageImportState {
 }
 
 sealed interface EditEvent {
+    /** v52 klon/onarma: kaynak noktası seçildi (ilk dokunuş kaynak olur), şimdi kopyalanacak yer boyanır. */
+    data object CloneSourceSet : EditEvent
     data class ImageAdded(val storedBytes: Int, val originalBytes: Int) : EditEvent
     data class ErasedRemoved(val count: Int) : EditEvent
     data class GapsFilled(val count: Int) : EditEvent

@@ -406,6 +406,8 @@ fun DrawingCanvas(
         }
         // v24 açık sayfanın kağıt rengi (not tuvalinde sayfaların kendi rengi olabilir)
         val pagePaper = canvas.pagePaperHex
+        // v52 yardımcı fırçalar (klon, onarma, karıştırıcı) kağıdı da okur
+        androidx.compose.runtime.SideEffect { com.karapp.drawguidance.ui.drawing.RasterStrokes.paperArgb = hexToColor(pagePaper).toArgb() }
         val paperPaints = remember(colors, pagePaper) { PaperPaints(colors, hexToColor(pagePaper), density.density) }
 
         Canvas(

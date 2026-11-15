@@ -11,6 +11,7 @@ enum EditEventText {
         case .commandNeedsSelection: return L("command_needs_selection")
         case .noGapsFound: return L("command_no_gaps")
         case .layerLocked: return L("layer_locked_event")
+        case .cloneSourceSet: return L("v51_fx_source_wait")
         case .saved: return L("saved_event")
         case .regionOpen: return L("region_open")
         case .noCorrection: return L("no_correction")

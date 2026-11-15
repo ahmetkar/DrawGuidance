@@ -121,7 +121,8 @@ enum StrokeRenderer {
             BackgroundRenderer.drawCanvasBackground(c, decor, 0, 0, Float(width), Float(height), scale: 1, paper: paper, vector: true)
         }
         c.beginTransparencyLayer(auxiliaryInfo: nil)
-        drawStrokeList(c, strokes)
+        // v52 piksel fırçaları bu çizimin kağıdını okur
+        RasterStrokes.withPaper(paper | 0xFF00_0000) { drawStrokeList(c, strokes) }
         c.endTransparencyLayer()
     }
 

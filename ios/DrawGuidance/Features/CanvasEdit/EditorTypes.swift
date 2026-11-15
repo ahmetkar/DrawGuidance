@@ -230,4 +230,6 @@ enum EditEvent: Equatable {
     case tutorialFinished(String)
     case pageLimit(Int)
     case paintMiss
+    /// v52 klon/onarma: ilk dokunuş kaynak oldu, şimdi kopyalanacak yer boyanır.
+    case cloneSourceSet
 }

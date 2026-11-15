@@ -79,12 +79,15 @@ fun EffectsSheet(
     onDismiss: () -> Unit,
     /** v42 hazır efekt resmi seçildi (null: Efektler sekmesi yok). */
     onImageEffect: ((com.karapp.drawguidance.data.comicassets.ComicProp) -> Unit)? = null,
+    /** v53 pencere tek işe ayrıldı: yalnız [initialTab] (Efektler ya da Çizgiler) gösterilir, sekme yok. */
+    single: Boolean = true,
 ) {
     // v48 yalnız resimli efektler ("Efektler") ve odak çizgileri; çizilen efektler ve ses yazıları sekmesi kaldırıldı
     val images = onImageEffect != null && com.karapp.drawguidance.data.comicassets.ComicAssets.catalog.effects.isNotEmpty()
     var tab by rememberSaveable { mutableStateOf(EffectsSheetTabs.start(initialTab, images)) }
-    ComicSheetFrame(stringResource(R.string.effects_title), stringResource(R.string.effects_hint), "effects_sheet", onDismiss) { columns ->
-        PillTabs(
+    val title = if (single) stringResource(if (tab == EffectsTab.LINES) R.string.effects_tab_lines else R.string.effects_title) else stringResource(R.string.effects_title)
+    ComicSheetFrame(title, stringResource(R.string.effects_hint), "effects_sheet", onDismiss) { columns ->
+        if (!single) PillTabs(
             (if (images) listOf(Triple(EffectsTab.IMAGES, stringResource(R.string.effects_tab_effects), Icons.Filled.Image)) else emptyList()) +
                 listOf(Triple(EffectsTab.LINES, stringResource(R.string.effects_tab_lines), Icons.Filled.Flare)),
             tab,

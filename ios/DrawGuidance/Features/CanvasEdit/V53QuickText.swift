@@ -61,9 +61,13 @@ struct QuickTextOverlay: View {
     var body: some View {
         if qt.active, let a = qt.anchor {
             let p = viewport.toScreen(a)
-            let scale = CGFloat(viewport.scale)
-            let w = max(CGFloat(qt.width) * scale, 160)
-            let fontSize = max(CGFloat(texts.settings.sizePx) * scale, 12)
+            let scale: CGFloat = CGFloat(viewport.scale)
+            let w: CGFloat = max(CGFloat(qt.width) * scale, 160)
+            let boxW: CGFloat = w + 90
+            let fontSize: CGFloat = max(CGFloat(texts.settings.sizePx) * scale, 12)
+            let px: CGFloat = CGFloat(p.x) - 28 + boxW / 2 + drag.width
+            let py: CGFloat = CGFloat(p.y) + 18 + drag.height
+            let ink: Color = Color(hex: vm.brush.settings.colorHex == "#FFFFFF" ? "#1E1E1E" : vm.brush.settings.colorHex) ?? .primary
             HStack(alignment: .top, spacing: 4) {
                 Image(systemName: "line.3.horizontal").font(.system(size: 12, weight: .bold)).foregroundStyle(Color.accentColor)
                     .frame(width: 22, height: 30)
@@ -75,7 +79,7 @@ struct QuickTextOverlay: View {
                     .accessibilityLabel(L("v53_quick_text_move"))
                 TextField(L("v53_quick_text_hint"), text: $qt.text)
                     .font(.system(size: fontSize))
-                    .foregroundStyle(Color(hex: vm.brush.settings.colorHex == "#FFFFFF" ? "#1E1E1E" : vm.brush.settings.colorHex) ?? .primary)
+                    .foregroundStyle(ink)
                     .focused($focused)
                     .submitLabel(.next)
                     .onSubmit { vm.commitQuickText(); focused = true }
@@ -94,13 +98,13 @@ struct QuickTextOverlay: View {
                 .accessibilityIdentifier("quick_text_close")
             }
             .padding(.horizontal, 6).padding(.vertical, 4)
-            .frame(width: w + 90, alignment: .leading)
+            .frame(width: boxW, alignment: .leading)
             .background(
                 RoundedRectangle(cornerRadius: 10, style: .continuous).fill(Color.accentColor.opacity(0.07))
                     .overlay(RoundedRectangle(cornerRadius: 10, style: .continuous)
                         .strokeBorder(Color.accentColor.opacity(0.55), style: StrokeStyle(lineWidth: 1.2, dash: [6, 4])))
             )
-            .position(x: CGFloat(p.x) - 28 + (w + 90) / 2 + drag.width, y: CGFloat(p.y) + 18 + drag.height)
+            .position(x: px, y: py)
             .onAppear { focused = true }
             .accessibilityElement(children: .contain)
             .accessibilityIdentifier("quick_text_box")

@@ -189,6 +189,56 @@ for k, (name, use) in TONES.items():
     S["v53_tone_" + k] = name
     S["v53_tone_" + k + "_use"] = use
 
+# Foto düzenleme (v53)
+S.update({
+    "v53_photo_tab_mask": ["Maske", "Mask", "القناع", "マスク", "마스크", "Маска", "蒙版"],
+    "v53_photo_sub_basic": ["Temel", "Basic", "أساسي", "基本", "기본", "Основные", "基本"],
+    "v53_photo_sub_tones": ["Tonlar", "Tones", "الدرجات", "トーン", "톤", "Тона", "色调"],
+    "v53_photo_sub_detail": ["Ayrıntı", "Detail", "التفاصيل", "ディテール", "디테일", "Детали", "细节"],
+    "v53_photo_sub_hsl": ["HSL", "HSL", "HSL", "HSL", "HSL", "HSL", "HSL"],
+    "v53_photo_sub_balance": ["Renk dengesi", "Color balance", "توازن الألوان", "カラーバランス", "색상 균형", "Цветовой баланс", "色彩平衡"],
+    "v53_photo_sub_comic": ["Çizgi roman", "Comic", "قصص مصورة", "コミック", "만화", "Комикс", "漫画"],
+    "v53_photo_sub_blur": ["Bulanıklık", "Blur", "التمويه", "ぼかし", "흐림", "Размытие", "模糊"],
+    "v53_photo_sub_vignette": ["Vinyet ve gren", "Vignette & grain", "التظليل والحبيبات", "周辺減光と粒子", "비네트와 그레인", "Виньетка и зерно", "暗角与颗粒"],
+    "v53_photo_sub_bg": ["Arka plan", "Background", "الخلفية", "背景", "배경", "Фон", "背景"],
+    "v53_photo_sub_clip": ["Kırpma maskesi", "Clipping mask", "قناع القص", "クリッピングマスク", "클리핑 마스크", "Обтравочная маска", "剪贴蒙版"],
+    "v53_photo_hsl_hint": ["Bir renk aralığı seç; yalnız o renkteki pikseller değişir.", "Pick a colour range; only pixels of that colour change.", "اختر نطاق لون؛ تتغير بكسلات ذلك اللون فقط.", "色域を選ぶと、その色の画素だけが変わります。", "색 범위를 고르면 그 색의 픽셀만 바뀝니다.", "Выберите цветовой диапазон — изменятся только его пиксели.", "选择一个颜色范围，只改变该颜色的像素。"],
+    "v53_photo_hsl_hue": ["Ton", "Hue", "تدرج اللون", "色相", "색조", "Тон", "色相"],
+    "v53_photo_hsl_sat": ["Doygunluk", "Saturation", "التشبع", "彩度", "채도", "Насыщенность", "饱和度"],
+    "v53_photo_hsl_light": ["Açıklık", "Lightness", "الإضاءة", "輝度", "밝기", "Яркость", "明度"],
+    "v53_photo_hsl_reset": ["HSL'i sıfırla", "Reset HSL", "إعادة ضبط HSL", "HSLをリセット", "HSL 초기화", "Сбросить HSL", "重置 HSL"],
+    "v53_photo_range_0": ["Kırmızılar", "Reds", "الأحمر", "レッド", "빨강", "Красные", "红色"],
+    "v53_photo_range_1": ["Turuncular", "Oranges", "البرتقالي", "オレンジ", "주황", "Оранжевые", "橙色"],
+    "v53_photo_range_2": ["Sarılar", "Yellows", "الأصفر", "イエロー", "노랑", "Жёлтые", "黄色"],
+    "v53_photo_range_3": ["Yeşiller", "Greens", "الأخضر", "グリーン", "초록", "Зелёные", "绿色"],
+    "v53_photo_range_4": ["Camgöbekleri", "Aquas", "السماوي", "アクア", "청록", "Бирюзовые", "青色"],
+    "v53_photo_range_5": ["Maviler", "Blues", "الأزرق", "ブルー", "파랑", "Синие", "蓝色"],
+    "v53_photo_range_6": ["Morlar", "Purples", "البنفسجي", "パープル", "보라", "Фиолетовые", "紫色"],
+    "v53_photo_range_7": ["Macentalar", "Magentas", "الأرجواني", "マゼンタ", "자홍", "Пурпурные", "洋红"],
+    "v53_photo_bal_shadows": ["Gölgeler", "Shadows", "الظلال", "シャドウ", "그림자", "Тени", "阴影"],
+    "v53_photo_bal_midtones": ["Orta tonlar", "Midtones", "الدرجات المتوسطة", "中間調", "중간톤", "Средние тона", "中间调"],
+    "v53_photo_bal_highlights": ["Vurgular", "Highlights", "الإضاءات", "ハイライト", "하이라이트", "Светлые", "高光"],
+    "v53_photo_bal_cr": ["Camgöbeği ↔ Kırmızı", "Cyan ↔ Red", "سماوي ↔ أحمر", "シアン ↔ レッド", "청록 ↔ 빨강", "Голубой ↔ Красный", "青 ↔ 红"],
+    "v53_photo_bal_mg": ["Macenta ↔ Yeşil", "Magenta ↔ Green", "أرجواني ↔ أخضر", "マゼンタ ↔ グリーン", "자홍 ↔ 초록", "Пурпурный ↔ Зелёный", "洋红 ↔ 绿"],
+    "v53_photo_bal_yb": ["Sarı ↔ Mavi", "Yellow ↔ Blue", "أصفر ↔ أزرق", "イエロー ↔ ブルー", "노랑 ↔ 파랑", "Жёлтый ↔ Синий", "黄 ↔ 蓝"],
+    "v53_photo_bal_preserve": ["Parlaklığı koru", "Preserve luminosity", "الحفاظ على السطوع", "明るさを保持", "밝기 유지", "Сохранять яркость", "保持明度"],
+    "v53_photo_clip_on": ["Kırpma maskesi", "Clipping mask", "قناع القص", "クリッピングマスク", "클리핑 마스크", "Обтравочная маска", "剪贴蒙版"],
+    "v53_photo_clip_hint": ["Dolgu yalnız resmin görünen kısmına uygulanır; arka planı kaldırınca nesnenin şeklini doldurur.", "The fill only covers the visible part of the image; after removing the background it fills the subject's shape.", "تُطبّق التعبئة على الجزء المرئي فقط؛ بعد إزالة الخلفية تملأ شكل العنصر.", "塗りは画像の見えている部分だけにかかります。背景を消すと被写体の形を塗ります。", "채우기는 이미지의 보이는 부분에만 적용됩니다. 배경을 지우면 대상의 모양을 채웁니다.", "Заливка ложится только на видимую часть; после удаления фона она заполняет силуэт объекта.", "填充只作用于图片可见部分；移除背景后会填满主体形状。"],
+    "v53_photo_clip_color": ["Renk", "Colour", "لون", "単色", "단색", "Цвет", "纯色"],
+    "v53_photo_clip_gradient": ["Gradyan", "Gradient", "تدرج", "グラデーション", "그라데이션", "Градиент", "渐变"],
+    "v53_photo_clip_color1": ["Renk 1", "Colour 1", "اللون 1", "色 1", "색 1", "Цвет 1", "颜色 1"],
+    "v53_photo_clip_color2": ["Renk 2", "Colour 2", "اللون 2", "色 2", "색 2", "Цвет 2", "颜色 2"],
+    "v53_photo_clip_angle": ["Gradyan açısı", "Gradient angle", "زاوية التدرج", "グラデーションの角度", "그라데이션 각도", "Угол градиента", "渐变角度"],
+    "v53_photo_clip_opacity": ["Örtücülük", "Opacity", "العتامة", "不透明度", "불투명도", "Непрозрачность", "不透明度"],
+    "v53_photo_clip_blend": ["Karışım kipi", "Blend mode", "وضع المزج", "描画モード", "혼합 모드", "Режим наложения", "混合模式"],
+    "v53_photo_blend_normal": ["Normal", "Normal", "عادي", "通常", "표준", "Обычный", "正常"],
+    "v53_photo_blend_multiply": ["Çarp", "Multiply", "ضرب", "乗算", "곱하기", "Умножение", "正片叠底"],
+    "v53_photo_blend_screen": ["Ekran", "Screen", "شاشة", "スクリーン", "스크린", "Экран", "滤色"],
+    "v53_photo_blend_overlay": ["Bindirme", "Overlay", "تراكب", "オーバーレイ", "오버레이", "Перекрытие", "叠加"],
+    "v53_photo_blend_soft_light": ["Yumuşak ışık", "Soft light", "ضوء ناعم", "ソフトライト", "소프트 라이트", "Мягкий свет", "柔光"],
+    "v53_photo_blend_color": ["Renk", "Color", "لون", "カラー", "색상", "Цветность", "颜色"],
+})
+
 
 def esc(s):
     s = s.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")

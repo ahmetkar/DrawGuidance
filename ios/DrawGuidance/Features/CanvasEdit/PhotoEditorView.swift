@@ -15,7 +15,7 @@ enum PhotoTab: String, CaseIterable, Identifiable {
         case .retouch: return "paintbrush.pointed"
         }
     }
-    var labelKey: String { "v52_photo_tab_\(rawValue)" }
+    var labelKey: String { self == .background ? "v53_photo_tab_mask" : "v52_photo_tab_\(rawValue)" }
 }
 
 private let retouchColors: [UInt32] = [0xFFFFFFFF, 0xFF000000, 0xFFE53935, 0xFFFB8C00, 0xFFFDD835, 0xFF43A047, 0xFF1E88E5, 0xFF8E24AA, 0xFFF8BBD0, 0xFF8D6E63]
@@ -41,6 +41,13 @@ struct PhotoEditorView: View {
     @State private var brushStrength: Float = 0.6
     @State private var brushColor: UInt32 = 0xFFE53935
     @State private var bgRemoveTap = true
+    // v53 menülerin alt grupları
+    @State private var lightSub = 0
+    @State private var colorSub = 0
+    @State private var effectsSub = 0
+    @State private var maskSub = 0
+    @State private var hslRange = 0
+    @State private var balanceRange = 1
 
     var body: some View {
         VStack(spacing: 0) {
@@ -167,20 +174,60 @@ struct PhotoEditorView: View {
                 }
             }
         case .light:
-            slider(L("v52_photo_exposure"), e.light.exposure, -1...1, "exposure") { v, x in x.light.exposure = v }
-            slider(L("v52_photo_highlights"), e.light.highlights, -1...1, "highlights") { v, x in x.light.highlights = v }
-            slider(L("v52_photo_shadows"), e.light.shadows, -1...1, "shadows") { v, x in x.light.shadows = v }
-            slider(L("v52_photo_whites"), e.light.whites, -1...1, "whites") { v, x in x.light.whites = v }
-            slider(L("v52_photo_blacks"), e.light.blacks, -1...1, "blacks") { v, x in x.light.blacks = v }
-            slider(L("v52_photo_clarity"), e.light.clarity, -1...1, "clarity") { v, x in x.light.clarity = v }
-            slider(L("adj_brightness"), e.adjust.brightness, -1...1, "brightness") { v, x in x.adjust.brightness = v }
-            slider(L("adj_contrast"), e.adjust.contrast, -1...1, "contrast") { v, x in x.adjust.contrast = v }
+            // v53 alt gruplar: Temel, Tonlar, Ayrıntı
+            subTabs(["v53_photo_sub_basic", "v53_photo_sub_tones", "v53_photo_sub_detail"], $lightSub, "light")
+            if lightSub == 0 {
+                slider(L("v52_photo_exposure"), e.light.exposure, -1...1, "exposure") { v, x in x.light.exposure = v }
+                slider(L("adj_brightness"), e.adjust.brightness, -1...1, "brightness") { v, x in x.adjust.brightness = v }
+                slider(L("adj_contrast"), e.adjust.contrast, -1...1, "contrast") { v, x in x.adjust.contrast = v }
+            } else if lightSub == 1 {
+                slider(L("v52_photo_highlights"), e.light.highlights, -1...1, "highlights") { v, x in x.light.highlights = v }
+                slider(L("v52_photo_shadows"), e.light.shadows, -1...1, "shadows") { v, x in x.light.shadows = v }
+                slider(L("v52_photo_whites"), e.light.whites, -1...1, "whites") { v, x in x.light.whites = v }
+                slider(L("v52_photo_blacks"), e.light.blacks, -1...1, "blacks") { v, x in x.light.blacks = v }
+            } else {
+                slider(L("v52_photo_clarity"), e.light.clarity, -1...1, "clarity") { v, x in x.light.clarity = v }
+                slider(L("adj_sharpen"), e.adjust.sharpen, 0...1, "sharpen") { v, x in x.adjust.sharpen = v }
+            }
         case .color:
-            slider(L("adj_saturation"), e.adjust.saturation, -1...1, "saturation") { v, x in x.adjust.saturation = v }
-            slider(L("v52_photo_vibrance"), e.light.vibrance, -1...1, "vibrance") { v, x in x.light.vibrance = v }
-            slider(L("adj_warmth"), e.adjust.warmth, -1...1, "warmth") { v, x in x.adjust.warmth = v }
-            slider(L("adj_tint"), e.adjust.tint, -1...1, "tint") { v, x in x.adjust.tint = v }
-            slider(L("adj_fade"), e.adjust.fade, 0...1, "fade") { v, x in x.adjust.fade = v }
+            // v53 alt gruplar: Temel, HSL, Renk dengesi
+            subTabs(["v53_photo_sub_basic", "v53_photo_sub_hsl", "v53_photo_sub_balance"], $colorSub, "color")
+            if colorSub == 0 {
+                slider(L("adj_saturation"), e.adjust.saturation, -1...1, "saturation") { v, x in x.adjust.saturation = v }
+                slider(L("v52_photo_vibrance"), e.light.vibrance, -1...1, "vibrance") { v, x in x.light.vibrance = v }
+                slider(L("adj_warmth"), e.adjust.warmth, -1...1, "warmth") { v, x in x.adjust.warmth = v }
+                slider(L("adj_tint"), e.adjust.tint, -1...1, "tint") { v, x in x.adjust.tint = v }
+                slider(L("adj_fade"), e.adjust.fade, 0...1, "fade") { v, x in x.adjust.fade = v }
+            } else if colorSub == 1 {
+                Text(L("v53_photo_hsl_hint")).font(.caption).foregroundStyle(.secondary)
+                ScrollView(.horizontal, showsIndicators: false) {
+                    HStack(spacing: 8) {
+                        ForEach(0..<8, id: \.self) { i in
+                            Circle().fill(uiColor(PhotoHsl.SWATCHES[i])).frame(width: 34, height: 34)
+                                .overlay(Circle().stroke(i == hslRange ? Color.primary : Color.secondary.opacity(0.3), lineWidth: i == hslRange ? 3 : 1))
+                                .onTapGesture { hslRange = i }
+                                .accessibilityIdentifier("photo_hsl_range_\(i)")
+                        }
+                    }
+                }
+                let r = hslRange
+                Text(L("v53_photo_range_\(r)")).font(.subheadline.weight(.semibold)).foregroundStyle(Color.accentColor)
+                slider(L("v53_photo_hsl_hue"), e.hsl.hue[r], -1...1, "hsl_hue") { v, x in x.hsl.hue[r] = v }
+                slider(L("v53_photo_hsl_sat"), e.hsl.saturation[r], -1...1, "hsl_sat") { v, x in x.hsl.saturation[r] = v }
+                slider(L("v53_photo_hsl_light"), e.hsl.lightness[r], -1...1, "hsl_light") { v, x in x.hsl.lightness[r] = v }
+                if !e.hsl.isIdentity {
+                    Button(L("v53_photo_hsl_reset")) { photo.update { $0.hsl = PhotoHsl() } }.accessibilityIdentifier("photo_hsl_reset")
+                }
+            } else {
+                subTabs(["v53_photo_bal_shadows", "v53_photo_bal_midtones", "v53_photo_bal_highlights"], $balanceRange, "balance")
+                let b = balanceRange
+                let vals = e.balance.range(b)
+                slider(L("v53_photo_bal_cr"), vals[0], -1...1, "bal_cr") { v, x in x.balance.set(b, 0, v) }
+                slider(L("v53_photo_bal_mg"), vals[1], -1...1, "bal_mg") { v, x in x.balance.set(b, 1, v) }
+                slider(L("v53_photo_bal_yb"), vals[2], -1...1, "bal_yb") { v, x in x.balance.set(b, 2, v) }
+                Toggle(L("v53_photo_bal_preserve"), isOn: Binding(get: { e.balance.preserve }, set: { v in photo.update { $0.balance.preserve = v } }))
+                    .accessibilityIdentifier("photo_bal_preserve")
+            }
         case .filters:
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: 8) {
@@ -193,23 +240,30 @@ struct PhotoEditorView: View {
                 }
             }
         case .effects:
-            Text(L("v52_photo_comic")).font(.subheadline.weight(.semibold)).foregroundStyle(Color.accentColor)
-            ScrollView(.horizontal, showsIndicators: false) {
-                HStack(spacing: 8) {
-                    chip(L("v52_photo_none"), selected: e.comic == nil, id: "photo_comic_none") { photo.update { $0.comic = nil } }
-                    ForEach(ComicFilter.allCases, id: \.self) { k in
-                        let locked = PhotoPremium.advancedFilter(k) && !sub.allows(.IMAGE_EFFECTS_ADVANCED, kind)
-                        chip(L("filter_\(k.rawValue.lowercased())") + (locked ? " 👑" : ""), selected: e.comic == k, id: "photo_comic_\(k.rawValue)") {
-                            if locked { premiumOpen = true } else { photo.update { $0.comic = k } }
+            // v53 alt gruplar: Çizgi roman, Bulanıklık, Vinyet ve gren
+            subTabs(["v53_photo_sub_comic", "v53_photo_sub_blur", "v53_photo_sub_vignette"], $effectsSub, "effects")
+            if effectsSub == 0 {
+                ScrollView(.horizontal, showsIndicators: false) {
+                    HStack(spacing: 8) {
+                        chip(L("v52_photo_none"), selected: e.comic == nil, id: "photo_comic_none") { photo.update { $0.comic = nil } }
+                        ForEach(ComicFilter.allCases, id: \.self) { k in
+                            let locked = PhotoPremium.advancedFilter(k) && !sub.allows(.IMAGE_EFFECTS_ADVANCED, kind)
+                            chip(L("filter_\(k.rawValue.lowercased())") + (locked ? " 👑" : ""), selected: e.comic == k, id: "photo_comic_\(k.rawValue)") {
+                                if locked { premiumOpen = true } else { photo.update { $0.comic = k } }
+                            }
                         }
                     }
                 }
+            } else if effectsSub == 1 {
+                slider(L("adj_blur"), e.adjust.blur, 0...1, "blur") { v, x in x.adjust.blur = v }
+            } else {
+                slider(L("adj_vignette"), e.adjust.vignette, 0...1, "vignette") { v, x in x.adjust.vignette = v }
+                slider(L("adj_grain"), e.adjust.grain, 0...1, "grain") { v, x in x.adjust.grain = v }
             }
-            slider(L("adj_blur"), e.adjust.blur, 0...1, "blur") { v, x in x.adjust.blur = v }
-            slider(L("adj_sharpen"), e.adjust.sharpen, 0...1, "sharpen") { v, x in x.adjust.sharpen = v }
-            slider(L("adj_vignette"), e.adjust.vignette, 0...1, "vignette") { v, x in x.adjust.vignette = v }
-            slider(L("adj_grain"), e.adjust.grain, 0...1, "grain") { v, x in x.adjust.grain = v }
         case .background:
+            // v53 Maske: arka plan kaldırma ve kırpma maskesi
+            subTabs(["v53_photo_sub_bg", "v53_photo_sub_clip"], $maskSub, "mask")
+            if maskSub == 1 { clipPanel(e) } else {
             Toggle(L("v52_photo_bg_on"), isOn: Binding(get: { e.background != nil }, set: { on in photo.update { $0.background = on ? BackgroundOptions() : nil } }))
                 .accessibilityIdentifier("photo_bg_on")
             if let bg = e.background {
@@ -233,6 +287,7 @@ struct PhotoEditorView: View {
                 .disabled(bg.removeAt.isEmpty && bg.keepAt.isEmpty)
             } else {
                 Text(L("bg_remove_hint")).font(.caption).foregroundStyle(.secondary)
+            }
             }
         case .retouch:
             Text(L("v52_photo_brush_hint")).font(.caption).foregroundStyle(.secondary)
@@ -260,6 +315,55 @@ struct PhotoEditorView: View {
                                 .onTapGesture { brushColor = c }
                         }
                     }
+                }
+            }
+        }
+    }
+
+    private func subTabs(_ keys: [String], _ sel: Binding<Int>, _ tag: String) -> some View {
+        ScrollView(.horizontal, showsIndicators: false) {
+            HStack(spacing: 8) {
+                ForEach(keys.indices, id: \.self) { i in chip(L(keys[i]), selected: sel.wrappedValue == i, id: "photo_sub_\(tag)_\(i)") { sel.wrappedValue = i } }
+            }
+        }
+    }
+
+    /// v53 kırpma maskesi: renk ya da gradyan dolgusu yalnız resmin görünen kısmına karışır.
+    @ViewBuilder private func clipPanel(_ e: PhotoEdit) -> some View {
+        Toggle(L("v53_photo_clip_on"), isOn: Binding(get: { e.clip != nil }, set: { on in photo.update { $0.clip = on ? PhotoClip() : nil } }))
+            .accessibilityIdentifier("photo_clip_on")
+        Text(L("v53_photo_clip_hint")).font(.caption).foregroundStyle(.secondary)
+        if let c = e.clip {
+            HStack(spacing: 8) {
+                chip(L("v53_photo_clip_color"), selected: c.fill == .COLOR, id: "photo_clip_fill_color") { photo.update { $0.clip?.fill = .COLOR } }
+                chip(L("v53_photo_clip_gradient"), selected: c.fill == .GRADIENT, id: "photo_clip_fill_gradient") { photo.update { $0.clip?.fill = .GRADIENT } }
+            }
+            Text(L("v53_photo_clip_color1")).font(.subheadline.weight(.semibold)).foregroundStyle(Color.accentColor)
+            swatches(c.color1) { v in photo.update { $0.clip?.color1 = v } }
+            if c.fill == .GRADIENT {
+                Text(L("v53_photo_clip_color2")).font(.subheadline.weight(.semibold)).foregroundStyle(Color.accentColor)
+                swatches(c.color2) { v in photo.update { $0.clip?.color2 = v } }
+                slider(L("v53_photo_clip_angle"), c.angle / 360, 0...1, "clip_angle") { v, x in x.clip?.angle = v * 360 }
+            }
+            Text(L("v53_photo_clip_blend")).font(.subheadline.weight(.semibold)).foregroundStyle(Color.accentColor)
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(spacing: 8) {
+                    ForEach(ClipBlend.allCases, id: \.self) { m in
+                        chip(L("v53_photo_blend_\(m.rawValue.lowercased())"), selected: c.blend == m, id: "photo_clip_blend_\(m.rawValue)") { photo.update { $0.clip?.blend = m } }
+                    }
+                }
+            }
+            slider(L("v53_photo_clip_opacity"), c.opacity, 0...1, "clip_opacity") { v, x in x.clip?.opacity = v }
+        }
+    }
+
+    private func swatches(_ selected: UInt32, _ onPick: @escaping (UInt32) -> Void) -> some View {
+        ScrollView(.horizontal, showsIndicators: false) {
+            HStack(spacing: 8) {
+                ForEach(retouchColors, id: \.self) { c in
+                    Circle().fill(uiColor(c)).frame(width: 30, height: 30)
+                        .overlay(Circle().stroke(c == selected ? Color.accentColor : Color.secondary.opacity(0.4), lineWidth: c == selected ? 3 : 1))
+                        .onTapGesture { onPick(c) }
                 }
             }
         }

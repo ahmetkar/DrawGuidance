@@ -1820,6 +1820,65 @@ class CanvasEditViewModel(
     /** v24 hazır 3B şekli tuvale ekler. */
     fun insertCatalogModel3d(catalogId: String) = models3d.insertCatalog(catalogId, takeAddAnchor())
 
+    // --- v53 ekran tonları, desenler ve hızlı yazı kutusu ---
+
+    /** Seçimde tonlanabilir (kapalı alanlı) şekil var mı (paneller dahil). */
+    fun selectionHasClosedShape(): Boolean {
+        val sel = store.selection
+        return store.canvas.value?.strokes?.any { it.id in sel && it.shape != null } == true
+    }
+
+    fun selectionHasTone(): Boolean {
+        val sel = store.selection
+        return store.canvas.value?.strokes?.any { it.id in sel && it.shape?.style?.tone != null } == true
+    }
+
+    /** Seçili şekillerin tonunu değiştirir; null tonu kaldırır. */
+    fun applyToneToSelection(tone: com.karapp.drawguidance.data.model.ToneFill?) {
+        val current = store.canvas.value ?: return
+        val sel = store.selection
+        var changed = false
+        val updated = current.strokes.map { s ->
+            val shape = s.shape
+            if (s.id !in sel || shape == null || shape.style.tone == tone) s
+            else { changed = true; s.copy(shape = shape.copy(style = shape.style.copy(tone = tone))) }
+        }
+        if (changed) store.commit(updated)
+    }
+
+    /** Görünen alanın ortasına tonla dolu bir alan ekler (kenarsız dikdörtgen; taşınır ve boyutlanır). */
+    fun insertToneArea(tone: com.karapp.drawguidance.data.model.ToneFill, viewCenter: Offset) {
+        val current = store.canvas.value ?: return
+        val center = takeAddAnchor() ?: viewCenter
+        val side = minOf(current.width, current.height) * 0.42f
+        val id = java.util.UUID.randomUUID().toString()
+        val stroke = com.karapp.drawguidance.ui.drawing.ShapeFactory.build(
+            "RECTANGLE", Offset(center.x - side / 2, center.y - side * 0.35f), Offset(center.x + side / 2, center.y + side * 0.35f),
+            com.karapp.drawguidance.data.model.ShapeStyle(strokeColorHex = tone.colorHex, strokeWidth = 0f, tone = tone),
+            id = id, order = current.strokes.size,
+        ) ?: return
+        store.commit(current.strokes + stroke)
+        inserted(setOf(id))
+    }
+
+    /** v53 hızlı yazı kutusu: yazıyı ekler; eklenen yazının alt kenarı döner. */
+    fun insertQuickText(content: String, anchor: Offset, width: Float?): Float? = texts.insertQuick(content, anchor, width)
+
+    /** v53 hızlı yazı kutusunun ilk yeri: son yazının altı (yoksa görünen alanın üstü). */
+    fun quickTextStart(visibleTopLeft: Offset): Pair<Offset, Float>? {
+        val current = store.canvas.value ?: return null
+        if (!current.kind.isNotes) return null
+        texts.commitOpenDraft()
+        val size = texts.settings.value.sizePx
+        val x = visibleTopLeft.x.coerceIn(current.width * 0.04f, current.width * 0.5f)
+        val lastBottom = current.strokes.filter { it.brushType == com.karapp.drawguidance.data.model.BrushType.TEXT }.mapNotNull { s -> s.points.maxOfOrNull { it.y } }.maxOrNull()
+        val y = (lastBottom?.let { it + size * 0.9f } ?: visibleTopLeft.y).coerceIn(size, current.height - size * 2)
+        val width = (current.width * 0.86f - x).coerceIn(size * 4, current.width.toFloat())
+        if (mode.value != EditMode.SELECT) setMode(EditMode.SELECT)
+        store.select(emptySet())
+        return Offset(x, y) to width
+    }
+
     // --- v27 çizgi roman ---
 
     fun insertBalloon(

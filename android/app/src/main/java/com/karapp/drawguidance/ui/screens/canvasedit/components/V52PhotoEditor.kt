@@ -107,6 +107,8 @@ import com.karapp.drawguidance.ui.i18n.Text
 import com.karapp.drawguidance.ui.screens.canvasedit.ImageEditChoice
 import com.karapp.drawguidance.ui.screens.canvasedit.state.PhotoEditController
 import com.karapp.drawguidance.ui.theme.NeuTheme
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
 import kotlin.math.abs
 import kotlin.math.max
 import kotlin.math.min
@@ -118,7 +120,8 @@ enum class PhotoTab(val icon: ImageVector, val label: Int, val tag: String) {
     COLOR(Icons.Filled.Palette, R.string.v52_photo_tab_color, "color"),
     FILTERS(Icons.Filled.PhotoFilter, R.string.v52_photo_tab_filters, "filters"),
     EFFECTS(Icons.Filled.AutoAwesome, R.string.v52_photo_tab_effects, "effects"),
-    BACKGROUND(Icons.Filled.AutoFixHigh, R.string.v52_photo_tab_background, "background"),
+    // v53 arka plan kaldırma ve kırpma maskesi aynı menüde ("Maske")
+    BACKGROUND(Icons.Filled.AutoFixHigh, R.string.v53_photo_tab_mask, "background"),
     RETOUCH(Icons.Filled.Brush, R.string.v52_photo_tab_retouch, "retouch"),
 }
 
@@ -241,7 +244,7 @@ private fun PhotoEditorScreen(photo: PhotoEditController) {
                 PhotoTab.COLOR -> ColorPanel(photo, edit)
                 PhotoTab.FILTERS -> FiltersPanel(photo, edit.look)
                 PhotoTab.EFFECTS -> EffectsPanel(photo, edit)
-                PhotoTab.BACKGROUND -> BackgroundPanel(photo, edit.background, bgRemoveTap) { bgRemoveTap = it }
+                PhotoTab.BACKGROUND -> MaskPanel(photo, edit, bgRemoveTap) { bgRemoveTap = it }
                 PhotoTab.RETOUCH -> RetouchPanel(
                     brush, { brush = it }, brushSize, { brushSize = it }, brushStrength, { brushStrength = it }, brushColor, { brushColor = it },
                 )
@@ -532,27 +535,153 @@ private fun CropPanel(photo: PhotoEditController, edit: PhotoEdit, aspectKey: St
     }
 }
 
+/** v53 menülerin alt grupları (yatay çipler). */
+@Composable
+private fun SubTabs(items: List<Int>, selected: Int, tag: String, onSelect: (Int) -> Unit) {
+    Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+        items.forEachIndexed { i, label -> NeuChip(stringResource(label), i == selected, { onSelect(i) }, Modifier.testTag("photo_sub_${tag}_$i")) }
+    }
+}
+
 @Composable
 private fun LightPanel(photo: PhotoEditController, edit: PhotoEdit) {
     val l = edit.light
-    PhotoSlider(stringResource(R.string.v52_photo_exposure), l.exposure, -1f..1f, "exposure", photo) { v -> { copy(light = light.copy(exposure = v)) } }
-    PhotoSlider(stringResource(R.string.v52_photo_highlights), l.highlights, -1f..1f, "highlights", photo) { v -> { copy(light = light.copy(highlights = v)) } }
-    PhotoSlider(stringResource(R.string.v52_photo_shadows), l.shadows, -1f..1f, "shadows", photo) { v -> { copy(light = light.copy(shadows = v)) } }
-    PhotoSlider(stringResource(R.string.v52_photo_whites), l.whites, -1f..1f, "whites", photo) { v -> { copy(light = light.copy(whites = v)) } }
-    PhotoSlider(stringResource(R.string.v52_photo_blacks), l.blacks, -1f..1f, "blacks", photo) { v -> { copy(light = light.copy(blacks = v)) } }
-    PhotoSlider(stringResource(R.string.v52_photo_clarity), l.clarity, -1f..1f, "clarity", photo) { v -> { copy(light = light.copy(clarity = v)) } }
-    PhotoSlider(stringResource(R.string.adj_brightness), edit.adjust.brightness, -1f..1f, "brightness", photo) { v -> { copy(adjust = adjust.copy(brightness = v)) } }
-    PhotoSlider(stringResource(R.string.adj_contrast), edit.adjust.contrast, -1f..1f, "contrast", photo) { v -> { copy(adjust = adjust.copy(contrast = v)) } }
+    var sub by rememberSaveable { mutableIntStateOf(0) }
+    SubTabs(listOf(R.string.v53_photo_sub_basic, R.string.v53_photo_sub_tones, R.string.v53_photo_sub_detail), sub, "light") { sub = it }
+    when (sub) {
+        0 -> {
+            PhotoSlider(stringResource(R.string.v52_photo_exposure), l.exposure, -1f..1f, "exposure", photo) { v -> { copy(light = light.copy(exposure = v)) } }
+            PhotoSlider(stringResource(R.string.adj_brightness), edit.adjust.brightness, -1f..1f, "brightness", photo) { v -> { copy(adjust = adjust.copy(brightness = v)) } }
+            PhotoSlider(stringResource(R.string.adj_contrast), edit.adjust.contrast, -1f..1f, "contrast", photo) { v -> { copy(adjust = adjust.copy(contrast = v)) } }
+        }
+        1 -> {
+            PhotoSlider(stringResource(R.string.v52_photo_highlights), l.highlights, -1f..1f, "highlights", photo) { v -> { copy(light = light.copy(highlights = v)) } }
+            PhotoSlider(stringResource(R.string.v52_photo_shadows), l.shadows, -1f..1f, "shadows", photo) { v -> { copy(light = light.copy(shadows = v)) } }
+            PhotoSlider(stringResource(R.string.v52_photo_whites), l.whites, -1f..1f, "whites", photo) { v -> { copy(light = light.copy(whites = v)) } }
+            PhotoSlider(stringResource(R.string.v52_photo_blacks), l.blacks, -1f..1f, "blacks", photo) { v -> { copy(light = light.copy(blacks = v)) } }
+        }
+        else -> {
+            PhotoSlider(stringResource(R.string.v52_photo_clarity), l.clarity, -1f..1f, "clarity", photo) { v -> { copy(light = light.copy(clarity = v)) } }
+            PhotoSlider(stringResource(R.string.adj_sharpen), edit.adjust.sharpen, 0f..1f, "sharpen", photo) { v -> { copy(adjust = adjust.copy(sharpen = v)) } }
+        }
+    }
 }
 
 @Composable
 private fun ColorPanel(photo: PhotoEditController, edit: PhotoEdit) {
     val a = edit.adjust
-    PhotoSlider(stringResource(R.string.adj_saturation), a.saturation, -1f..1f, "saturation", photo) { v -> { copy(adjust = adjust.copy(saturation = v)) } }
-    PhotoSlider(stringResource(R.string.v52_photo_vibrance), edit.light.vibrance, -1f..1f, "vibrance", photo) { v -> { copy(light = light.copy(vibrance = v)) } }
-    PhotoSlider(stringResource(R.string.adj_warmth), a.warmth, -1f..1f, "warmth", photo) { v -> { copy(adjust = adjust.copy(warmth = v)) } }
-    PhotoSlider(stringResource(R.string.adj_tint), a.tint, -1f..1f, "tint", photo) { v -> { copy(adjust = adjust.copy(tint = v)) } }
-    PhotoSlider(stringResource(R.string.adj_fade), a.fade, 0f..1f, "fade", photo) { v -> { copy(adjust = adjust.copy(fade = v)) } }
+    var sub by rememberSaveable { mutableIntStateOf(0) }
+    SubTabs(listOf(R.string.v53_photo_sub_basic, R.string.v53_photo_sub_hsl, R.string.v53_photo_sub_balance), sub, "color") { sub = it }
+    when (sub) {
+        0 -> {
+            PhotoSlider(stringResource(R.string.adj_saturation), a.saturation, -1f..1f, "saturation", photo) { v -> { copy(adjust = adjust.copy(saturation = v)) } }
+            PhotoSlider(stringResource(R.string.v52_photo_vibrance), edit.light.vibrance, -1f..1f, "vibrance", photo) { v -> { copy(light = light.copy(vibrance = v)) } }
+            PhotoSlider(stringResource(R.string.adj_warmth), a.warmth, -1f..1f, "warmth", photo) { v -> { copy(adjust = adjust.copy(warmth = v)) } }
+            PhotoSlider(stringResource(R.string.adj_tint), a.tint, -1f..1f, "tint", photo) { v -> { copy(adjust = adjust.copy(tint = v)) } }
+            PhotoSlider(stringResource(R.string.adj_fade), a.fade, 0f..1f, "fade", photo) { v -> { copy(adjust = adjust.copy(fade = v)) } }
+        }
+        1 -> HslPanel(photo, edit.hsl)
+        else -> BalancePanel(photo, edit.balance)
+    }
+}
+
+private val RANGE_NAMES = listOf(
+    R.string.v53_photo_range_0, R.string.v53_photo_range_1, R.string.v53_photo_range_2, R.string.v53_photo_range_3,
+    R.string.v53_photo_range_4, R.string.v53_photo_range_5, R.string.v53_photo_range_6, R.string.v53_photo_range_7,
+)
+
+/** v53 HSL: renk aralığını seç, o aralığın tonunu, doygunluğunu ve açıklığını ayarla. */
+@Composable
+private fun HslPanel(photo: PhotoEditController, hsl: com.karapp.drawguidance.content.image.PhotoHsl) {
+    val colors = NeuTheme.colors
+    var range by rememberSaveable { mutableIntStateOf(0) }
+    Text(stringResource(R.string.v53_photo_hsl_hint), style = MaterialTheme.typography.labelSmall, color = colors.contentMuted)
+    Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.horizontalScroll(rememberScrollState())) {
+        com.karapp.drawguidance.content.image.PhotoHsl.SWATCHES.forEachIndexed { i, c ->
+            val sel = i == range
+            Box(
+                Modifier.size(34.dp).clip(CircleShape).background(Color(c.toInt()))
+                    .border(if (sel) 3.dp else 1.dp, if (sel) colors.content else Color.Black.copy(alpha = 0.15f), CircleShape)
+                    .clickable(role = Role.Tab) { range = i }.testTag("photo_hsl_range_$i"),
+            )
+        }
+    }
+    Text(stringResource(RANGE_NAMES[range]), style = MaterialTheme.typography.titleSmall, color = colors.accent)
+    PhotoSlider(stringResource(R.string.v53_photo_hsl_hue), hsl.hue[range], -1f..1f, "hsl_hue", photo) { v -> { copy(hsl = hsl.with(range, h = v)) } }
+    PhotoSlider(stringResource(R.string.v53_photo_hsl_sat), hsl.saturation[range], -1f..1f, "hsl_sat", photo) { v -> { copy(hsl = hsl.with(range, s = v)) } }
+    PhotoSlider(stringResource(R.string.v53_photo_hsl_light), hsl.lightness[range], -1f..1f, "hsl_light", photo) { v -> { copy(hsl = hsl.with(range, l = v)) } }
+    if (!hsl.isIdentity) TextButton({ photo.update { it.copy(hsl = com.karapp.drawguidance.content.image.PhotoHsl()) } }, Modifier.testTag("photo_hsl_reset")) {
+        Text(stringResource(R.string.v53_photo_hsl_reset))
+    }
+}
+
+/** v53 renk dengesi: gölgeler / orta tonlar / vurgular; üç renk ekseni ve parlaklığı koru. */
+@Composable
+private fun BalancePanel(photo: PhotoEditController, b: com.karapp.drawguidance.content.image.PhotoBalance) {
+    var range by rememberSaveable { mutableIntStateOf(1) }
+    SubTabs(listOf(R.string.v53_photo_bal_shadows, R.string.v53_photo_bal_midtones, R.string.v53_photo_bal_highlights), range, "balance") { range = it }
+    val r = b.range(range)
+    PhotoSlider(stringResource(R.string.v53_photo_bal_cr), r[0], -1f..1f, "bal_cr", photo) { v -> { copy(balance = balance.with(range, 0, v)) } }
+    PhotoSlider(stringResource(R.string.v53_photo_bal_mg), r[1], -1f..1f, "bal_mg", photo) { v -> { copy(balance = balance.with(range, 1, v)) } }
+    PhotoSlider(stringResource(R.string.v53_photo_bal_yb), r[2], -1f..1f, "bal_yb", photo) { v -> { copy(balance = balance.with(range, 2, v)) } }
+    Row(verticalAlignment = Alignment.CenterVertically) {
+        Text(stringResource(R.string.v53_photo_bal_preserve), style = MaterialTheme.typography.bodyMedium, modifier = Modifier.weight(1f))
+        NeuSwitch(b.preserve, { v -> photo.update { it.copy(balance = it.balance.copy(preserve = v)) } }, Modifier.testTag("photo_bal_preserve"))
+    }
+}
+
+/** v53 kırpma maskesi: renk/gradyan dolgusu yalnız resmin görünen kısmına kırpılarak karışır. */
+@Composable
+private fun ClipPanel(photo: PhotoEditController, clip: com.karapp.drawguidance.content.image.PhotoClip?) {
+    val colors = NeuTheme.colors
+    Row(verticalAlignment = Alignment.CenterVertically) {
+        Text(stringResource(R.string.v53_photo_clip_on), style = MaterialTheme.typography.bodyMedium, modifier = Modifier.weight(1f))
+        NeuSwitch(clip != null, { on -> photo.update { it.copy(clip = if (on) com.karapp.drawguidance.content.image.PhotoClip() else null) } }, Modifier.testTag("photo_clip_on"))
+    }
+    Text(stringResource(R.string.v53_photo_clip_hint), style = MaterialTheme.typography.labelSmall, color = colors.contentMuted)
+    if (clip == null) return
+    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+        NeuChip(stringResource(R.string.v53_photo_clip_color), clip.fill == com.karapp.drawguidance.content.image.ClipFill.COLOR,
+            { photo.update { it.copy(clip = it.clip?.copy(fill = com.karapp.drawguidance.content.image.ClipFill.COLOR)) } }, Modifier.testTag("photo_clip_fill_color"))
+        NeuChip(stringResource(R.string.v53_photo_clip_gradient), clip.fill == com.karapp.drawguidance.content.image.ClipFill.GRADIENT,
+            { photo.update { it.copy(clip = it.clip?.copy(fill = com.karapp.drawguidance.content.image.ClipFill.GRADIENT)) } }, Modifier.testTag("photo_clip_fill_gradient"))
+    }
+    SectionTitle(stringResource(R.string.v53_photo_clip_color1))
+    ClipSwatches(clip.color1, "c1") { c -> photo.update { it.copy(clip = it.clip?.copy(color1 = c)) } }
+    if (clip.fill == com.karapp.drawguidance.content.image.ClipFill.GRADIENT) {
+        SectionTitle(stringResource(R.string.v53_photo_clip_color2))
+        ClipSwatches(clip.color2, "c2") { c -> photo.update { it.copy(clip = it.clip?.copy(color2 = c)) } }
+        PhotoSlider(stringResource(R.string.v53_photo_clip_angle), clip.angle / 360f, 0f..1f, "clip_angle", photo) { v -> { copy(clip = this.clip?.copy(angle = v * 360f)) } }
+    }
+    SectionTitle(stringResource(R.string.v53_photo_clip_blend))
+    Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.horizontalScroll(rememberScrollState())) {
+        com.karapp.drawguidance.content.image.ClipBlend.entries.forEach { m ->
+            NeuChip(stringResource(BLEND_NAMES.getValue(m)), clip.blend == m, { photo.update { it.copy(clip = it.clip?.copy(blend = m)) } }, Modifier.testTag("photo_clip_blend_${m.name}"))
+        }
+    }
+    PhotoSlider(stringResource(R.string.v53_photo_clip_opacity), clip.opacity, 0f..1f, "clip_opacity", photo) { v -> { copy(clip = this.clip?.copy(opacity = v)) } }
+}
+
+private val BLEND_NAMES = mapOf(
+    com.karapp.drawguidance.content.image.ClipBlend.NORMAL to R.string.v53_photo_blend_normal,
+    com.karapp.drawguidance.content.image.ClipBlend.MULTIPLY to R.string.v53_photo_blend_multiply,
+    com.karapp.drawguidance.content.image.ClipBlend.SCREEN to R.string.v53_photo_blend_screen,
+    com.karapp.drawguidance.content.image.ClipBlend.OVERLAY to R.string.v53_photo_blend_overlay,
+    com.karapp.drawguidance.content.image.ClipBlend.SOFT_LIGHT to R.string.v53_photo_blend_soft_light,
+    com.karapp.drawguidance.content.image.ClipBlend.COLOR to R.string.v53_photo_blend_color,
+)
+
+@Composable
+private fun ClipSwatches(selected: Int, tag: String, onPick: (Int) -> Unit) {
+    Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.horizontalScroll(rememberScrollState())) {
+        RETOUCH_COLORS.forEach { c ->
+            Box(
+                Modifier.size(30.dp).clip(CircleShape).background(Color(c))
+                    .border(if (c == selected) 3.dp else 1.dp, if (c == selected) NeuTheme.colors.accent else Color.Black.copy(alpha = 0.2f), CircleShape)
+                    .clickable { onPick(c) }.testTag("photo_clip_${tag}_${Integer.toHexString(c)}"),
+            )
+        }
+    }
 }
 
 @Composable
@@ -582,19 +711,33 @@ private fun FiltersPanel(photo: PhotoEditController, look: ImageLook) {
 private fun EffectsPanel(photo: PhotoEditController, edit: PhotoEdit) {
     val premium = com.karapp.drawguidance.ui.premium.LocalPremium.current
     val advLocked = premium.locked(PremiumFeature.IMAGE_EFFECTS_ADVANCED)
-    SectionTitle(stringResource(R.string.v52_photo_comic))
-    val kinds = listOf(null to R.string.v52_photo_none, ComicFilter.COMIC to R.string.filter_comic, ComicFilter.HALFTONE to R.string.filter_halftone, ComicFilter.MANGA to R.string.filter_manga, ComicFilter.POP to R.string.filter_pop)
-    Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-        kinds.forEach { (k, label) ->
-            val locked = k != null && advLocked && PremiumRules.isAdvancedFilter(k)
-            NeuChip(stringResource(label), edit.comic == k, { if (!locked || premium.request(PremiumFeature.IMAGE_EFFECTS_ADVANCED)) photo.update { it.copy(comic = k) } }, Modifier.testTag("photo_comic_${k?.name ?: "none"}"))
+    var sub by rememberSaveable { mutableIntStateOf(0) }
+    SubTabs(listOf(R.string.v53_photo_sub_comic, R.string.v53_photo_sub_blur, R.string.v53_photo_sub_vignette), sub, "effects") { sub = it }
+    val a = edit.adjust
+    when (sub) {
+        0 -> {
+            val kinds = listOf(null to R.string.v52_photo_none, ComicFilter.COMIC to R.string.filter_comic, ComicFilter.HALFTONE to R.string.filter_halftone, ComicFilter.MANGA to R.string.filter_manga, ComicFilter.POP to R.string.filter_pop)
+            Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                kinds.forEach { (k, label) ->
+                    val locked = k != null && advLocked && PremiumRules.isAdvancedFilter(k)
+                    NeuChip(stringResource(label), edit.comic == k, { if (!locked || premium.request(PremiumFeature.IMAGE_EFFECTS_ADVANCED)) photo.update { it.copy(comic = k) } }, Modifier.testTag("photo_comic_${k?.name ?: "none"}"))
+                }
+            }
+        }
+        1 -> PhotoSlider(stringResource(R.string.adj_blur), a.blur, 0f..1f, "blur", photo) { v -> { copy(adjust = adjust.copy(blur = v)) } }
+        else -> {
+            PhotoSlider(stringResource(R.string.adj_vignette), a.vignette, 0f..1f, "vignette", photo) { v -> { copy(adjust = adjust.copy(vignette = v)) } }
+            PhotoSlider(stringResource(R.string.adj_grain), a.grain, 0f..1f, "grain", photo) { v -> { copy(adjust = adjust.copy(grain = v)) } }
         }
     }
-    val a = edit.adjust
-    PhotoSlider(stringResource(R.string.adj_blur), a.blur, 0f..1f, "blur", photo) { v -> { copy(adjust = adjust.copy(blur = v)) } }
-    PhotoSlider(stringResource(R.string.adj_sharpen), a.sharpen, 0f..1f, "sharpen", photo) { v -> { copy(adjust = adjust.copy(sharpen = v)) } }
-    PhotoSlider(stringResource(R.string.adj_vignette), a.vignette, 0f..1f, "vignette", photo) { v -> { copy(adjust = adjust.copy(vignette = v)) } }
-    PhotoSlider(stringResource(R.string.adj_grain), a.grain, 0f..1f, "grain", photo) { v -> { copy(adjust = adjust.copy(grain = v)) } }
+}
+
+/** v53 Maske menüsü: arka plan kaldırma ve kırpma maskesi. */
+@Composable
+private fun MaskPanel(photo: PhotoEditController, edit: PhotoEdit, removeTap: Boolean, onRemoveTap: (Boolean) -> Unit) {
+    var sub by rememberSaveable { mutableIntStateOf(0) }
+    SubTabs(listOf(R.string.v53_photo_sub_bg, R.string.v53_photo_sub_clip), sub, "mask") { sub = it }
+    if (sub == 0) BackgroundPanel(photo, edit.background, removeTap, onRemoveTap) else ClipPanel(photo, edit.clip)
 }
 
 @Composable

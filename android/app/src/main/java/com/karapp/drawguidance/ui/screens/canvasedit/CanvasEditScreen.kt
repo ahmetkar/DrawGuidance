@@ -62,6 +62,10 @@ import androidx.compose.material.icons.filled.ContentCut
 import androidx.compose.material.icons.filled.Category
 import androidx.compose.material.icons.filled.FilterVintage
 import androidx.compose.material.icons.filled.Flare
+import androidx.compose.material.icons.filled.Texture
+import androidx.compose.material.icons.filled.Grain
+import androidx.compose.material.icons.filled.ShortText
+import androidx.compose.material.icons.filled.Accessibility
 import androidx.compose.material.icons.filled.FlashOn
 import androidx.compose.material.icons.filled.EmojiPeople
 import androidx.compose.material.icons.filled.Landscape
@@ -427,6 +431,10 @@ fun CanvasEditScreen(
     // Başlıktaki ek düğmeler: Kaydet (otomatik kayıt kapalıyken), ⋮ (PDF, ayarlar); v19: Katmanlar üst menüde
     // v52 çizim yardımcıları (resim tuvallerinde)
     val drawHelpers = com.karapp.drawguidance.ui.screens.canvasedit.components.rememberDrawHelpers()
+    // v53 yapı kılavuzu, hızlı yazı kutusu ve ton/desen pencereleri
+    val structureGuide = com.karapp.drawguidance.ui.screens.canvasedit.components.rememberStructureGuide()
+    val quickText = com.karapp.drawguidance.ui.screens.canvasedit.components.rememberQuickText()
+    var toneSheet by rememberSaveable { mutableStateOf<String?>(null) }
     val helpersShown = kind == com.karapp.drawguidance.data.model.CanvasKind.ART || kind == com.karapp.drawguidance.data.model.CanvasKind.SIMPLE_ART
     val headerActions: @Composable () -> Unit = { com.karapp.drawguidance.ui.screens.canvasedit.components.ToolHelpScope(toolHelp) {
         if (viewModel.isTempImageEdit) {
@@ -692,6 +700,26 @@ fun CanvasEditScreen(
         )
     }
 
+    // v53 hızlı yazı kutusu: açılınca son yazının altında; kapanınca kutudaki yazı eklenir
+    val commitQuickText: (Boolean) -> Unit = { advance ->
+        quickText.anchor?.let { a ->
+            val t = quickText.text
+            quickText.text = ""
+            val bottom = viewModel.insertQuickText(t, Offset(a.x, a.y + textSettings.sizePx * 0.7f), quickText.width)
+            if (advance && bottom != null) {
+                val next = bottom + textSettings.sizePx * 0.45f
+                if (next < (canvas?.height ?: 0) - textSettings.sizePx) quickText.anchor = Offset(a.x, next)
+            }
+        }
+    }
+    val toggleQuickText: () -> Unit = {
+        if (quickText.active) { commitQuickText(false); quickText.close() } else {
+            val vs = viewport.viewSize
+            viewModel.quickTextStart(viewport.toCanvas(Offset(vs.width * 0.06f, vs.height * 0.08f)))?.let { (p, w) ->
+                quickText.anchor = p; quickText.width = w; quickText.text = ""; quickText.active = true
+            }
+        }
+    }
     val notes = kind.isNotes
     val comic = kind == com.karapp.drawguidance.data.model.CanvasKind.COMIC
     // Ekle (+) menüsü: öğeler tek listede; seçilen öğe hatırlanır ve menüde etkin görünür
@@ -702,6 +730,8 @@ fun CanvasEditScreen(
         if (notes) com.karapp.drawguidance.ui.screens.canvasedit.components.AddMenuItem("graph", stringResource(R.string.v52_add_graph), Icons.Filled.ShowChart) { viewModel.openGraphPicker() } else null,
         if (notes) com.karapp.drawguidance.ui.screens.canvasedit.components.AddMenuItem("table", stringResource(R.string.v52_add_table), Icons.Filled.TableChart) { viewModel.tables.openCreate() } else null,
         com.karapp.drawguidance.ui.screens.canvasedit.components.AddMenuItem("text", stringResource(R.string.add_text), Icons.Filled.TextFields) { viewModel.startAction(EditMode.TEXT) },
+        // v53 not almada hızlı yazı kutusu
+        if (notes) com.karapp.drawguidance.ui.screens.canvasedit.components.AddMenuItem("textbox", stringResource(R.string.v53_quick_text), Icons.Filled.ShortText) { toggleQuickText() } else null,
         if (notes) com.karapp.drawguidance.ui.screens.canvasedit.components.AddMenuItem("diagram", stringResource(R.string.add_diagram), Icons.Filled.AccountTree) { viewModel.openDiagramPicker() } else null,
         // v45 not alma panelleri: çizim alanını çerçeveli bölümlere ayıran yerleşimler
         if (notes) com.karapp.drawguidance.ui.screens.canvasedit.components.AddMenuItem("panels", stringResource(R.string.v45_panels_add), com.karapp.drawguidance.ui.screens.canvasedit.components.V45Icons.NotesPanels) { viewModel.v45.openPanels() } else null,
@@ -722,6 +752,12 @@ fun CanvasEditScreen(
         if (comic) com.karapp.drawguidance.ui.screens.canvasedit.components.AddMenuItem("effects", stringResource(R.string.add_effects), Icons.Filled.FlashOn) {
             comicFxOpen = com.karapp.drawguidance.ui.screens.canvasedit.components.EffectsTab.EFFECTS
         } else null,
+        // v53 odak/hız çizgileri, desenler ve ekran tonları ayrı düğme ve pencerelerde (yalnız çizgi roman)
+        if (comic) com.karapp.drawguidance.ui.screens.canvasedit.components.AddMenuItem("lines", stringResource(R.string.effects_tab_lines), Icons.Filled.Flare) {
+            comicFxOpen = com.karapp.drawguidance.ui.screens.canvasedit.components.EffectsTab.LINES
+        } else null,
+        if (comic) com.karapp.drawguidance.ui.screens.canvasedit.components.AddMenuItem("patterns", stringResource(R.string.v53_patterns), Icons.Filled.Texture) { toneSheet = "PATTERN" } else null,
+        if (comic) com.karapp.drawguidance.ui.screens.canvasedit.components.AddMenuItem("tones", stringResource(R.string.v53_tones), Icons.Filled.Grain) { toneSheet = "TONE" } else null,
         // v43 inmiş paketlerin şekil, diyalog kutusu ve diyagram resimleri (paket varsa)
         if (com.karapp.drawguidance.ui.screens.canvasedit.components.PackWindows.hasAny(installedPacks, kind.packMode())) {
             com.karapp.drawguidance.ui.screens.canvasedit.components.AddMenuItem("packs", stringResource(R.string.v43_add_packs), Icons.Filled.Inventory2) { packsOpen = true }
@@ -952,6 +988,8 @@ fun CanvasEditScreen(
             eyedropperActive = canvasPick == com.karapp.drawguidance.ui.screens.canvasedit.components.CanvasPick.EYEDROPPER,
             onPractice = if (kind == com.karapp.drawguidance.data.model.CanvasKind.ART) ({ practiceUi.sheet = !practiceUi.sheet }) else null,
             practiceActive = practiceUi.sheet || practiceRun != null,
+            onStructure = if (kind == com.karapp.drawguidance.data.model.CanvasKind.ART || kind == com.karapp.drawguidance.data.model.CanvasKind.COMIC) ({ structureGuide.sheet = true }) else null,
+            structureActive = structureGuide.active || structureGuide.sheet,
         )
         }
     }
@@ -999,6 +1037,8 @@ fun CanvasEditScreen(
         if (kids) add(challengeUi.tool())
         if (kind == com.karapp.drawguidance.data.model.CanvasKind.SIMPLE_ART) add(practiceUi.tool(practiceRun != null))
         if (kind == com.karapp.drawguidance.data.model.CanvasKind.SIMPLE_ART) add(com.karapp.drawguidance.ui.screens.canvasedit.components.SimpleTool("helpers", Icons.Filled.GridOn, stringResource(R.string.v52_helpers_short), drawHelpers.active || drawHelpers.sheet, { drawHelpers.sheet = true }))
+        // v53 canlı, nesne ve eşya yapı kılavuzları
+        if (kind == com.karapp.drawguidance.data.model.CanvasKind.SIMPLE_ART) add(com.karapp.drawguidance.ui.screens.canvasedit.components.SimpleTool("structure", Icons.Filled.Accessibility, stringResource(R.string.v53_struct_short), structureGuide.active || structureGuide.sheet, { structureGuide.sheet = true }))
         // v36 basit resimde şekil düzenleme (az noktalı vektör düzenleme): seçili ya da dokunulan şekil açılır
         if (kind == com.karapp.drawguidance.data.model.CanvasKind.SIMPLE_ART) {
             add(com.karapp.drawguidance.ui.screens.canvasedit.components.SimpleTool(
@@ -1017,6 +1057,8 @@ fun CanvasEditScreen(
             if (com.karapp.drawguidance.ui.screens.canvasedit.components.PackWindows.hasAny(installedPacks, kind.packMode())) add(com.karapp.drawguidance.ui.screens.canvasedit.components.SimpleTool("packs", Icons.Filled.Inventory2, stringResource(R.string.v43_add_packs), packsOpen, { packsOpen = true }))
             // v45 Panel ekle (not alma panelleri) diyagramın hemen ardında
             add(com.karapp.drawguidance.ui.screens.canvasedit.components.SimpleTool("panels", com.karapp.drawguidance.ui.screens.canvasedit.components.V45Icons.NotesPanels, stringResource(R.string.v45_panels_add), viewModel.v45.panelsOpen.collectAsState().value, viewModel.v45::openPanels))
+            // v53 hızlı yazı kutusu
+            add(com.karapp.drawguidance.ui.screens.canvasedit.components.SimpleTool("textbox", Icons.Filled.ShortText, stringResource(R.string.v53_quick_text), quickText.active, toggleQuickText))
         }
         add(com.karapp.drawguidance.ui.screens.canvasedit.components.SimpleTool("background", Icons.Filled.Wallpaper, if (kids) simpleTexts.background else simpleTexts.backgroundFull, backgroundOpen || simpleBackgroundOpen || backgroundEdit, {
             // Çocuklarda yalnız renk (büyük palet), öteki basit türlerde arka plan penceresi (renk, kağıt desenleri, resim)
@@ -1439,6 +1481,11 @@ fun CanvasEditScreen(
                     com.karapp.drawguidance.ui.screens.canvasedit.components.CheckPreview(drawHelpers, shown)
                 }
             }
+            // v53 yapı kılavuzu (yalnız görünüm) ve not almada hızlı yazı kutusu
+            if (kind == com.karapp.drawguidance.data.model.CanvasKind.ART || kind == com.karapp.drawguidance.data.model.CanvasKind.SIMPLE_ART || kind == com.karapp.drawguidance.data.model.CanvasKind.COMIC) {
+                com.karapp.drawguidance.ui.screens.canvasedit.components.StructureOverlay(structureGuide, viewport)
+            }
+            if (kind.isNotes) com.karapp.drawguidance.ui.screens.canvasedit.components.QuickTextOverlay(quickText, viewport, textSettings.sizePx, brush.colorHex, onCommit = { commitQuickText(true) }, onClose = toggleQuickText)
             // v32 eğitimde çizilmekte olan çizgiler
             if (tutorialUi != null) com.karapp.drawguidance.ui.screens.canvasedit.tutorial.TutorialLiveLayer(tutorialLive, viewport)
             // v37 çocuk boyamasında kova imleci ve boyanmaya hazır alan
@@ -2453,6 +2500,17 @@ fun CanvasEditScreen(
                 onImageEffect = { p -> close(); viewModel.insertComicProp(com.karapp.drawguidance.data.comicassets.ComicAssetKind.EFFECT, p) },
             )
         }
+        // v53 desenler ve ekran tonları (ayrı pencereler)
+        toneSheet?.let { g ->
+            val group = if (g == "TONE") com.karapp.drawguidance.content.comic.ComicTones.Group.TONE else com.karapp.drawguidance.content.comic.ComicTones.Group.PATTERN
+            com.karapp.drawguidance.ui.screens.canvasedit.components.V53ToneSheet(
+                group = group, canApply = viewModel.selectionHasClosedShape(), hasTone = viewModel.selectionHasTone(),
+                onInsert = { t -> toneSheet = null; val vs = viewport.viewSize; viewModel.insertToneArea(t, viewport.toCanvas(Offset(vs.width / 2f, vs.height / 2f))) },
+                onApply = { t -> toneSheet = null; viewModel.applyToneToSelection(t) },
+                onDismiss = { toneSheet = null },
+            )
+        }
+        if (structureGuide.sheet) com.karapp.drawguidance.ui.screens.canvasedit.components.StructureGuideSheet(structureGuide, canvas?.width ?: 1000, canvas?.height ?: 1000)
         // v27 GLB içe aktarma: ayrıntı ve "3B Şekillerim'e ayrı şekil olarak kaydedilsin mi?" sorusu
         glbPending?.let { p ->
             com.karapp.drawguidance.ui.screens.model3d.GlbImportAskDialog(

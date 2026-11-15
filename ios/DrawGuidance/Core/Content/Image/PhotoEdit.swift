@@ -29,6 +29,48 @@ struct PhotoLight: Equatable {
     var isIdentity: Bool { self == PhotoLight() }
 }
 
+/// v53 HSL: 8 renk aralığı için ton (±30°), doygunluk ve açıklık (−1..1) (Android `PhotoHsl`).
+struct PhotoHsl: Equatable {
+    var hue = [Float](repeating: 0, count: 8)
+    var saturation = [Float](repeating: 0, count: 8)
+    var lightness = [Float](repeating: 0, count: 8)
+    var isIdentity: Bool { hue.allSatisfy { $0 == 0 } && saturation.allSatisfy { $0 == 0 } && lightness.allSatisfy { $0 == 0 } }
+
+    static let CENTERS: [Float] = [0, 30, 60, 120, 180, 240, 275, 315]
+    static let SWATCHES: [UInt32] = [0xFFE53935, 0xFFFB8C00, 0xFFFDD835, 0xFF43A047, 0xFF00ACC1, 0xFF1E88E5, 0xFF8E24AA, 0xFFD81B60]
+}
+
+/// v53 renk dengesi: gölgeler/orta tonlar/vurgular × (camgöbeği–kırmızı, macenta–yeşil, sarı–mavi).
+struct PhotoBalance: Equatable {
+    var shadows: [Float] = [0, 0, 0]
+    var midtones: [Float] = [0, 0, 0]
+    var highlights: [Float] = [0, 0, 0]
+    var preserve = true
+    var isIdentity: Bool { (shadows + midtones + highlights).allSatisfy { $0 == 0 } }
+
+    func range(_ i: Int) -> [Float] { i == 0 ? shadows : i == 1 ? midtones : highlights }
+    mutating func set(_ i: Int, _ channel: Int, _ v: Float) {
+        switch i {
+        case 0: shadows[channel] = v
+        case 1: midtones[channel] = v
+        default: highlights[channel] = v
+        }
+    }
+}
+
+enum ClipFill: String, CaseIterable { case COLOR, GRADIENT }
+enum ClipBlend: String, CaseIterable { case NORMAL, MULTIPLY, SCREEN, OVERLAY, SOFT_LIGHT, COLOR }
+
+/// v53 kırpma maskesi: dolgu yalnız resmin görünen piksellerine karışır.
+struct PhotoClip: Equatable {
+    var fill: ClipFill = .COLOR
+    var color1: UInt32 = 0xFFE53935
+    var color2: UInt32 = 0xFF1E88E5
+    var angle: Float = 90
+    var blend: ClipBlend = .OVERLAY
+    var opacity: Float = 0.7
+}
+
 struct PhotoEdit: Equatable {
     var rotation: Int = 0
     var flipH = false
@@ -42,6 +84,12 @@ struct PhotoEdit: Equatable {
     var comic: ComicFilter? = nil
     var background: BackgroundOptions? = nil
     var strokes: [PhotoStroke] = []
+    /// v53 renk aralıklarına göre ton, doygunluk, açıklık.
+    var hsl = PhotoHsl()
+    /// v53 renk dengesi.
+    var balance = PhotoBalance()
+    /// v53 kırpma maskesi.
+    var clip: PhotoClip? = nil
 
     var isIdentity: Bool { self == PhotoEdit() }
     var quarter: Int { ((rotation % 4) + 4) % 4 }
@@ -70,9 +118,149 @@ enum PhotoOps {
         }
         if cancelled() { return (px, cw, ch) }
         if !edit.light.isIdentity { px = light(px, cw, ch, edit.light) }
+        if !edit.hsl.isIdentity { px = hsl(px, edit.hsl) }
+        if !edit.balance.isIdentity { px = balance(px, edit.balance) }
+        if cancelled() { return (px, cw, ch) }
         if let c = edit.comic { px = ComicFilters.apply(c, px, cw, ch, cancelled: cancelled) }
         if edit.look != .NONE || !edit.adjust.isIdentity { px = ImageEffects.apply(px, cw, ch, look: edit.look, adjust: edit.adjust, cancelled: cancelled) }
+        if let c = edit.clip { px = clip(px, cw, ch, c) }
         return (px, cw, ch)
+    }
+
+    // MARK: v53 HSL, renk dengesi, kırpma maskesi (Android ile aynı hesap)
+
+    private static func rgbToHsl(_ r: Float, _ g: Float, _ b: Float) -> (Float, Float, Float) {
+        let mx = max(r, g, b), mn = min(r, g, b)
+        let l = (mx + mn) / 2
+        if mx == mn { return (0, 0, l) }
+        let d = mx - mn
+        let s = l > 0.5 ? d / (2 - mx - mn) : d / (mx + mn)
+        var h: Float
+        if mx == r { h = (g - b) / d + (g < b ? 6 : 0) } else if mx == g { h = (b - r) / d + 2 } else { h = (r - g) / d + 4 }
+        h *= 60
+        return (h, s, l)
+    }
+
+    private static func hue2rgb(_ p: Float, _ q: Float, _ t0: Float) -> Float {
+        var t = t0
+        if t < 0 { t += 1 }
+        if t > 1 { t -= 1 }
+        if t < 1.0 / 6 { return p + (q - p) * 6 * t }
+        if t < 0.5 { return q }
+        if t < 2.0 / 3 { return p + (q - p) * (2.0 / 3 - t) * 6 }
+        return p
+    }
+
+    private static func hslToRgb(_ h0: Float, _ s: Float, _ l: Float) -> (Float, Float, Float) {
+        if s <= 0 { return (l, l, l) }
+        let h = ((h0.truncatingRemainder(dividingBy: 360) + 360).truncatingRemainder(dividingBy: 360)) / 360
+        let q = l < 0.5 ? l * (1 + s) : l + s - l * s
+        let p = 2 * l - q
+        return (hue2rgb(p, q, h + 1.0 / 3), hue2rgb(p, q, h), hue2rgb(p, q, h - 1.0 / 3))
+    }
+
+    static func rangeWeight(_ h: Float, _ range: Int) -> Float {
+        let c = PhotoHsl.CENTERS
+        let center = c[range], prev = c[(range + 7) % 8], next = c[(range + 1) % 8]
+        var d = h - center
+        if d > 180 { d -= 360 }
+        if d < -180 { d += 360 }
+        let span = d >= 0 ? (next - center + 360).truncatingRemainder(dividingBy: 360) : (center - prev + 360).truncatingRemainder(dividingBy: 360)
+        return (1 - abs(d) / max(span, 1)).coerceIn(0, 1)
+    }
+
+    @inline(__always) private static func pack(_ a: UInt32, _ r: Float, _ g: Float, _ b: Float) -> UInt32 {
+        let ri = UInt32(Int((r * 255).rounded()).coerceIn(0, 255)), gi = UInt32(Int((g * 255).rounded()).coerceIn(0, 255))
+        let bi = UInt32(Int((b * 255).rounded()).coerceIn(0, 255))
+        return a << 24 | ri << 16 | gi << 8 | bi
+    }
+
+    static func hsl(_ src: [UInt32], _ adj: PhotoHsl) -> [UInt32] {
+        var out = src
+        for i in 0..<src.count {
+            let c = src[i]
+            let a = c >> 24
+            if a == 0 { continue }
+            let (h0, s0, l0) = rgbToHsl(Float(c >> 16 & 0xFF) / 255, Float(c >> 8 & 0xFF) / 255, Float(c & 0xFF) / 255)
+            let gray = (s0 * 2).coerceIn(0, 1)
+            var dh: Float = 0, ds: Float = 0, dl: Float = 0
+            for r in 0..<8 {
+                let w = rangeWeight(h0, r) * gray
+                if w == 0 { continue }
+                dh += w * adj.hue[r]; ds += w * adj.saturation[r]; dl += w * adj.lightness[r]
+            }
+            if dh == 0 && ds == 0 && dl == 0 { continue }
+            let h = h0 + dh * 30
+            let s = (ds >= 0 ? s0 + (1 - s0) * ds : s0 * (1 + ds)).coerceIn(0, 1)
+            let l = (dl >= 0 ? l0 + (1 - l0) * dl * 0.6 : l0 * (1 + dl * 0.6)).coerceIn(0, 1)
+            let (r, g, b) = hslToRgb(h, s, l)
+            out[i] = pack(a, r, g, b)
+        }
+        return out
+    }
+
+    static func balance(_ src: [UInt32], _ b: PhotoBalance) -> [UInt32] {
+        var out = src
+        let k: Float = 0.32
+        for i in 0..<src.count {
+            let c = src[i]
+            let a = c >> 24
+            if a == 0 { continue }
+            let r0 = Float(c >> 16 & 0xFF) / 255, g0 = Float(c >> 8 & 0xFF) / 255, b0 = Float(c & 0xFF) / 255
+            let lum = 0.299 * r0 + 0.587 * g0 + 0.114 * b0
+            let ws = ((0.5 - lum) * 2).coerceIn(0, 1), wh = ((lum - 0.5) * 2).coerceIn(0, 1), wm = (1 - abs(lum - 0.5) * 2).coerceIn(0, 1)
+            var r = r0 + (b.shadows[0] * ws + b.midtones[0] * wm + b.highlights[0] * wh) * k
+            var g = g0 + (b.shadows[1] * ws + b.midtones[1] * wm + b.highlights[1] * wh) * k
+            var bl = b0 + (b.shadows[2] * ws + b.midtones[2] * wm + b.highlights[2] * wh) * k
+            if b.preserve {
+                let d = lum - (0.299 * r + 0.587 * g + 0.114 * bl)
+                r += d; g += d; bl += d
+            }
+            out[i] = pack(a, r, g, bl)
+        }
+        return out
+    }
+
+    private static func blendCh(_ mode: ClipBlend, _ a: Float, _ b: Float) -> Float {
+        switch mode {
+        case .NORMAL, .COLOR: return b
+        case .MULTIPLY: return a * b
+        case .SCREEN: return 1 - (1 - a) * (1 - b)
+        case .OVERLAY: return a < 0.5 ? 2 * a * b : 1 - 2 * (1 - a) * (1 - b)
+        case .SOFT_LIGHT: return (1 - 2 * b) * a * a + 2 * b * a
+        }
+    }
+
+    static func clip(_ src: [UInt32], _ w: Int, _ h: Int, _ clip: PhotoClip) -> [UInt32] {
+        var out = src
+        let rad = clip.angle * Float.pi / 180
+        let dx = cos(rad), dy = sin(rad)
+        let corners: [Float] = [0, Float(w) * dx, Float(h) * dy, Float(w) * dx + Float(h) * dy]
+        let p0 = corners.min()!, p1 = corners.max()!
+        let span = max(p1 - p0, 1)
+        let c1 = clip.color1, c2 = clip.color2
+        let op = clip.opacity.coerceIn(0, 1)
+        for y in 0..<h {
+            for x in 0..<w {
+                let i = y * w + x
+                let c = src[i]
+                let a = c >> 24
+                if a == 0 { continue }
+                let t: Float = clip.fill == .GRADIENT ? ((Float(x) * dx + Float(y) * dy - p0) / span).coerceIn(0, 1) : 0
+                let fr = (Float(c1 >> 16 & 0xFF) * (1 - t) + Float(c2 >> 16 & 0xFF) * t) / 255
+                let fg = (Float(c1 >> 8 & 0xFF) * (1 - t) + Float(c2 >> 8 & 0xFF) * t) / 255
+                let fb = (Float(c1 & 0xFF) * (1 - t) + Float(c2 & 0xFF) * t) / 255
+                let r0 = Float(c >> 16 & 0xFF) / 255, g0 = Float(c >> 8 & 0xFF) / 255, b0 = Float(c & 0xFF) / 255
+                var r = blendCh(clip.blend, r0, fr), g = blendCh(clip.blend, g0, fg), b = blendCh(clip.blend, b0, fb)
+                if clip.blend == .COLOR {
+                    let d = (0.299 * r0 + 0.587 * g0 + 0.114 * b0) - (0.299 * r + 0.587 * g + 0.114 * b)
+                    r += d; g += d; b += d
+                }
+                r = r0 + (r - r0) * op; g = g0 + (g - g0) * op; b = b0 + (b - b0) * op
+                out[i] = pack(a, r, g, b)
+            }
+        }
+        return out
     }
 
     // MARK: geometri

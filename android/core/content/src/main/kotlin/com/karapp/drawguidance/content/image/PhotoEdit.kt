@@ -52,6 +52,69 @@ data class PhotoLight(
     val isIdentity: Boolean get() = exposure == 0f && highlights == 0f && shadows == 0f && whites == 0f && blacks == 0f && clarity == 0f && vibrance == 0f
 }
 
+/**
+ * v53 HSL ayarı: 8 renk aralığı (kırmızı, turuncu, sarı, yeşil, camgöbeği, mavi, mor, macenta) için ton kaydırma,
+ * doygunluk ve açıklık (her biri −1..1; ton ±30°).
+ */
+data class PhotoHsl(
+    val hue: List<Float> = ZERO8,
+    val saturation: List<Float> = ZERO8,
+    val lightness: List<Float> = ZERO8,
+) {
+    val isIdentity: Boolean get() = hue.all { it == 0f } && saturation.all { it == 0f } && lightness.all { it == 0f }
+
+    fun with(range: Int, h: Float? = null, s: Float? = null, l: Float? = null): PhotoHsl = copy(
+        hue = if (h == null) hue else hue.toMutableList().also { it[range] = h },
+        saturation = if (s == null) saturation else saturation.toMutableList().also { it[range] = s },
+        lightness = if (l == null) lightness else lightness.toMutableList().also { it[range] = l },
+    )
+
+    companion object {
+        val ZERO8: List<Float> = List(8) { 0f }
+        /** Aralıkların merkez tonları (derece). */
+        val CENTERS = floatArrayOf(0f, 30f, 60f, 120f, 180f, 240f, 275f, 315f)
+        val SWATCHES = longArrayOf(0xFFE53935, 0xFFFB8C00, 0xFFFDD835, 0xFF43A047, 0xFF00ACC1, 0xFF1E88E5, 0xFF8E24AA, 0xFFD81B60)
+    }
+}
+
+/**
+ * v53 renk dengesi: gölgeler, orta tonlar ve vurgular için camgöbeği–kırmızı, macenta–yeşil, sarı–mavi (−1..1);
+ * [preserve] parlaklığı korur.
+ */
+data class PhotoBalance(
+    val shadows: List<Float> = ZERO3,
+    val midtones: List<Float> = ZERO3,
+    val highlights: List<Float> = ZERO3,
+    val preserve: Boolean = true,
+) {
+    val isIdentity: Boolean get() = shadows.all { it == 0f } && midtones.all { it == 0f } && highlights.all { it == 0f }
+
+    fun range(i: Int): List<Float> = when (i) { 0 -> shadows; 1 -> midtones; else -> highlights }
+    fun with(i: Int, channel: Int, v: Float): PhotoBalance {
+        val r = range(i).toMutableList().also { it[channel] = v }
+        return when (i) { 0 -> copy(shadows = r); 1 -> copy(midtones = r); else -> copy(highlights = r) }
+    }
+
+    companion object { val ZERO3: List<Float> = List(3) { 0f } }
+}
+
+/** v53 kırpma maskesinin dolgusu ve karışım kipi. */
+enum class ClipFill { COLOR, GRADIENT }
+enum class ClipBlend { NORMAL, MULTIPLY, SCREEN, OVERLAY, SOFT_LIGHT, COLOR }
+
+/**
+ * v53 kırpma maskesi: renk ya da gradyan dolgusu yalnız resmin görünen (saydam olmayan) piksellerine kırpılarak
+ * karıştırılır (arka plan kaldırılınca nesnenin şekli dolar). [angle] gradyan açısı (derece), [opacity] 0..1.
+ */
+data class PhotoClip(
+    val fill: ClipFill = ClipFill.COLOR,
+    val color1: Int = 0xFFE53935.toInt(),
+    val color2: Int = 0xFF1E88E5.toInt(),
+    val angle: Float = 90f,
+    val blend: ClipBlend = ClipBlend.OVERLAY,
+    val opacity: Float = 0.7f,
+)
+
 data class PhotoEdit(
     val rotation: Int = 0,
     val flipH: Boolean = false,
@@ -65,6 +128,12 @@ data class PhotoEdit(
     val comic: ComicFilter? = null,
     val background: BackgroundOptions? = null,
     val strokes: List<PhotoStroke> = emptyList(),
+    /** v53 renk aralıklarına göre ton, doygunluk, açıklık. */
+    val hsl: PhotoHsl = PhotoHsl(),
+    /** v53 renk dengesi. */
+    val balance: PhotoBalance = PhotoBalance(),
+    /** v53 kırpma maskesi (null: yok). */
+    val clip: PhotoClip? = null,
 ) {
     val isIdentity: Boolean get() = this == PhotoEdit()
     val quarter: Int get() = ((rotation % 4) + 4) % 4
@@ -92,9 +161,154 @@ object PhotoOps {
         }
         if (cancelled()) return Triple(px, cw, ch)
         if (!edit.light.isIdentity) px = light(px, cw, ch, edit.light)
+        if (!edit.hsl.isIdentity) px = hsl(px, edit.hsl)
+        if (!edit.balance.isIdentity) px = balance(px, edit.balance)
+        if (cancelled()) return Triple(px, cw, ch)
         edit.comic?.let { px = ComicFilters.apply(it, px, cw, ch, cancelled) }
         if (edit.look != ImageLook.NONE || !edit.adjust.isIdentity) px = ImageEffects.apply(px, cw, ch, edit.look, edit.adjust, cancelled)
+        edit.clip?.let { px = clip(px, cw, ch, it) }
         return Triple(px, cw, ch)
+    }
+
+    // ------------------------------------------------------------------ v53 HSL, renk dengesi, kırpma maskesi
+
+    private fun rgbToHsl(r: Float, g: Float, b: Float, out: FloatArray) {
+        val mx = max(r, max(g, b)); val mn = min(r, min(g, b))
+        val l = (mx + mn) / 2f
+        if (mx == mn) { out[0] = 0f; out[1] = 0f; out[2] = l; return }
+        val d = mx - mn
+        val s = if (l > 0.5f) d / (2f - mx - mn) else d / (mx + mn)
+        var h = when (mx) {
+            r -> (g - b) / d + (if (g < b) 6f else 0f)
+            g -> (b - r) / d + 2f
+            else -> (r - g) / d + 4f
+        }
+        h *= 60f
+        out[0] = h; out[1] = s; out[2] = l
+    }
+
+    private fun hue2rgb(p: Float, q: Float, t0: Float): Float {
+        var t = t0
+        if (t < 0f) t += 1f
+        if (t > 1f) t -= 1f
+        return when {
+            t < 1f / 6f -> p + (q - p) * 6f * t
+            t < 0.5f -> q
+            t < 2f / 3f -> p + (q - p) * (2f / 3f - t) * 6f
+            else -> p
+        }
+    }
+
+    private fun hslToRgb(h0: Float, s: Float, l: Float, out: FloatArray) {
+        if (s <= 0f) { out[0] = l; out[1] = l; out[2] = l; return }
+        val h = (((h0 % 360f) + 360f) % 360f) / 360f
+        val q = if (l < 0.5f) l * (1f + s) else l + s - l * s
+        val p = 2f * l - q
+        out[0] = hue2rgb(p, q, h + 1f / 3f); out[1] = hue2rgb(p, q, h); out[2] = hue2rgb(p, q, h - 1f / 3f)
+    }
+
+    /** Tonun aralığa yakınlığı (0..1): merkezden komşu merkeze doğru doğrusal azalır. */
+    fun rangeWeight(h: Float, range: Int): Float {
+        val c = PhotoHsl.CENTERS
+        val center = c[range]
+        val prev = c[(range + 7) % 8]; val next = c[(range + 1) % 8]
+        var d = h - center
+        if (d > 180f) d -= 360f
+        if (d < -180f) d += 360f
+        val span = if (d >= 0f) ((next - center + 360f) % 360f) else ((center - prev + 360f) % 360f)
+        return (1f - abs(d) / span.coerceAtLeast(1f)).coerceIn(0f, 1f)
+    }
+
+    fun hsl(src: IntArray, adj: PhotoHsl): IntArray {
+        val out = IntArray(src.size)
+        val hsl = FloatArray(3); val rgb = FloatArray(3)
+        for (i in src.indices) {
+            val c = src[i]
+            val a = c ushr 24
+            if (a == 0) { out[i] = c; continue }
+            rgbToHsl(((c shr 16) and 0xFF) / 255f, ((c shr 8) and 0xFF) / 255f, (c and 0xFF) / 255f, hsl)
+            val gray = (hsl[1] * 2f).coerceIn(0f, 1f)
+            var dh = 0f; var ds = 0f; var dl = 0f
+            for (r in 0 until 8) {
+                val w = rangeWeight(hsl[0], r) * gray
+                if (w == 0f) continue
+                dh += w * adj.hue[r]; ds += w * adj.saturation[r]; dl += w * adj.lightness[r]
+            }
+            if (dh == 0f && ds == 0f && dl == 0f) { out[i] = c; continue }
+            val h = hsl[0] + dh * 30f
+            val s = (if (ds >= 0f) hsl[1] + (1f - hsl[1]) * ds else hsl[1] * (1f + ds)).coerceIn(0f, 1f)
+            val l = (if (dl >= 0f) hsl[2] + (1f - hsl[2]) * dl * 0.6f else hsl[2] * (1f + dl * 0.6f)).coerceIn(0f, 1f)
+            hslToRgb(h, s, l, rgb)
+            out[i] = (a shl 24) or ((rgb[0] * 255f).roundToInt().coerceIn(0, 255) shl 16) or
+                ((rgb[1] * 255f).roundToInt().coerceIn(0, 255) shl 8) or (rgb[2] * 255f).roundToInt().coerceIn(0, 255)
+        }
+        return out
+    }
+
+    fun balance(src: IntArray, b: PhotoBalance): IntArray {
+        val out = IntArray(src.size)
+        for (i in src.indices) {
+            val c = src[i]
+            val a = c ushr 24
+            if (a == 0) { out[i] = c; continue }
+            val r0 = ((c shr 16) and 0xFF) / 255f; val g0 = ((c shr 8) and 0xFF) / 255f; val b0 = (c and 0xFF) / 255f
+            val lum = 0.299f * r0 + 0.587f * g0 + 0.114f * b0
+            val ws = ((0.5f - lum) * 2f).coerceIn(0f, 1f)
+            val wh = ((lum - 0.5f) * 2f).coerceIn(0f, 1f)
+            val wm = (1f - abs(lum - 0.5f) * 2f).coerceIn(0f, 1f)
+            val k = 0.32f
+            var r = r0 + (b.shadows[0] * ws + b.midtones[0] * wm + b.highlights[0] * wh) * k
+            var g = g0 + (b.shadows[1] * ws + b.midtones[1] * wm + b.highlights[1] * wh) * k
+            var bl = b0 + (b.shadows[2] * ws + b.midtones[2] * wm + b.highlights[2] * wh) * k
+            if (b.preserve) {
+                val d = lum - (0.299f * r + 0.587f * g + 0.114f * bl)
+                r += d; g += d; bl += d
+            }
+            out[i] = (a shl 24) or ((r * 255f).roundToInt().coerceIn(0, 255) shl 16) or
+                ((g * 255f).roundToInt().coerceIn(0, 255) shl 8) or (bl * 255f).roundToInt().coerceIn(0, 255)
+        }
+        return out
+    }
+
+    private fun blendCh(mode: ClipBlend, a: Float, b: Float): Float = when (mode) {
+        ClipBlend.NORMAL, ClipBlend.COLOR -> b
+        ClipBlend.MULTIPLY -> a * b
+        ClipBlend.SCREEN -> 1f - (1f - a) * (1f - b)
+        ClipBlend.OVERLAY -> if (a < 0.5f) 2f * a * b else 1f - 2f * (1f - a) * (1f - b)
+        ClipBlend.SOFT_LIGHT -> (1f - 2f * b) * a * a + 2f * b * a
+    }
+
+    fun clip(src: IntArray, w: Int, h: Int, clip: PhotoClip): IntArray {
+        val out = IntArray(src.size)
+        val rad = Math.toRadians(clip.angle.toDouble())
+        val dx = cos(rad).toFloat(); val dy = sin(rad).toFloat()
+        // Gradyan izdüşümünün uçları (resmin köşelerinden)
+        val corners = listOf(0f to 0f, w.toFloat() to 0f, 0f to h.toFloat(), w.toFloat() to h.toFloat()).map { (x, y) -> x * dx + y * dy }
+        val p0 = corners.min(); val p1 = corners.max()
+        val span = (p1 - p0).coerceAtLeast(1f)
+        val c1 = clip.color1; val c2 = clip.color2
+        val op = clip.opacity.coerceIn(0f, 1f)
+        for (y in 0 until h) for (x in 0 until w) {
+            val i = y * w + x
+            val c = src[i]
+            val a = c ushr 24
+            if (a == 0) { out[i] = c; continue }
+            val t = if (clip.fill == ClipFill.GRADIENT) ((x * dx + y * dy - p0) / span).coerceIn(0f, 1f) else 0f
+            val fr = (((c1 shr 16) and 0xFF) * (1 - t) + ((c2 shr 16) and 0xFF) * t) / 255f
+            val fg = (((c1 shr 8) and 0xFF) * (1 - t) + ((c2 shr 8) and 0xFF) * t) / 255f
+            val fb = ((c1 and 0xFF) * (1 - t) + (c2 and 0xFF) * t) / 255f
+            val r0 = ((c shr 16) and 0xFF) / 255f; val g0 = ((c shr 8) and 0xFF) / 255f; val b0 = (c and 0xFF) / 255f
+            var r = blendCh(clip.blend, r0, fr); var g = blendCh(clip.blend, g0, fg); var b = blendCh(clip.blend, b0, fb)
+            if (clip.blend == ClipBlend.COLOR) {
+                // Renk kipi: dolgunun rengi, resmin parlaklığı
+                val d = (0.299f * r0 + 0.587f * g0 + 0.114f * b0) - (0.299f * r + 0.587f * g + 0.114f * b)
+                r += d; g += d; b += d
+            }
+            r = r0 + (r - r0) * op; g = g0 + (g - g0) * op; b = b0 + (b - b0) * op
+            out[i] = (a shl 24) or ((r * 255f).roundToInt().coerceIn(0, 255) shl 16) or
+                ((g * 255f).roundToInt().coerceIn(0, 255) shl 8) or (b * 255f).roundToInt().coerceIn(0, 255)
+        }
+        return out
     }
 
     // ------------------------------------------------------------------ geometri

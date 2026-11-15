@@ -12,7 +12,6 @@ import com.karapp.drawguidance.data.model.BalloonSpec
 import com.karapp.drawguidance.data.model.BalloonStyle
 import com.karapp.drawguidance.data.model.BalloonTail
 import com.karapp.drawguidance.data.model.BrushType
-import com.karapp.drawguidance.data.model.FontGroup
 import com.karapp.drawguidance.data.model.GradientSpec
 import com.karapp.drawguidance.data.model.ShapeStyle
 import com.karapp.drawguidance.data.model.Stroke
@@ -56,6 +55,28 @@ class ComicController(
      * görünen sayfanın ortası). Eklenen balon seçilir. v36 [options] yazısı boşsa öntanımlı yazı hemen yazılmaya açılır;
      * yazı pencerede yazıldıysa balon o yazı, yazı tipi, boyut, renk, hizalama ve kuyrukla eklenir.
      */
+    /** v53 balonun türüne uygun yazı tipi (çizgi roman yazı tipleri). */
+    fun balloonFont(style: BalloonStyle): TextFont = when (style) {
+        BalloonStyle.SHOUT, BalloonStyle.ELECTRIC, BalloonStyle.FLASH, BalloonStyle.ROUGH, BalloonStyle.ICICLE, BalloonStyle.DRIP -> TextFont.BANGERS
+        BalloonStyle.THOUGHT, BalloonStyle.WAVY, BalloonStyle.HEART -> TextFont.SHANTELL
+        BalloonStyle.WHISPER -> TextFont.PATRICK_HAND
+        BalloonStyle.NARRATION -> TextFont.COMIC_RELIEF_BOLD
+        BalloonStyle.PHONE -> TextFont.SANS
+        else -> TextFont.COMIC_RELIEF
+    }
+
+    /** v53 balon yazısının varsayılan boyu: sayfanın kısa kenarına göre; bağırmada büyük, fısıltıda küçük. */
+    fun balloonTextSize(style: BalloonStyle, w: Float, h: Float): Float {
+        val base = (min(w, h) * 0.034f).coerceIn(18f, 64f)
+        val k = when (style) {
+            BalloonStyle.SHOUT, BalloonStyle.FLASH, BalloonStyle.ELECTRIC -> 1.25f
+            BalloonStyle.WHISPER -> 0.85f
+            BalloonStyle.NARRATION -> 0.9f
+            else -> 1f
+        }
+        return (base * k).coerceIn(TextController.MIN_TEXT_SIZE, TextController.MAX_TEXT_SIZE)
+    }
+
     fun insertBalloon(style: BalloonStyle, speakers: Int, center: Offset?, options: BalloonTextOptions = BalloonTextOptions()) {
         val current = store.canvas.value ?: return
         val typed = options.content.isNotBlank()
@@ -72,7 +93,9 @@ class ComicController(
         val current = store.canvas.value ?: return null
         // v29 kullanıcının son seçtiği biçimden (düzenlenen başka bir balonun biçiminden değil)
         val settings = texts.defaults.value
-        val size = options?.sizePx?.coerceIn(TextController.MIN_TEXT_SIZE, TextController.MAX_TEXT_SIZE) ?: settings.sizePx
+        // v53 varsayılan yazı boyutu ve tipi balonun türüne ve sayfanın boyuna göre
+        val size = options?.sizePx?.coerceIn(TextController.MIN_TEXT_SIZE, TextController.MAX_TEXT_SIZE)
+            ?: balloonTextSize(style, current.width.toFloat(), current.height.toFloat())
         val c = center ?: Offset(current.width / 2f, current.height / 2f)
         val width = (min(current.width, current.height) * 0.36f).coerceIn(size * 6f, size * 14f)
         val tails = when {
@@ -88,10 +111,12 @@ class ComicController(
             fillHex = when (style) { BalloonStyle.NARRATION -> "#FFF59D"; BalloonStyle.PHONE -> PHONE_FILL; else -> "#FFFFFF" },
             strokeHex = if (style == BalloonStyle.PHONE) PHONE_BORDER else "#111111",
         )
-        val font = options?.font ?: settings.spec.font.takeIf { it.group == FontGroup.COMIC } ?: TextFont.COMIC_RELIEF
+        val font = options?.font ?: balloonFont(style)
         val spec = TextSpec(
             content = content, font = font, align = options?.align ?: TextAlignKind.CENTER,
             box = TextBox(width = width, balloon = balloon, effects = settings.spec.box?.effects),
+            bold = options?.font == null && (style == BalloonStyle.SHOUT || style == BalloonStyle.FLASH || style == BalloonStyle.ELECTRIC),
+            italic = options?.font == null && style == BalloonStyle.WHISPER,
         )
         val (w, h) = TextRenderer.measure(spec, size)
         val points = TextRenderer.quadAt(spec, size, c.x - w / 2f, c.y - h / 2f).map { StrokePoint(q(it.x), q(it.y)) }

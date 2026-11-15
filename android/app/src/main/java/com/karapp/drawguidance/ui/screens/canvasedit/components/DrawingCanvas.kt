@@ -735,6 +735,7 @@ fun DrawingCanvas(
             val needsLayer = movingStrokes.isNotEmpty() || (liveVisible && live.isEraser) ||
                 pendingAppended.any { it.brushType == BrushType.ERASER }
             val paperLayer = Rect(paper.left, paper.top, paper.right, paper.bottom).intersect(Rect(Offset.Zero, size))
+            val isolate = SelectionIsolation.active(mode, canvas.kind, selectedIds)
             if (needsLayer) drawIntoCanvas { it.saveLayer(paperLayer, androidx.compose.ui.graphics.Paint()) }
             clipRect(paper.left, paper.top, paper.right, paper.bottom) {
                 val cached = holder.bitmap
@@ -742,13 +743,17 @@ fun DrawingCanvas(
                 if (cacheTick >= 0 && cached != null && cachedKey != null) {
                     val k = scale / cachedKey.scale
                     translate(offset.x - cachedKey.offset.x * k, offset.y - cachedKey.offset.y * k) {
-                        scale(k, k, pivot = Offset.Zero) { drawImage(cached) }
+                        // v53 seçim soyutlama: seçim varken öteki elemanlar soluk (seçili olanlar aşağıda tam renkli)
+                        scale(k, k, pivot = Offset.Zero) { drawImage(cached, alpha = if (isolate) SelectionIsolation.DIM else 1f) }
                     }
                 }
                 translate(offset.x, offset.y) {
                     scale(scale, scale, pivot = Offset.Zero) {
                         // Önbellek arka planda yenilenirken sonradan eklenen çizimler doğrudan çizilir
                         pendingAppended.forEach { if (!(liveVisible && it.id == live.strokeId)) drawStroke(it) }
+                        if (isolate && !mode.transformsSelection) {
+                            selectedStrokes.forEach { if (it.brushType != BrushType.ERASER && !it.brushType.isHelper && it.id !in hiddenIds) drawStroke(it) }
+                        }
                         (activePreview as? Preview.Shape)?.let { shapePreview ->
                             currentActions.buildShape(shapePreview.gestureId, shapePreview.start, shapePreview.end).forEach { drawStroke(it) }
                         }
@@ -1360,4 +1365,13 @@ private fun DrawScope.drawDiagramEditing(
             }
         }
     }
+}
+
+/** v53 seçim soyutlama: seçim varken (Seç ve dönüştürme modlarında) öteki elemanlar soluk çizilir. */
+object SelectionIsolation {
+    const val DIM = 0.28f
+
+    fun active(mode: EditMode, kind: com.karapp.drawguidance.data.model.CanvasKind, selected: Set<String>): Boolean =
+        selected.isNotEmpty() && kind != com.karapp.drawguidance.data.model.CanvasKind.KIDS &&
+            (mode == EditMode.SELECT || mode.transformsSelection)
 }

@@ -1,0 +1,3 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- v53 ton, desen ve yapı kılavuzu adları çalışma anında adla çözülür: kaynak küçültmede silinmesin -->
+<resources xmlns:tools="http://schemas.android.com/tools" tools:keep="@string/v53_tone_*,@string/v53_sg_*,@string/v53_struct_group_*,@string/v53_font_group_*" />

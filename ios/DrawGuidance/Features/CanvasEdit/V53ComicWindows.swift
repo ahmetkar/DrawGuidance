@@ -163,42 +163,28 @@ struct BalloonInlineEditor: View {
         return s
     }
 
+    /// Balonun ekrandaki kutusu ve yazı boyutu.
+    private struct Geo {
+        let rect: CGRect
+        let inset: CGFloat
+        let fontSize: CGFloat
+    }
+
+    private func geo(_ s: Stroke) -> Geo {
+        let xs = s.points.map(\.x), ys = s.points.map(\.y)
+        let tl = viewport.toScreen(P(xs.min() ?? 0, ys.min() ?? 0))
+        let br = viewport.toScreen(P(xs.max() ?? 0, ys.max() ?? 0))
+        let rect = CGRect(x: CGFloat(tl.x), y: CGFloat(tl.y), width: CGFloat(br.x - tl.x), height: CGFloat(br.y - tl.y))
+        let fs: CGFloat = max(CGFloat(s.sizePx * viewport.scale), 9)
+        return Geo(rect: rect, inset: min(rect.width, rect.height) * 0.16, fontSize: fs)
+    }
+
     var body: some View {
         if let s = Self.balloonStroke(texts, store), let spec = s.text {
-            let xs = s.points.map(\.x), ys = s.points.map(\.y)
-            let tl = viewport.toScreen(P(xs.min() ?? 0, ys.min() ?? 0))
-            let br = viewport.toScreen(P(xs.max() ?? 0, ys.max() ?? 0))
-            let w = CGFloat(br.x - tl.x), h = CGFloat(br.y - tl.y)
-            let inset = min(w, h) * 0.16
-            let fontSize = max(CGFloat(s.sizePx * viewport.scale), 9)
-            let fill = Color(hex: spec.box?.balloon?.fillHex ?? "#FFFFFF") ?? .white
+            let g = geo(s)
             ZStack {
-                TextField("", text: $text, axis: .vertical)
-                    .font(Font(FontRegistry.uiFont(spec.font, size: fontSize)))
-                    .bold(spec.bold).italic(spec.italic)
-                    .multilineTextAlignment(spec.align == .LEFT ? .leading : spec.align == .RIGHT ? .trailing : .center)
-                    .foregroundStyle(Color(hex: s.colorHex) ?? .black)
-                    .focused($focused)
-                    .padding(4)
-                    .frame(width: max(w - inset * 2, 60), height: max(h - inset * 2, fontSize * 1.6))
-                    .background(RoundedRectangle(cornerRadius: 8).fill(fill.opacity(0.96)))
-                    .overlay(RoundedRectangle(cornerRadius: 8).strokeBorder(Color.accentColor.opacity(0.5), style: StrokeStyle(lineWidth: 1, dash: [4, 3])))
-                    .position(x: CGFloat(tl.x) + w / 2, y: CGFloat(tl.y) + h / 2)
-                    .accessibilityIdentifier("balloon_inline_field")
-                HStack(spacing: 8) {
-                    Button { texts.cancel(); text = "" } label: {
-                        Image(systemName: "xmark").font(.system(size: 12, weight: .bold)).frame(width: 30, height: 30)
-                            .background(Circle().fill(Color(uiColor: .secondarySystemBackground)))
-                    }
-                    .accessibilityIdentifier("balloon_inline_cancel")
-                    Button { vm.confirmText(text); text = "" } label: {
-                        Label(L("v53_done"), systemImage: "checkmark").font(.footnote.weight(.semibold))
-                            .padding(.horizontal, 12).frame(height: 30)
-                            .background(Capsule().fill(Color.accentColor)).foregroundStyle(.white)
-                    }
-                    .accessibilityIdentifier("balloon_inline_done")
-                }
-                .position(x: CGFloat(tl.x) + w / 2, y: CGFloat(br.y) + 24)
+                field(s, spec, g)
+                buttons(g)
             }
             .onAppear {
                 // Yeni balonda örnek yazı silinir, doğrudan yazılır
@@ -208,6 +194,52 @@ struct BalloonInlineEditor: View {
             }
             .onChange(of: text) { _, t in texts.updateDraftText(t) }
         }
+    }
+
+    private func alignment(_ a: TextAlignKind) -> TextAlignment {
+        switch a {
+        case .LEFT: return .leading
+        case .RIGHT: return .trailing
+        default: return .center
+        }
+    }
+
+    private func field(_ s: Stroke, _ spec: TextSpec, _ g: Geo) -> some View {
+        let fill: Color = Color(hex: spec.box?.balloon?.fillHex ?? "#FFFFFF") ?? .white
+        let ink: Color = Color(hex: s.colorHex) ?? .black
+        let font = Font(FontRegistry.uiFont(spec.font, size: g.fontSize))
+        let w: CGFloat = max(g.rect.width - g.inset * 2, 60)
+        let h: CGFloat = max(g.rect.height - g.inset * 2, g.fontSize * 1.6)
+        return TextField("", text: $text, axis: .vertical)
+            .font(font)
+            .bold(spec.bold)
+            .italic(spec.italic)
+            .multilineTextAlignment(alignment(spec.align))
+            .foregroundStyle(ink)
+            .focused($focused)
+            .padding(4)
+            .frame(width: w, height: h)
+            .background(RoundedRectangle(cornerRadius: 8).fill(fill.opacity(0.96)))
+            .overlay(RoundedRectangle(cornerRadius: 8).strokeBorder(Color.accentColor.opacity(0.5), style: StrokeStyle(lineWidth: 1, dash: [4, 3])))
+            .position(x: g.rect.midX, y: g.rect.midY)
+            .accessibilityIdentifier("balloon_inline_field")
+    }
+
+    private func buttons(_ g: Geo) -> some View {
+        HStack(spacing: 8) {
+            Button { texts.cancel(); text = "" } label: {
+                Image(systemName: "xmark").font(.system(size: 12, weight: .bold)).frame(width: 30, height: 30)
+                    .background(Circle().fill(Color(uiColor: .secondarySystemBackground)))
+            }
+            .accessibilityIdentifier("balloon_inline_cancel")
+            Button { vm.confirmText(text); text = "" } label: {
+                Label(L("v53_done"), systemImage: "checkmark").font(.footnote.weight(.semibold))
+                    .padding(.horizontal, 12).frame(height: 30)
+                    .background(Capsule().fill(Color.accentColor)).foregroundStyle(.white)
+            }
+            .accessibilityIdentifier("balloon_inline_done")
+        }
+        .position(x: g.rect.midX, y: g.rect.maxY + 24)
     }
 }
 

@@ -248,6 +248,26 @@ class TextController(
     }
 
     /** Yazıyı ekler/günceller (düzenlenen yazı boşaltılırsa silinir); eklenen yazı seçili olur. */
+    /**
+     * v53 hızlı yazı kutusu (not alma): yazı taslak açılmadan, geçerli yazı ayarlarıyla doğrudan arka plansız eklenir.
+     * Eklenen yazının alt kenarı döner (sonraki kutu onun altında açılır).
+     */
+    fun insertQuick(content: String, anchor: Offset, width: Float?): Float? {
+        val current = store.canvas.value ?: return null
+        if (content.isBlank()) return null
+        val settings = _settings.value
+        val q = ContentCodec::quantize
+        val spec = newSpec(TextDraft(anchor, null, content, width), settings, content)
+            .copy(box = width?.let { com.karapp.drawguidance.data.model.TextBox(width = it) })
+        val points = TextRenderer.quadAt(spec, settings.sizePx, anchor.x, anchor.y - settings.sizePx * 0.7f).map { StrokePoint(q(it.x), q(it.y)) }
+        val stroke = Stroke(
+            id = UUID.randomUUID().toString(), points = points, colorHex = brush().inkColor(), brushType = BrushType.TEXT,
+            sizePx = settings.sizePx, opacity = 1f, order = current.strokes.size, text = spec,
+        )
+        store.commit(current.strokes + stroke)
+        return points.maxOf { it.y }
+    }
+
     fun confirm(content: String) {
         val draft = _draft.value ?: return
         _draft.value = null

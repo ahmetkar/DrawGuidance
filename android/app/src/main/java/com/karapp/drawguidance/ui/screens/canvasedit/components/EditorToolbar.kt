@@ -24,6 +24,7 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.AccountTree
 import androidx.compose.material.icons.filled.Category
 import androidx.compose.material.icons.filled.Colorize
+import androidx.compose.material.icons.filled.Accessibility
 import androidx.compose.material.icons.filled.FitnessCenter
 import androidx.compose.material.icons.filled.ContentCut
 import androidx.compose.material.icons.filled.GridOn
@@ -208,6 +209,9 @@ fun EditorToolRow(
     /** v50 yetişkin çizim alıştırmaları (gelişmiş resimde Çiz satırında). */
     onPractice: (() -> Unit)? = null,
     practiceActive: Boolean = false,
+    /** v53 canlı, nesne ve eşya yapı kılavuzları (resim ve çizgi romanda Çiz satırında). */
+    onStructure: (() -> Unit)? = null,
+    structureActive: Boolean = false,
 ) {
     // Tam genişlikte (telefon) düğmeler biraz küçülür: 9 araç 360 dp'ye sığar; v27 Çiz satırında Kalem de varken
     // (10 düğme) bir kademe daha küçülür ki Katmanlar ekrana sığsın
@@ -309,6 +313,12 @@ fun EditorToolRow(
             NeuIconButton(
                 Icons.Filled.FitnessCenter, practiceText, onPractice, size = button, selected = practiceActive,
                 modifier = Modifier.testTag("tool_practice"),
+            )
+        })
+        if (onStructure != null) add(ToolSlot("structure", selected = structureActive) {
+            NeuIconButton(
+                Icons.Filled.Accessibility, stringResource(R.string.v53_struct_short), onStructure, size = button, selected = structureActive,
+                modifier = Modifier.testTag("tool_structure"),
             )
         })
         // Boya kutusu: seçim yoksa arka plan, arka planı olan eleman seçiliyse onun dolgusu

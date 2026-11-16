@@ -124,7 +124,7 @@ final class ComicController {
 
     /// v53 çizgi roman efekt yazısının biçimi: kalın yazı tipi, gradyan dolgu, kalın koyu harf kenarı, beyaz dış kenar,
     /// sert gölge ve büyük harf. Pencerelerdeki önizlemeler de bunu çizer.
-    static func sfxSpec(_ preset: SfxPreset, size: Float, text: String? = nil) -> TextSpec {
+    nonisolated static func sfxSpec(_ preset: SfxPreset, size: Float, text: String? = nil) -> TextSpec {
         let font = TextFont(rawValue: preset.font) ?? .BANGERS
         let shadow: String? = preset.shadow.count == 7 || !preset.shadow.hasSuffix("00000000") ? preset.shadow : nil
         return TextSpec(content: text ?? I18n.tr(preset.text), font: font, align: .CENTER, outlineColorHex: preset.outline, outlineWidth: size * 0.085,
@@ -134,7 +134,7 @@ final class ComicController {
     }
 
     /// v53 balon yazısının efektleri: diyaloglar büyük harfle (telefon mesajı hariç); diğer efektler korunur.
-    static func balloonEffects(_ style: BalloonStyle, _ base: TextEffects?) -> TextEffects? {
+    nonisolated static func balloonEffects(_ style: BalloonStyle, _ base: TextEffects?) -> TextEffects? {
         if style == .PHONE { return base }
         var e = base ?? TextEffects()
         e.caps = true

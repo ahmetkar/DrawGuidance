@@ -523,13 +523,13 @@
                 "zh": "夜间追逐"
             },
             "hints": {
-                "tr": "Polisiye hikâye: şehir arka planları, dedektif ve hırsız, hız çizgileri, BAM! ve WHOOSH! efektleri.",
-                "en": "Detective story: city backgrounds, a detective and a thief, speed lines, BAM! and WHOOSH! effects.",
-                "ar": "قصة بوليسية: خلفيات مدينة ومحققة ولص وخطوط سرعة ومؤثرات.",
-                "ja": "探偵もの：街の背景、探偵と怪盗、スピード線、効果音。",
-                "ko": "탐정 이야기: 도시 배경, 탐정과 도둑, 속도선, 효과음.",
-                "ru": "Детектив: город, сыщица и вор, линии скорости, звуки.",
-                "zh": "侦探故事：城市背景、侦探与怪盗、速度线和音效。"
+                "tr": "Polisiye hikâye: liman ve şehir arka planları, dedektif ve polis, hız ve odak çizgileri, BAM! ve WHOOSH! efektleri.",
+                "en": "Detective story: harbor and city backgrounds, a detective and a police officer, speed and focus lines, BAM! and WHOOSH! effects.",
+                "ar": "قصة بوليسية: خلفيات ميناء ومدينة ومحقق وشرطي وخطوط سرعة وتركيز ومؤثرات.",
+                "ja": "探偵もの：港と街の背景、探偵と警官、スピード線と集中線、効果音。",
+                "ko": "탐정 이야기: 항구와 도시 배경, 탐정과 경찰, 속도선과 집중선, 효과음.",
+                "ru": "Детектив: порт и город, сыщик и полицейский, линии скорости и фокуса, звуки.",
+                "zh": "侦探故事：港口与城市背景、侦探与警察、速度线、集中线和音效。"
             },
             "pages": 2,
             "width": 1200,
@@ -548,8 +548,8 @@
                 "zh": "四格笑话"
             },
             "hints": {
-                "tr": "Dört karelik hazır şaka: karakterler, ev ve park arka planları, diyalog ve HAHAHA efekti.",
-                "en": "A ready four-panel gag: characters, home and park backgrounds, dialogue and a HAHAHA effect.",
+                "tr": "Dört karelik hazır şaka: dede ve torun, park arka planları, diyaloglar ve HAHAHA efekti.",
+                "en": "A ready four-panel gag: grandpa and grandson, park backgrounds, dialogue and a HAHAHA effect.",
                 "ar": "نكتة جاهزة من أربع لوحات: شخصيات وخلفيات وحوار ومؤثر ضحك.",
                 "ja": "完成済みの4コマギャグ：キャラクター、背景、セリフ、笑いの効果音。",
                 "ko": "완성된 4컷 개그: 캐릭터, 배경, 대사, 웃음 효과음.",

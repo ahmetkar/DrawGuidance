@@ -3,64 +3,58 @@
     "height": 1800,
     "assets": [
         {
-            "id": "2901318a-2b07-4ded-988a-44bee80f08ac",
+            "id": "4b3a3a15-a940-4b56-814c-e4a74fd4401a",
             "file": "img_1.webp",
             "w": 518,
             "h": 810
         },
         {
-            "id": "e09c2835-005a-4155-8f8e-0a379c29d063",
+            "id": "464677a8-31bd-4eaf-a27d-34dba07b1185",
             "file": "img_2.webp",
             "w": 518,
             "h": 810
         },
         {
-            "id": "9a92c395-3bc4-4f5d-9d81-744faa686138",
+            "id": "96807a8c-ac77-4a79-93d6-ac41522fabb7",
             "file": "img_3.webp",
             "w": 518,
             "h": 810
         },
         {
-            "id": "4249ff0e-03ca-482f-bea6-ed01d8a4aa1f",
+            "id": "8e41381d-2ca6-4f36-bee6-9ffabeb48402",
             "file": "img_4.webp",
-            "w": 518,
-            "h": 810
+            "w": 141,
+            "h": 448
         },
         {
-            "id": "6011a7f8-6617-4a9a-b3cb-caa41b5acdde",
+            "id": "6cfc4b5e-c4b7-4db0-aacd-603a73fdc5e1",
             "file": "img_5.webp",
             "w": 169,
             "h": 448
         },
         {
-            "id": "ff682088-97ee-46fa-8013-0117ae24a5a4",
+            "id": "94584814-be9e-42ac-a7c9-e17b45847ec0",
             "file": "img_6.webp",
-            "w": 441,
-            "h": 448
+            "w": 159,
+            "h": 168
         },
         {
-            "id": "f82d8e82-3b81-4dcd-aa9d-0bef10185f26",
+            "id": "1b940b6d-8531-4cdc-adf8-41aa6827d62c",
             "file": "img_7.webp",
-            "w": 194,
-            "h": 172
+            "w": 173,
+            "h": 170
         },
         {
-            "id": "fc0d379d-78f6-42d9-80db-6753bcf4aba7",
+            "id": "634102b3-6895-414c-a1f0-189f23a2c8a7",
             "file": "img_8.webp",
-            "w": 441,
-            "h": 448
+            "w": 178,
+            "h": 168
         },
         {
-            "id": "4c6f89d3-0c0b-48ff-a181-98ed6491db58",
+            "id": "dd273868-f5a4-4128-bd44-c5730ef9e7d9",
             "file": "img_9.webp",
-            "w": 194,
-            "h": 172
-        },
-        {
-            "id": "7803d279-e57e-4dc3-8423-64c086e49256",
-            "file": "img_10.webp",
-            "w": 441,
-            "h": 448
+            "w": 157,
+            "h": 176
         }
     ]
 }

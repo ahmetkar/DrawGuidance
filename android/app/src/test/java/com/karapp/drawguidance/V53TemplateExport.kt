@@ -113,13 +113,14 @@ class V53TemplateExport : TemplateExportBase() {
      * Balon karenin içinde: eni karenin [w] payı; merkezi kenarlara taşmayacak biçimde kaydırılır. Bağırma büyük,
      * fısıltı küçük yazılır.
      */
-    private fun talk(panel: Rect, u: Float, v: Float, text: String, tail: TailDirection, style: BalloonStyle = BalloonStyle.SPEECH, w: Float = 0.62f) {
+    private fun talk(panel: Rect, u: Float, v: Float, text: String, tail: TailDirection, style: BalloonStyle = BalloonStyle.SPEECH, w: Float = 0.8f) {
         val size = when (style) {
             BalloonStyle.SHOUT -> 52f
-            BalloonStyle.WHISPER -> 30f
-            else -> 34f
+            BalloonStyle.WHISPER -> 28f
+            else -> 32f
         }
-        val width = panel.width * w
+        // Düşünce balonunun bulut kenarı yazıya yer bırakır: daha dar ve yüksek
+        val width = panel.width * (if (style == BalloonStyle.THOUGHT && w == 0.8f) 0.64f else w)
         val half = width / 2f + panel.width * 0.03f
         val x = (panel.left + panel.width * u).coerceIn(panel.left + half, panel.right - half)
         balloon(Offset(x, panel.top + panel.height * v), text, style, tail, size, width = width)
@@ -139,10 +140,10 @@ class V53TemplateExport : TemplateExportBase() {
         val r = l.map { it.second }
         // 1: iki öğrenci okul çatısında (tam boy, yan yana, birbirine dönük)
         backdrop("okul_cati", l[0].first)
-        who("ogrenci_arda", "poz_01", r[0], 0.28f, 0.74f, maxW = 0.42f)
-        who("ogrenci_ece", "poz_01", r[0], 0.74f, 0.72f, maxW = 0.42f)
-        caption(r[0], "Pazartesi sabahı, okulun ilk günü…")
-        talk(r[0], 0.66f, 0.25f, "Arda! Ödevini getirdin mi?", TailDirection.BOTTOM_RIGHT, w = 0.58f)
+        who("ogrenci_arda", "poz_01", r[0], 0.26f, 0.66f, maxW = 0.42f)
+        who("ogrenci_ece", "poz_01", r[0], 0.74f, 0.64f, maxW = 0.42f)
+        caption(r[0], "Pazartesi sabahı, okulun ilk günü…", w = 0.42f)
+        talk(r[0], 0.74f, 0.22f, "Arda! Ödevini getirdin mi?", TailDirection.BOTTOM_RIGHT, w = 0.56f)
         // 2: Arda'nın şaşkın yüzü (sade zemin, odak çizgileri yüzüne toplanır)
         ground(r[1], "#FFFFFF")
         lines(ComicLinesKind.FOCUS, r[1], density = 1.6f)
@@ -151,7 +152,7 @@ class V53TemplateExport : TemplateExportBase() {
         // 3: Ece başını çeviriyor (kasvet deseni: manga tate-sen)
         ground(r[2], "#ECEFF1", ToneFill("pat_vlines", 0.55f, colorHex = "#37474F"))
         who("ogrenci_ece", "gunluk_02", r[2], 0.6f, 0.62f, maxW = 0.6f)
-        talk(r[2], 0.32f, 0.16f, "Yine mi unuttun…", TailDirection.BOTTOM_RIGHT, BalloonStyle.THOUGHT, w = 0.46f)
+        talk(r[2], 0.32f, 0.16f, "Yine mi unuttun…", TailDirection.BOTTOM_RIGHT, BalloonStyle.THOUGHT, w = 0.5f)
         page(1)
         panelsAny("four_grid")
         val l2 = readingOrder(false)
@@ -173,7 +174,7 @@ class V53TemplateExport : TemplateExportBase() {
         backdrop("okul_cati", l2[3].first)
         who("ogrenci_arda", "ifade_04", q[3], 0.26f, 0.48f, maxW = 0.48f)
         who("ogrenci_ece", "ifade_03", q[3], 0.75f, 0.48f, maxW = 0.48f)
-        talk(q[3], 0.3f, 0.13f, "Ödev çatıdaymış!", TailDirection.BOTTOM_LEFT, w = 0.6f)
+        talk(q[3], 0.3f, 0.13f, "Ödev çatıdaymış!", TailDirection.BOTTOM_LEFT)
         sfx("HAHAHA", q[3].at(0.64f, 0.37f), 72f)
         export("comic_story_school", CanvasKind.COMIC, landing = 0, coverPage = 0)
     }
@@ -189,7 +190,7 @@ class V53TemplateExport : TemplateExportBase() {
         backdrop("liman", l[0].first)
         who("dedektif_cemal", "gunluk_02", r[0], 0.62f, 0.62f, maxW = 0.62f)
         caption(r[0], "Akşam, liman. Çalınan veriler burada bir yerde…")
-        talk(r[0], 0.36f, 0.33f, "Taze ayak izleri!", TailDirection.BOTTOM_RIGHT, w = 0.5f)
+        talk(r[0], 0.36f, 0.34f, "Taze ayak izleri!", TailDirection.BOTTOM_RIGHT, w = 0.6f)
         // 2: polis şüpheliyi görüyor
         backdrop("gunbatimi_cadde", l[1].first)
         who("polis_murat", "aksiyon_06", r[1], 0.6f, 0.74f, maxW = 0.6f)
@@ -221,8 +222,8 @@ class V53TemplateExport : TemplateExportBase() {
         backdrop("fabrika", l2[3].first)
         who("dedektif_cemal", "ifade_02", q[3], 0.26f, 0.5f, maxW = 0.48f)
         who("polis_murat", "ifade_02", q[3], 0.75f, 0.5f, maxW = 0.48f)
-        talk(q[3], 0.34f, 0.12f, "Veriler bu çantada!", TailDirection.BOTTOM_LEFT, w = 0.6f)
-        talk(q[3], 0.66f, 0.31f, "Dava kapandı.", TailDirection.BOTTOM_RIGHT, w = 0.52f)
+        talk(q[3], 0.4f, 0.11f, "Veriler bu çantada!", TailDirection.BOTTOM_LEFT, w = 0.74f)
+        talk(q[3], 0.62f, 0.33f, "Dava kapandı.", TailDirection.BOTTOM_RIGHT, w = 0.64f)
         export("comic_story_chase", CanvasKind.COMIC, landing = 0, coverPage = 0)
     }
 
@@ -237,7 +238,7 @@ class V53TemplateExport : TemplateExportBase() {
         backdrop("nehir_park", l[0].first)
         who("ege", "poz_01", q[0], 0.28f, 0.68f, maxW = 0.42f)
         who("hasan_dede", "poz_01", q[0], 0.74f, 0.72f, maxW = 0.42f)
-        talk(q[0], 0.36f, 0.14f, "Dede, eskiden okula nasıl giderdin?", TailDirection.BOTTOM_LEFT, w = 0.68f)
+        talk(q[0], 0.36f, 0.14f, "Dede, eskiden okula nasıl giderdin?", TailDirection.BOTTOM_LEFT)
         // 2: dede övünüyor
         backdrop("sonbahar_park", l[1].first)
         who("hasan_dede", "ifade_09", q[1], 0.5f, 0.56f, maxW = 0.8f)
@@ -250,7 +251,7 @@ class V53TemplateExport : TemplateExportBase() {
         backdrop("avlu", l[3].first)
         who("hasan_dede", "ifade_05", q[3], 0.26f, 0.48f, maxW = 0.48f)
         who("ege", "ifade_02", q[3], 0.75f, 0.48f, maxW = 0.48f)
-        talk(q[3], 0.3f, 0.13f, "Hikâye bu, evlat!", TailDirection.BOTTOM_LEFT, w = 0.6f)
+        talk(q[3], 0.3f, 0.13f, "Hikâye bu, evlat!", TailDirection.BOTTOM_LEFT)
         sfx("HAHAHA", q[3].at(0.64f, 0.37f), 72f)
         export("comic_story_strip", CanvasKind.COMIC, landing = 0, coverPage = 0)
     }

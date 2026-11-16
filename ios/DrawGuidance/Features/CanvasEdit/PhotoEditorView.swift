@@ -468,8 +468,9 @@ private struct PhotoCanvasView: View {
             .contentShape(Rectangle())
             .gesture(drag(size, rect))
             .simultaneousGesture(
-                MagnifyGesture()
-                    .onChanged { v in scale = min(6, max(1, baseScale * v.magnification)); if scale <= 1.001 { pan = .zero } }
+                // v55 iOS 16: MagnifyGesture (iOS 17) yerine MagnificationGesture
+                MagnificationGesture()
+                    .onChanged { v in scale = min(6, max(1, baseScale * v)); if scale <= 1.001 { pan = .zero } }
                     .onEnded { _ in baseScale = scale; basePan = pan }
             )
             .accessibilityIdentifier("photo_canvas")

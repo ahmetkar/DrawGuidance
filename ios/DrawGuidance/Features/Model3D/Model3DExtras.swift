@@ -266,14 +266,14 @@ struct Model3DListView: View {
         }
         .navigationTitle(L("model3d_my_models"))
         .toolbar {
-            ToolbarItemGroup(placement: .topBarTrailing) {
+            ToolbarItemGroup(placement: .navigationBarTrailing) {
                 Button { picking = true } label: { Label(L("glb_import_button"), systemImage: "square.and.arrow.down") }
                     .disabled(importing).accessibilityIdentifier("models3d_import_glb")
                 Button { open = OpenModel(id: UUID().uuidString, modelId: nil) } label: { Label(L("model3d_new"), systemImage: "plus") }
                     .accessibilityIdentifier("models3d_new")
             }
         }
-        .navigationDestination(item: $open) { o in Model3DEditorView(repository: repository, modelId: o.modelId).toolbar(.hidden, for: .tabBar) }
+        .navigationDestinationCompat(item: $open) { o in Model3DEditorView(repository: repository, modelId: o.modelId).toolbar(.hidden, for: .tabBar) }
         .fileImporter(isPresented: $picking, allowedContentTypes: [.glb, .gltf, .data]) { r in
             guard case .success(let url) = r else { return }
             let ok = url.startAccessingSecurityScopedResource()

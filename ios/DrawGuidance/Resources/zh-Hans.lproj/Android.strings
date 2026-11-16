@@ -3637,6 +3637,8 @@
 "v54_template_choose_message" = "没有选中用作模板的形状或图片。请从绘图助手或形状中选择一个，或点击画布上的形状。";
 "v54_template_choose_shapes" = "形状";
 "v54_template_helper_hint" = "所选助手的线条将成为形状模板；靠近线条绘制即可描摹。";
+"v55_image_err_memory" = "此图片对本设备的内存来说过大（%1$@）。为避免应用崩溃未添加，请尝试较小的副本。";
+"v55_image_err_pixels" = "分辨率过高，无法处理（%1$d×%2$d，超过 10 亿像素）。请尝试较小的副本。";
 "vector_cut" = "切断";
 "vector_delete" = "删除";
 "vector_edit_open" = "编辑矢量";

@@ -67,7 +67,7 @@ struct SubscriptionView: View {
         }
         .navigationTitle(L("v39_sub_title"))
         .manageSubscriptionsSheet(isPresented: $manageOpen)
-        .onChange(of: manageOpen) { _, open in
+        .onChangeCompat(of: manageOpen) { _, open in
             // Yönetim sayfası kapanınca (iptal, plan değişikliği) hak yeniden okunur
             if !open { Task { await store.refresh(); await store.refreshServer() } }
         }

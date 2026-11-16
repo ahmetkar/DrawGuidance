@@ -197,7 +197,7 @@ struct BalloonInlineEditor: View {
                 texts.updateDraftText(text)
                 focused = true
             }
-            .onChange(of: text) { _, t in texts.updateDraftText(t) }
+            .onChangeCompat(of: text) { _, t in texts.updateDraftText(t) }
         }
     }
 

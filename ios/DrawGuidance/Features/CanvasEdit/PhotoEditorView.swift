@@ -78,7 +78,7 @@ struct PhotoEditorView: View {
         }
         .background(Color(red: 0.06, green: 0.07, blue: 0.08).ignoresSafeArea())
         .accessibilityIdentifier("photo_editor")
-        .onChange(of: tab) { _, t in photo.setCropMode(t == .crop) }
+        .onChangeCompat(of: tab) { _, t in photo.setCropMode(t == .crop) }
         .onAppear { photo.setCropMode(tab == .crop) }
         .confirmationDialog(L("v52_photo_discard"), isPresented: $confirmDiscard, titleVisibility: .visible) {
             Button(L("v52_photo_discard_yes"), role: .destructive) { photo.close() }

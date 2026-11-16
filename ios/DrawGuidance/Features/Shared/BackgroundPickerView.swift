@@ -107,7 +107,7 @@ struct BackgroundPickerView: View {
                 slider(L("bg_image_opacity"), value: $spec.imageOpacity, 0.1...1)
             }
         }
-        .onChange(of: photo) { _, item in
+        .onChangeCompat(of: photo) { _, item in
             guard let item else { return }
             Task {
                 if let data = try? await item.loadTransferable(type: Data.self) { onGallery?(data) }

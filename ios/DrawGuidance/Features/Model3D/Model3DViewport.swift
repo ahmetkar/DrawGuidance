@@ -96,14 +96,14 @@ struct Model3DViewport: View {
                     .accessibilityIdentifier("model3d_viewport")
             }
             .onAppear { size = geo.size; vm.setViewport(Int(geo.size.width), Int(geo.size.height)); scheduleRender() }
-            .onChange(of: geo.size) { _, s in size = s; vm.setViewport(Int(s.width), Int(s.height)); scheduleRender() }
+            .onChangeCompat(of: geo.size) { _, s in size = s; vm.setViewport(Int(s.width), Int(s.height)); scheduleRender() }
         }
         .onReceive(vm.$model) { _ in DispatchQueue.main.async { scheduleRender() } }
         .onReceive(vm.$selection) { _ in DispatchQueue.main.async { scheduleRender() } }
         .onReceive(vm.$tool) { _ in DispatchQueue.main.async { scheduleRender() } }
         .onReceive(vm.$renderTick) { _ in DispatchQueue.main.async { scheduleRender() } }
         .onReceive(vm.$quality) { _ in DispatchQueue.main.async { scheduleRender() } }
-        .onChange(of: interacting) { _, _ in scheduleRender() }
+        .onChangeCompat(of: interacting) { _, _ in scheduleRender() }
     }
 
     private var background: some View {

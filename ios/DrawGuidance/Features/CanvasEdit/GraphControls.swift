@@ -21,7 +21,7 @@ struct GraphControlsBar: View {
             .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 16))
             .padding(.horizontal, 8)
             .accessibilityIdentifier("graph_controls")
-            .onChange(of: p.kind) { _, _ in error = nil }
+            .onChangeCompat(of: p.kind) { _, _ in error = nil }
         }
     }
 
@@ -140,7 +140,7 @@ struct GraphValueHost: View {
             } message: {
                 if req?.tag.hasPrefix("tick:") == true { Text(L("graph_edit_tick_hint")) }
             }
-            .onChange(of: req) { _, r in if let r { draft = r.initial } }
+            .onChangeCompat(of: req) { _, r in if let r { draft = r.initial } }
             .accessibilityIdentifier("graph_value_sheet")
     }
 

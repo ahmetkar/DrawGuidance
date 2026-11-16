@@ -197,6 +197,17 @@ struct CanvasFormSheet: View {
                 if !templates.isEmpty { templateSection }
                 if !fromTemplate {
                     sizeSection
+                    // v55 sayfa sayısı boyutun hemen altında (çizgi roman ve not alma); seçilen sayıda sayfa oluşur ve
+                    // düzenleyicideki sayfa şeridinden sayfalar arasında geçilir
+                    if kind.paged && !isEditMode {
+                        Section {
+                            Picker(L("page_count_label"), selection: $pageCount) {
+                                ForEach([1, 2, 4, 8, 16].filter { $0 <= kind.maxPages }, id: \.self) { Text("\($0)").tag($0) }
+                            }
+                            .pickerStyle(.segmented)
+                            .accessibilityIdentifier("form_page_count")
+                        } header: { Text(L("page_count_label")) } footer: { Text(L("page_limit_hint", kind.maxPages)) }
+                    }
                     Section(L("canvas_background_color_label")) {
                         HStack(spacing: 12) {
                             ForEach(Self.paperSwatches, id: \.self) { hex in
@@ -223,14 +234,6 @@ struct CanvasFormSheet: View {
                                                  },
                                                  galleryPreview: galleryPreview)
                         }
-                    }
-                    if kind.paged && !isEditMode {
-                        Section {
-                            Picker(L("page_count_label"), selection: $pageCount) {
-                                ForEach([1, 2, 4, 8, 16].filter { $0 <= kind.maxPages }, id: \.self) { Text("\($0)").tag($0) }
-                            }
-                            .pickerStyle(.segmented)
-                        } header: { Text(L("page_count_label")) } footer: { Text(L("page_limit_hint", kind.maxPages)) }
                     }
                 }
                 Section {

@@ -468,7 +468,7 @@ struct LiveBroadcastBridge: View {
         .onReceive(store.$canvas) { c in
             if let c, share.isBroadcasting(c.localId) { share.publishLive(c) }
         }
-        .onChange(of: share.liveOut) { _, out in
+        .onChangeCompat(of: share.liveOut) { _, out in
             // Yayın başlarken tuvalin o anki hali hemen gider
             if let out, out.canvasId == canvasLocalId, let c = store.canvas { share.publishLive(c) }
         }
@@ -478,7 +478,7 @@ struct LiveBroadcastBridge: View {
             if let c = store.canvas { share.publishLive(c) }
         }
         .onDisappear { share.pauseLive(canvasLocalId) }
-        .onChange(of: scenePhase) { _, phase in
+        .onChangeCompat(of: scenePhase) { _, phase in
             if phase == .background { share.pauseLive(canvasLocalId) }
             else if phase == .active { share.resumeLive(canvasLocalId); if let c = store.canvas { share.publishLive(c) } }
         }
@@ -527,7 +527,7 @@ private struct PairCodeEntry: View {
                     .keyboardType(.numberPad).textContentType(.oneTimeCode)
                     .font(.system(size: 34, weight: .bold, design: .monospaced)).multilineTextAlignment(.center)
                     .focused($focused)
-                    .onChange(of: code) { _, v in
+                    .onChangeCompat(of: code) { _, v in
                         let d = String(v.filter { $0.isASCII && $0.isNumber }.prefix(SharePairing.CODE_DIGITS))
                         if d != v { code = d }
                     }

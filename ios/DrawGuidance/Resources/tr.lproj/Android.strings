@@ -3637,6 +3637,8 @@
 "v54_template_choose_message" = "Kalıp için seçili bir şekil ya da resim yok. Çizim yardımcılarından ya da şekillerden birini seç; istersen tuvaldeki bir şekle de dokunabilirsin.";
 "v54_template_choose_shapes" = "Şekiller";
 "v54_template_helper_hint" = "Seçtiğin çizim yardımcısının çizgileri şekil kalıbı olur; kenarına yakın çizerek izleyebilirsin.";
+"v55_image_err_memory" = "Bu resim bu cihazın belleği için çok büyük (%1$@). Uygulamanın çökmemesi için eklenmedi; daha küçük bir kopyasını deneyin.";
+"v55_image_err_pixels" = "Çözünürlük işlenemeyecek kadar yüksek (%1$d×%2$d, 1 gigapikselin üstünde). Daha küçük bir kopyasını deneyin.";
 "vector_cut" = "Kes";
 "vector_delete" = "Sil";
 "vector_edit_open" = "Vektör düzenle";

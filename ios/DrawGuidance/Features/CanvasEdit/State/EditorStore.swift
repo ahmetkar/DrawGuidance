@@ -57,7 +57,7 @@ final class EditorStore: ObservableObject {
     private let clock: () -> Int64
     let indexer = ElementIndexer()
     private var indexGeneration = 0
-    private var history = EditHistory<DocumentState>(maxSize: EditorStore.MAX_HISTORY, coalesceWindowMs: EditorStore.COALESCE_WINDOW_MS)
+    private var history = EditHistory<DocumentState>(maxSize: Budget3D.historyLimit(EditorStore.MAX_HISTORY), coalesceWindowMs: EditorStore.COALESCE_WINDOW_MS)
 
     /// Otomatik kayıt.
     var autosave = true {
@@ -82,7 +82,7 @@ final class EditorStore: ObservableObject {
     func beginSandbox() {
         guard let current = canvas, sandbox == nil else { return }
         sandbox = Sandbox(canvas: current, history: history, selection: selectedIds, dirty: dirty)
-        history = EditHistory(maxSize: Self.MAX_HISTORY, coalesceWindowMs: Self.COALESCE_WINDOW_MS)
+        history = EditHistory(maxSize: Budget3D.historyLimit(Self.MAX_HISTORY), coalesceWindowMs: Self.COALESCE_WINDOW_MS)
         selectedIds = []
         var c = current
         c.pages = [[]]

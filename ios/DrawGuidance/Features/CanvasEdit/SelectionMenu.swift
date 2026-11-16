@@ -87,7 +87,7 @@ struct SelectionMenu: View {
                 .opacity(size == .zero ? 0 : 1)
             }
             .onPreferenceChange(MenuSizeKey.self) { size = $0 }
-            .onChange(of: store.selectedIds) { _, _ in listOpen = false }
+            .onChangeCompat(of: store.selectedIds) { _, _ in listOpen = false }
         }
     }
 

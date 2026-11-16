@@ -32,13 +32,13 @@ enum ImageIssue: Equatable {
     /// Kullanıcıya gösterilen açıklama (Android metinleri).
     var message: String {
         switch self {
-        // v54 sınırlar 10 MB ve 8192 px / 64 MP
-        case .tooLarge(let b): return L("v54_image_err_too_large", ImageImportValidator.kb(b))
+        // v55 sabit sınır yok; yalnız bellek koruması (cihaz belleğine göre) ve 1 gigapiksel
+        case .tooLarge(let b): return L("v55_image_err_memory", ImageImportValidator.kb(b))
         case .unsupportedFormat: return L("image_err_format")
         case .unreadable: return L("image_err_unreadable")
         case .suspicious: return L("v54_image_err_suspicious")
         case .tooSmall(let w, let h): return L("image_err_too_small", w, h)
-        case .dimensionsTooLarge(let w, let h): return L("v54_image_err_dimensions", w, h)
+        case .dimensionsTooLarge(let w, let h): return L("v55_image_err_pixels", w, h)
         case .tooDetailed(let p): return L("image_err_detail", p)
         case .detailed(let p): return L("image_warn_detail", p)
         case .willDownscale(let w, let h, let tw, let th): return L("image_warn_downscale", w, h, tw, th)
@@ -61,35 +61,41 @@ struct ImageCheckResult {
     var accepted: Bool { errors.isEmpty && image != nil }
 }
 
-/// Tuvale eklenecek resmin sıkı kontrolleri (Android `ImageImportValidator`):
+/// Tuvale eklenecek resmin kontrolleri (Android `ImageImportValidator`; v55: tüm modlarda detay ve boyut sınırı yok,
+/// yalnız güvenlik ve bellek koruması):
 /// - Biçim: yalnızca PNG, JPEG, WEBP (dosya imzasından)
 /// - v54 yapı ve gömülü kod denetimi (`ImageSecurity`): betik, HTML, çalıştırılabilir ya da arşiv içeren resim reddedilir
-/// - v54 dosya boyutu en fazla 10 MB (8 MB üstü uyarı)
-/// - v54 kenarlar 16–8192 px, en fazla 64 MP; uzun kenarı 3000 px'ten (giriş düzeyinde 2000 px) büyükse küçültülür
-///   (uyarı). Büyük resim tam boyda açılmaz (ImageIO küçük resim olarak hedef boyda çözer).
-/// - Detay: 256 px'e küçültülmüş gri görüntüde güçlü kenarlı piksel oranı; %30 ve üstü reddedilir, %15 ve üstü uyarı.
+/// - v55 dosya boyutu ve çözünürlük için sabit sınır yok. Uygulamanın çökmemesi için yalnız: dosya cihaz belleğinin
+///   1/16'sını ([maxImportBytes], 32–256 MB) ve çözünürlük 1 gigapikseli aşamaz.
+/// - Saklanırken uzun kenar 3000 px'e (giriş düzeyinde 2000, düşük RAM'li cihazda 1600 px) küçültülür (uyarı). Büyük resim
+///   tam boyda açılmaz (ImageIO küçük resim olarak hedef boyda çözer).
+/// - v55 detay (doku yoğunluğu) sınırı kaldırıldı.
 /// Kaydedilecek veri: v54 her zaman yeniden kodlanır (üst veri ve eklenmiş veriler atılır): JPEG kaynakta JPEG, ötekilerde PNG.
 enum ImageImportValidator {
-    static let MAX_BYTES = 10 * 1024 * 1024
-    static let WARN_BYTES = 8 * 1024 * 1024
-    static let MIN_SIDE = 16
-    static let MAX_SIDE = 8192
-    static let MAX_PIXELS = 64_000_000
+    /// Çözünürlük için yalnız teknik üst sınır (1 gigapiksel; çözücü süresi ve bellek için).
+    static let MAX_PIXELS = 1_000_000_000
     static let STORE_MAX_SIDE = 3000
     static let STORE_MAX_SIDE_LOW = 2000
-    static let DETAIL_REJECT: Float = 0.30
-    static let DETAIL_WARN: Float = 0.15
+    static let STORE_MAX_SIDE_LOW_RAM = 1600
     private static let ANALYSIS_SIDE = 256
     private static let EDGE_THRESHOLD = 96.0
 
+    /// v55 okunabilecek en büyük dosya: cihaz belleğinin 1/16'sı, 32–256 MB (dosya baytları ve çözme için yer kalsın).
+    static var maxImportBytes: Int { maxImportBytes(memory: ProcessInfo.processInfo.physicalMemory) }
+
+    static func maxImportBytes(memory: UInt64) -> Int {
+        let v = memory / 16
+        return Int(min(max(v, 32 << 20), 256 << 20))
+    }
+
     /// Cihaz sınıfına göre saklanan resmin uzun kenarı.
-    static var storeMaxSide: Int { Budget3D.tier == .LOW ? STORE_MAX_SIDE_LOW : STORE_MAX_SIDE }
+    static var storeMaxSide: Int { Budget3D.lowRam ? STORE_MAX_SIDE_LOW_RAM : Budget3D.tier == .LOW ? STORE_MAX_SIDE_LOW : STORE_MAX_SIDE }
 
     static func kb(_ b: Int) -> String { b >= 1024 * 1024 ? String(format: "%.1f MB", Double(b) / 1048576).replacingOccurrences(of: ".", with: ",") : "\(b / 1024) KB" }
 
     static func check(_ bytes: Data, storeSide: Int = storeMaxSide) -> ImageCheckResult {
         var errors: [ImageIssue] = [], warnings: [ImageIssue] = []
-        if bytes.count > MAX_BYTES { errors.append(.tooLarge(bytes.count)) }
+        if bytes.count > maxImportBytes { errors.append(.tooLarge(bytes.count)) }
         guard let mime = sniffMime(bytes) else { return ImageCheckResult(errors: errors + [.unsupportedFormat], warnings: [], image: nil) }
         if !errors.isEmpty { return ImageCheckResult(errors: errors, warnings: warnings, image: nil) }
         // v54 yapı ve gömülü kod denetimi (çözmeden önce)
@@ -98,14 +104,13 @@ enum ImageImportValidator {
         case .SUSPICIOUS: return ImageCheckResult(errors: [.suspicious], warnings: [], image: nil)
         case .CLEAN: break
         }
-        if bytes.count > WARN_BYTES { warnings.append(.nearSizeLimit(bytes.count)) }
         guard let src = CGImageSourceCreateWithData(bytes as CFData, nil),
               let props = CGImageSourceCopyPropertiesAtIndex(src, 0, nil) as? [CFString: Any],
               let w = props[kCGImagePropertyPixelWidth] as? Int, let h = props[kCGImagePropertyPixelHeight] as? Int, w > 0, h > 0 else {
             return ImageCheckResult(errors: [.unreadable], warnings: [], image: nil)
         }
-        if w < MIN_SIDE || h < MIN_SIDE { errors.append(.tooSmall(w, h)) }
-        if w > MAX_SIDE || h > MAX_SIDE || w * h > MAX_PIXELS { errors.append(.dimensionsTooLarge(w, h)) }
+        // v55 sabit boyut sınırı yok; yalnız işlenemeyecek kadar büyük (1 GP üstü) çözünürlük
+        if Int64(w) * Int64(h) > Int64(MAX_PIXELS) { errors.append(.dimensionsTooLarge(w, h)) }
         if !errors.isEmpty { return ImageCheckResult(errors: errors, warnings: warnings, image: nil) }
         let longest = max(w, h)
         let factor: Float = longest > storeSide ? Float(storeSide) / Float(longest) : 1
@@ -114,14 +119,11 @@ enum ImageImportValidator {
             return ImageCheckResult(errors: [.unreadable], warnings: [], image: nil)
         }
         if factor < 1 { warnings.append(.willDownscale(w, h, image.width, image.height)) }
-        let detail = detailScore(image)
-        let percent = ktRound(detail * 100)
-        if detail >= DETAIL_REJECT { errors.append(.tooDetailed(percent)) } else if detail >= DETAIL_WARN { warnings.append(.detailed(percent)) }
-        if !errors.isEmpty { return ImageCheckResult(errors: errors, warnings: warnings, image: nil) }
+        // v55 detay sınırı yok (doku yoğunluğu hesaplanmaz)
         guard let (stored, storedMime) = reencode(mime, image) else { return ImageCheckResult(errors: [.unreadable], warnings: [], image: nil) }
         return ImageCheckResult(errors: errors, warnings: warnings,
                                 image: PreparedImage(bytes: stored, mimeType: storedMime, width: image.width, height: image.height, image: image,
-                                                     originalBytes: bytes.count, detailScore: detail))
+                                                     originalBytes: bytes.count, detailScore: 0))
     }
 
     /// v54 hedef boyda çözme: küçültülecekse ImageIO küçük resmi (tam boy bitmap açılmaz), ardından önçarpımlı RGBA kopya.

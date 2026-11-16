@@ -378,7 +378,7 @@ struct LinesInsertSection: View {
             }
             .pickerStyle(.segmented)
             .accessibilityIdentifier("lines_style")
-            .onChange(of: style) { _, s in
+            .onChangeCompat(of: style) { _, s in
                 LinesPresetMemory.style = s
                 if ComicLines.style(kind) != s, let first = ComicLines.kinds(s).first { select(first) }
             }

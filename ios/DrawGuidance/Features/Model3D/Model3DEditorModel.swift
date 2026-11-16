@@ -149,7 +149,7 @@ final class Model3DEditorModel: ObservableObject {
 
     private func pushUndo(_ m: Model3D) {
         undoStack.append(m)
-        if undoStack.count > Self.MAX_HISTORY { undoStack.removeFirst() }
+        while undoStack.count > Budget3D.historyLimit(Self.MAX_HISTORY) { undoStack.removeFirst() }
         redoStack.removeAll()
         refreshFlags()
     }

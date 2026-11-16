@@ -56,14 +56,14 @@ struct PracticeLayer: View {
         }
         .accessibilityElement(children: .contain)
         .accessibilityIdentifier("practice_layer")
-        .onChange(of: ctl.run?.seq) { _, seq in
+        .onChangeCompat(of: ctl.run?.seq) { _, seq in
             if seq != nil {
                 viewport.fit(); fade()
                 introOpen = true
                 DispatchQueue.main.asyncAfter(deadline: .now() + 4.5) { if ctl.run?.seq == seq { withAnimation { introOpen = false } } }
             }
         }
-        .onChange(of: ctl.hints) { _, _ in fade() }
+        .onChangeCompat(of: ctl.hints) { _, _ in fade() }
         .sheet(isPresented: Binding(get: { ctl.listOpen }, set: { ctl.listOpen = $0 })) {
             PracticeSheet(levels: ctl.levels(), best: prefs.best, current: ctl.run?.index, active: ctl.active,
                           locked: { l in !prefs.unlocked.contains(l.id) && ctl.isLocked(l) },

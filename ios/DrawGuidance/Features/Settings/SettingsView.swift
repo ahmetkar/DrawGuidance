@@ -128,7 +128,7 @@ struct SettingsView: View {
             }
             Toggle(L("export_use_gallery"), isOn: $export.saveToPhotos)
         } header: { Text(L("export_section_title")) } footer: { Text(L("export_section_description")) }
-        .onChange(of: export) { _, s in s.save() }
+        .onChangeCompat(of: export) { _, s in s.save() }
         Section {
             if let usage {
                 ForEach(StorageArea.allCases, id: \.self) { a in

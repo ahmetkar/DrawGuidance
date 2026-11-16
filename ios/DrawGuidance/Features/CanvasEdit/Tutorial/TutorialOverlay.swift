@@ -104,7 +104,7 @@ struct TutorialOverlay: View {
         }
         .frame(width: size.width, height: size.height, alignment: .topLeading)
         .onPreferenceChange(CalloutSizeKey.self) { calloutSize = $0 }
-        .onChange(of: "\(ui.group.id):\(ui.index):\(Int(calloutSize.height))") { _, key in fitPaper(key, size, canvasRect) }
+        .onChangeCompat(of: "\(ui.group.id):\(ui.index):\(Int(calloutSize.height))") { _, key in fitPaper(key, size, canvasRect) }
         .onAppear { withAnimation(.easeInOut(duration: 1.1).repeatForever(autoreverses: true)) { pulse = true } }
     }
 

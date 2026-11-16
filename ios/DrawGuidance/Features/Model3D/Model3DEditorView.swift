@@ -221,10 +221,10 @@ private struct SceneArea3: View {
         }
         .clipShape(RoundedRectangle(cornerRadius: 18))
         .onAppear { showHint() }
-        .onChange(of: vm.tool) { _, _ in showHint() }
-        .onChange(of: vm.mode) { _, _ in showHint() }
-        .onChange(of: vm.faceMode) { _, _ in showHint() }
-        .onChange(of: vm.paintScope) { _, _ in showHint() }
+        .onChangeCompat(of: vm.tool) { _, _ in showHint() }
+        .onChangeCompat(of: vm.mode) { _, _ in showHint() }
+        .onChangeCompat(of: vm.faceMode) { _, _ in showHint() }
+        .onChangeCompat(of: vm.paintScope) { _, _ in showHint() }
     }
 
     private func showHint() {

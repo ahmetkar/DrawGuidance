@@ -2,7 +2,8 @@ name: DrawGuidance
 options:
   bundleIdPrefix: com.karapp
   deploymentTarget:
-    iOS: "17.0"
+    # v55 geniş cihaz desteği: iOS 16 (iPhone 8 / X, iPad 5. nesil). iOS 15 planı: claude/v55-plan-cihaz-destegi.md C2
+    iOS: "16.0"
   developmentLanguage: tr
 packages:
   TalsecRuntime:
@@ -23,8 +24,8 @@ packages:
     exactVersion: 8.0.0
 settings:
   base:
-    MARKETING_VERSION: "1.12.0"
-    CURRENT_PROJECT_VERSION: "54"
+    MARKETING_VERSION: "1.12.1"
+    CURRENT_PROJECT_VERSION: "55"
     SWIFT_VERSION: "5.0"
     # Apple Developer takım kimliği (gizli değil; imzalama ve freeRASP imza denetimi için)
     DEVELOPMENT_TEAM: "G3LKL7QH6D"

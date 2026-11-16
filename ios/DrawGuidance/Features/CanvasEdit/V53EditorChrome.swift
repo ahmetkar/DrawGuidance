@@ -537,7 +537,7 @@ struct AddRowItems: View {
         .accessibilityLabel(L("add_image"))
         .accessibilityIdentifier("add_image")
         .tutorialAnchor(TutorialAnchor.add("image"))
-        .onChange(of: photo) { _, it in
+        .onChangeCompat(of: photo) { _, it in
             guard let it else { return }
             Task {
                 if let data = try? await it.loadTransferable(type: Data.self) {

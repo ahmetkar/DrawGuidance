@@ -83,6 +83,8 @@ struct CanvasEditScreen: View {
             .overlay(alignment: .bottom) { if vm.loaded { LiveBroadcastBridge(store: vm.store, canvasLocalId: vm.canvasLocalId) } }
             // v53 Elemanlar, Katmanlar ve Özellikler sağdan açılan panelde
             .overlay { if vm.loaded && vm.store.canvas?.kind != .KIDS { EditorSidePanelHost(vm: vm, store: vm.store, brushPickerOpen: $brushPickerOpen) } }
+            // v55 çizgi roman ve not almada sayfa şeridi (sayfalar arası geçiş, ekleme, çoğaltma, silme)
+            if vm.loaded { PageStripView(vm: vm, store: vm.store) }
         }
         .background(Color(uiColor: CanvasColors.background))
         .overlay { EditorToastHost(events: vm.events) }
@@ -92,14 +94,14 @@ struct CanvasEditScreen: View {
                                 mascot: vm.store.canvas?.kind == .KIDS)
             }
         }
-        .onChange(of: vm.loaded) { _, loaded in
+        .onChangeCompat(of: vm.loaded) { _, loaded in
             guard loaded, let c = vm.store.canvas else { return }
             // v51 önceki tuvalden yeni alıştırmayla gelindiyse alıştırma hemen açılır (eğitim önerisi yerine)
             if let i = PracticeHandoff.take(c.localId) {
                 if i == PracticeHandoff.LIST { vm.practice.listOpen = true } else { vm.practice.open(i) }
             } else { vm.tutorial.maybeOffer(c.kind) }
         }
-        .onChange(of: vm.switchToCanvas) { _, id in if let id { onSwitchCanvas(id) } }
+        .onChangeCompat(of: vm.switchToCanvas) { _, id in if let id { onSwitchCanvas(id) } }
         .modifier(TutorialOfferPresenter(vm: vm, ctl: vm.tutorial))
         .navigationBarBackButtonHidden(true)
         .toolbar(.hidden, for: .navigationBar)
@@ -282,7 +284,7 @@ private struct TempImageEditCloser: ViewModifier {
     func body(content: Content) -> some View {
         if vm.isTempImageEdit {
             content
-                .onChange(of: vm.tempClosed) { _, closed in if closed { dismiss() } }
+                .onChangeCompat(of: vm.tempClosed) { _, closed in if closed { dismiss() } }
                 .onAppear { vm.emit(.message(L(vm.isTempShapeEdit ? "v52_temp_shape_hint" : "v51_temp_image_hint"))) }
         } else {
             content

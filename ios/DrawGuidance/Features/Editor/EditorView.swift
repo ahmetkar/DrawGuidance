@@ -54,7 +54,7 @@ struct EditorView: View {
             DispatchQueue.global(qos: .userInitiated).async { CanvasAssetStore.shared.ensureLoaded(c) }
         }
         .onReceive(NotificationCenter.default.publisher(for: CanvasImageCache.changed).receive(on: RunLoop.main)) { _ in historyTick += 1 }
-        .onChange(of: photo) { _, item in
+        .onChangeCompat(of: photo) { _, item in
             guard let item else { return }
             photo = nil
             Task {

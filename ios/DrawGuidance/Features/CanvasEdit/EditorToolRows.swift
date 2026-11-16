@@ -84,7 +84,7 @@ struct TextDraftBar: View {
                     .textFieldStyle(.roundedBorder)
                     .focused($focused)
                     .accessibilityIdentifier("text_draft_field")
-                    .onChange(of: text) { _, t in texts.updateDraftText(t) }
+                    .onChangeCompat(of: text) { _, t in texts.updateDraftText(t) }
                 Button { vm.confirmText(text); text = "" } label: { Image(systemName: "checkmark.circle.fill").font(.title2) }
                     .accessibilityIdentifier("text_confirm")
                 Button { texts.cancel(); text = "" } label: { Image(systemName: "xmark.circle").font(.title2) }
@@ -93,7 +93,7 @@ struct TextDraftBar: View {
             .padding(10)
             .background(.regularMaterial)
             .onAppear { text = draft.content; focused = true }
-            .onChange(of: draft.anchor) { _, _ in text = draft.content }
+            .onChangeCompat(of: draft.anchor) { _, _ in text = draft.content }
         }
     }
 }

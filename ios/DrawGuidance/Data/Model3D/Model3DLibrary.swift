@@ -12,6 +12,18 @@ enum Budget3D {
         return gb < 2.5 ? .LOW : gb < 5.5 ? .MID : .HIGH
     }()
 
+    /// v55 düşük RAM'li cihaz (≤ 2,2 GB; iPhone 8, iPad 5. nesil gibi iOS 16 cihazları): geri alma geçmişi kısa,
+    /// saklanan resim 1600 px.
+    static let lowRam: Bool = isLowRam(memory: ProcessInfo.processInfo.physicalMemory)
+    static let LOW_RAM_BYTES: UInt64 = 2200 * 1024 * 1024
+
+    static func isLowRam(memory: UInt64) -> Bool { memory > 0 && memory <= LOW_RAM_BYTES }
+
+    /// v55 geri alma geçmişinin uzunluğu: düşük RAM'de normalin %40'ı (en az 20), diğer cihazlarda değişmez.
+    static func historyLimit(_ normal: Int, lowRam: Bool = Budget3D.lowRam) -> Int {
+        lowRam ? max(normal * 2 / 5, min(20, normal)) : normal
+    }
+
     static var csgTriangles: Int { tier == .LOW ? 4_000 : tier == .MID ? 12_000 : 30_000 }
     static var brushSides: Int { tier == .LOW ? 8 : tier == .MID ? 10 : 14 }
     static var brushSamples: Int { tier == .LOW ? 90 : tier == .MID ? 160 : 240 }

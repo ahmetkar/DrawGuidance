@@ -140,7 +140,7 @@ struct SimpleToolbar: View {
         .padding(.bottom, 6)
         .accessibilityElement(children: .contain)
         .accessibilityIdentifier("simple_tool_row")
-        .onChange(of: photo) { _, item in
+        .onChangeCompat(of: photo) { _, item in
             guard let item else { return }
             Task {
                 if let data = try? await item.loadTransferable(type: Data.self) {

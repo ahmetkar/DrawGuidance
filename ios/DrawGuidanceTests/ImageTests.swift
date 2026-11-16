@@ -31,10 +31,11 @@ final class ImageTests: XCTestCase {
         let r = ImageImportValidator.check(data)
         XCTAssertTrue(r.accepted, "\(r.errors)")
         XCTAssertEqual(r.image?.width, 400)
-        XCTAssertLessThan(r.image!.detailScore, ImageImportValidator.DETAIL_WARN)
+        XCTAssertTrue(r.warnings.isEmpty, "\(r.warnings)")
     }
 
-    func testNoiseIsTooDetailed() {
+    /// v55 çok detaylı (gürültü) resim de eklenir, detay uyarısı yok.
+    func testNoiseIsAcceptedWithoutDetailLimit() {
         var rnd = JavaRandom(7)
         let data = png(300, 300) { c in
             for y in 0..<150 {
@@ -45,13 +46,15 @@ final class ImageTests: XCTestCase {
             }
         }
         let r = ImageImportValidator.check(data)
-        XCTAssertFalse(r.accepted)
-        XCTAssertTrue(r.errors.contains { if case .tooDetailed = $0 { return true }; return false } ||
-                      r.errors.contains { if case .tooLarge = $0 { return true }; return false }, "\(r.errors)")
+        XCTAssertTrue(r.accepted, "\(r.errors)")
+        XCTAssertFalse(r.warnings.contains { if case .detailed = $0 { return true }; return false })
     }
 
-    func testRejectsTinyAndUnknown() {
-        XCTAssertEqual(ImageImportValidator.check(png(10, 10) { _ in }).errors, [.tooSmall(10, 10)])
+    func testTinyAcceptedUnknownRejected() {
+        // v55 en küçük kenar sınırı yok
+        let tiny = ImageImportValidator.check(png(10, 10) { _ in })
+        XCTAssertTrue(tiny.accepted, "\(tiny.errors)")
+        XCTAssertEqual(tiny.image?.width, 10)
         XCTAssertEqual(ImageImportValidator.check(Data("merhaba".utf8)).errors, [.unsupportedFormat])
         XCTAssertEqual(ImageImportValidator.sniffMime(Data([0xFF, 0xD8, 0xFF, 0xE0])), "image/jpeg")
     }
@@ -66,8 +69,30 @@ final class ImageTests: XCTestCase {
         XCTAssertTrue(r.accepted, "\(r.errors)")
         XCTAssertEqual(r.image?.width, 2000); XCTAssertEqual(r.image?.height, 1000)
         XCTAssertTrue(r.warnings.contains(.willDownscale(4000, 2000, 2000, 1000)))
-        // v54 8192 px'e kadar kabul, üstü reddedilir
-        XCTAssertTrue(ImageImportValidator.check(png(9000, 20) { _ in }).errors.contains(.dimensionsTooLarge(9000, 20)))
+        // v55 8192 px üstü de kabul: uzun kenar saklama boyuna küçültülür
+        let wide = ImageImportValidator.check(png(9000, 20) { _ in }, storeSide: 3000)
+        XCTAssertTrue(wide.accepted, "\(wide.errors)")
+        XCTAssertEqual(wide.image?.width, 3000)
+    }
+
+    /// v55 bellek koruması: cihaz belleğinin 1/16'sı, 32–256 MB; 1 gigapiksel teknik üst sınır.
+    func testMemoryGuardLimits() {
+        XCTAssertEqual(ImageImportValidator.maxImportBytes(memory: 2 << 30), 128 << 20)
+        XCTAssertEqual(ImageImportValidator.maxImportBytes(memory: 256 << 20), 32 << 20)
+        XCTAssertEqual(ImageImportValidator.maxImportBytes(memory: 16 << 30), 256 << 20)
+        XCTAssertGreaterThan(ImageImportValidator.maxImportBytes, 10 * 1024 * 1024)
+        XCTAssertEqual(ImageImportValidator.MAX_PIXELS, 1_000_000_000)
+    }
+
+    /// v55 düşük RAM'li cihaz (≤ 2,2 GB) ve kısaltılmış geri alma geçmişi.
+    func testLowRamClass() {
+        XCTAssertTrue(Budget3D.isLowRam(memory: 2 << 30))
+        XCTAssertFalse(Budget3D.isLowRam(memory: 3 << 30))
+        XCTAssertFalse(Budget3D.isLowRam(memory: 0))
+        XCTAssertEqual(Budget3D.historyLimit(100, lowRam: true), 40)
+        XCTAssertEqual(Budget3D.historyLimit(60, lowRam: true), 24)
+        XCTAssertEqual(Budget3D.historyLimit(30, lowRam: true), 20)
+        XCTAssertEqual(Budget3D.historyLimit(100, lowRam: false), 100)
     }
 
     func testAffineDetection() {

@@ -20,9 +20,8 @@
 	<array><string>UIInterfaceOrientationPortrait</string><string>UIInterfaceOrientationLandscapeLeft</string><string>UIInterfaceOrientationLandscapeRight</string></array>
 	<key>UISupportedInterfaceOrientations~ipad</key>
 	<array><string>UIInterfaceOrientationPortrait</string><string>UIInterfaceOrientationPortraitUpsideDown</string><string>UIInterfaceOrientationLandscapeLeft</string><string>UIInterfaceOrientationLandscapeRight</string></array>
+	<!-- v55 en az izin: kamera ve tüm galeriyi okuma izni yok (resim seçimi PhotosPicker ile izinsiz); yalnız galeriye kaydetme -->
 	<key>NSPhotoLibraryAddUsageDescription</key><string>Çizimlerinizi galeriye kaydetmek için.</string>
-	<key>NSPhotoLibraryUsageDescription</key><string>Tuvale resim eklemek için.</string>
-	<key>NSCameraUsageDescription</key><string>Tuvale fotoğraf eklemek için.</string>
 	<!-- v51 cihazlar arası paylaşım: aynı Wi-Fi ağındaki cihazları bulma (Bonjour) -->
 	<key>NSLocalNetworkUsageDescription</key><string>Aynı Wi-Fi ağındaki cihazlarla tuval ve resim paylaşmak ve canlı yayın yapmak için.</string>
 	<key>NSBonjourServices</key>

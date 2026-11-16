@@ -245,7 +245,7 @@ struct KidsChallengeLayer: View {
             if let id = vm.store.canvas?.localId, let level = ChallengeLaunch.take(id) { ctl.open(level) }
             ctl.onKidsEntry()
         }
-        .onChange(of: current?.seq) { _, seq in if seq != nil { viewport.fit() } }
+        .onChangeCompat(of: current?.seq) { _, seq in if seq != nil { viewport.fit() } }
         .sheet(isPresented: $ui.progress) {
             ChallengeProgressSheet(best: prefs.challengeBest, current: current?.index, reachable: ctl.reachable, premiumLocked: ctl.premiumLocked,
                                    onOpen: { i in ui.progress = false; ctl.open(i) },
@@ -361,9 +361,9 @@ private struct ChallengeMascot: View {
         .accessibilityIdentifier("challenge_mascot")
         .accessibilityValue(said?.key ?? "idle")
         .onAppear { reset() }
-        .onChange(of: run.seq) { _, _ in reset() }
-        .onChange(of: vm.store.canvas?.strokes.count) { _, _ in if said?.key == "intro" { said = nil } }
-        .onChange(of: close) { _, c in
+        .onChangeCompat(of: run.seq) { _, _ in reset() }
+        .onChangeCompat(of: vm.store.canvas?.strokes.count) { _, _ in if said?.key == "intro" { said = nil } }
+        .onChangeCompat(of: close) { _, c in
             if c && !cheered { cheered = true; said = ("close", L("challenge_live_close"), MascotLook(face: .EXCITED, gesture: .CHEER)) }
         }
     }
@@ -516,7 +516,7 @@ private struct ChallengeResultCard: View {
             }
             .padding(.horizontal, 20).padding(.vertical, 18)
         }
-        .scrollBounceBehavior(.basedOnSize)
+        .scrollBounceBasedOnSizeCompat()
         .frame(maxWidth: 380)
         .fixedSize(horizontal: false, vertical: true)
         .background(RoundedRectangle(cornerRadius: 30).fill(KidStyle.card(dark)))

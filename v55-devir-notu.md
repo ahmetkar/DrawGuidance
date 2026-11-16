@@ -1,13 +1,14 @@
-# v55 devir notu (Android 1.12.1 / 55) — dal `claude/v55`
+# v55 devir notu (Android ve iOS 1.12.1 / 55) — dal `claude/v55`
 
 _2026-11-16. Bu not, bu sohbeti hiç görmemiş yeni bir Claude oturumunun işi kaldığı yerden sürdürebilmesi için
 yazıldı. Okuma sırası:_
 
 1. Bu not.
 2. `claude/v54-durum.md` (güvenlik ve resim kuralları).
-3. `claude/v55-plan-cihaz-destegi.md` (cihaz desteği planı; iOS bölümü henüz uygulanmadı).
-4. `backend/docs/v55-dagitim-plani.md`.
-5. Eski ayrıntılar için `claude/YENI-SOHBET-DEVIR.md` (v49'a kadar) ve `claude/vNN-durum.md` belgeleri.
+3. `claude/v55-plan-cihaz-destegi.md` (cihaz desteği planı; iOS 16 aşaması uygulandı, iOS 15 aşaması yapılmadı).
+4. `v55-app-store-rehberi.md` (App Store yükleme rehberi).
+5. `backend/docs/v55-dagitim-plani.md`.
+6. Eski ayrıntılar için `claude/YENI-SOHBET-DEVIR.md` (v49'a kadar) ve `claude/vNN-durum.md` belgeleri.
 
 ## 1. Kim, ne, nerede
 
@@ -20,7 +21,7 @@ yazıldı. Okuma sırası:_
 | Bilgisayar | `C:\Users\ahmet\Documents\DrawGuidance`. Git değil; kaynak ağacının kopyası. Claude masaüstü uygulamasıyla bağlanır (`device_bash` ile `$HOME/mnt/DrawGuidance`). |
 | Sırlar | Bilgisayarda `yayin-anahtari\`; derleme ortamında `android/app/keystore/`. **Asla yazdırılmaz, commit edilmez.** GitHub Secrets değerleri de yazdırılmaz. Uygulama içi satın almanın `ASC_*` değişkenlerine dokunulmaz. |
 
-## 2. v55'te yapılanlar (yalnız Android; iOS bilerek değişmedi)
+## 2. v55'te yapılanlar (2.1–2.4 Android, 2.5 iOS)
 
 ### 2.1 Geniş cihaz desteği (plan B1–B5)
 
@@ -89,12 +90,12 @@ yazıldı. Okuma sırası:_
   - Çıktı `assets/templates/` klasörüne kopyalandı. `catalog.json` sırası `TemplateExportBase.ORDER`'da.
 - **Çeviriler:** `V53TemplateInfo` içinde 7 dilde ad ve açıklama.
 - **Test:** `V46TemplateFilesTest.v55MangaStoryReplacesSchoolAdventure`.
-- iOS'ta bu şablon kimliği yoktu; iOS'a dokunulmadı.
+- iOS şablonları aynı klasörü (Android `assets/templates`) okuduğu için değişiklik iOS'a da geçti.
 
 ### 2.4 Sürüm
 
 - `versionCode 55`, `versionName 1.12.1` (`android/app/build.gradle.kts`).
-- iOS 1.12.0 (54) olarak kaldı.
+- iOS da 1.12.1 (55) oldu (bkz. 2.5).
 - R8 tam kipi **kapalı kalmalı** (Android 10 Ayarlar çökmesi). Ahmet sordu; kazancı küçük, riski büyük olduğu için açılmadı.
 
 
@@ -114,11 +115,18 @@ yazıldı. Okuma sırası:_
   boyutun hemen altına taşındı.
 - **Manga şablonu:** iOS şablonları Android `assets/templates` klasörünü paylaşıyor; Android'deki değişiklik iOS'a da geçti.
 - **Sürüm:** 1.12.1 (55). Testler: `DrawGuidanceTests/V55Tests.swift`, `ImageTests` güncellendi.
-- **CI:** dal `claude/v55`. Hızlı denetim derlemesi geçti. İmzalı koşu 43936512117 arşivledi ama App Store yüklemesi Apple
-  sunucu hatasıyla düştü ("unexpected error on the server side"); yeniden denenecek. `ios.yml` aynı dalda bir koşu başlayınca
-  öncekini iptal eder (concurrency): imzalı koşu sürerken başka koşu başlatmayın.
-- **Dikkat:** İlk hızlı denetimde NOTES/COMIC/SIMPLE_NOTES ekran görüntüleri 22 sn'de düzenleyiciyi göstermedi (açılış 11–13 sn
-  gecikmeli; yavaş makine olabilir). İkinci görüntü eklendi; sonuç doğrulanmadan sürüm yayımlanmamalı.
+- **Uygulama simgesi (önemli):** iOS simge kataloğunda hiç simge dosyası yoktu (yalnız boş `Contents.json`). Apple
+  yüklemeyi reddetti. Android uyarlanabilir simgesinden üretilen `AppIcon.appiconset/AppIcon-1024.png` eklendi.
+- **Xcode 26:** App Store artık yalnız iOS 26 SDK ile derlenmiş yüklemeleri kabul ediyor. `macos-15-intel` kalıbında
+  öntanımlı Xcode 16.4 (iOS 18.5 SDK) idi. `ios.yml`'deki iki işe de "Xcode 26 seç" adımı eklendi (şu an 26.3). Bu
+  yüzden v52'nin imzalı IPA'sı da bu haliyle App Store'a yüklenemezdi.
+- **CI:** dal `claude/v55`. Hızlı denetim (koşu 43950911758) geçti. Her tuval türünde ikinci ekran görüntüsü (47. sn)
+  eklendi; çizgi roman ve not almada sayfa şeridi görünüyor (`1 / 1`, `Kapak · 1`). İlk denetimde düzenleyicinin 22. sn'de
+  görünmemesi simülatör yavaşlığıydı.
+- **TestFlight:** koşu 43961863712 (Xcode 26.3) 1.12.1 (55)'i App Store Connect'e yükledi ("Upload succeeded"). Ardından
+  yüklemesiz koşu 43965920918 imzalı IPA dosyası için başlatıldı.
+- `ios.yml` aynı dalda yeni koşu başlayınca öncekini iptal eder (concurrency): bir koşu sürerken başkasını başlatmayın.
+- **iOS testleri** (birim + arayüz, `tests_only=true`) bu sürüm için henüz çalıştırılmadı.
 
 ## 2.6 Backend 44.2.0 → 54.0.0 ve Android Apple girişi
 
@@ -135,8 +143,10 @@ yazıldı. Okuma sırası:_
 |---|---|
 | `DrawGuidance-v55.aab` | Play'e yüklenecek. İmzalayan CN=Ahmet Kar (SHA-256 `42:96:62:1D…02:2A`). SHA-256 `29acecdc8a95bc47…eb4f69`. bundletool ile manifest doğrulandı. |
 | `DrawGuidance-v55.apk` | Test için; imzalı. `apksigner` ile doğrulandı. |
-| Değişen dosyalar | Bilgisayardaki proje klasörüne yazıldı. Eskiler `_eski_v54\` klasöründe. Silinen okul şablonu klasörü de `_eski_v54\` içine taşındı. |
-| Backend planı | `backend/docs/v55-dagitim-plani.md`. Sunucuda kod değişikliği yok; plan üretimi 50.0.0'dan 54.0.0'a geçirmek ve web ortam değişkenleri içindir. |
+| Değişen dosyalar (Android turu) | Bilgisayardaki proje klasörüne yazıldı. Eskiler `_eski_v54\` klasöründe. Silinen okul şablonu klasörü de `_eski_v54\` içine taşındı. |
+| iOS 1.12.1 (55) | TestFlight'a yüklendi (koşu 43961863712). İmzalı IPA: koşu 43965920918 `ios-signed` artifact'ı. |
+| Backend planı | `backend/docs/v55-dagitim-plani.md`: 44.2.0'dan 54.0.0'a tek adımda güncelleme. Ahmet uyguladı. |
+| App Store rehberi | `v55-app-store-rehberi.md` |
 
 ## 4. Test durumu
 
@@ -178,13 +188,13 @@ yazıldı. Okuma sırası:_
 - **Play Console (Ahmet):**
   - Cihaz bütünlüğü kontrolleri ve Android Go hariç tutma kuralı kapatılmalı (bkz. 2.1).
   - AAB yüklenince cihaz kataloğunda Redmi Note 8/10 "destekleniyor" görünmeli.
-- **iOS cihaz desteği:** `claude/v55-plan-cihaz-destegi.md` iOS bölümü (iOS 15 tabanı, Xcode 26) planlandı ama uygulanmadı. Ahmet "iOS şimdiki gibi kalsın" dedi.
-- **iOS'ta resim sınırları** hâlâ v54'teki gibi (10 MB / 8192 px / detay). Android ile eşitlenmesi istenirse ayrı iş.
-- **Sunucu:** üretimde hâlâ 50.0.0 olabilir. `v55-dagitim-plani.md` uygulanmalı:
-  - önce `cli_password_hash` sırrı,
-  - sonra imaj ve `stack deploy`,
-  - sonra Vercel'de `IP_HASH_SALT`.
-- **TestFlight:** yalnız Ahmet söyleyince yüklenir. Son koşu onun isteğiyle iptal edildi.
+- **iOS 15 desteği** (plan C2: NavigationStack, Layout, PhotosPicker vb. uyum katmanı) yapılmadı; büyük iş.
+- **iPhone Duo** (katlanabilir, iOS 27): uygulama çalışır ama açık iç ekrana ve katla/aç geçişine özel uyarlama ve
+  deneme yapılmadı. CI'da Duo simülatörü yok.
+- **Android Apple girişi** `ERROR_INVALID_CREDENTIAL`: `adb logcat` çıktısı bekleniyor (2.6). Gerekirse `appleError`
+  hata mesajını da gösterecek şekilde değiştirilmeli.
+- **Sunucu sürümü kaydı:** mağazalarda yayımlanınca `dg-cli.sh surum ekle --kod 55 --ad 1.12.1 …`.
+- **TestFlight ve prod değişiklikleri** yalnız Ahmet söyleyince yapılır.
 - Şablon yalnız resmi kontrol edildi; manga 2. sayfası ekran görüntüsüyle bakılmadı. İstenirse `V53TemplateExport` sonrası sayfa çıktısı alınabilir.
 
 ## 8. Yeni sohbete ilk mesaj önerisi

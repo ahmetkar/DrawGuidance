@@ -226,6 +226,12 @@ object ToolDescriptions {
         R.string.v45_kids_size_thin to R.string.v45_help_kids_brush_size,
         R.string.v45_kids_size_medium to R.string.v45_help_kids_brush_size,
         R.string.v45_kids_size_thick to R.string.v45_help_kids_brush_size,
+        // v53 yapı kılavuzu, hızlı yazı kutusu, çizgi roman desenleri, ekran tonları ve odak çizgileri düğmesi
+        R.string.v53_struct_short to R.string.v53_help_structure,
+        R.string.v53_quick_text to R.string.v53_help_quick_text,
+        R.string.v53_patterns to R.string.v53_help_patterns,
+        R.string.v53_tones to R.string.v53_help_tones,
+        R.string.effects_tab_lines to R.string.v53_help_lines,
     )
 
     /** Kaynak olmayan sabit adlar (Döndür ve Ölçekle mod çubuğundaki adım düğmeleri). */

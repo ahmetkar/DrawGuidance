@@ -67,11 +67,15 @@ class V46TemplateFilesTest {
         val all = CanvasTemplates.catalog.templates
         // v48 çizgi romanda üç boş şablon (çizgi roman, manga, webtoon; v47 hikâyeleri kaldırıldı), not almada beş,
         // basit not almada üç şablon
-        assertEquals(listOf("comic_blank_pages", "comic_blank_manga", "comic_blank_webtoon"), CanvasTemplates.forKind(CanvasKind.COMIC).map { it.id })
-        // v51 not alma tek mod: eski basit not şablonları da not almada (toplam sekiz)
-        assertEquals(8, CanvasTemplates.forKind(CanvasKind.NOTES).size)
+        // v52 şerit ve aksiyon şablonları, v53 dolu hikâyeler (okul, takip, şaka şeridi)
+        assertEquals(
+            listOf("comic_blank_pages", "comic_blank_manga", "comic_blank_webtoon", "comic_strips", "comic_blank_action", "comic_story_school", "comic_story_chase", "comic_story_strip"),
+            CanvasTemplates.forKind(CanvasKind.COMIC).map { it.id },
+        )
+        // v51 not alma tek mod: eski basit not şablonları da not almada (v52: dokuz not + altı basit not)
+        assertEquals(15, CanvasTemplates.forKind(CanvasKind.NOTES).size)
         assertTrue(CanvasTemplates.forKind(CanvasKind.NOTES).map { it.id }.containsAll(listOf("simple_lesson", "simple_todo", "simple_week")))
-        assertEquals(11, all.size)
+        assertEquals(23, all.size)
         for (old in OLD_COMIC) {
             assertEquals(old, null, CanvasTemplates.find(old))
             assertFalse(old, File(ASSETS, "templates/$old").exists())
@@ -84,7 +88,7 @@ class V46TemplateFilesTest {
             assertTrue(t.canvasKind in CanvasTemplates.KINDS)
         }
         // v48 boş çizgi roman şablonları: 4 sayfa, her sayfa başka panel düzeninde, her sayfada balon
-        for (t in CanvasTemplates.forKind(CanvasKind.COMIC)) {
+        for (t in CanvasTemplates.forKind(CanvasKind.COMIC).filter { it.id in BLANK_COMIC }) {
             val doc = pages(t.id)
             assertEquals(t.id, 4, t.pages)
             assertEquals(t.id, 4, doc.size)
@@ -143,13 +147,18 @@ class V46TemplateFilesTest {
             }
             val kind = t.canvasKind!!
             val types = pages(t.id).flatten().map { it.brushType }.toSet()
-            if (kind == CanvasKind.COMIC) {
+            if (kind == CanvasKind.COMIC && t.id.startsWith("comic_story_")) {
+                // v53 dolu hikâyeler: paneller, mekân/karakter resimleri ve balonlar
+                assertTrue("${t.id}: paneller", pages(t.id).flatten().any { PanelSets.isPanel(it) })
+                assertTrue("${t.id}: resimler", BrushType.IMAGE in types)
+                assertTrue("${t.id}: balonlar", pages(t.id).flatten().any { it.text?.box?.balloon != null })
+            } else if (kind == CanvasKind.COMIC && t.id in BLANK_COMIC) {
                 assertTrue("${t.id}: paneller", pages(t.id).flatten().any { PanelSets.isPanel(it) })
                 // v48 arka plan ve karakter yok: yalnız paneller ve balonlar
                 assertFalse("${t.id}: resim yok", BrushType.IMAGE in types)
                 assertTrue("${t.id}: balonlar", pages(t.id).flatten().any { it.text?.box?.balloon != null })
                 assertTrue("${t.id}: yalnız panel ve balon", pages(t.id).flatten().all { PanelSets.isPanel(it) || it.text?.box?.balloon != null })
-            } else {
+            } else if (kind != CanvasKind.COMIC) {
                 assertTrue("${t.id}: yazılar", BrushType.TEXT in types)
             }
         }
@@ -165,7 +174,7 @@ class V46TemplateFilesTest {
     @Test
     fun comicTemplatesHaveNoBackgroundsOrCharacters() {
         // v48 çizgi roman şablonları boş: resim (karakter, mekân) ve kâğıt arka planı yok
-        for (t in CanvasTemplates.forKind(CanvasKind.COMIC)) {
+        for (t in CanvasTemplates.forKind(CanvasKind.COMIC).filter { it.id in BLANK_COMIC }) {
             val m = meta(t.id)
             assertTrue(t.id, m.assets.isEmpty())
             assertTrue(t.id, File(ASSETS, "templates/${t.id}").listFiles()!!.none { it.name.startsWith("img_") })
@@ -410,4 +419,6 @@ class V46NewCharactersTest {
 }
 
 /** v47 kaldırılan eski çizgi roman şablonları. */
+/** v48 boş çizgi roman şablonları (resimsiz, dört sayfa). */
+private val BLANK_COMIC = setOf("comic_blank_pages", "comic_blank_manga", "comic_blank_webtoon")
 private val OLD_COMIC = listOf("comic" + "_action", "comic_manga", "comic_webtoon", "comic_yonkoma", "comic_dialogue", "comic_ganryujima", "comic_ronin", "comic_urashima")

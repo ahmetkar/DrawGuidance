@@ -3399,6 +3399,11 @@
 "v53_font_group_sans" = "Sans";
 "v53_font_group_serif" = "Serif";
 "v53_group_n" = "Group %1$d";
+"v53_help_lines" = "Adds speed, focus and burst lines; inside the selected panel if there is one.";
+"v53_help_patterns" = "Adds comic patterns (flowers, sparkles, gloom lines…) or fills the selected closed shape with one.";
+"v53_help_quick_text" = "Opens a quick note box: type with the keyboard; when done it becomes plain text and a new box opens.";
+"v53_help_structure" = "Places a structure guide (skeleton and proportion lines) for living things and objects on the canvas so you can draw over it.";
+"v53_help_tones" = "Adds a screentone (dots, lines, hatching) or tones the selected closed shape; density, scale and angle can be set.";
 "v53_hint_add" = "Choose an item above or tap the canvas.";
 "v53_hint_area_select" = "Draw around the area to select it.";
 "v53_hint_crop" = "Drag the edges to set the crop.";

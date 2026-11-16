@@ -26,6 +26,11 @@
     <string name="v53_font_group_sans">ゴシック</string>
     <string name="v53_font_group_serif">明朝</string>
     <string name="v53_group_n" formatted="true">グループ %1$d</string>
+    <string name="v53_help_lines">スピード線・集中線・爆発線を追加します。コマを選択していればその中に。</string>
+    <string name="v53_help_patterns">漫画の模様（花、キラキラ、縦線…）を追加するか、選択した閉じた図形を塗ります。</string>
+    <string name="v53_help_quick_text">クイックメモ欄を開きます。キーボードで入力し、完了すると背景のない文字になり、次の欄が開きます。</string>
+    <string name="v53_help_structure">生き物や物の構造ガイド（骨格・比率線）をキャンバスに置き、その上に描けます。</string>
+    <string name="v53_help_tones">スクリーントーン（網点・線・カケアミ）を追加するか、選択した閉じた図形に貼ります。濃さ・大きさ・角度を調整できます。</string>
     <string name="v53_hint_add">上のメニューから選ぶか、キャンバスをタップします。</string>
     <string name="v53_hint_area_select">範囲を指でなぞって選択します。</string>
     <string name="v53_hint_crop">端をドラッグして切り抜き範囲を決めます。</string>

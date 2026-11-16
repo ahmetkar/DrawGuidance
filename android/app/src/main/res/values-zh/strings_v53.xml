@@ -26,6 +26,11 @@
     <string name="v53_font_group_sans">无衬线</string>
     <string name="v53_font_group_serif">衬线</string>
     <string name="v53_group_n" formatted="true">组 %1$d</string>
+    <string name="v53_help_lines">添加速度线、集中线和爆炸线；若选中分格则加在其中。</string>
+    <string name="v53_help_patterns">添加漫画图案（花朵、闪光、阴郁线…）或用其填充所选闭合形状。</string>
+    <string name="v53_help_quick_text">打开快速笔记框：用键盘输入，完成后变为无背景文字，并自动打开新框。</string>
+    <string name="v53_help_structure">在画布上放置生物和物体的结构参考（骨架、比例线），可在其上作画。</string>
+    <string name="v53_help_tones">添加网点（点、线、排线）或为所选闭合形状加网点；可调整密度、比例和角度。</string>
     <string name="v53_hint_add">从上方选择要添加的项目，或点击画布。</string>
     <string name="v53_hint_area_select">用手指圈出要选择的区域。</string>
     <string name="v53_hint_crop">拖动边缘设置裁剪范围。</string>

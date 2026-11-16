@@ -3399,6 +3399,11 @@
 "v53_font_group_sans" = "Sade";
 "v53_font_group_serif" = "Tırnaklı";
 "v53_group_n" = "Grup %1$d";
+"v53_help_lines" = "Hız, odak ve patlama çizgileri ekler; seçili kare varsa onun içine.";
+"v53_help_patterns" = "Çizgi roman desenleri (çiçek, parıltı, kasvet çizgileri…) ekler ya da seçili kapalı şekli onunla doldurur.";
+"v53_help_quick_text" = "Hızlı not kutusu açar: klavyeyle yaz, bitince arka plansız yazı olur ve hemen yenisi açılır.";
+"v53_help_structure" = "Canlı, nesne ve eşyaların yapı kılavuzunu (iskelet, orantı çizgileri) tuvale yerleştirir; üzerinden çizersin.";
+"v53_help_tones" = "Ekran tonu (nokta, çizgi, tarama) ekler ya da seçili kapalı şekle gölge tonu verir; sıklık, ölçek ve açı ayarlanır.";
 "v53_hint_add" = "Üst menüden eklenecek öğeyi seç ya da tuvale dokun.";
 "v53_hint_area_select" = "Seçmek için parmağınla alanı çiz.";
 "v53_hint_crop" = "Kenarları sürükleyerek kırpma alanını ayarla.";

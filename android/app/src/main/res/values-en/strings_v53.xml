@@ -26,6 +26,11 @@
     <string name="v53_font_group_sans">Sans</string>
     <string name="v53_font_group_serif">Serif</string>
     <string name="v53_group_n" formatted="true">Group %1$d</string>
+    <string name="v53_help_lines">Adds speed, focus and burst lines; inside the selected panel if there is one.</string>
+    <string name="v53_help_patterns">Adds comic patterns (flowers, sparkles, gloom lines…) or fills the selected closed shape with one.</string>
+    <string name="v53_help_quick_text">Opens a quick note box: type with the keyboard; when done it becomes plain text and a new box opens.</string>
+    <string name="v53_help_structure">Places a structure guide (skeleton and proportion lines) for living things and objects on the canvas so you can draw over it.</string>
+    <string name="v53_help_tones">Adds a screentone (dots, lines, hatching) or tones the selected closed shape; density, scale and angle can be set.</string>
     <string name="v53_hint_add">Choose an item above or tap the canvas.</string>
     <string name="v53_hint_area_select">Draw around the area to select it.</string>
     <string name="v53_hint_crop">Drag the edges to set the crop.</string>

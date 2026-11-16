@@ -5,8 +5,9 @@ final class ShapeTests: XCTestCase {
     func testCatalogAndIndex() {
         let cat = ShapeTemplates.catalog
         let idx = ShapeIndex.fromCatalog(cat)
-        XCTAssertEqual(idx.templateCount, 766)
-        XCTAssertEqual(idx.rowCount, 5362)
+        // v54 144 yeni şablon
+        XCTAssertEqual(idx.templateCount, 910)
+        XCTAssertEqual(idx.rowCount, 6370)
     }
 
     func testHeartFindsItself() throws {

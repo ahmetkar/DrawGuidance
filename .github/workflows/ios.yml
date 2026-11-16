@@ -130,6 +130,9 @@ jobs:
             xcrun simctl launch --terminate-running-process "$UDID" com.karapp.drawguidance -uiTesting -dgOpenNew $K ${{ inputs.diag_args }}
             sleep 22
             xcrun simctl io "$UDID" screenshot build/diag/quick-$K.png || true
+            # v55 yavaş makinede açılış gecikirse ikinci görüntü
+            sleep 25
+            xcrun simctl io "$UDID" screenshot build/diag/quick-$K-2.png || true
             PID=$(pgrep -f "DrawGuidance.app/DrawGuidance" | head -1)
             [ -n "$PID" ] && ps -o pid,%cpu,rss,etime -p "$PID" | tail -1 | sed "s/^/$K /" | tee -a build/diag/quick-ps.txt
             xcrun simctl terminate "$UDID" com.karapp.drawguidance || true

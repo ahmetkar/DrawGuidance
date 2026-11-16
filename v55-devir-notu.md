@@ -97,6 +97,38 @@ yazıldı. Okuma sırası:_
 - iOS 1.12.0 (54) olarak kaldı.
 - R8 tam kipi **kapalı kalmalı** (Android 10 Ayarlar çökmesi). Ahmet sordu; kazancı küçük, riski büyük olduğu için açılmadı.
 
+
+## 2.5 iOS v55 (Ahmet'in 21:14 istekleri; "hepsi yalnız iOS için")
+
+- **Cihaz desteği:** dağıtım hedefi 17.0 → **16.0** (`project.yml`). iOS 17 API'leri için `Core/Platform/Compat16.swift`:
+  `onChangeCompat` (33 yer), `navigationDestinationCompat(item:)` (2), `scrollBounceBasedOnSizeCompat`; `.topBarTrailing` →
+  `.navigationBarTrailing`; `MagnifyGesture` → `MagnificationGesture`; `.snappy` → `.easeOut`. iOS 15 (plan C2) yapılmadı.
+- **İzinler:** Info.plist'ten `NSCameraUsageDescription` ve `NSPhotoLibraryUsageDescription` kaldırıldı. Kalanlar: galeriye
+  kaydetme ve yerel ağ. `Resources/PrivacyInfo.xcprivacy` eklendi (UserDefaults CA92.1, FileTimestamp C617.1, SystemBootTime 35F9.1).
+- **Düşük RAM:** `Budget3D.lowRam` (≤ 2,2 GB) ve `historyLimit` (EditorStore, Model3D). Düşük RAM'de saklanan resim 1600 px.
+- **Resim sınırları:** `Data/Images/ImageImportValidator.swift` Android ile aynı: detay ve sabit boyut sınırı yok;
+  `maxImportBytes` = fiziksel belleğin 1/16'sı (32–256 MB), 1 gigapiksel. Metinler `v55_image_err_*`
+  (`Android.strings` `tools/strings-export/convert.py` ile yeniden üretildi).
+- **Sayfalar (hata):** iOS'ta sayfalar oluşuyor ama düzenleyicide sayfa geçişi yoktu. Yeni `Features/CanvasEdit/PageStripView.swift`
+  (tuvalin altında: konum yazısı, sayfa çipleri, ekle; uzun basınca çoğalt/sil/kapak ekle). `CanvasForm` sayfa sayısı seçicisi
+  boyutun hemen altına taşındı.
+- **Manga şablonu:** iOS şablonları Android `assets/templates` klasörünü paylaşıyor; Android'deki değişiklik iOS'a da geçti.
+- **Sürüm:** 1.12.1 (55). Testler: `DrawGuidanceTests/V55Tests.swift`, `ImageTests` güncellendi.
+- **CI:** dal `claude/v55`. Hızlı denetim derlemesi geçti. İmzalı koşu 43936512117 arşivledi ama App Store yüklemesi Apple
+  sunucu hatasıyla düştü ("unexpected error on the server side"); yeniden denenecek. `ios.yml` aynı dalda bir koşu başlayınca
+  öncekini iptal eder (concurrency): imzalı koşu sürerken başka koşu başlatmayın.
+- **Dikkat:** İlk hızlı denetimde NOTES/COMIC/SIMPLE_NOTES ekran görüntüleri 22 sn'de düzenleyiciyi göstermedi (açılış 11–13 sn
+  gecikmeli; yavaş makine olabilir). İkinci görüntü eklendi; sonuç doğrulanmadan sürüm yayımlanmamalı.
+
+## 2.6 Backend 44.2.0 → 54.0.0 ve Android Apple girişi
+
+- Üretim 44.2.0'dı; plan `backend/docs/v55-dagitim-plani.md` (tek adımda 54.0.0, iki sır, `sudo env` ile deploy, Mongo yedeği
+  `dgbackup` kullanıcısıyla). Ahmet sunucuyu güncelledi (22:18).
+- Yeni `backend/docker/swarm/dg-cli.sh` (boşluklu argümanlar, sudo, şifre sorusu); GitHub raw adresinden indirilir.
+- Android'de Apple ile giriş `ERROR_INVALID_CREDENTIAL` veriyor (Firebase `OAuthProvider("apple.com")`; sunucuyla ilgisiz).
+  Ahmet Services ID, anahtar ve Firebase ayarlarının doğru olduğunu söyledi. Ayrıntı için `adb logcat` çıktısı istendi
+  (invalid_client / audience / redirect_uri). Uygulama hata mesajını değil yalnız kodu gösteriyor.
+
 ## 3. Teslimler
 
 | Dosya | Bilgi |

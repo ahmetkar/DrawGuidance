@@ -15,6 +15,14 @@ final class V55Tests: XCTestCase {
         XCTAssertNil(info["UIRequiredDeviceCapabilities"], "zorunlu donanım yok")
     }
 
+    /// v55 uygulama simgesi (App Store doğrulaması CFBundleIconName ve 120/152 px simge ister; önceden simge yoktu).
+    func testAppIconPresent() {
+        let icons = Bundle.main.infoDictionary?["CFBundleIcons"] as? [String: Any]
+        let primary = icons?["CFBundlePrimaryIcon"] as? [String: Any]
+        XCTAssertEqual(primary?["CFBundleIconName"] as? String, "AppIcon")
+        XCTAssertNotNil(UIImage(named: "AppIcon"))
+    }
+
     func testVersion() {
         let info = Bundle.main.infoDictionary ?? [:]
         XCTAssertEqual(info["CFBundleShortVersionString"] as? String, "1.12.1")

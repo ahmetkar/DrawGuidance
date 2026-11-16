@@ -293,7 +293,7 @@ abstract class TemplateExportBase : V32EditorBase() {
             "notes_chemistry", "notes_physics", "notes_vocab", "notes_timeline",
             "simple_reading", "simple_shopping", "simple_exam",
             // v53 dolu çizgi roman şablonları
-            "comic_story_school", "comic_story_chase", "comic_story_strip",
+            "comic_story_manga", "comic_story_chase", "comic_story_strip",
         )
 
         fun l(tr: String, en: String, ar: String, ja: String, ko: String, ru: String, zh: String) =

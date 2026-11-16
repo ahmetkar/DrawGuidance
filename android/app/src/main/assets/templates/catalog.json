@@ -486,25 +486,25 @@
             "height": 1754
         },
         {
-            "id": "comic_story_school",
+            "id": "comic_story_manga",
             "kind": "COMIC",
             "names": {
-                "tr": "Okul macerası",
-                "en": "School adventure",
-                "ar": "مغامرة مدرسية",
-                "ja": "学校の冒険",
-                "ko": "학교 모험",
-                "ru": "Школьное приключение",
-                "zh": "校园冒险"
+                "tr": "Manga: Avlu düellosu",
+                "en": "Manga: Courtyard duel",
+                "ar": "مانغا: مبارزة الفناء",
+                "ja": "マンガ：中庭の決闘",
+                "ko": "만화: 안뜰의 결투",
+                "ru": "Манга: дуэль во дворе",
+                "zh": "漫画：庭院决斗"
             },
             "hints": {
-                "tr": "Hazır hikâye: okul ve park arka planları, iki öğrenci karakteri, diyaloglar, anlatı kutuları ve ses efektleri.",
-                "en": "Ready story: school backgrounds, two student characters, dialogue, captions and sound effects.",
-                "ar": "قصة جاهزة: خلفيات مدرسية وشخصيتا طالبين وحوارات ومربعات سرد ومؤثرات صوتية.",
-                "ja": "完成済みのお話：学校の背景、生徒2人、セリフ、ナレーション、効果音。",
-                "ko": "완성된 이야기: 학교 배경, 학생 캐릭터 둘, 대사, 내레이션, 효과음.",
-                "ru": "Готовая история: школьные фоны, два ученика, диалоги, подписи и звуки.",
-                "zh": "现成故事：校园背景、两位学生角色、对白、旁白和音效。"
+                "tr": "Örnek manga: sağdan sola okunur; iki kılıç ustası, eski avlu, ekran tonları, hız ve darbe çizgileri, ses efektleri.",
+                "en": "Sample manga: read right to left; two swordsmen, an old courtyard, screentones, speed and impact lines, sound effects.",
+                "ar": "مانغا نموذجية تُقرأ من اليمين إلى اليسار: مبارزان بالسيف وفناء قديم ودرجات شاشة وخطوط سرعة ومؤثرات صوتية.",
+                "ja": "マンガの見本（右から左へ読む）：剣士2人、古い中庭、スクリーントーン、スピード線、効果音。",
+                "ko": "만화 견본(오른쪽에서 왼쪽으로 읽기): 검객 둘, 오래된 안뜰, 스크린톤, 속도선, 효과음.",
+                "ru": "Образец манги (читается справа налево): два мечника, старый двор, скринтоны, линии скорости и звуки.",
+                "zh": "漫画示例（从右往左读）：两位剑客、古老庭院、网点、速度线和音效。"
             },
             "pages": 2,
             "width": 1200,

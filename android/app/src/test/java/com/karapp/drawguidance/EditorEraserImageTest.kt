@@ -106,20 +106,17 @@ class EditorEraserImageTest : EditorTestBase() {
         compose.onNodeWithContentDescription("Geri al").performScrollTo().performClick()
         waitFor { canvas().strokes.size == 2 }
 
-        // Çok detaylı resim reddedilir ve nedeni gösterilir
+        // v55 çok detaylı resim ve 10 MB'yi aşan dosya da sınırsız eklenir (uyarısız)
         val dir = compose.activity.cacheDir
         val noisy = File(dir, "gurultu.png").apply { writeBytes(ImageImportValidatorTest.png(ImageImportValidatorTest.noise(300, 300))) }
         pickImage(noisy)
-        waitForText("Resim eklenemedi")
-        waitForText("çok detaylı", substring = true)
-        compose.onNodeWithText("Tamam").clickInPopup()
-        waitFor { compose.onAllNodesWithText("Resim eklenemedi").fetchSemanticsNodes().isEmpty() }
-
-        // v54 10 MB'yi aşan dosya reddedilir
+        waitFor { canvas().strokes.count { it.brushType == BrushType.IMAGE } == 1 }
+        assertTrue(compose.onAllNodesWithText("Resim eklenemedi").fetchSemanticsNodes().isEmpty())
         val huge = File(dir, "buyuk.png").apply { writeBytes(ImageImportValidatorTest.png(ImageImportValidatorTest.noise(2048, 2048))) }
+        assertTrue(huge.length() > 10L * 1024 * 1024)
         pickImage(huge)
-        waitForText("Dosya çok büyük", substring = true)
-        compose.onNodeWithText("Tamam").clickInPopup()
+        waitFor(30_000) { canvas().strokes.count { it.brushType == BrushType.IMAGE } == 2 }
+        assertTrue(compose.onAllNodesWithText("Dosya çok büyük", substring = true).fetchSemanticsNodes().isEmpty())
 
         // Yüksek çözünürlüklü sade resim: uyarı + onayla eklenir, küçültülüp saklanır
         val wide = File(dir, "logo.jpg").apply { writeBytes(ImageImportValidatorTest.jpeg(ImageImportValidatorTest.simpleDrawing(4000, 2000))) }
@@ -127,8 +124,8 @@ class EditorEraserImageTest : EditorTestBase() {
         waitForText("Resim eklenmeden önce")
         waitForText("küçültülecek", substring = true)
         compose.onNodeWithText("Yine de ekle").clickInPopup()
-        waitFor { canvas().strokes.any { it.brushType == BrushType.IMAGE } }
-        val image = canvas().strokes.single { it.brushType == BrushType.IMAGE }
+        waitFor { canvas().strokes.count { it.brushType == BrushType.IMAGE } == 3 }
+        val image = canvas().strokes.filter { it.brushType == BrushType.IMAGE }.single { it.assetId != null && runBlocking { GlobalContext.get().get<CanvasAssetDao>().getByIds(listOf(it.assetId!!)) }.single().width == 3000 }
         assertEquals(4, image.points.size)
         val assets = runBlocking { GlobalContext.get().get<CanvasAssetDao>().getByIds(listOf(image.assetId!!)) }
         // v54 saklanan uzun kenar 3000 px (test cihazı orta sınıf)

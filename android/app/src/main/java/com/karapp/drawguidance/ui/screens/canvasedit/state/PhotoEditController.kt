@@ -132,7 +132,7 @@ class PhotoEditController(
         if (after == before) return
         if (key == null || key != lastKey) {
             undoStack.addLast(before)
-            if (undoStack.size > MAX_HISTORY) undoStack.removeFirst()
+            while (undoStack.size > com.karapp.drawguidance.platform.DeviceCaps.historyLimit(MAX_HISTORY)) undoStack.removeFirst()
             redoStack.clear()
         }
         lastKey = key

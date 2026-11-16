@@ -41,7 +41,7 @@ object DeviceCaps {
 
     fun init(context: Context) {
         val am = context.getSystemService(Context.ACTIVITY_SERVICE) as? ActivityManager ?: return
-        lowRam = runCatching { am.isLowRamDevice }.getOrDefault(false)
+        val goFlag = runCatching { am.isLowRamDevice }.getOrDefault(false)
         val large = context.applicationInfo.flags and ApplicationInfo.FLAG_LARGE_HEAP != 0
         heapMb = runCatching { if (large) am.largeMemoryClass else am.memoryClass }.getOrDefault(0)
         totalRamMb = runCatching {
@@ -49,6 +49,8 @@ object DeviceCaps {
             am.getMemoryInfo(info)
             info.totalMem / (1024 * 1024)
         }.getOrDefault(0L)
+        // v55 Android Go bayrağı olmayan ama ≤ 2 GB belleği olan cihazlar da düşük RAM sayılır
+        lowRam = isLowRam(goFlag, totalRamMb)
     }
 
     /** v25 cihaz sınıfı (3B düzenleyicinin ayrıntı ve kalite bütçeleri için). */
@@ -130,6 +132,18 @@ object DeviceCaps {
         return bytes.toInt()
     }
 
+    /**
+     * v55 geri alma geçmişinin uzunluğu: düşük RAM'li (Android Go, ≤ 2 GB) cihazda her adım bellekte bir belge
+     * kopyası tuttuğundan kısaltılır (normalin %40'ı, en az 20 adım); diğer cihazlarda değişmez.
+     */
+    fun historyLimit(normal: Int): Int = historyLimit(normal, lowRam)
+
+    internal fun historyLimit(normal: Int, lowRam: Boolean): Int =
+        if (lowRam) (normal * 2 / 5).coerceAtLeast(minOf(20, normal)) else normal
+
+    /** v55 düşük RAM'li cihaz mı (Android Go ya da toplam bellek ≤ 2 GB). */
+    fun isLowRam(lowRamFlag: Boolean, totalRamMb: Long): Boolean = lowRamFlag || (totalRamMb in 1..LOW_RAM_MB)
+
     /** Bellek yetersiz uyarısı gelince bırakılabilecek önbellekler bu dinleyicilerle temizlenir. */
     private val trimListeners = java.util.concurrent.CopyOnWriteArrayList<() -> Unit>()
 
@@ -163,4 +177,7 @@ object DeviceCaps {
     }
 
     const val DEFAULT_EXPORT_SIDE = 4096
+
+    /** v55 bu kadar ya da daha az toplam bellek düşük RAM sayılır (2 GB; çekirdeğin ayırdığı pay için biraz üstü). */
+    const val LOW_RAM_MB = 2200L
 }

@@ -47,34 +47,44 @@ class ImageCheckResult(
 }
 
 /**
- * Tuvale eklenecek resmin sıkı kontrolleri:
+ * Tuvale eklenecek resmin kontrolleri (v55: her modda detay ve boyut sınırı yok; yalnız güvenlik ve bellek koruması):
  * - Biçim: yalnızca PNG, JPEG, WEBP (dosya imzasından anlaşılır; uzantıya güvenilmez)
  * - v54 yapı denetimi ([ImageSecurity]): parça/segment yapısı tutarlı olmalı; içinde ya da bitiş işaretinden sonra
  *   betik, HTML, çalıştırılabilir dosya ya da arşiv imzası bulunan resim reddedilir
- * - v54 dosya boyutu en fazla 10 MB (8 MB üstü uyarı)
- * - v54 boyut: kenarlar 16–8192 px, en fazla 64 MP; uzun kenarı 3000 px'ten (giriş düzeyi cihazda 2000 px) büyükse
- *   küçültülür (uyarı). Büyük resim önce tam boyda açılmaz (Android 9+ ImageDecoder hedef boyda, öncesinde inSampleSize)
- * - Detay: 256 px'e küçültülmüş gri tonlu görüntüde güçlü kenar içeren piksel oranı.
- *   %30 ve üstü reddedilir (fotoğraf/doku gibi çok detaylı), %15 ve üstü uyarı verilir.
+ * - v55 dosya boyutu ve çözünürlük için sabit sınır yok. Yalnız uygulamanın çökmemesi için: dosya, uygulamanın
+ *   kullanabileceği belleğin üçte birini ([maxImportBytes], en çok 256 MB) ve çözünürlük 1 gigapikseli aşamaz.
+ * - Saklanırken uzun kenar 3000 px'e (giriş düzeyinde 2000, düşük RAM'li cihazda 1600 px) küçültülür (uyarı). Büyük
+ *   resim bellekte tam boyda açılmaz (Android 9+ ImageDecoder hedef boyda, öncesinde inSampleSize).
+ * - v55 detay (doku yoğunluğu) sınırı kaldırıldı: fotoğraf ve dokulu resimler de eklenir.
  * Kaydedilecek veri: v54 her zaman yeniden kodlanır (özgün dosya saklanmaz: üst veri, konum bilgisi ve eklenmiş
- * veriler atılır); PNG, (Android 11+) kayıpsız WEBP ve JPEG kaynakta JPEG içinden en küçüğü.
+ * veriler atılır); JPEG kaynakta JPEG, ötekilerde PNG ve kayıpsız WEBP içinden en küçüğü.
  */
 object ImageImportValidator {
-    const val MAX_BYTES = 10L * 1024L * 1024L
-    const val WARN_BYTES = 8L * 1024L * 1024L
-    const val MIN_SIDE = 16
-    const val MAX_SIDE = 8192
-    const val MAX_PIXELS = 64_000_000L
+    /** Çözünürlük için yalnız teknik üst sınır (1 gigapiksel; çözücü süresi ve bellek için). */
+    const val MAX_PIXELS = 1_000_000_000L
     const val STORE_MAX_SIDE = 3000
     const val STORE_MAX_SIDE_LOW = 2000
-    const val DETAIL_REJECT = 0.30f
-    const val DETAIL_WARN = 0.15f
+    const val STORE_MAX_SIDE_LOW_RAM = 1600
     private const val ANALYSIS_SIDE = 256
     private const val EDGE_THRESHOLD = 96
 
-    /** Cihaz sınıfına göre saklanan resmin uzun kenarı (giriş düzeyinde bellek için daha küçük). */
+    /**
+     * v55 okunabilecek en büyük dosya: uygulamanın Java yığınının üçte biri (dosya baytları yığında tutulur; çözme ve
+     * yeniden kodlama için yer kalsın), 16–256 MB arası.
+     */
+    val maxImportBytes: Long
+        get() {
+            val heap = Runtime.getRuntime().maxMemory().takeIf { it in 1 until Long.MAX_VALUE } ?: (256L shl 20)
+            return (heap / 3).coerceIn(16L shl 20, 256L shl 20)
+        }
+
+    /** Cihaz sınıfına göre saklanan resmin uzun kenarı (giriş düzeyinde ve düşük RAM'li cihazda bellek için daha küçük). */
     val storeMaxSide: Int
-        get() = if (com.karapp.drawguidance.platform.DeviceCaps.tier == com.karapp.drawguidance.platform.DeviceCaps.Tier.LOW) STORE_MAX_SIDE_LOW else STORE_MAX_SIDE
+        get() = when {
+            com.karapp.drawguidance.platform.DeviceCaps.lowRam -> STORE_MAX_SIDE_LOW_RAM
+            com.karapp.drawguidance.platform.DeviceCaps.tier == com.karapp.drawguidance.platform.DeviceCaps.Tier.LOW -> STORE_MAX_SIDE_LOW
+            else -> STORE_MAX_SIDE
+        }
 
     fun check(resolver: ContentResolver, uri: Uri): ImageCheckResult {
         val declaredSize = runCatching {
@@ -82,31 +92,46 @@ object ImageImportValidator {
                 if (c.moveToFirst() && !c.isNull(0)) c.getLong(0) else null
             }
         }.getOrNull()
-        if (declaredSize != null && declaredSize > MAX_BYTES) {
+        val limit = maxImportBytes
+        if (declaredSize != null && declaredSize > limit) {
             return ImageCheckResult(listOf(ImageIssue.TooLarge(declaredSize)), emptyList(), null)
         }
-        val bytes = runCatching {
-            resolver.openInputStream(uri)?.use { input ->
-                val out = ByteArrayOutputStream()
-                val buffer = ByteArray(16 * 1024)
-                var total = 0L
-                while (true) {
-                    val n = input.read(buffer)
-                    if (n < 0) break
-                    total += n
-                    if (total > MAX_BYTES) return ImageCheckResult(listOf(ImageIssue.TooLarge(total + input.available())), emptyList(), null)
-                    out.write(buffer, 0, n)
-                }
-                out.toByteArray()
-            }
-        }.getOrNull() ?: return ImageCheckResult(listOf(ImageIssue.Unreadable), emptyList(), null)
+        val read = runCatching {
+            resolver.openInputStream(uri)?.use { input -> readLimited(input, declaredSize, limit) }
+        }
+        (read.exceptionOrNull() as? TooLargeException)?.let { return ImageCheckResult(listOf(ImageIssue.TooLarge(it.bytes)), emptyList(), null) }
+        val bytes = read.getOrNull() ?: return ImageCheckResult(listOf(ImageIssue.Unreadable), emptyList(), null)
         return check(bytes)
     }
+
+    /**
+     * v55 akışı sınır içinde okur: boyut biliniyorsa tek dizi (büyük dosyada kopya bellek harcanmaz), dizi gerektikçe
+     * büyür. Sınır aşılırsa [ImageIssue.TooLarge] için [TooLargeException].
+     */
+    internal fun readLimited(input: java.io.InputStream, declaredSize: Long?, limit: Long): ByteArray {
+        var buf = ByteArray(if (declaredSize != null && declaredSize in 1..limit) declaredSize.toInt() else 256 * 1024)
+        var size = 0
+        while (true) {
+            if (size == buf.size) {
+                if (size.toLong() >= limit) {
+                    if (input.read() < 0) break
+                    throw TooLargeException(size + 1L)
+                }
+                buf = buf.copyOf(minOf(limit, maxOf(buf.size * 2L, 256L * 1024)).toInt())
+            }
+            val n = input.read(buf, size, buf.size - size)
+            if (n < 0) break
+            size += n
+        }
+        return if (size == buf.size) buf else buf.copyOf(size)
+    }
+
+    class TooLargeException(val bytes: Long) : java.io.IOException("too large")
 
     fun check(bytes: ByteArray, storeSide: Int = storeMaxSide): ImageCheckResult {
         val errors = ArrayList<ImageIssue>()
         val warnings = ArrayList<ImageIssue>()
-        if (bytes.size > MAX_BYTES) errors += ImageIssue.TooLarge(bytes.size.toLong())
+        if (bytes.size > maxImportBytes) errors += ImageIssue.TooLarge(bytes.size.toLong())
         val mime = sniffMime(bytes)
         if (mime == null) {
             errors += ImageIssue.UnsupportedFormat
@@ -119,15 +144,14 @@ object ImageImportValidator {
             ImageSecurity.Verdict.SUSPICIOUS -> return ImageCheckResult(listOf(ImageIssue.Suspicious), emptyList(), null)
             ImageSecurity.Verdict.CLEAN -> Unit
         }
-        if (bytes.size > WARN_BYTES) warnings += ImageIssue.NearSizeLimit(bytes.size.toLong())
 
         val bounds = BitmapFactory.Options().apply { inJustDecodeBounds = true }
         BitmapFactory.decodeByteArray(bytes, 0, bytes.size, bounds)
         val w = bounds.outWidth
         val h = bounds.outHeight
         if (w <= 0 || h <= 0) return ImageCheckResult(listOf(ImageIssue.Unreadable), emptyList(), null)
-        if (w < MIN_SIDE || h < MIN_SIDE) errors += ImageIssue.TooSmall(w, h)
-        if (w > MAX_SIDE || h > MAX_SIDE || w.toLong() * h > MAX_PIXELS) errors += ImageIssue.DimensionsTooLarge(w, h)
+        // v55 sabit boyut sınırı yok; yalnız işlenemeyecek kadar büyük (1 GP üstü) çözünürlük
+        if (w.toLong() * h > MAX_PIXELS) errors += ImageIssue.DimensionsTooLarge(w, h)
         if (errors.isNotEmpty()) return ImageCheckResult(errors, warnings, null)
 
         // Kaydedilecek boyut (uzun kenar en fazla storeSide)
@@ -138,17 +162,7 @@ object ImageImportValidator {
         val bitmap = decodeTo(bytes, w, h, targetW, targetH) ?: return ImageCheckResult(listOf(ImageIssue.Unreadable), emptyList(), null)
         if (factor < 1f) warnings += ImageIssue.WillDownscale(w, h, bitmap.width, bitmap.height)
 
-        val detail = detailScore(bitmap)
-        val percent = (detail * 100).roundToInt()
-        when {
-            detail >= DETAIL_REJECT -> errors += ImageIssue.TooDetailed(percent)
-            detail >= DETAIL_WARN -> warnings += ImageIssue.Detailed(percent)
-        }
-        if (errors.isNotEmpty()) {
-            bitmap.recycle()
-            return ImageCheckResult(errors, warnings, null)
-        }
-
+        // v55 detay sınırı yok (doku yoğunluğu hesaplanmaz)
         val (storedBytes, storedMime) = smallestEncoding(mime, bitmap)
         if (storedBytes.isEmpty()) {
             bitmap.recycle()
@@ -156,7 +170,7 @@ object ImageImportValidator {
         }
         return ImageCheckResult(
             errors, warnings,
-            PreparedImage(storedBytes, storedMime, bitmap.width, bitmap.height, bitmap, bytes.size, detail),
+            PreparedImage(storedBytes, storedMime, bitmap.width, bitmap.height, bitmap, bytes.size, 0f),
         )
     }
 

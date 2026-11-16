@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- v55 resim ekleme: sabit boyut/detay sınırı yok; yalnız bellek koruması -->
+<resources>
+    <string name="v55_image_err_memory" formatted="true">Это изображение слишком велико для памяти устройства (%1$s). Оно не добавлено, чтобы приложение не завершилось с ошибкой; попробуйте копию меньшего размера.</string>
+    <string name="v55_image_err_pixels" formatted="true">Разрешение слишком велико для обработки (%1$d×%2$d, более 1 гигапикселя). Попробуйте копию меньшего размера.</string>
+</resources>

@@ -17,7 +17,7 @@ import org.robolectric.annotation.GraphicsMode
 import java.io.ByteArrayOutputStream
 import java.util.Random
 
-/** Resim ekleme kontrolleri: biçim, v54 10 MB ve 8192 px, boyut sınırları, detay yoğunluğu, gömülü kod ve kayıt biçimi. */
+/** Resim ekleme kontrolleri: biçim, v55 sabit boyut/detay sınırı yok (yalnız bellek koruması), gömülü kod ve kayıt biçimi. */
 @RunWith(AndroidJUnit4::class)
 @GraphicsMode(GraphicsMode.Mode.NATIVE)
 @Config(sdk = [34])
@@ -58,13 +58,11 @@ class ImageImportValidatorTest {
     }
 
     @Test fun detailScoresAreOrdered() {
+        // v55 detay puanı artık eklemeyi engellemez; ölçüm yine tutarlı
         val simple = ImageImportValidator.detailScore(simpleDrawing(512, 512))
         val light = ImageImportValidator.detailScore(busy(512, 512, 150))
         val heavy = ImageImportValidator.detailScore(busy(512, 512, 3000))
         val random = ImageImportValidator.detailScore(noise(256, 256))
-        println("DETAIL simple=$simple light=$light heavy=$heavy noise=$random")
-        assertTrue(simple < ImageImportValidator.DETAIL_WARN)
-        assertTrue(random >= ImageImportValidator.DETAIL_REJECT)
         assertTrue(simple < light && light < heavy && heavy <= random + 0.05f)
     }
 
@@ -80,27 +78,45 @@ class ImageImportValidatorTest {
         assertTrue("saklanan veri orijinalden çok büyük olmamalı", image.bytes.size <= bytes.size * 11 / 10)
     }
 
-    @Test fun tooLargeFileIsRejected() {
+    @Test fun v55LargeFileOver10MbIsAccepted() {
         val bytes = png(noise(2048, 2048))
-        assertTrue(bytes.size > ImageImportValidator.MAX_BYTES)
+        assertTrue(bytes.size > 10L * 1024 * 1024)
+        assertTrue(bytes.size < ImageImportValidator.maxImportBytes)
         val result = ImageImportValidator.check(bytes)
-        assertTrue(result.errors.any { it is ImageIssue.TooLarge })
-        assertTrue(!result.accepted)
+        assertTrue(result.errors.toString(), result.accepted)
+        assertTrue(result.warnings.none { it is ImageIssue.NearSizeLimit || it is ImageIssue.Detailed })
     }
 
-    @Test fun tooDetailedImageIsRejected() {
-        val bytes = png(noise(300, 300))
-        assertTrue(bytes.size < ImageImportValidator.MAX_BYTES)
-        val result = ImageImportValidator.check(bytes)
-        assertTrue(result.errors.toString(), result.errors.any { it is ImageIssue.TooDetailed })
+    @Test fun v55DetailedImageIsAcceptedWithoutDetailWarning() {
+        val result = ImageImportValidator.check(png(noise(300, 300)))
+        assertTrue(result.errors.toString(), result.accepted)
+        assertTrue(result.warnings.toString(), result.warnings.isEmpty())
     }
 
-    @Test fun unsupportedTinyAndHugeImagesAreRejected() {
+    @Test fun v55TinyAndExtremeAspectImagesAreAccepted() {
         assertEquals(listOf(ImageIssue.UnsupportedFormat), ImageImportValidator.check("GIF89a not really".toByteArray()).errors)
-        assertTrue(ImageImportValidator.check(png(simpleDrawing(10, 10))).errors.any { it is ImageIssue.TooSmall })
-        assertTrue(ImageImportValidator.check(png(simpleDrawing(9000, 40))).errors.any { it is ImageIssue.DimensionsTooLarge })
-        // v54 8192 px'e kadar kabul
-        assertTrue(ImageImportValidator.check(png(simpleDrawing(4500, 40))).errors.none { it is ImageIssue.DimensionsTooLarge })
+        val tiny = ImageImportValidator.check(png(simpleDrawing(10, 10)))
+        assertTrue(tiny.errors.toString(), tiny.accepted)
+        assertEquals(10, tiny.image!!.width)
+        // 8192 px üstü: eskiden reddedilirdi, şimdi uzun kenar saklama boyuna küçültülür
+        val wide = ImageImportValidator.check(png(simpleDrawing(9000, 40)), storeSide = 3000)
+        assertTrue(wide.errors.toString(), wide.accepted)
+        assertEquals(3000, wide.image!!.width)
+        assertTrue(wide.warnings.any { it is ImageIssue.WillDownscale })
+    }
+
+    @Test fun v55MemoryGuardLimitsAreSane() {
+        val limit = ImageImportValidator.maxImportBytes
+        assertTrue(limit in (16L shl 20)..(256L shl 20))
+        assertEquals(1_000_000_000L, ImageImportValidator.MAX_PIXELS)
+        // Sınır içinde: tamamı okunur (bildirilen boyut yanlış/eksik olsa da)
+        val data = ByteArray(700_000) { (it % 251).toByte() }
+        assertTrue(data.contentEquals(ImageImportValidator.readLimited(data.inputStream(), null, 1_000_000)))
+        assertTrue(data.contentEquals(ImageImportValidator.readLimited(data.inputStream(), 100L, 1_000_000)))
+        assertTrue(data.contentEquals(ImageImportValidator.readLimited(data.inputStream(), 700_000L, 700_000)))
+        // Sınır aşılırsa okuma durur (bellek taşmaz)
+        val e = runCatching { ImageImportValidator.readLimited(data.inputStream(), null, 500_000) }.exceptionOrNull()
+        assertTrue(e is ImageImportValidator.TooLargeException)
     }
 
     @Test fun largeResolutionIsDownscaledWithWarning() {

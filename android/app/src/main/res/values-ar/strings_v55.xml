@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- v55 resim ekleme: sabit boyut/detay sınırı yok; yalnız bellek koruması -->
+<resources>
+    <string name="v55_image_err_memory" formatted="true">هذه الصورة كبيرة جدًا على ذاكرة هذا الجهاز (%1$s). لم تتم إضافتها حتى لا يتعطل التطبيق؛ جرّب نسخة أصغر.</string>
+    <string name="v55_image_err_pixels" formatted="true">الدقة أعلى من أن تتم معالجتها (%1$d×%2$d، أكثر من 1 جيجابكسل). جرّب نسخة أصغر.</string>
+</resources>

@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- v55 resim ekleme: sabit boyut/detay sınırı yok; yalnız bellek koruması -->
+<resources>
+    <string name="v55_image_err_memory" formatted="true">이 이미지는 이 기기의 메모리에 비해 너무 커요(%1$s). 앱이 멈추지 않도록 추가하지 않았어요. 더 작은 사본을 사용해 보세요.</string>
+    <string name="v55_image_err_pixels" formatted="true">해상도가 너무 높아 처리할 수 없어요(%1$d×%2$d, 1기가픽셀 초과). 더 작은 사본을 사용해 보세요.</string>
+</resources>

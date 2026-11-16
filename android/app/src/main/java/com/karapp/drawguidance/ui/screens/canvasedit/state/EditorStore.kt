@@ -112,7 +112,7 @@ class EditorStore(
     val indexer = ElementIndexer()
     private val indexRequests = MutableStateFlow<List<Stroke>?>(null)
 
-    private var history = EditHistory<DocumentState>(MAX_HISTORY, COALESCE_WINDOW_MS)
+    private var history = EditHistory<DocumentState>(com.karapp.drawguidance.platform.DeviceCaps.historyLimit(MAX_HISTORY), COALESCE_WINDOW_MS)
 
     /**
      * v32 eğitim modu ("kum havuzu"): eğitimin çizimleri kaydedilmez ve kullanıcının geri alma geçmişine girmez; eğitim

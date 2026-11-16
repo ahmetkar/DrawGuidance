@@ -2925,12 +2925,12 @@ private fun IssueList(issues: List<ImageIssue>) {
 @Composable
 fun issueText(issue: ImageIssue): String = when (issue) {
     // v54 sınırlar 10 MB ve 8192 px / 64 MP
-    is ImageIssue.TooLarge -> stringResource(R.string.v54_image_err_too_large, formatBytes(issue.bytes))
+    is ImageIssue.TooLarge -> stringResource(R.string.v55_image_err_memory, formatBytes(issue.bytes))
     ImageIssue.UnsupportedFormat -> stringResource(R.string.image_err_format)
     ImageIssue.Unreadable -> stringResource(R.string.image_err_unreadable)
     ImageIssue.Suspicious -> stringResource(R.string.v54_image_err_suspicious)
     is ImageIssue.TooSmall -> stringResource(R.string.image_err_too_small, issue.width, issue.height)
-    is ImageIssue.DimensionsTooLarge -> stringResource(R.string.v54_image_err_dimensions, issue.width, issue.height)
+    is ImageIssue.DimensionsTooLarge -> stringResource(R.string.v55_image_err_pixels, issue.width, issue.height)
     is ImageIssue.TooDetailed -> stringResource(R.string.image_err_detail, issue.percent)
     is ImageIssue.Detailed -> stringResource(R.string.image_warn_detail, issue.percent)
     is ImageIssue.WillDownscale -> stringResource(R.string.image_warn_downscale, issue.width, issue.height, issue.targetWidth, issue.targetHeight)

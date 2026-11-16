@@ -20,16 +20,17 @@ object V53TemplateInfo {
         mapOf("tr" to tr, "en" to en, "ar" to ar, "ja" to ja, "ko" to ko, "ru" to ru, "zh" to zh)
 
     val INFO: Map<String, Pair<Map<String, String>, Map<String, String>>> = mapOf(
-        "comic_story_school" to (
-            l("Okul macerası", "School adventure", "مغامرة مدرسية", "学校の冒険", "학교 모험", "Школьное приключение", "校园冒险") to
+        // v55 "Okul macerası" yerine örnek manga (sağdan sola okunur)
+        "comic_story_manga" to (
+            l("Manga: Avlu düellosu", "Manga: Courtyard duel", "مانغا: مبارزة الفناء", "マンガ：中庭の決闘", "만화: 안뜰의 결투", "Манга: дуэль во дворе", "漫画：庭院决斗") to
                 l(
-                    "Hazır hikâye: okul ve park arka planları, iki öğrenci karakteri, diyaloglar, anlatı kutuları ve ses efektleri.",
-                    "Ready story: school backgrounds, two student characters, dialogue, captions and sound effects.",
-                    "قصة جاهزة: خلفيات مدرسية وشخصيتا طالبين وحوارات ومربعات سرد ومؤثرات صوتية.",
-                    "完成済みのお話：学校の背景、生徒2人、セリフ、ナレーション、効果音。",
-                    "완성된 이야기: 학교 배경, 학생 캐릭터 둘, 대사, 내레이션, 효과음.",
-                    "Готовая история: школьные фоны, два ученика, диалоги, подписи и звуки.",
-                    "现成故事：校园背景、两位学生角色、对白、旁白和音效。",
+                    "Örnek manga: sağdan sola okunur; iki kılıç ustası, eski avlu, ekran tonları, hız ve darbe çizgileri, ses efektleri.",
+                    "Sample manga: read right to left; two swordsmen, an old courtyard, screentones, speed and impact lines, sound effects.",
+                    "مانغا نموذجية تُقرأ من اليمين إلى اليسار: مبارزان بالسيف وفناء قديم ودرجات شاشة وخطوط سرعة ومؤثرات صوتية.",
+                    "マンガの見本（右から左へ読む）：剣士2人、古い中庭、スクリーントーン、スピード線、効果音。",
+                    "만화 견본(오른쪽에서 왼쪽으로 읽기): 검객 둘, 오래된 안뜰, 스크린톤, 속도선, 효과음.",
+                    "Образец манги (читается справа налево): два мечника, старый двор, скринтоны, линии скорости и звуки.",
+                    "漫画示例（从右往左读）：两位剑客、古老庭院、网点、速度线和音效。",
                 )
             ),
         "comic_story_chase" to (
@@ -131,52 +132,66 @@ class V53TemplateExport : TemplateExportBase() {
         narration(Offset(panel.left + width / 2f + panel.width * 0.025f, panel.top + panel.height * 0.065f), text, 28f, width = width)
     }
 
+    /**
+     * v55 örnek manga (Okul macerası yerine; şövalye Aras ve beyaz saçlı kılıççı Doruk, ikisi de temel karakter): sağdan sola okuma sırası, manga kare düzeni, ekran tonlu sade zeminler,
+     * hız/odak/darbe çizgileri. İlk karede avlu, sonra yüz yakın çekimleri ve düello.
+     */
     @Test
-    fun comicStorySchool() {
-        open("Okul macerası", CanvasKind.COMIC, 1200, 1800, pages = 2, cover = false)
+    fun comicStoryManga() {
+        open("Manga: Avlu düellosu", CanvasKind.COMIC, 1200, 1800, pages = 2, cover = false)
         page(0)
-        panelsAny("three_big_bottom")
-        val l = readingOrder(false)
+        panelsAny("manga")
+        val l = readingOrder(true)
         val r = l.map { it.second }
-        // 1: iki öğrenci okul çatısında (tam boy, yan yana, birbirine dönük)
-        backdrop("okul_cati", l[0].first)
-        who("ogrenci_arda", "poz_01", r[0], 0.26f, 0.66f, maxW = 0.42f)
-        who("ogrenci_ece", "poz_01", r[0], 0.74f, 0.64f, maxW = 0.42f)
-        caption(r[0], "Pazartesi sabahı, okulun ilk günü…", w = 0.42f)
-        talk(r[0], 0.74f, 0.22f, "Arda! Ödevini getirdin mi?", TailDirection.BOTTOM_RIGHT, w = 0.56f)
-        // 2: Arda'nın şaşkın yüzü (sade zemin, odak çizgileri yüzüne toplanır)
-        ground(r[1], "#FFFFFF")
-        lines(ComicLinesKind.FOCUS, r[1], density = 1.6f)
-        who("ogrenci_arda", "ifade_06", r[1], 0.5f, 0.56f, maxW = 0.8f)
-        talk(r[1], 0.5f, 0.15f, "Hangi ödev?!", TailDirection.BOTTOM_LEFT, BalloonStyle.SHOUT)
-        // 3: Ece başını çeviriyor (kasvet deseni: manga tate-sen)
-        ground(r[2], "#ECEFF1", ToneFill("pat_vlines", 0.55f, colorHex = "#37474F"))
-        who("ogrenci_ece", "gunluk_02", r[2], 0.6f, 0.62f, maxW = 0.6f)
-        talk(r[2], 0.32f, 0.16f, "Yine mi unuttun…", TailDirection.BOTTOM_RIGHT, BalloonStyle.THOUGHT, w = 0.5f)
+        // 1 (geniş üst kare): eski avlu, iki samuray karşı karşıya; sağdaki önce konuşur
+        backdrop("avlu2", l[0].first)
+        who("kilicci_doruk", "poz_01", r[0], 0.74f, 0.7f, maxW = 0.36f)
+        who("sovalye_aras", "poz_01", r[0], 0.26f, 0.72f, maxW = 0.36f)
+        caption(r[0], "Eski konak avlusu, şafak vakti…", w = 0.38f)
+        talk(r[0], 0.72f, 0.2f, "Sonunda geldin, Aras.", TailDirection.BOTTOM_RIGHT, w = 0.42f)
+        // 2: Aras kararlı (dikey kasvet çizgileri)
+        ground(r[1], "#F5F5F5", ToneFill("pat_vlines", 0.45f, colorHex = "#424242"))
+        who("sovalye_aras", "ifade_01", r[1], 0.5f, 0.6f, maxW = 0.82f)
+        talk(r[1], 0.5f, 0.15f, "Sözümü tutmaya geldim.", TailDirection.BOTTOM_LEFT)
+        // 3: Doruk'un iç sesi (yumuşak nokta tonu)
+        ground(r[2], "#FFFFFF", ToneFill("tone_dot_radial", 0.4f, colorHex = "#616161"))
+        who("kilicci_doruk", "ifade_05", r[2], 0.5f, 0.6f, maxW = 0.82f)
+        talk(r[2], 0.5f, 0.15f, "Eski dostum… rakibim.", TailDirection.BOTTOM_RIGHT, BalloonStyle.THOUGHT)
+        // 4: Aras bağırır (odak çizgileri yüzüne toplanır)
+        ground(r[3], "#FFFFFF")
+        lines(ComicLinesKind.FOCUS, r[3], density = 1.8f)
+        who("sovalye_aras", "ifade_03", r[3], 0.5f, 0.58f, maxW = 0.82f)
+        talk(r[3], 0.5f, 0.14f, "Kılıcını çek!", TailDirection.BOTTOM_LEFT, BalloonStyle.SHOUT)
+        // 5: Aras atılır (hız çizgileri arkasında)
+        ground(r[4], "#FFFFFF", ToneFill("tone_dot_grad", 0.35f, angle = 90f, colorHex = "#424242"))
+        lines(ComicLinesKind.SPEED_H, r[4], density = 1.8f)
+        who("sovalye_aras", "aksiyon_01", r[4], 0.5f, 0.8f, maxW = 0.78f)
+        sfx("VUUUŞ", r[4].at(0.7f, 0.16f), 88f)
         page(1)
         panelsAny("four_grid")
-        val l2 = readingOrder(false)
+        val l2 = readingOrder(true)
         val q = l2.map { it.second }
-        // 1: Arda'nın aklına bir fikir gelir (parıltı deseni)
-        ground(q[0], "#FFF8E1", ToneFill("pat_sparkle", 0.55f, colorHex = "#F9A825"))
-        who("ogrenci_arda", "ifade_02", q[0], 0.5f, 0.56f, maxW = 0.8f)
-        talk(q[0], 0.5f, 0.15f, "Bir planım var!", TailDirection.BOTTOM_LEFT)
-        // 2: Ece kuşkulu
-        backdrop("sakura_sokak", l2[1].first)
-        who("ogrenci_ece", "ifade_05", q[1], 0.5f, 0.56f, maxW = 0.8f)
-        talk(q[1], 0.5f, 0.15f, "Bu iyi bitmeyecek.", TailDirection.BOTTOM_RIGHT)
-        // 3: Arda koşuyor (sade zemin, arkasında hız çizgileri)
-        ground(q[2], "#FFFFFF", ToneFill("tone_dot_radial", 0.35f, colorHex = "#90A4AE"))
-        lines(ComicLinesKind.SPEED_H, q[2], density = 1.6f)
-        who("ogrenci_arda", "aksiyon_01", q[2], 0.55f, 0.78f, maxW = 0.7f)
-        sfx("VUUUŞ", q[2].at(0.3f, 0.16f), 92f)
-        // 4: ödev çatıdaymış; ikisi de gülüyor (yüzler yan yana)
-        backdrop("okul_cati", l2[3].first)
-        who("ogrenci_arda", "ifade_04", q[3], 0.26f, 0.48f, maxW = 0.48f)
-        who("ogrenci_ece", "ifade_03", q[3], 0.75f, 0.48f, maxW = 0.48f)
-        talk(q[3], 0.3f, 0.13f, "Ödev çatıdaymış!", TailDirection.BOTTOM_LEFT)
-        sfx("HAHAHA", q[3].at(0.64f, 0.37f), 72f)
-        export("comic_story_school", CanvasKind.COMIC, landing = 0, coverPage = 0)
+        // 1: kılıçlar çarpışır (darbe çizgileri, büyük efekt)
+        ground(q[0], "#FFFFFF", ToneFill("tone_dot_radial", 0.45f, colorHex = "#212121"))
+        lines(ComicLinesKind.BURST, q[0], density = 1.6f)
+        who("sovalye_aras", "aksiyon_02", q[0], 0.5f, 0.74f, maxW = 0.8f)
+        sfx("ŞAK!", q[0].at(0.5f, 0.15f), 110f)
+        // 2: Aras şaşkın
+        ground(q[1], "#FFFFFF")
+        lines(ComicLinesKind.FOCUS, q[1], density = 1.4f)
+        who("sovalye_aras", "ifade_04", q[1], 0.5f, 0.56f, maxW = 0.8f)
+        talk(q[1], 0.5f, 0.14f, "Bu hız… nasıl?!", TailDirection.BOTTOM_LEFT)
+        // 3: Doruk gülümser (parıltı deseni)
+        ground(q[2], "#FAFAFA", ToneFill("pat_sparkle", 0.45f, colorHex = "#757575"))
+        who("kilicci_doruk", "ifade_02", q[2], 0.5f, 0.56f, maxW = 0.8f)
+        talk(q[2], 0.5f, 0.14f, "Yıllarca bu anı bekledim.", TailDirection.BOTTOM_RIGHT)
+        // 4: avluda ikisi de gülümser; "devam edecek"
+        backdrop("avlu2", l2[3].first)
+        who("kilicci_doruk", "ifade_02", q[3], 0.74f, 0.48f, maxW = 0.48f)
+        who("sovalye_aras", "ifade_02", q[3], 0.26f, 0.48f, maxW = 0.48f)
+        talk(q[3], 0.7f, 0.13f, "Berabere… bu seferlik.", TailDirection.BOTTOM_LEFT, w = 0.6f)
+        caption(q[3], "Devam edecek…", w = 0.4f)
+        export("comic_story_manga", CanvasKind.COMIC, landing = 0, coverPage = 0)
     }
 
     @Test

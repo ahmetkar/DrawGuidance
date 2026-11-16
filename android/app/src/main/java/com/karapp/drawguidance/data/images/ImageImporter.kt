@@ -17,12 +17,13 @@ class ImageImporter(private val context: Context) {
     }
 
     /**
-     * v29 Resimlerim'deki (uygulamanın kaydettiği) resim: boyut ve ayrıntı sınırı uygulanmaz, yalnız uzun kenarı
+     * v29 Resimlerim'deki (uygulamanın kaydettiği) resim: boyut ve ayrıntı sınırı uygulanmaz (v55 artık hiçbir resimde), yalnız uzun kenarı
      * [ImageImportValidator.storeMaxSide]'a küçültülür. Okunamazsa null.
      */
     suspend fun prepareSaved(uri: Uri): PreparedImage? = withContext(Dispatchers.IO) {
         runCatching {
-            val bytes = context.contentResolver.openInputStream(uri)?.use { it.readBytes() } ?: return@runCatching null
+            // v55 boyut sınırı yok; yalnız bellek koruması (uygulama belleğinin üçte biri)
+            val bytes = context.contentResolver.openInputStream(uri)?.use { ImageImportValidator.readLimited(it, null, ImageImportValidator.maxImportBytes) } ?: return@runCatching null
             // v54 yalnız resim dosyası (imza ve yapı denetimi); büyük resim tam boyda açılmaz
             val sourceMime = ImageImportValidator.sniffMime(bytes) ?: return@runCatching null
             if (ImageSecurity.inspect(bytes, sourceMime) != ImageSecurity.Verdict.CLEAN) return@runCatching null

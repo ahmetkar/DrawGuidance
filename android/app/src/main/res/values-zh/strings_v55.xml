@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- v55 resim ekleme: sabit boyut/detay sınırı yok; yalnız bellek koruması -->
+<resources>
+    <string name="v55_image_err_memory" formatted="true">此图片对本设备的内存来说过大（%1$s）。为避免应用崩溃未添加，请尝试较小的副本。</string>
+    <string name="v55_image_err_pixels" formatted="true">分辨率过高，无法处理（%1$d×%2$d，超过 10 亿像素）。请尝试较小的副本。</string>
+</resources>

@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- v55 resim ekleme: sabit boyut/detay sınırı yok; yalnız bellek koruması -->
+<resources>
+    <string name="v55_image_err_memory" formatted="true">Bu resim bu cihazın belleği için çok büyük (%1$s). Uygulamanın çökmemesi için eklenmedi; daha küçük bir kopyasını deneyin.</string>
+    <string name="v55_image_err_pixels" formatted="true">Çözünürlük işlenemeyecek kadar yüksek (%1$d×%2$d, 1 gigapikselin üstünde). Daha küçük bir kopyasını deneyin.</string>
+</resources>

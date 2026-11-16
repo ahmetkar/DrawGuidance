@@ -356,7 +356,7 @@ class Model3DEditorViewModel(
 
     private fun pushUndo(m: Model3D) {
         undo.addLast(m)
-        if (undo.size > MAX_HISTORY) undo.removeFirst()
+        while (undo.size > com.karapp.drawguidance.platform.DeviceCaps.historyLimit(MAX_HISTORY)) undo.removeFirst()
         redo.clear()
         refreshFlags()
     }

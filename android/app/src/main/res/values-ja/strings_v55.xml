@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- v55 resim ekleme: sabit boyut/detay sınırı yok; yalnız bellek koruması -->
+<resources>
+    <string name="v55_image_err_memory" formatted="true">この画像はこの端末のメモリには大きすぎます（%1$s）。アプリが停止しないよう追加しませんでした。小さいコピーをお試しください。</string>
+    <string name="v55_image_err_pixels" formatted="true">解像度が高すぎて処理できません（%1$d×%2$d、1ギガピクセル超）。小さいコピーをお試しください。</string>
+</resources>

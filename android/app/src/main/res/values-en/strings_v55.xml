@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- v55 resim ekleme: sabit boyut/detay sınırı yok; yalnız bellek koruması -->
+<resources>
+    <string name="v55_image_err_memory" formatted="true">This image is too large for this device\'s memory (%1$s). It wasn\'t added so the app doesn\'t crash; try a smaller copy.</string>
+    <string name="v55_image_err_pixels" formatted="true">The resolution is too high to process (%1$d×%2$d, over 1 gigapixel). Try a smaller copy.</string>
+</resources>

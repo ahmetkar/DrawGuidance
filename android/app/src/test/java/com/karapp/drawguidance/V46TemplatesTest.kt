@@ -28,6 +28,7 @@ import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotEquals
 import org.junit.Assert.assertNotNull
+import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -69,7 +70,7 @@ class V46TemplateFilesTest {
         // basit not almada üç şablon
         // v52 şerit ve aksiyon şablonları, v53 dolu hikâyeler (okul, takip, şaka şeridi)
         assertEquals(
-            listOf("comic_blank_pages", "comic_blank_manga", "comic_blank_webtoon", "comic_strips", "comic_blank_action", "comic_story_school", "comic_story_chase", "comic_story_strip"),
+            listOf("comic_blank_pages", "comic_blank_manga", "comic_blank_webtoon", "comic_strips", "comic_blank_action", "comic_story_manga", "comic_story_chase", "comic_story_strip"),
             CanvasTemplates.forKind(CanvasKind.COMIC).map { it.id },
         )
         // v51 not alma tek mod: eski basit not şablonları da not almada (v52: dokuz not + altı basit not)
@@ -184,6 +185,22 @@ class V46TemplateFilesTest {
         fun cx(s: Stroke) = (s.points.minOf { it.x } + s.points.maxOf { it.x }) / 2f
         assertTrue(cx(topmost("comic_blank_manga")) > 600f)
         assertTrue(cx(topmost("comic_blank_pages")) < 600f)
+    }
+
+    @Test
+    fun v55MangaStoryReplacesSchoolAdventure() {
+        // v55 "Okul macerası" kaldırıldı; yerine sağdan sola okunan örnek manga
+        assertNull(CanvasTemplates.find("comic_story_school"))
+        assertFalse(File(ASSETS, "templates/comic_story_school").exists())
+        val t = CanvasTemplates.find("comic_story_manga")!!
+        assertEquals("Manga: Avlu düellosu", t.names["tr"])
+        assertEquals(2, pages(t.id).size)
+        // Sayfa 1'deki ilk konuşma balonu (en üstte, anlatı değil) sağ yarıda: okuma sağdan başlar
+        val first = pages(t.id)[0].filter { it.text?.box?.balloon != null && it.text?.box?.balloon?.style != com.karapp.drawguidance.data.model.BalloonStyle.NARRATION }
+            .minBy { it.points.minOf { p -> p.y } }
+        assertTrue((first.points.minOf { it.x } + first.points.maxOf { it.x }) / 2f > 600f)
+        // Manga karakterleri ve mekân resmi var
+        assertTrue(meta(t.id).assets.size >= 5)
     }
 
     @Test

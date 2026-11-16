@@ -26,8 +26,8 @@
     <string name="v52_temp_edit_failed">Couldn\'t open for editing</string>
     <string name="v52_live_paused">Broadcast paused: the sender is editing</string>
     <string name="v52_live_paused_badge">Broadcast paused</string>
-    <string name="v52_helpers_title">Drawing helpers</string>
-    <string name="v52_helpers_short">Helpers</string>
+    <string name="v52_helpers_title">Composition and view</string>
+    <string name="v52_helpers_short">Composition</string>
     <string name="v52_helper_composition">Composition guide</string>
     <string name="v52_helper_composition_hint">Place the main subject on the lines and their crossings; not saved on the paper.</string>
     <string name="v52_helper_none">Off</string>

@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- v54: tools/i18n-v53/strings_v54.py ile üretildi; elle değiştirmeyin -->
+<resources>
+    <string name="v53_sg_airplane">Airplane</string>
+    <string name="v53_sg_backpack">Backpack</string>
+    <string name="v53_sg_bicycle">Bicycle</string>
+    <string name="v53_sg_bird_fly">Bird (flying)</string>
+    <string name="v53_sg_box_1p">Box (one-point)</string>
+    <string name="v53_sg_butterfly">Butterfly</string>
+    <string name="v53_sg_camera">Camera</string>
+    <string name="v53_sg_cat_walk">Cat (walking)</string>
+    <string name="v53_sg_clock">Clock</string>
+    <string name="v53_sg_cow">Cow</string>
+    <string name="v53_sg_cylinder_lying">Lying cylinder</string>
+    <string name="v53_sg_dog_sit">Dog (sitting)</string>
+    <string name="v53_sg_dragon">Dragon</string>
+    <string name="v53_sg_elephant">Elephant</string>
+    <string name="v53_sg_face_3q">Face (three-quarter)</string>
+    <string name="v53_sg_guitar">Guitar</string>
+    <string name="v53_sg_hand_open">Open hand</string>
+    <string name="v53_sg_headphones">Headphones</string>
+    <string name="v53_sg_house_2p">House (two-point)</string>
+    <string name="v53_sg_human_3q">Human (three-quarter)</string>
+    <string name="v53_sg_human_run">Human (running)</string>
+    <string name="v53_sg_human_sit">Human (sitting)</string>
+    <string name="v53_sg_laptop">Laptop</string>
+    <string name="v53_sg_rabbit">Rabbit</string>
+    <string name="v53_sg_rose">Rose</string>
+    <string name="v53_sg_ship">Ship</string>
+    <string name="v53_sg_sofa">Sofa</string>
+    <string name="v53_sg_street_1p">Street (one-point)</string>
+    <string name="v53_sg_teapot">Teapot</string>
+    <string name="v53_sg_tower">Tower</string>
+    <string name="v53_sg_umbrella">Umbrella</string>
+    <string name="v53_sg_wine_glass">Stemmed glass</string>
+    <string name="v54_image_err_dimensions" formatted="true">Resolution is too high (%1$d×%2$d). Each side can be at most 8192 px, with a total of at most 64 MP.</string>
+    <string name="v54_image_err_suspicious">This file is not a safe image: it contains code or another file. It was not added.</string>
+    <string name="v54_image_err_too_large" formatted="true">File is too large: %1$s. The maximum is 10 MB.</string>
+    <string name="v54_image_warn_near_limit" formatted="true">File is close to the 10 MB limit (%1$s).</string>
+    <string name="v54_share_pair_connect">Connect</string>
+    <string name="v54_share_pair_enter" formatted="true">Enter the 6-digit pairing code shown on %1$s.</string>
+    <string name="v54_share_pair_old">The app on the other device is out of date; update it for encrypted sharing.</string>
+    <string name="v54_share_pair_renew">Pairing must be renewed; connect again and enter the code.</string>
+    <string name="v54_share_pair_show" formatted="true">%1$s wants to connect. Enter this code on that device:</string>
+    <string name="v54_share_pair_show_note">The code is for this connection only; the transfer is encrypted.</string>
+    <string name="v54_share_pair_title">Pairing code</string>
+    <string name="v54_share_pair_wrong">Wrong pairing code; try again.</string>
+    <string name="v54_template_choose_canvas">Pick on canvas</string>
+    <string name="v54_template_choose_message">Nothing is selected for the template. Pick one of the drawing helpers or shapes, or tap a shape on the canvas.</string>
+    <string name="v54_template_choose_shapes">Shapes</string>
+    <string name="v54_template_helper_hint">The lines of the helper you pick become the shape template; draw near them to trace.</string>
+</resources>

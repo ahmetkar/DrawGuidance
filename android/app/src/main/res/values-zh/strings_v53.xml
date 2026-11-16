@@ -150,8 +150,8 @@
     <string name="v53_struct_opacity">可见度</string>
     <string name="v53_struct_remove">移除参考</string>
     <string name="v53_struct_settings">参考设置</string>
-    <string name="v53_struct_short">结构参考</string>
-    <string name="v53_struct_title">结构参考</string>
+    <string name="v53_struct_short">绘图助手</string>
+    <string name="v53_struct_title">绘图助手</string>
     <string name="v53_templates_hint">为页面选择分格布局。</string>
     <string name="v53_text_section">文字</string>
     <string name="v53_text_size">字号</string>

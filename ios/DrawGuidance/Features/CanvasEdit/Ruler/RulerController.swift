@@ -40,6 +40,11 @@ final class RulerController: ObservableObject {
     @Published private(set) var template: TemplateGhost?
     @Published private(set) var locked = false
     @Published var libraryOpen = false
+    /// v54 kalıp seçme uyarısı (çizim modları ve çizgi roman): seçili şekil ya da resim yokken "Çizim yardımcıları" ya da
+    /// "Şekiller"den birini seçmeye yönlendirir.
+    @Published var chooserOpen = false
+    /// v54 çizim yardımcısından kalıp seçilirken yardımcılar penceresi açık mı.
+    @Published var helperPickOpen = false
 
     private let elements: () -> ElementIndex?
     private var store: RulerSettingsStore?
@@ -112,6 +117,8 @@ final class RulerController: ObservableObject {
     }
 
     func finish() {
+        chooserOpen = false
+        helperPickOpen = false
         session = .NONE
         template = nil
         shapeCache = nil
@@ -160,6 +167,21 @@ final class RulerController: ObservableObject {
         guard let stroke = ShapeFactory.build(shapeId, P(center.x - hw, center.y - hh), P(center.x + hw, center.y + hh), style: ShapeStyle(),
                                               graph: nil, id: "ruler-template", order: 0, opacity: 1),
               let ghost = TemplateGhost.of(TemplateGhost.contoursOf([stroke])) else { return false }
+        setTemplate(ghost)
+        return true
+    }
+
+    /// v54 seçili elemanlardan (şekil, resim, çizim) kalıp; çizilecek kontur yoksa false.
+    func templateFrom(_ strokes: [Stroke]) -> Bool {
+        let visible = strokes.filter { !$0.hidden }
+        guard let ghost = TemplateGhost.of(TemplateGhost.contoursOf(visible), colorHex: visible.first.map(colorOf) ?? "#3B82F6") else { return false }
+        setTemplate(ghost)
+        return true
+    }
+
+    /// v54 tuval koordinatındaki konturlardan (ör. çizim yardımcısının çizgileri) kalıp.
+    func templateFromContours(_ contours: [Contour]) -> Bool {
+        guard let ghost = TemplateGhost.of(contours) else { return false }
         setTemplate(ghost)
         return true
     }

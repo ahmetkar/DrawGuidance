@@ -131,6 +131,7 @@ struct CanvasEditScreen: View {
         .modifier(PhotoEditorHost(vm: vm, photo: vm.photo))
         .sheet(isPresented: $brushPickerOpen) { brushPicker }
         .modifier(AddWindowsHost(vm: vm, addUi: addUi))
+        .modifier(RulerSheetsHost(vm: vm, ruler: vm.ruler))
         .sheet(isPresented: Binding(get: { vm.structure.sheet }, set: { vm.structure.sheet = $0 })) {
             StructureGuideSheet(state: vm.structure, canvas: vm.store.canvas)
         }

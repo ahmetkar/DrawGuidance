@@ -101,6 +101,11 @@ final class EditorViewModel: ObservableObject, EditorHost {
     /// v44 çocuk görevi sürüyor mu.
     var inChallenge: () -> Bool = { false }
 
+    /// v54 öneri yok: çocuk görevi, yetişkin alıştırması ya da şekil kalıbı oturumu (kalıp seçimi ve kalıpla çizim).
+    func suggestionsBlocked() -> Bool {
+        inChallenge() || ruler.session == .TEMPLATE || ruler.session == .TEMPLATE_PICK
+    }
+
     /// v38 çocuk modunda çizim görevi (seviye kurulurken çizim moduna geçilir, öneriler temizlenir).
     private(set) lazy var challenge: KidsChallengeController = {
         let c = KidsChallengeController(store, before: { [unowned self] in chooseMode(.DRAW); handwriting.reset() },
@@ -194,12 +199,12 @@ final class EditorViewModel: ObservableObject, EditorHost {
         let prefs = deps.prefs
         handwriting = HandwritingController(
             store, self,
-            enabled: { [unowned self] in mode == .DRAW && !inChallenge() && (inTutorial() ? tutorialAiStep() : prefs.handwriting && aiOn()) },
+            enabled: { [unowned self] in mode == .DRAW && !suggestionsBlocked() && (inTutorial() ? tutorialAiStep() : prefs.handwriting && aiOn()) },
             templates: learning,
             textEnabled: { [unowned self] in inTutorial() || prefs.textSuggest },
             shapeEnabled: { [unowned self] in inTutorial() || prefs.shapeSuggest },
             selectionEnabled: { [unowned self] in
-                !inTutorial() && !inChallenge() && aiOn() && prefs.handwriting && prefs.selectionSuggest && (mode.kind == .BASE || mode.transformsSelection)
+                !inTutorial() && !suggestionsBlocked() && aiOn() && prefs.handwriting && prefs.selectionSuggest && (mode.kind == .BASE || mode.transformsSelection)
             },
             lineEnabled: { [unowned self] in inTutorial() || prefs.lineSuggest })
         kidsPaint = KidsPaintController { [unowned self] p in shapes.paintTarget(p, locked: store.lockedIds()) }
@@ -460,7 +465,8 @@ final class EditorViewModel: ObservableObject, EditorHost {
     }
 
     func onInk(_ stroke: Stroke) {
-        if inChallenge() { return }
+        // v54 kalıpla çizilen çizgi sonra da öneriye katılmaz
+        if suggestionsBlocked() { if !inChallenge() { handwriting.exclude(stroke) }; return }
         if ruler.onTemplate(stroke.points.map(\.x), stroke.points.map(\.y)) { handwriting.exclude(stroke) } else { handwriting.onInk(stroke) }
     }
 

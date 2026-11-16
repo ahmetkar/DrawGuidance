@@ -75,6 +75,15 @@ class RulerController(private val elements: () -> ElementIndex?) {
     /** Kalıp için kütüphane penceresi açık mı. */
     val libraryOpen = MutableStateFlow(false)
 
+    /**
+     * v54 kalıp seçme uyarısı (çizim modları ve çizgi roman): seçili şekil ya da resim yokken kalıp açılınca
+     * "Çizim yardımcıları" ya da "Şekiller"den birini seçmeye yönlendirir.
+     */
+    val chooserOpen = MutableStateFlow(false)
+
+    /** v54 çizim yardımcısından kalıp seçilirken yardımcılar penceresi açık mı. */
+    val helperPickOpen = MutableStateFlow(false)
+
     private var store: RulerSettingsStore? = null
 
     /** Ayarların saklandığı yer bağlanır ve son ayarlar okunur (bir kez). */
@@ -151,6 +160,8 @@ class RulerController(private val elements: () -> ElementIndex?) {
 
     /** Bitir: normal çizime dönülür. */
     fun finish() {
+        chooserOpen.value = false
+        helperPickOpen.value = false
         _session.value = GuideSession.NONE
         _template.value = null
         shapeCache = null
@@ -206,6 +217,21 @@ class RulerController(private val elements: () -> ElementIndex?) {
             style = ShapeStyle(), id = "ruler-template", order = 0,
         ) ?: return false
         val ghost = TemplateGhost.of(TemplateGhost.contoursOf(listOf(stroke))) ?: return false
+        setTemplate(ghost)
+        return true
+    }
+
+    /** v54 seçili elemanlardan (şekil, resim, çizim) kalıp; çizilecek kontur yoksa false. */
+    fun templateFrom(strokes: List<Stroke>): Boolean {
+        val visible = strokes.filter { !it.hidden }
+        val ghost = TemplateGhost.of(TemplateGhost.contoursOf(visible), visible.firstOrNull()?.let { colorOf(it) } ?: "#3B82F6") ?: return false
+        setTemplate(ghost)
+        return true
+    }
+
+    /** v54 tuval koordinatındaki konturlardan (ör. çizim yardımcısının çizgileri) kalıp. */
+    fun templateFromContours(contours: List<Pair<FloatArray, Boolean>>): Boolean {
+        val ghost = TemplateGhost.of(contours) ?: return false
         setTemplate(ghost)
         return true
     }

@@ -3,6 +3,7 @@ package com.karapp.drawguidance
 import android.util.Log
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.semantics.SemanticsActions
+import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.hasClickAction
 import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.longClick
@@ -54,13 +55,13 @@ class V14CanvasGalleryTest : EditorTestBase() {
         compose.onNodeWithContentDescription("Geri").performClick()
         waitFor { compose.onAllNodesWithText("Seçili tuval").fetchSemanticsNodes().isEmpty() }
         // Liste görünümü ve ada göre sıralama
-        compose.onNodeWithContentDescription("Liste görünümü").performClick()
+        compose.onNodeWithTag("canvas_list_more", useUnmergedTree = true).performClick(); compose.waitForIdle(); compose.onNodeWithTag("canvas_list_view", useUnmergedTree = true).performClick()
         waitFor { compose.onAllNodesWithTag("canvas_gallery").fetchSemanticsNodes().isEmpty() }
         waitForText("Manzara")
-        compose.onNodeWithContentDescription("Sırala").performClick()
+        compose.onNodeWithTag("canvas_list_more", useUnmergedTree = true).performClick(); compose.waitForIdle(); compose.onNodeWithTag("canvas_list_sort", useUnmergedTree = true).performClick()
         waitForText("Ada göre")
         compose.onNodeWithText("Ada göre").performClick()
-        compose.onNodeWithContentDescription("Galeri görünümü").performClick()
+        compose.onNodeWithTag("canvas_list_more", useUnmergedTree = true).performClick(); compose.waitForIdle(); compose.onNodeWithTag("canvas_list_view", useUnmergedTree = true).performClick()
         waitFor { compose.onAllNodesWithTag("canvas_gallery").fetchSemanticsNodes().isNotEmpty() }
         assertTrue("ada göre sıralıyken tarih bölümü yok", compose.onAllNodesWithText("Bugün").fetchSemanticsNodes().isEmpty())
         // Tuvale dokununca açılır

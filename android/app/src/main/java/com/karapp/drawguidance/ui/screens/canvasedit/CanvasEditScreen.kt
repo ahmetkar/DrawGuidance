@@ -724,14 +724,14 @@ fun CanvasEditScreen(
     val comic = kind == com.karapp.drawguidance.data.model.CanvasKind.COMIC
     // Ekle (+) menüsü: öğeler tek listede; seçilen öğe hatırlanır ve menüde etkin görünür
     val addItems = listOfNotNull(
+        // v53 not almada hızlı yazı kutusu; v54 Ekle menüsünün en başında
+        if (notes) com.karapp.drawguidance.ui.screens.canvasedit.components.AddMenuItem("textbox", stringResource(R.string.v53_quick_text), Icons.Filled.ShortText) { toggleQuickText() } else null,
         com.karapp.drawguidance.ui.screens.canvasedit.components.AddMenuItem("shape", stringResource(R.string.add_shape), Icons.Filled.Category) { viewModel.openShapePicker() },
         if (notes) com.karapp.drawguidance.ui.screens.canvasedit.components.AddMenuItem("formula", stringResource(R.string.add_formula), Icons.Filled.Functions) { viewModel.openFormulaPicker() } else null,
         // v52 grafik ve tablo ayrı düğmelerde
         if (notes) com.karapp.drawguidance.ui.screens.canvasedit.components.AddMenuItem("graph", stringResource(R.string.v52_add_graph), Icons.Filled.ShowChart) { viewModel.openGraphPicker() } else null,
         if (notes) com.karapp.drawguidance.ui.screens.canvasedit.components.AddMenuItem("table", stringResource(R.string.v52_add_table), Icons.Filled.TableChart) { viewModel.tables.openCreate() } else null,
         com.karapp.drawguidance.ui.screens.canvasedit.components.AddMenuItem("text", stringResource(R.string.add_text), Icons.Filled.TextFields) { viewModel.startAction(EditMode.TEXT) },
-        // v53 not almada hızlı yazı kutusu
-        if (notes) com.karapp.drawguidance.ui.screens.canvasedit.components.AddMenuItem("textbox", stringResource(R.string.v53_quick_text), Icons.Filled.ShortText) { toggleQuickText() } else null,
         if (notes) com.karapp.drawguidance.ui.screens.canvasedit.components.AddMenuItem("diagram", stringResource(R.string.add_diagram), Icons.Filled.AccountTree) { viewModel.openDiagramPicker() } else null,
         // v45 not alma panelleri: çizim alanını çerçeveli bölümlere ayıran yerleşimler
         if (notes) com.karapp.drawguidance.ui.screens.canvasedit.components.AddMenuItem("panels", stringResource(R.string.v45_panels_add), com.karapp.drawguidance.ui.screens.canvasedit.components.V45Icons.NotesPanels) { viewModel.v45.openPanels() } else null,
@@ -2511,6 +2511,20 @@ fun CanvasEditScreen(
             )
         }
         if (structureGuide.sheet) com.karapp.drawguidance.ui.screens.canvasedit.components.StructureGuideSheet(structureGuide, canvas?.width ?: 1000, canvas?.height ?: 1000)
+        // v54 şekil kalıbı için çizim yardımcısı seçimi: seçilen yardımcının çizgileri kalıp olur (görünen alanın ortasında)
+        val helperPick by viewModel.ruler.helperPickOpen.collectAsState()
+        if (helperPick) com.karapp.drawguidance.ui.screens.canvasedit.components.StructureGuideSheet(
+            structureGuide, canvas?.width ?: 1000, canvas?.height ?: 1000,
+            onPick = { g ->
+                viewModel.ruler.helperPickOpen.value = false
+                val vs = viewport.viewSize
+                val sc = viewport.scale.coerceAtLeast(0.01f)
+                val center = if (vs.width > 0) viewport.toCanvas(Offset(vs.width / 2f, vs.height / 2f)) else Offset((canvas?.width ?: 1000) / 2f, (canvas?.height ?: 1000) / 2f)
+                val h = if (vs.width > 0) minOf(vs.height / sc * 0.6f, vs.width / sc * 0.7f / g.aspect.coerceAtLeast(0.1f)) else 600f
+                viewModel.ruler.templateFromContours(com.karapp.drawguidance.ui.screens.canvasedit.components.structureContours(g, center, h))
+            },
+            onDismiss = { viewModel.ruler.helperPickOpen.value = false },
+        )
         // v27 GLB içe aktarma: ayrıntı ve "3B Şekillerim'e ayrı şekil olarak kaydedilsin mi?" sorusu
         glbPending?.let { p ->
             com.karapp.drawguidance.ui.screens.model3d.GlbImportAskDialog(
@@ -2910,15 +2924,17 @@ private fun IssueList(issues: List<ImageIssue>) {
 
 @Composable
 fun issueText(issue: ImageIssue): String = when (issue) {
-    is ImageIssue.TooLarge -> stringResource(R.string.image_err_too_large, formatBytes(issue.bytes))
+    // v54 sınırlar 10 MB ve 8192 px / 64 MP
+    is ImageIssue.TooLarge -> stringResource(R.string.v54_image_err_too_large, formatBytes(issue.bytes))
     ImageIssue.UnsupportedFormat -> stringResource(R.string.image_err_format)
     ImageIssue.Unreadable -> stringResource(R.string.image_err_unreadable)
+    ImageIssue.Suspicious -> stringResource(R.string.v54_image_err_suspicious)
     is ImageIssue.TooSmall -> stringResource(R.string.image_err_too_small, issue.width, issue.height)
-    is ImageIssue.DimensionsTooLarge -> stringResource(R.string.image_err_dimensions, issue.width, issue.height)
+    is ImageIssue.DimensionsTooLarge -> stringResource(R.string.v54_image_err_dimensions, issue.width, issue.height)
     is ImageIssue.TooDetailed -> stringResource(R.string.image_err_detail, issue.percent)
     is ImageIssue.Detailed -> stringResource(R.string.image_warn_detail, issue.percent)
     is ImageIssue.WillDownscale -> stringResource(R.string.image_warn_downscale, issue.width, issue.height, issue.targetWidth, issue.targetHeight)
-    is ImageIssue.NearSizeLimit -> stringResource(R.string.image_warn_near_limit, formatBytes(issue.bytes))
+    is ImageIssue.NearSizeLimit -> stringResource(R.string.v54_image_warn_near_limit, formatBytes(issue.bytes))
 }
 
 /** 1536 → "1,5 KB", 1048576 → "1,00 MB" */

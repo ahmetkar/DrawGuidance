@@ -19,6 +19,8 @@ enum ImageIssue: Equatable {
     case tooLarge(Int)
     case unsupportedFormat
     case unreadable
+    /// v54 resmin içinde/sonunda kod ya da başka bir dosya var.
+    case suspicious
     case tooSmall(Int, Int)
     case dimensionsTooLarge(Int, Int)
     case tooDetailed(Int)
@@ -30,15 +32,17 @@ enum ImageIssue: Equatable {
     /// Kullanıcıya gösterilen açıklama (Android metinleri).
     var message: String {
         switch self {
-        case .tooLarge(let b): return L("image_err_too_large", ImageImportValidator.kb(b))
+        // v54 sınırlar 10 MB ve 8192 px / 64 MP
+        case .tooLarge(let b): return L("v54_image_err_too_large", ImageImportValidator.kb(b))
         case .unsupportedFormat: return L("image_err_format")
         case .unreadable: return L("image_err_unreadable")
+        case .suspicious: return L("v54_image_err_suspicious")
         case .tooSmall(let w, let h): return L("image_err_too_small", w, h)
-        case .dimensionsTooLarge(let w, let h): return L("image_err_dimensions", w, h)
+        case .dimensionsTooLarge(let w, let h): return L("v54_image_err_dimensions", w, h)
         case .tooDetailed(let p): return L("image_err_detail", p)
         case .detailed(let p): return L("image_warn_detail", p)
         case .willDownscale(let w, let h, let tw, let th): return L("image_warn_downscale", w, h, tw, th)
-        case .nearSizeLimit(let b): return L("image_warn_near_limit", ImageImportValidator.kb(b))
+        case .nearSizeLimit(let b): return L("v54_image_warn_near_limit", ImageImportValidator.kb(b))
         }
     }
 
@@ -59,29 +63,41 @@ struct ImageCheckResult {
 
 /// Tuvale eklenecek resmin sıkı kontrolleri (Android `ImageImportValidator`):
 /// - Biçim: yalnızca PNG, JPEG, WEBP (dosya imzasından)
-/// - Dosya boyutu en fazla 1 MB (0,8 MB üstü uyarı)
-/// - Kenarlar 16–4096 px, en fazla 16 MP; uzun kenarı 1600 px'ten büyükse küçültülür (uyarı)
+/// - v54 yapı ve gömülü kod denetimi (`ImageSecurity`): betik, HTML, çalıştırılabilir ya da arşiv içeren resim reddedilir
+/// - v54 dosya boyutu en fazla 10 MB (8 MB üstü uyarı)
+/// - v54 kenarlar 16–8192 px, en fazla 64 MP; uzun kenarı 3000 px'ten (giriş düzeyinde 2000 px) büyükse küçültülür
+///   (uyarı). Büyük resim tam boyda açılmaz (ImageIO küçük resim olarak hedef boyda çözer).
 /// - Detay: 256 px'e küçültülmüş gri görüntüde güçlü kenarlı piksel oranı; %30 ve üstü reddedilir, %15 ve üstü uyarı.
-/// Kaydedilecek veri: özgün, PNG (ve küçültülen JPEG'de JPEG) içinden en küçüğü.
+/// Kaydedilecek veri: v54 her zaman yeniden kodlanır (üst veri ve eklenmiş veriler atılır): JPEG kaynakta JPEG, ötekilerde PNG.
 enum ImageImportValidator {
-    static let MAX_BYTES = 1024 * 1024
-    static let WARN_BYTES = 800 * 1024
+    static let MAX_BYTES = 10 * 1024 * 1024
+    static let WARN_BYTES = 8 * 1024 * 1024
     static let MIN_SIDE = 16
-    static let MAX_SIDE = 4096
-    static let MAX_PIXELS = 16_000_000
-    static let STORE_MAX_SIDE = 1600
+    static let MAX_SIDE = 8192
+    static let MAX_PIXELS = 64_000_000
+    static let STORE_MAX_SIDE = 3000
+    static let STORE_MAX_SIDE_LOW = 2000
     static let DETAIL_REJECT: Float = 0.30
     static let DETAIL_WARN: Float = 0.15
     private static let ANALYSIS_SIDE = 256
     private static let EDGE_THRESHOLD = 96.0
 
+    /// Cihaz sınıfına göre saklanan resmin uzun kenarı.
+    static var storeMaxSide: Int { Budget3D.tier == .LOW ? STORE_MAX_SIDE_LOW : STORE_MAX_SIDE }
+
     static func kb(_ b: Int) -> String { b >= 1024 * 1024 ? String(format: "%.1f MB", Double(b) / 1048576).replacingOccurrences(of: ".", with: ",") : "\(b / 1024) KB" }
 
-    static func check(_ bytes: Data) -> ImageCheckResult {
+    static func check(_ bytes: Data, storeSide: Int = storeMaxSide) -> ImageCheckResult {
         var errors: [ImageIssue] = [], warnings: [ImageIssue] = []
         if bytes.count > MAX_BYTES { errors.append(.tooLarge(bytes.count)) }
         guard let mime = sniffMime(bytes) else { return ImageCheckResult(errors: errors + [.unsupportedFormat], warnings: [], image: nil) }
         if !errors.isEmpty { return ImageCheckResult(errors: errors, warnings: warnings, image: nil) }
+        // v54 yapı ve gömülü kod denetimi (çözmeden önce)
+        switch ImageSecurity.inspect(bytes, mime: mime) {
+        case .MALFORMED: return ImageCheckResult(errors: [.unreadable], warnings: [], image: nil)
+        case .SUSPICIOUS: return ImageCheckResult(errors: [.suspicious], warnings: [], image: nil)
+        case .CLEAN: break
+        }
         if bytes.count > WARN_BYTES { warnings.append(.nearSizeLimit(bytes.count)) }
         guard let src = CGImageSourceCreateWithData(bytes as CFData, nil),
               let props = CGImageSourceCopyPropertiesAtIndex(src, 0, nil) as? [CFString: Any],
@@ -92,28 +108,45 @@ enum ImageImportValidator {
         if w > MAX_SIDE || h > MAX_SIDE || w * h > MAX_PIXELS { errors.append(.dimensionsTooLarge(w, h)) }
         if !errors.isEmpty { return ImageCheckResult(errors: errors, warnings: warnings, image: nil) }
         let longest = max(w, h)
-        let factor: Float = longest > STORE_MAX_SIDE ? Float(STORE_MAX_SIDE) / Float(longest) : 1
+        let factor: Float = longest > storeSide ? Float(storeSide) / Float(longest) : 1
         let tw = max(1, ktRound(Float(w) * factor)), th = max(1, ktRound(Float(h) * factor))
-        guard let decoded = CGImageSourceCreateImageAtIndex(src, 0, nil), let image = scaled(decoded, tw, th) else {
+        guard let image = decodeTo(src, w: w, h: h, tw: tw, th: th) else {
             return ImageCheckResult(errors: [.unreadable], warnings: [], image: nil)
         }
-        if factor < 1 { warnings.append(.willDownscale(w, h, tw, th)) }
+        if factor < 1 { warnings.append(.willDownscale(w, h, image.width, image.height)) }
         let detail = detailScore(image)
         let percent = ktRound(detail * 100)
         if detail >= DETAIL_REJECT { errors.append(.tooDetailed(percent)) } else if detail >= DETAIL_WARN { warnings.append(.detailed(percent)) }
         if !errors.isEmpty { return ImageCheckResult(errors: errors, warnings: warnings, image: nil) }
-        let (stored, storedMime) = smallestEncoding(bytes, mime, image, keepOriginal: factor == 1)
+        guard let (stored, storedMime) = reencode(mime, image) else { return ImageCheckResult(errors: [.unreadable], warnings: [], image: nil) }
         return ImageCheckResult(errors: errors, warnings: warnings,
                                 image: PreparedImage(bytes: stored, mimeType: storedMime, width: image.width, height: image.height, image: image,
                                                      originalBytes: bytes.count, detailScore: detail))
     }
 
-    /// Uygulamanın kendi kaydettiği resim (Resimlerim): sınır yok, yalnız uzun kenar 1600 px'e küçültülür.
+    /// v54 hedef boyda çözme: küçültülecekse ImageIO küçük resmi (tam boy bitmap açılmaz), ardından önçarpımlı RGBA kopya.
+    static func decodeTo(_ src: CGImageSource, w: Int, h: Int, tw: Int, th: Int) -> CGImage? {
+        let decoded: CGImage?
+        if tw != w || th != h {
+            let opts: [CFString: Any] = [kCGImageSourceCreateThumbnailFromImageAlways: true, kCGImageSourceThumbnailMaxPixelSize: max(tw, th),
+                                         kCGImageSourceShouldCacheImmediately: true]
+            decoded = CGImageSourceCreateThumbnailAtIndex(src, 0, opts as CFDictionary)
+        } else {
+            decoded = CGImageSourceCreateImageAtIndex(src, 0, nil)
+        }
+        guard let decoded else { return nil }
+        return scaled(decoded, decoded.width, decoded.height)
+    }
+
+    /// Uygulamanın kendi kaydettiği resim (Resimlerim): boyut sınırı yok, yapı denetimi var; uzun kenar cihaza göre küçültülür.
     static func prepareSaved(_ bytes: Data) -> PreparedImage? {
-        guard let decoded = CanvasImageCache.decode(bytes) else { return nil }
-        let w = decoded.width, h = decoded.height
-        let factor: Float = max(w, h) > STORE_MAX_SIDE ? Float(STORE_MAX_SIDE) / Float(max(w, h)) : 1
-        guard let image = scaled(decoded, max(1, ktRound(Float(w) * factor)), max(1, ktRound(Float(h) * factor))),
+        guard let mime = sniffMime(bytes), ImageSecurity.inspect(bytes, mime: mime) == .CLEAN,
+              let src = CGImageSourceCreateWithData(bytes as CFData, nil),
+              let props = CGImageSourceCopyPropertiesAtIndex(src, 0, nil) as? [CFString: Any],
+              let w = props[kCGImagePropertyPixelWidth] as? Int, let h = props[kCGImagePropertyPixelHeight] as? Int, w > 0, h > 0 else { return nil }
+        let side = storeMaxSide
+        let factor: Float = max(w, h) > side ? Float(side) / Float(max(w, h)) : 1
+        guard let image = decodeTo(src, w: w, h: h, tw: max(1, ktRound(Float(w) * factor)), th: max(1, ktRound(Float(h) * factor))),
               let png = encode(image, UTType.png) else { return nil }
         let alpha = hasAlpha(image)
         if !alpha && png.count > 600 * 1024, let jpg = encode(image, UTType.jpeg, quality: 0.9) {
@@ -199,12 +232,10 @@ enum ImageImportValidator {
         return CGImageDestinationFinalize(dst) ? out as Data : nil
     }
 
-    private static func smallestEncoding(_ original: Data, _ mime: String, _ img: CGImage, keepOriginal: Bool) -> (Data, String) {
-        var candidates: [(Data, String)] = []
-        if keepOriginal { candidates.append((original, mime)) }
-        if let png = encode(img, .png) { candidates.append((png, "image/png")) }
-        // Küçültülen JPEG fotoğraflar için JPEG de aday (kaynak zaten kayıplı)
-        if !keepOriginal && mime == "image/jpeg", let jpg = encode(img, .jpeg, quality: 0.92) { candidates.append((jpg, "image/jpeg")) }
-        return candidates.filter { !$0.0.isEmpty }.min { $0.0.count < $1.0.count } ?? (original, mime)
+    /// v54 her zaman yeniden kodlanır (özgün dosya saklanmaz): JPEG kaynakta (saydamlık yoksa) JPEG %92, ötekilerde PNG.
+    private static func reencode(_ mime: String, _ img: CGImage) -> (Data, String)? {
+        if mime == "image/jpeg" && !hasAlpha(img), let jpg = encode(img, .jpeg, quality: 0.92), !jpg.isEmpty { return (jpg, "image/jpeg") }
+        if let png = encode(img, .png), !png.isEmpty { return (png, "image/png") }
+        return nil
     }
 }

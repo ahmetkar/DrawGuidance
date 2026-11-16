@@ -84,11 +84,25 @@ class CanvasAssetStore(private val dao: CanvasAssetDao) {
             scope.launch {
                 runCatching {
                     dao.getByIds(listOf(id)).firstOrNull()?.let { asset ->
-                        BitmapFactory.decodeByteArray(asset.data, 0, asset.data.size)?.let { CanvasImageCache.put(asset.id, it.asImageBitmap()) }
+                        decodeForCache(asset.data)?.let { CanvasImageCache.put(asset.id, it.asImageBitmap()) }
                     }
                 }
             }
         }
+    }
+
+    /**
+     * v54 önbelleğe çözme: resim önbellek bütçesinin yarısından büyükse inSampleSize ile küçültülerek açılır (büyük
+     * resim düşük bellekli cihazda önbelleğe sığmayıp sürekli yeniden yüklenmesin).
+     */
+    private fun decodeForCache(data: ByteArray): android.graphics.Bitmap? {
+        val bounds = BitmapFactory.Options().apply { inJustDecodeBounds = true }
+        BitmapFactory.decodeByteArray(data, 0, data.size, bounds)
+        if (bounds.outWidth <= 0 || bounds.outHeight <= 0) return null
+        val budget = com.karapp.drawguidance.platform.DeviceCaps.imageCacheBytes / 2L
+        var sample = 1
+        while ((bounds.outWidth.toLong() / sample) * (bounds.outHeight.toLong() / sample) * 4L > budget && sample < 16) sample *= 2
+        return BitmapFactory.decodeByteArray(data, 0, data.size, BitmapFactory.Options().apply { inSampleSize = sample })
     }
 
     /** Her tuvalin resim verilerinin toplam boyutu (bayt). */

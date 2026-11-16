@@ -34,7 +34,7 @@ final class V53FeaturesTests: XCTestCase {
 
     func testStructureGuidesLoad() {
         let all = StructureGuides.all
-        XCTAssertEqual(all.count, 27)
+        XCTAssertEqual(all.count, 59) // v54 32 yeni çizim yardımcısı
         XCTAssertEqual(Set(all.map(\.id)).count, all.count)
         for g in StructureGroup.allCases { XCTAssertGreaterThanOrEqual(StructureGuides.byGroup(g).count, 6, g.rawValue) }
     }

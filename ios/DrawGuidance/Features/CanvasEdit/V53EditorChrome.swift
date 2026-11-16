@@ -333,7 +333,7 @@ struct AdvancedMenus: View {
         }
         ChromeButton(icon: "star.square.on.square", label: L("v40_template"), selected: ruler.session == .TEMPLATE || ruler.session == .TEMPLATE_PICK,
                      id: "template_button", anchor: TutorialAnchor.TEMPLATE) {
-            if ruler.session == .TEMPLATE || ruler.session == .TEMPLATE_PICK { ruler.finish() } else { ruler.openTemplate(); ruler.libraryOpen = true }
+            RulerOpen.template(vm, ruler)
         }
         if kind == .ART {
             ChromeButton(icon: "figure.strengthtraining.traditional", label: L("v50_practice"), selected: vm.practice.active, id: "practice_button") {
@@ -417,6 +417,37 @@ struct AdvancedMenus: View {
 
 /// Cetvel açma (tuvalin görünen ortasında).
 enum RulerOpen {
+    /// v54 şekil kalıbı: seçili şekil ya da resim varsa kalıp doğrudan ondan; yoksa çizim modlarında ve çizgi romanda
+    /// "Çizim yardımcıları" ya da "Şekiller"e yönlendiren uyarı, diğer modlarda şekil kütüphanesi açılır.
+    @MainActor static func template(_ vm: EditorViewModel, _ ruler: RulerController) {
+        if ruler.session == .TEMPLATE || ruler.session == .TEMPLATE_PICK { ruler.finish(); return }
+        let selected = selectedStrokes(vm)
+        if vm.mode != .DRAW { vm.chooseMode(.DRAW) }
+        ruler.openTemplate()
+        if !selected.isEmpty && ruler.templateFrom(selected) { return }
+        // eğitim kalıbı kendisi seçer; uyarı açılmaz
+        if vm.tutorial.active { return }
+        if vm.store.canvas?.kind.base == .ART { ruler.chooserOpen = true } else { ruler.libraryOpen = true }
+    }
+
+    /// Seçili elemanların (grupları dahil) görünür çizimleri; silgiler alınmaz.
+    @MainActor static func selectedStrokes(_ vm: EditorViewModel) -> [Stroke] {
+        let ids = vm.store.selectedIds
+        if ids.isEmpty { return [] }
+        let index = vm.store.currentIndex()
+        let all = index.expand(ids)
+        return index.strokes.filter { all.contains($0.id) && !$0.hidden && $0.brushType != .ERASER }
+    }
+
+    /// v54 çizim yardımcısının çizgileri görünen alanın ortasında kalıp olur.
+    @MainActor static func templateFromHelper(_ vm: EditorViewModel, _ ruler: RulerController, _ g: StructureGuide) {
+        let v = vm.viewport
+        let sc = max(v.scale, 0.01)
+        let center = v.toCanvas(P(v.viewSize.w / 2, v.viewSize.h / 2))
+        let h = v.viewSize.w > 0 ? min(v.viewSize.h / sc * 0.6, v.viewSize.w / sc * 0.7 / max(g.aspect, 0.1)) : 600
+        _ = ruler.templateFromContours(StructureContours.of(g, center: center, height: h))
+    }
+
     @MainActor static func ruler(_ vm: EditorViewModel, _ ruler: RulerController) {
         let v = vm.viewport
         let center = v.toCanvas(P(v.viewSize.w / 2, v.viewSize.h / 2))
@@ -467,6 +498,8 @@ struct AddRowItems: View {
 
     var body: some View {
         let notes = kind.isNotes, comic = kind == .COMIC
+        // v53 hızlı yazı kutusu; v54 not almada Ekle menüsünün en başında
+        if notes { item("textbox", "character.textbox", L("v53_quick_text"), selected: vm.quickText.active) { vm.toggleQuickText() } }
         item("shape", "square.on.circle", L("add_shape")) { vm.shapes.openPicker() }
         if notes {
             item("formula", "function", L("add_formula")) { vm.formulas.openPicker() }
@@ -475,8 +508,6 @@ struct AddRowItems: View {
         }
         item("text", "textformat", L("add_text"), selected: vm.mode == .TEXT) { vm.startAction(.TEXT, target: []) }
         if notes {
-            // v53 hızlı yazı kutusu
-            item("textbox", "character.textbox", L("v53_quick_text"), selected: vm.quickText.active) { vm.toggleQuickText() }
             item("diagram", "point.3.connected.trianglepath.dotted", L("add_diagram")) { vm.diagrams.openPicker() }
             item("panels", "rectangle.split.2x2", L("v45_panels_add")) { addUi.open = .panels }
         }

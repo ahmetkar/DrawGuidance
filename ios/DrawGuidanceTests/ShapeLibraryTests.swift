@@ -16,7 +16,7 @@ final class ShapeLibraryTests: XCTestCase {
     func testBundledNetsLoad() throws {
         let url = try XCTUnwrap(Bundle(for: CanvasStore.self).url(forResource: "catalog-nets", withExtension: "bin"))
         let nets = try CatalogBinary.decodeModeNets(Data(contentsOf: url))
-        XCTAssertEqual(nets.version, 43000)
+        XCTAssertEqual(nets.version, 54000)
         XCTAssertTrue(nets.items.contains { $0.mode == "ART" })
         XCTAssertTrue(nets.items.contains { $0.mode == "NOTES_TEXT" })
     }

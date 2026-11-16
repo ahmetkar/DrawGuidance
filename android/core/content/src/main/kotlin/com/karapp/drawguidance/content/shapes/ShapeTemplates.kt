@@ -61,9 +61,9 @@ object ShapeTemplates {
      * özel şablonlar ([modeOnly]). v30 (5): araştırmayla eklenen not (görsel not tutma) ve çizgi roman (Lexicon of
      * Comicana) şablonları. v34 (6): çocuk boyama şekillerinden üretilen çocuk modu şablonları ("cocuk."). v37 (7):
      * kütüphaneden üretilen nesne, karakter ve efekt şablonları ([LibraryTemplates]). v50 (8): yetişkin alıştırma
-     * şekillerinden üretilen şablonlar ("alistirma.").
+     * şekillerinden üretilen şablonlar ("alistirma."). v54 (9): çizim modları için 160+ yeni şablon ([v54AnimalTemplates] vd.).
      */
-    const val VERSION = 8
+    const val VERSION = 9
 
     val all: List<ShapeTemplate> by lazy {
         val scope = TemplateScope()
@@ -82,6 +82,14 @@ object ShapeTemplates {
             commonTemplates()
             // v27 tam figürler (parça önerisi)
             partTemplates()
+            // v54 çizim modları için yeni şablonlar (hayvan, bitki, doğa, taşıt, eşya, müzik, spor, yapı, hayal, simge)
+            v54AnimalTemplates()
+            v54NatureTemplates()
+            v54VehicleTemplates()
+            v54ObjectTemplates()
+            v54MusicSportTemplates()
+            v54BuildingFantasyTemplates()
+            v54ComicSymbolTemplates()
         }
         val keys = HashSet<String>()
         scope.out.forEach { require(keys.add(it.key)) { "yinelenen şablon: ${it.key}" } }

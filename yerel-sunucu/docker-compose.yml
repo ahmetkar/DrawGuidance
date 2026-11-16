@@ -65,6 +65,8 @@ services:
       DEVICE_DATA_KEY: ${DEVICE_DATA_KEY}
       GCS_BUCKET: ${GCS_BUCKET:-dgpackets}
       GCS_SERVICE_ACCOUNT_JSON: /run/dg-secrets/gcs.json
+      # v54 yönetim komut satırının şifre özeti (Yonetim.bat sifre-ozeti ile üretilip .env'ye yazılır)
+      CLI_PASSWORD_HASH: ${CLI_PASSWORD_HASH:-}
     ports:
       - "${API_PORT:-4747}:4747"
     volumes:

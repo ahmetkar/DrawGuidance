@@ -152,7 +152,7 @@ abstract class V13ShotsBase : WideLayoutTestBase() {
         // Küçük resimler arka planda yüklenir
         repeat(10) { Thread.sleep(150); compose.waitForIdle(); shadowOf(android.os.Looper.getMainLooper()).idle() }
         shot("$prefix-1-gallery")
-        compose.onNodeWithContentDescription("Liste görünümü").performClick()
+        compose.onNodeWithTag("canvas_list_more", useUnmergedTree = true).performClick(); compose.waitForIdle(); compose.onNodeWithTag("canvas_list_view", useUnmergedTree = true).performClick()
         compose.waitForIdle()
         shot("$prefix-2-list")
         compose.onNode(hasText("Ayarlar") and hasClickAction()).performSemanticsAction(SemanticsActions.OnClick)

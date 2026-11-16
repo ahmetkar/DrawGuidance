@@ -4,13 +4,13 @@ import com.karapp.drawguidance.content.library.Audience
 import com.karapp.drawguidance.content.library.LibCategory
 
 /**
- * v17 "Çizim yardımcıları" (resim tuvali): renksiz, özgün çizgi çizimler — portreler, insan, taşıtlar, yapılar, doğa
+ * v17 "Çizim yardımcıları", v54 "Yardımcı şekiller" (resim tuvali): renksiz, özgün çizgi çizimler — portreler, insan, taşıtlar, yapılar, doğa
  * (bulut, güneş, ağaç, çalı, çimen), hayvanlar, meyveler, sebzeler ve ev eşyaları. Eski renkli hazır çizimlerin ve
  * temel çizimlerin yerine seçicide bunlar görünür.
  */
 object SketchLibrary {
 
-    const val SECTION = "Çizim yardımcıları"
+    const val SECTION = "Yardımcı şekiller"
 
     val categories: List<LibCategory> by lazy {
         listOf(

@@ -26,8 +26,8 @@
     <string name="v52_temp_edit_failed">Düzenlemeye açılamadı</string>
     <string name="v52_live_paused">Yayına ara verildi: gönderen düzenliyor</string>
     <string name="v52_live_paused_badge">Yayına ara verildi</string>
-    <string name="v52_helpers_title">Çizim yardımcıları</string>
-    <string name="v52_helpers_short">Yardımcılar</string>
+    <string name="v52_helpers_title">Kompozisyon ve bakış</string>
+    <string name="v52_helpers_short">Kompozisyon</string>
     <string name="v52_helper_composition">Kompozisyon kılavuzu</string>
     <string name="v52_helper_composition_hint">Ana öğeyi çizgilerin ve kesişim noktalarının üstüne yerleştir; kâğıda yazılmaz.</string>
     <string name="v52_helper_none">Kapalı</string>

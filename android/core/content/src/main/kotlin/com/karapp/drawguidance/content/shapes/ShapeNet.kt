@@ -103,11 +103,17 @@ class ShapeNet(
          * eğitildi; gizli katman 256 → 320 (bkz. testlerdeki ModeNetsV38Training).
          */
         fun modeNetVersion(mode: ShapeMode): Int = when (mode) {
-            ShapeMode.ART, ShapeMode.COMIC, ShapeMode.NOTES, ShapeMode.KIDS -> V38
+            ShapeMode.ART, ShapeMode.COMIC, ShapeMode.NOTES, ShapeMode.KIDS -> V54
         }
 
         /** v38 ağlarının sürümü. */
         const val V38 = 38
+
+        /**
+         * v54 ağlarının sürümü: 144 yeni çizim şablonu, gizli katman 384, bırakma + erken durdurma ile yeniden eğitildi
+         * (bkz. testlerdeki ModeNetsV54Training).
+         */
+        const val V54 = 54
 
         /**
          * v37 bu sürümden eski temel ağın üstünde cihazda öğrenilenler yeni ağa taşınmaz, silinir (kabul/ret sayaçları,

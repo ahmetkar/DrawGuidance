@@ -43,9 +43,9 @@ object CatalogInfo {
     /**
      * Uygulamayla gelen kataloğun sürümü (sunucunun tohum dosyası da bu sürümle üretilir). v38: 38000 (4+ elemanla
      * yeniden eğitilen mod ağları ve yazı ağının "yazı mı" kapısı). v43: 43000 (nesne kütüphanesi kaldırıldı; v42 genel
-     * şekiller).
+     * şekiller). v54: 54000 (144 yeni çizim şablonu ve onlarla yeniden eğitilen mod ağları).
      */
-    const val VERSION: Long = 43000L
+    const val VERSION: Long = 54000L
 
     /** Modların temel ağlarının biçimi. */
     const val MODE_NET_FORMAT = "modenet-int8-v1"

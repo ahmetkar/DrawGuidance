@@ -17,7 +17,7 @@ import org.robolectric.annotation.GraphicsMode
 import java.io.ByteArrayOutputStream
 import java.util.Random
 
-/** Resim ekleme kontrolleri: biçim, 1 MB, boyut sınırları, detay yoğunluğu ve kayıt biçimi. */
+/** Resim ekleme kontrolleri: biçim, v54 10 MB ve 8192 px, boyut sınırları, detay yoğunluğu, gömülü kod ve kayıt biçimi. */
 @RunWith(AndroidJUnit4::class)
 @GraphicsMode(GraphicsMode.Mode.NATIVE)
 @Config(sdk = [34])
@@ -76,11 +76,12 @@ class ImageImportValidatorTest {
         val image = assertNotNullAndGet(result.image)
         assertEquals(800, image.width)
         assertEquals(600, image.height)
-        assertTrue("saklanan veri orijinalden büyük olmamalı", image.bytes.size <= bytes.size)
+        // v54 her zaman yeniden kodlanır (özgün dosya saklanmaz); boyut orijinale yakın kalır
+        assertTrue("saklanan veri orijinalden çok büyük olmamalı", image.bytes.size <= bytes.size * 11 / 10)
     }
 
     @Test fun tooLargeFileIsRejected() {
-        val bytes = png(noise(1024, 1024))
+        val bytes = png(noise(2048, 2048))
         assertTrue(bytes.size > ImageImportValidator.MAX_BYTES)
         val result = ImageImportValidator.check(bytes)
         assertTrue(result.errors.any { it is ImageIssue.TooLarge })
@@ -97,17 +98,27 @@ class ImageImportValidatorTest {
     @Test fun unsupportedTinyAndHugeImagesAreRejected() {
         assertEquals(listOf(ImageIssue.UnsupportedFormat), ImageImportValidator.check("GIF89a not really".toByteArray()).errors)
         assertTrue(ImageImportValidator.check(png(simpleDrawing(10, 10))).errors.any { it is ImageIssue.TooSmall })
-        assertTrue(ImageImportValidator.check(png(simpleDrawing(4500, 40))).errors.any { it is ImageIssue.DimensionsTooLarge })
+        assertTrue(ImageImportValidator.check(png(simpleDrawing(9000, 40))).errors.any { it is ImageIssue.DimensionsTooLarge })
+        // v54 8192 px'e kadar kabul
+        assertTrue(ImageImportValidator.check(png(simpleDrawing(4500, 40))).errors.none { it is ImageIssue.DimensionsTooLarge })
     }
 
     @Test fun largeResolutionIsDownscaledWithWarning() {
-        val bytes = jpeg(simpleDrawing(3200, 1600))
-        val result = ImageImportValidator.check(bytes)
+        val bytes = jpeg(simpleDrawing(6000, 3000))
+        val result = ImageImportValidator.check(bytes, storeSide = 3000)
         assertTrue(result.errors.toString(), result.accepted)
         val downscale = result.warnings.filterIsInstance<ImageIssue.WillDownscale>().single()
-        assertEquals(1600, downscale.targetWidth)
-        assertEquals(800, downscale.targetHeight)
-        assertEquals(1600, result.image!!.width)
+        assertEquals(3000, downscale.targetWidth)
+        assertEquals(1500, downscale.targetHeight)
+        assertEquals(3000, result.image!!.width)
+        assertEquals("image/jpeg", result.image!!.mimeType)
+    }
+
+    @Test fun imageWithEmbeddedCodeIsRejected() {
+        val bytes = png(simpleDrawing(200, 200)) + "<script>alert(1)</script>".toByteArray()
+        assertEquals(listOf(ImageIssue.Suspicious), ImageImportValidator.check(bytes).errors)
+        val zip = jpeg(simpleDrawing(200, 200)) + byteArrayOf('P'.code.toByte(), 'K'.code.toByte(), 3, 4, 10, 0)
+        assertEquals(listOf(ImageIssue.Suspicious), ImageImportValidator.check(zip).errors)
     }
 
     private fun <T> assertNotNullAndGet(value: T?): T { assertNotNull(value); return value!! }

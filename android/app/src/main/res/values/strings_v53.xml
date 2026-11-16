@@ -29,7 +29,7 @@
     <string name="v53_help_lines">Hız, odak ve patlama çizgileri ekler; seçili kare varsa onun içine.</string>
     <string name="v53_help_patterns">Çizgi roman desenleri (çiçek, parıltı, kasvet çizgileri…) ekler ya da seçili kapalı şekli onunla doldurur.</string>
     <string name="v53_help_quick_text">Hızlı not kutusu açar: klavyeyle yaz, bitince arka plansız yazı olur ve hemen yenisi açılır.</string>
-    <string name="v53_help_structure">Canlı, nesne ve eşyaların yapı kılavuzunu (iskelet, orantı çizgileri) tuvale yerleştirir; üzerinden çizersin.</string>
+    <string name="v53_help_structure">Canlı, nesne ve eşyaların çizim yardımcısını (iskelet, orantı ve perspektif çizgileri) tuvale yerleştirir; üzerinden çizersin.</string>
     <string name="v53_help_tones">Ekran tonu (nokta, çizgi, tarama) ekler ya da seçili kapalı şekle gölge tonu verir; sıklık, ölçek ve açı ayarlanır.</string>
     <string name="v53_hint_add">Üst menüden eklenecek öğeyi seç ya da tuvale dokun.</string>
     <string name="v53_hint_area_select">Seçmek için parmağınla alanı çiz.</string>
@@ -150,8 +150,8 @@
     <string name="v53_struct_opacity">Görünürlük</string>
     <string name="v53_struct_remove">Kılavuzu kaldır</string>
     <string name="v53_struct_settings">Kılavuz ayarları</string>
-    <string name="v53_struct_short">Yapı kılavuzu</string>
-    <string name="v53_struct_title">Yapı kılavuzları</string>
+    <string name="v53_struct_short">Çizim yardımcısı</string>
+    <string name="v53_struct_title">Çizim yardımcıları</string>
     <string name="v53_templates_hint">Panel düzenini seç; paneller sayfaya yerleşir.</string>
     <string name="v53_text_section">Yazı</string>
     <string name="v53_text_size">Yazı boyutu</string>

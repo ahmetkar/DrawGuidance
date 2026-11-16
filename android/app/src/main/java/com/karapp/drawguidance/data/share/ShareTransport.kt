@@ -13,11 +13,17 @@ interface ShareTransport {
     interface Listener {
         fun onFound(route: ShareRoute, endpoint: String, name: String, platform: String)
         fun onLost(route: ShareRoute, endpoint: String)
-        /** Karşı cihaz bağlanmak istiyor: [ShareTransport.accept] ya da [ShareTransport.reject] çağrılır (paylaşım sayfası kendiliğinden kabul eder; gelen her teklif ayrıca onaylanır). */
+        /**
+         * Karşı cihaz bağlanmak istiyor: [ShareTransport.accept] ya da [ShareTransport.reject] çağrılır (paylaşım sayfası
+         * kendiliğinden kabul eder; gelen her teklif ayrıca onaylanır). v54 [code]: ekranda gösterilecek eşleşme şifresi
+         * (daha önce eşleşmiş cihazda null).
+         */
         fun onRequest(route: ShareRoute, endpoint: String, name: String, platform: String, code: String?)
         fun onConnected(route: ShareRoute, endpoint: String, name: String, platform: String)
         fun onDisconnected(route: ShareRoute, endpoint: String)
         fun onMessage(route: ShareRoute, endpoint: String, bytes: ByteArray)
+        /** v54 bağlanan cihazda: karşı cihazın ekranındaki eşleşme şifresi girilmeli ([ShareTransport.submitCode]). */
+        fun onCodeNeeded(route: ShareRoute, endpoint: String, name: String) {}
         /** Büyük mesaj alınırken ilerleme (0..1). */
         fun onProgress(route: ShareRoute, endpoint: String, fraction: Float) {}
         fun onError(route: ShareRoute, message: String) {}
@@ -32,6 +38,9 @@ interface ShareTransport {
     fun accept(endpoint: String)
     fun reject(endpoint: String)
     fun disconnect(endpoint: String)
+    /** v54 eşleşme şifresi girildi / vazgeçildi. */
+    fun submitCode(endpoint: String, code: String) {}
+    fun cancelCode(endpoint: String) {}
     fun send(endpoint: String, message: ByteArray)
     /** Her şeyi kapatır (bağlantılar dahil). */
     fun shutdown()

@@ -1,11 +1,16 @@
 import Foundation
 import Network
 
-/// Bağlantı yolu düzeyinde tanışma (TCP'nin ilk çerçevesi; Android `LanHello` ile aynı).
+/// Bağlantı yolu düzeyinde tanışma (TCP'nin ilk çerçevesi; Android `LanHello` ile aynı). v54: `v` protokol, `pk` geçici
+/// P-256 açık anahtarı (base64), `k` bağlanan bu cihazla daha önce eşleşmiş mi, `m` kabul edenin seçtiği eşleşme yolu.
 struct LanHello: Codable {
     var id: String
     var name: String
     var platform: String
+    var v: Int?
+    var pk: String?
+    var k: Bool?
+    var m: String?
 }
 
 protocol LanTransportDelegate: AnyObject {
@@ -16,11 +21,19 @@ protocol LanTransportDelegate: AnyObject {
     func lanMessage(_ endpoint: String, _ bytes: Data)
     func lanProgress(_ endpoint: String, _ fraction: Double)
     func lanError(_ message: String)
+    /// v54 kabul eden cihazda gösterilecek eşleşme şifresi (nil: daha önce eşleşmiş cihaz; gösterilecek şifre yok).
+    func lanPairCode(_ endpoint: String, name: String, code: String?)
+    /// v54 bağlanan cihazda karşı cihazın ekranındaki şifre girilmeli (`submitCode`).
+    func lanCodeNeeded(_ endpoint: String, name: String)
 }
 
 /// v51 aynı Wi-Fi ağındaki cihazlar (iOS ↔ Android, iOS ↔ iOS): Bonjour ile görünür olur ve arar (TXT: id, p, n), bağlantı
 /// TCP'dir. Her çerçeve [u32 BE uzunluk][veri]; ilk çerçeve tanışmadır: bağlanan 0x7F + `LanHello`, kabul eden 0x7E +
 /// `LanHello`. Gelen bağlantılar kendiliğinden kabul edilir (içerik ayrıca teklif onayıyla alınır).
+///
+/// v54 her bağlantı eşleşme şifresiyle doğrulanır ve şifrelenir (`SharePairing`): kabul eden cihaz 6 haneli şifre
+/// gösterir, bağlanan cihazda girilir (daha önce eşleşmişlerde saklanan güven anahtarı). Bağlanan 0x7D + doğrulama kodu,
+/// kabul eden 0x7B + kendi kodu (yanlışsa 0x7C) gönderir; sonraki çerçeveler AES-GCM ile şifrelidir.
 final class LanTransport {
     weak var delegate: LanTransportDelegate?
     private let queue = DispatchQueue(label: "drawguidance.share.lan")
@@ -29,9 +42,19 @@ final class LanTransport {
     private var me = LanHello(id: "", name: "iPhone", platform: "ios")
     private var found: [String: (endpoint: NWEndpoint, name: String, platform: String)] = [:]
     private var conns: [String: NWConnection] = [:]
+    private var sealers: [String: SharePairing.Sealer] = [:]
+    /// Şifre girilmesini bekleyen giden bağlantılar (A).
+    private struct Awaiting { let c: NWConnection; let z: Data; let transcript: Data; let name: String; let platform: String }
+    private var awaiting: [String: Awaiting] = [:]
+    /// Doğrulaması süren gelen bağlantılar (B; vazgeçilince kapatılır).
+    private var handshaking: [String: NWConnection] = [:]
 
     private static let HELLO_REQ: UInt8 = 0x7F
     private static let HELLO_OK: UInt8 = 0x7E
+    private static let PAIR_PROOF: UInt8 = 0x7D
+    private static let PAIR_FAIL: UInt8 = 0x7C
+    private static let PAIR_OK: UInt8 = 0x7B
+    private static let MODE_CODE = "code", MODE_KNOWN = "known"
 
     func start(name: String, instanceId: String) {
         queue.async { [self] in
@@ -94,21 +117,72 @@ final class LanTransport {
                 guard let self else { return }
                 switch s {
                 case .ready:
-                    self.sendFrame(c, Data([Self.HELLO_REQ]) + ((try? JSONEncoder().encode(self.me)) ?? Data()))
+                    let key = SharePairing.newKey()
+                    let stored = ShareTrustStore.get(endpoint)
+                    var hello = self.me
+                    hello.v = SharePairing.VERSION; hello.pk = SharePairing.publicRaw(key).base64EncodedString(); hello.k = stored != nil
+                    let request = Data([Self.HELLO_REQ]) + ((try? JSONEncoder().encode(hello)) ?? Data())
+                    self.sendFrame(c, request)
                     self.readFrame(c, endpoint: nil) { frame in
                         guard let frame, frame.first == Self.HELLO_OK,
                               let them = try? JSONDecoder().decode(LanHello.self, from: frame.dropFirst()) else {
                             c.cancel(); self.delegate?.lanDisconnected(endpoint); return
                         }
-                        self.open(c, endpoint, name: them.name.isEmpty ? peer.name : them.name, platform: them.platform.isEmpty ? peer.platform : them.platform)
+                        guard (them.v ?? 1) >= SharePairing.VERSION, let pk = them.pk.flatMap({ Data(base64Encoded: $0) }),
+                              let z = try? SharePairing.sharedSecret(key, pk) else {
+                            self.delegate?.lanError("Karşı cihazın uygulaması güncel değil")
+                            c.cancel(); self.delegate?.lanDisconnected(endpoint); return
+                        }
+                        let transcript = SharePairing.transcript(request, frame)
+                        let name = them.name.isEmpty ? peer.name : them.name
+                        let platform = them.platform.isEmpty ? peer.platform : them.platform
+                        if them.m == Self.MODE_KNOWN, let stored {
+                            self.confirmOutgoing(c, endpoint, SharePairing.derive(z: z, secret: stored, transcript: transcript), name, platform, known: true)
+                        } else {
+                            if stored != nil { ShareTrustStore.remove(endpoint) }
+                            self.awaiting[endpoint] = Awaiting(c: c, z: z, transcript: transcript, name: name, platform: platform)
+                            self.delegate?.lanCodeNeeded(endpoint, name: name)
+                        }
                     }
                 case .failed, .cancelled:
                     if self.conns[endpoint] === c { self.conns[endpoint] = nil }
+                    if self.awaiting[endpoint]?.c === c { self.awaiting[endpoint] = nil }
                     self.delegate?.lanDisconnected(endpoint)
                 default: break
                 }
             }
             c.start(queue: queue)
+        }
+    }
+
+    /// v54 bağlanan cihazda girilen eşleşme şifresiyle doğrulama sürer.
+    func submitCode(_ endpoint: String, _ code: String) {
+        queue.async { [self] in
+            guard let a = awaiting.removeValue(forKey: endpoint) else { return }
+            let keys = SharePairing.derive(z: a.z, secret: Data(SharePairing.normalizeCode(code).utf8), transcript: a.transcript)
+            confirmOutgoing(a.c, endpoint, keys, a.name, a.platform, known: false)
+        }
+    }
+
+    func cancelCode(_ endpoint: String) {
+        queue.async { [self] in
+            awaiting.removeValue(forKey: endpoint)?.c.cancel()
+        }
+    }
+
+    /// A: doğrulama kodunu gönderir, B'ninkini doğrular; doğruysa şifreli bağlantı açılır.
+    private func confirmOutgoing(_ c: NWConnection, _ endpoint: String, _ keys: SharePairing.Keys, _ name: String, _ platform: String, known: Bool) {
+        sendFrame(c, Data([Self.PAIR_PROOF]) + SharePairing.confirmTag(keys, "A"))
+        readFrame(c, endpoint: nil) { [weak self] reply in
+            guard let self else { return }
+            guard let reply, reply.first == Self.PAIR_OK, SharePairing.same(Data(reply.dropFirst()), SharePairing.confirmTag(keys, "B")) else {
+                if known { ShareTrustStore.remove(endpoint) }
+                self.delegate?.lanError(known ? "Eşleşme yenilenmeli" : "Eşleşme şifresi yanlış")
+                c.cancel()
+                return
+            }
+            ShareTrustStore.put(endpoint, keys.trust)
+            self.open(c, endpoint, name: name, platform: platform, sealer: SharePairing.Sealer(keys.aToB), opener: SharePairing.Opener(keys.bToA))
         }
     }
 
@@ -121,8 +195,38 @@ final class LanTransport {
                           let hello = try? JSONDecoder().decode(LanHello.self, from: frame.dropFirst()), !hello.id.isEmpty, hello.id != self.me.id else {
                         c.cancel(); return
                     }
-                    self.sendFrame(c, Data([Self.HELLO_OK]) + ((try? JSONEncoder().encode(self.me)) ?? Data()))
-                    self.open(c, hello.id, name: hello.name, platform: hello.platform)
+                    // Şifresiz (eski sürüm) bağlantı kabul edilmez
+                    guard (hello.v ?? 1) >= SharePairing.VERSION, let pk = hello.pk.flatMap({ Data(base64Encoded: $0) }) else {
+                        self.delegate?.lanError("Karşı cihazın uygulaması güncel değil")
+                        c.cancel(); return
+                    }
+                    let key = SharePairing.newKey()
+                    let stored = (hello.k ?? false) ? ShareTrustStore.get(hello.id) : nil
+                    let code = stored == nil ? SharePairing.newCode() : nil
+                    var me = self.me
+                    me.v = SharePairing.VERSION; me.pk = SharePairing.publicRaw(key).base64EncodedString(); me.m = code == nil ? Self.MODE_KNOWN : Self.MODE_CODE
+                    let reply = Data([Self.HELLO_OK]) + ((try? JSONEncoder().encode(me)) ?? Data())
+                    guard let z = try? SharePairing.sharedSecret(key, pk) else { c.cancel(); return }
+                    let keys = SharePairing.derive(z: z, secret: code.map { Data($0.utf8) } ?? stored!, transcript: SharePairing.transcript(frame, reply))
+                    self.handshaking[hello.id]?.cancel()
+                    self.handshaking[hello.id] = c
+                    self.delegate?.lanPairCode(hello.id, name: hello.name, code: code)
+                    self.sendFrame(c, reply)
+                    // Şifrenin girilmesi beklenir; doğrulama kodu gelince
+                    self.readFrame(c, endpoint: nil) { proof in
+                        if self.handshaking[hello.id] === c { self.handshaking[hello.id] = nil }
+                        guard let proof, proof.first == Self.PAIR_PROOF, SharePairing.same(Data(proof.dropFirst()), SharePairing.confirmTag(keys, "A")) else {
+                            if proof != nil { self.sendFrame(c, Data([Self.PAIR_FAIL])) }
+                            if code == nil { ShareTrustStore.remove(hello.id) }
+                            if proof != nil { self.delegate?.lanError(code == nil ? "Eşleşme yenilenmeli" : "Eşleşme şifresi yanlış") }
+                            self.delegate?.lanDisconnected(hello.id)
+                            self.queue.asyncAfter(deadline: .now() + 0.3) { c.cancel() }
+                            return
+                        }
+                        self.sendFrame(c, Data([Self.PAIR_OK]) + SharePairing.confirmTag(keys, "B"))
+                        ShareTrustStore.put(hello.id, keys.trust)
+                        self.open(c, hello.id, name: hello.name, platform: hello.platform, sealer: SharePairing.Sealer(keys.bToA), opener: SharePairing.Opener(keys.aToB))
+                    }
                 }
             } else if case .failed = s {
                 c.cancel()
@@ -131,27 +235,34 @@ final class LanTransport {
         c.start(queue: queue)
     }
 
-    private func open(_ c: NWConnection, _ endpoint: String, name: String, platform: String) {
+    /// v54 kabul eden cihazda eşleşmeden vazgeçildi.
+    func reject(_ endpoint: String) {
+        queue.async { [self] in handshaking.removeValue(forKey: endpoint)?.cancel() }
+    }
+
+    private func open(_ c: NWConnection, _ endpoint: String, name: String, platform: String, sealer: SharePairing.Sealer, opener: SharePairing.Opener) {
         if let old = conns[endpoint], old !== c { old.cancel() }
         conns[endpoint] = c
+        sealers[endpoint] = sealer
         c.stateUpdateHandler = { [weak self] s in
             guard let self else { return }
             switch s {
             case .failed, .cancelled:
-                if self.conns[endpoint] === c { self.conns[endpoint] = nil; self.delegate?.lanDisconnected(endpoint) }
+                if self.conns[endpoint] === c { self.conns[endpoint] = nil; self.sealers[endpoint] = nil; self.delegate?.lanDisconnected(endpoint) }
             default: break
             }
         }
         delegate?.lanConnected(endpoint, name: name, platform: platform)
-        loop(c, endpoint)
+        loop(c, endpoint, opener)
     }
 
-    private func loop(_ c: NWConnection, _ endpoint: String) {
+    private func loop(_ c: NWConnection, _ endpoint: String, _ opener: SharePairing.Opener) {
         readFrame(c, endpoint: endpoint) { [weak self] frame in
             guard let self else { return }
-            guard let frame else { c.cancel(); return }
-            self.delegate?.lanMessage(endpoint, frame)
-            self.loop(c, endpoint)
+            // Doğrulanamayan (değiştirilmiş) çerçeve bağlantıyı kapatır
+            guard let frame, let plain = try? opener.open(frame) else { c.cancel(); return }
+            self.delegate?.lanMessage(endpoint, plain)
+            self.loop(c, endpoint, opener)
         }
     }
 
@@ -161,14 +272,18 @@ final class LanTransport {
 
     func send(_ endpoint: String, _ message: Data) {
         queue.async { [self] in
-            guard let c = conns[endpoint] else { delegate?.lanError("no connection"); return }
-            sendFrame(c, message)
+            guard let c = conns[endpoint], let sealer = sealers[endpoint], let sealed = try? sealer.seal(message) else { delegate?.lanError("no connection"); return }
+            sendFrame(c, sealed)
         }
     }
 
     func shutdown() {
         stop()
-        queue.async { [self] in conns.values.forEach { $0.cancel() }; conns.removeAll() }
+        queue.async { [self] in
+            conns.values.forEach { $0.cancel() }; conns.removeAll(); sealers.removeAll()
+            awaiting.values.forEach { $0.c.cancel() }; awaiting.removeAll()
+            handshaking.values.forEach { $0.cancel() }; handshaking.removeAll()
+        }
     }
 
     // MARK: Çerçeveler
@@ -183,7 +298,7 @@ final class LanTransport {
         c.receive(minimumIncompleteLength: 4, maximumLength: 4) { [weak self] head, _, _, error in
             guard let head, head.count == 4, error == nil else { done(nil); return }
             let n = Int(ShareWire.readU32([UInt8](head), 0))
-            guard n >= 0, n <= ShareWire.MAX_MESSAGE else { done(nil); return }
+            guard n >= 0, n <= ShareWire.MAX_MESSAGE + 16 else { done(nil); return }
             if n == 0 { done(Data()); return }
             self?.readBody(c, n, Data(capacity: n), endpoint: endpoint, done)
         }

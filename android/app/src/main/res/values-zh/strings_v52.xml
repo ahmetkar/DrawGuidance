@@ -26,8 +26,8 @@
     <string name="v52_temp_edit_failed">无法打开进行编辑</string>
     <string name="v52_live_paused">直播已暂停：发送方正在编辑</string>
     <string name="v52_live_paused_badge">直播已暂停</string>
-    <string name="v52_helpers_title">绘图辅助</string>
-    <string name="v52_helpers_short">辅助</string>
+    <string name="v52_helpers_title">构图与视图</string>
+    <string name="v52_helpers_short">构图</string>
     <string name="v52_helper_composition">构图参考线</string>
     <string name="v52_helper_composition_hint">把主体放在线及其交点上；不会保存到纸上。</string>
     <string name="v52_helper_none">关闭</string>

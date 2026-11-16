@@ -26,8 +26,8 @@
     <string name="v52_temp_edit_failed">編集用に開けませんでした</string>
     <string name="v52_live_paused">配信を一時停止中：送信者が編集中</string>
     <string name="v52_live_paused_badge">配信を一時停止中</string>
-    <string name="v52_helpers_title">描画アシスト</string>
-    <string name="v52_helpers_short">アシスト</string>
+    <string name="v52_helpers_title">構図とビュー</string>
+    <string name="v52_helpers_short">構図</string>
     <string name="v52_helper_composition">構図ガイド</string>
     <string name="v52_helper_composition_hint">主役を線と交点に置きましょう。用紙には保存されません。</string>
     <string name="v52_helper_none">オフ</string>

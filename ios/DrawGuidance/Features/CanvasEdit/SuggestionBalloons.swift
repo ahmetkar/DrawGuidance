@@ -76,13 +76,13 @@ struct SuggestBalloon: View {
     }
 }
 
-/// v38 Premium kuralı: gelişmiş (çok parçalı, kütüphane, 3B) şekil önerisi (Android `PremiumRules.isAdvancedSuggestion`).
+/// Premium kuralı (Android `PremiumRules.isAdvancedSuggestion`): v54 şekil ve yazı önerileri Free; yalnız 3B cisim
+/// önerisi (çizimi 3B cisme çevirme) Premium.
 enum SuggestPremium {
     static let ADVANCED_SUGGEST_PARTS = 4
     static func isAdvanced(vector: Bool, solid: String?, parts: Int) -> Bool {
-        if vector { return solid == nil || solid!.hasPrefix(ShapeLibrary.PREFIX) }
-        if solid != nil { return true }
-        return parts >= ADVANCED_SUGGEST_PARTS
+        if vector { return false }
+        return solid != nil
     }
 }
 

@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- v54: tools/i18n-v53/strings_v54.py ile üretildi; elle değiştirmeyin -->
+<resources>
+    <string name="v53_sg_airplane">飞机</string>
+    <string name="v53_sg_backpack">背包</string>
+    <string name="v53_sg_bicycle">自行车</string>
+    <string name="v53_sg_bird_fly">鸟（飞翔）</string>
+    <string name="v53_sg_box_1p">盒子（一点透视）</string>
+    <string name="v53_sg_butterfly">蝴蝶</string>
+    <string name="v53_sg_camera">相机</string>
+    <string name="v53_sg_cat_walk">猫（行走）</string>
+    <string name="v53_sg_clock">时钟</string>
+    <string name="v53_sg_cow">奶牛</string>
+    <string name="v53_sg_cylinder_lying">横放圆柱</string>
+    <string name="v53_sg_dog_sit">狗（坐姿）</string>
+    <string name="v53_sg_dragon">龙</string>
+    <string name="v53_sg_elephant">大象</string>
+    <string name="v53_sg_face_3q">脸（四分之三侧）</string>
+    <string name="v53_sg_guitar">吉他</string>
+    <string name="v53_sg_hand_open">张开的手</string>
+    <string name="v53_sg_headphones">耳机</string>
+    <string name="v53_sg_house_2p">房子（两点透视）</string>
+    <string name="v53_sg_human_3q">人体（四分之三侧）</string>
+    <string name="v53_sg_human_run">人体（奔跑）</string>
+    <string name="v53_sg_human_sit">人体（坐姿）</string>
+    <string name="v53_sg_laptop">笔记本电脑</string>
+    <string name="v53_sg_rabbit">兔子</string>
+    <string name="v53_sg_rose">玫瑰</string>
+    <string name="v53_sg_ship">轮船</string>
+    <string name="v53_sg_sofa">沙发</string>
+    <string name="v53_sg_street_1p">街道（一点透视）</string>
+    <string name="v53_sg_teapot">茶壶</string>
+    <string name="v53_sg_tower">塔楼</string>
+    <string name="v53_sg_umbrella">雨伞</string>
+    <string name="v53_sg_wine_glass">高脚杯</string>
+    <string name="v54_image_err_dimensions" formatted="true">分辨率过高（%1$d×%2$d）。边长最大 8192 px，总像素最多 64 MP。</string>
+    <string name="v54_image_err_suspicious">此文件不是安全的图片：其中包含代码或其他文件，未添加。</string>
+    <string name="v54_image_err_too_large" formatted="true">文件过大：%1$s。最大不能超过 10 MB。</string>
+    <string name="v54_image_warn_near_limit" formatted="true">文件接近 10 MB 上限（%1$s）。</string>
+    <string name="v54_share_pair_connect">连接</string>
+    <string name="v54_share_pair_enter" formatted="true">请输入 %1$s 屏幕上显示的 6 位配对码。</string>
+    <string name="v54_share_pair_old">对方设备上的应用版本过旧，请更新以使用加密分享。</string>
+    <string name="v54_share_pair_renew">需要重新配对；请重新连接并输入代码。</string>
+    <string name="v54_share_pair_show" formatted="true">%1$s 想要连接。请在该设备上输入此代码：</string>
+    <string name="v54_share_pair_show_note">此代码仅用于本次连接；传输内容已加密。</string>
+    <string name="v54_share_pair_title">配对码</string>
+    <string name="v54_share_pair_wrong">配对码错误，请重试。</string>
+    <string name="v54_template_choose_canvas">从画布选择</string>
+    <string name="v54_template_choose_message">没有选中用作模板的形状或图片。请从绘图助手或形状中选择一个，或点击画布上的形状。</string>
+    <string name="v54_template_choose_shapes">形状</string>
+    <string name="v54_template_helper_hint">所选助手的线条将成为形状模板；靠近线条绘制即可描摹。</string>
+</resources>

@@ -87,9 +87,20 @@ class SharePackages(
         val h = pkg.header
         val localId = existingId ?: UUID.randomUUID().toString()
         val now = System.currentTimeMillis()
+        // v54 resimler yalnız gerçek ve temiz resim dosyasıysa (imza, yapı ve gömülü kod denetimi); tür bildirilene
+        // değil dosyanın imzasına göre kaydedilir. Biri bile uymazsa paket kurulmaz
+        val mimes = pkg.header.assets.mapIndexed { i, a ->
+            val bytes = pkg.assets[i]
+            val sniffed = com.karapp.drawguidance.data.images.ImageImportValidator.sniffMime(bytes)
+            if (a.mime.startsWith("image/") || sniffed != null) {
+                require(sniffed != null) { "resim değil" }
+                require(com.karapp.drawguidance.data.images.ImageSecurity.inspect(bytes, sniffed) == com.karapp.drawguidance.data.images.ImageSecurity.Verdict.CLEAN) { "güvenli resim değil" }
+                sniffed
+            } else a.mime
+        }
         pkg.header.assets.forEachIndexed { i, a ->
             val newId = ids.getOrPut(a.id) { UUID.randomUUID().toString() }
-            assetDao.insert(CanvasAssetEntity(newId, localId, a.mime, a.w, a.h, pkg.assets[i], now))
+            assetDao.insert(CanvasAssetEntity(newId, localId, mimes[i], a.w, a.h, pkg.assets[i], now))
         }
         // İçerik çözülebilmeli (bozuk paket kaydedilmez); resim kimlikleri bu cihazdakilerle değişir
         val doc = ContentCodec.decodeDocument(pkg.content)

@@ -42,6 +42,8 @@ data class SharePeer(
 )
 
 data class ShareConnectionRequest(val key: String, val name: String, val platform: String, val code: String?)
+/** v54 bağlanan cihazda eşleşme şifresi sorusu (karşı cihazın ekranındaki şifre girilir). */
+data class ShareCodePrompt(val key: String, val name: String, val wrong: Boolean = false)
 data class ShareIncomingOffer(val key: String, val peerName: String, val offer: ShareOffer)
 data class ShareTransferStatus(val peerName: String, val title: String, val sending: Boolean, val progress: Float? = null)
 data class ShareLiveOut(val canvasId: String, val peerKey: String, val peerName: String, val paused: Boolean = false, val startedAt: Long = System.currentTimeMillis(), val sentFrames: Int = 0)
@@ -84,6 +86,8 @@ class ShareManager(
     val peers: StateFlow<List<SharePeer>> = _peers.asStateFlow()
     private val _request = MutableStateFlow<ShareConnectionRequest?>(null)
     val request: StateFlow<ShareConnectionRequest?> = _request.asStateFlow()
+    private val _codePrompt = MutableStateFlow<ShareCodePrompt?>(null)
+    val codePrompt: StateFlow<ShareCodePrompt?> = _codePrompt.asStateFlow()
     private val _offer = MutableStateFlow<ShareIncomingOffer?>(null)
     val offer: StateFlow<ShareIncomingOffer?> = _offer.asStateFlow()
     private val _status = MutableStateFlow<ShareTransferStatus?>(null)
@@ -289,13 +293,37 @@ class ShareManager(
     }
 
     override fun onRequest(route: ShareRoute, endpoint: String, name: String, platform: String, code: String?) {
-        // Bağlantı kendiliğinden kabul edilir; içerik ancak teklif onaylanınca alınır
-        setState(key(route, endpoint), PeerState.CONNECTING, name, platform)
+        // Bağlantı kendiliğinden kabul edilir; içerik ancak teklif onaylanınca alınır. v54 ilk eşleşmede şifre ekranda
+        // gösterilir (karşı cihazda girilir); doğrulanmadan bağlantı açılmaz
+        val key = key(route, endpoint)
+        setState(key, PeerState.CONNECTING, name, platform)
+        if (code != null) _request.value = ShareConnectionRequest(key, name, platform, code)
         transports[route]?.accept(endpoint)
+    }
+
+    override fun onCodeNeeded(route: ShareRoute, endpoint: String, name: String) {
+        _codePrompt.value = ShareCodePrompt(key(route, endpoint), name)
+    }
+
+    /** v54 karşı cihazın ekranındaki eşleşme şifresi girildi. */
+    fun submitCode(code: String) {
+        val p = _codePrompt.value ?: return
+        _codePrompt.value = null
+        val (route, endpoint) = split(p.key) ?: return
+        transports[route]?.submitCode(endpoint, code)
+    }
+
+    /** v54 eşleşmeden vazgeçildi (bağlanan cihaz). */
+    fun cancelCode() {
+        val p = _codePrompt.value ?: return
+        _codePrompt.value = null
+        val (route, endpoint) = split(p.key) ?: return
+        transports[route]?.cancelCode(endpoint)
     }
 
     override fun onConnected(route: ShareRoute, endpoint: String, name: String, platform: String) {
         val key = key(route, endpoint)
+        if (_request.value?.key == key) _request.value = null
         setState(key, PeerState.CONNECTED, name, platform)
         send(key, ShareWire.encode(ShareWire.HELLO, ShareWire.text(ShareHello(name = settings.deviceName.value, platform = "android", app = BuildConfig.VERSION_NAME))))
         afterConnect.remove(key)?.let { list -> synchronized(list) { list.toList() }.forEach { runCatching { it() } } }
@@ -309,6 +337,7 @@ class ShareManager(
             list.mapNotNull { p -> if (p.key != key) p else if (_active.value) p.copy(state = PeerState.FOUND) else null }
         }
         if (_request.value?.key == key) _request.value = null
+        if (_codePrompt.value?.key == key) _codePrompt.value = null
         if (afterConnect.remove(key) != null && !wasConnected) _events.tryEmit(ShareEvent.Failed(peer?.name ?: ""))
         if (_offer.value?.key == key) _offer.value = null
         if (_liveOut.value?.peerKey == key) { _liveOut.value = null; liveJob?.cancel(); liveJob = null }
@@ -324,6 +353,8 @@ class ShareManager(
 
     override fun onError(route: ShareRoute, message: String) {
         _errors.value = localize(message)
+        // v54 eşleşme hataları paylaşım sayfası kapalıyken de görünsün
+        if (message.startsWith("Eşleşme") || message.startsWith("Karşı cihazın")) _events.tryEmit(ShareEvent.Failed(localize(message)))
     }
 
     override fun onMessage(route: ShareRoute, endpoint: String, bytes: ByteArray) {
@@ -466,7 +497,15 @@ class ShareManager(
         val from = h.from.ifBlank { peerName(key) }
         when (h.type) {
             ShareWire.TYPE_IMAGE -> {
-                images.saveReceived(pkg.content, h.name, h.mime ?: "image/png", h.imageW, h.imageH, "share:$from")
+                // v54 gelen resim: türü dosyanın imzasından; yapı ve gömülü kod denetiminden geçmeli
+                val mime = com.karapp.drawguidance.data.images.ImageImportValidator.sniffMime(pkg.content)
+                if (mime == null || com.karapp.drawguidance.data.images.ImageSecurity.inspect(pkg.content, mime) != com.karapp.drawguidance.data.images.ImageSecurity.Verdict.CLEAN) {
+                    send(key, ShareWire.encode(ShareWire.REJECT, ShareWire.text(ShareReply(h.id))))
+                    _status.value = null
+                    _events.tryEmit(ShareEvent.Failed(context.getString(com.karapp.drawguidance.R.string.v54_image_err_suspicious)))
+                    return
+                }
+                images.saveReceived(pkg.content, h.name, mime, h.imageW, h.imageH, "share:$from")
                 send(key, ShareWire.encode(ShareWire.RECEIVED, ShareWire.text(ShareReply(h.id))))
                 _status.value = null
                 _events.tryEmit(ShareEvent.Received(ShareWire.TYPE_IMAGE, h.name, from, null))
@@ -501,6 +540,10 @@ class ShareManager(
         "Cihaz bulunamadı" -> context.getString(com.karapp.drawguidance.R.string.v52_share_err_no_device)
         "Tuval bulunamadı" -> context.getString(com.karapp.drawguidance.R.string.v52_share_err_no_canvas)
         "Resim okunamadı" -> context.getString(com.karapp.drawguidance.R.string.v52_share_err_image)
+        // v54 eşleşme
+        "Eşleşme şifresi yanlış" -> context.getString(com.karapp.drawguidance.R.string.v54_share_pair_wrong)
+        "Eşleşme yenilenmeli" -> context.getString(com.karapp.drawguidance.R.string.v54_share_pair_renew)
+        "Karşı cihazın uygulaması güncel değil" -> context.getString(com.karapp.drawguidance.R.string.v54_share_pair_old)
         else -> message
     }
 

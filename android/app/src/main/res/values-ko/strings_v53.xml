@@ -150,8 +150,8 @@
     <string name="v53_struct_opacity">선명도</string>
     <string name="v53_struct_remove">가이드 제거</string>
     <string name="v53_struct_settings">가이드 설정</string>
-    <string name="v53_struct_short">구조 가이드</string>
-    <string name="v53_struct_title">구조 가이드</string>
+    <string name="v53_struct_short">그리기 도우미</string>
+    <string name="v53_struct_title">그리기 도우미</string>
     <string name="v53_templates_hint">페이지 칸 배치를 고르세요.</string>
     <string name="v53_text_section">글자</string>
     <string name="v53_text_size">글자 크기</string>

@@ -23,6 +23,7 @@ import androidx.compose.material.icons.filled.Stop
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Inbox
+import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
@@ -83,6 +84,63 @@ fun ShareHost(onOpenCanvas: (String) -> Unit, onOpenLive: (String) -> Unit, shar
                 is ShareEvent.Disconnected -> toast(context, context.getString(R.string.v51_share_disconnected, e.name))
             }
         }
+    }
+
+    // v54 eşleşme şifresi: kabul eden cihazda gösterilir, bağlanan cihazda girilir
+    val pairRequest by share.request.collectAsState()
+    pairRequest?.takeIf { it.code != null }?.let { r ->
+        AlertDialog(
+            onDismissRequest = {},
+            containerColor = colors.background,
+            modifier = Modifier.testTag("share_pair_show"),
+            icon = { Icon(Icons.Filled.Lock, null, tint = colors.accent) },
+            title = { Text(stringResource(R.string.v54_share_pair_title)) },
+            text = {
+                Column(verticalArrangement = Arrangement.spacedBy(10.dp), horizontalAlignment = Alignment.CenterHorizontally) {
+                    Text(stringResource(R.string.v54_share_pair_show, r.name), translate = false)
+                    Text(
+                        r.code.orEmpty().chunked(3).joinToString(" "), translate = false,
+                        style = MaterialTheme.typography.displaySmall, fontWeight = FontWeight.Bold, color = colors.accent,
+                        modifier = Modifier.testTag("share_pair_code"),
+                    )
+                    Text(stringResource(R.string.v54_share_pair_show_note), style = MaterialTheme.typography.bodySmall, color = colors.contentMuted)
+                }
+            },
+            confirmButton = {},
+            dismissButton = { TextButton(onClick = { share.answerRequest(false) }, modifier = Modifier.testTag("share_pair_cancel")) { Text(stringResource(R.string.v53_cancel)) } },
+        )
+    }
+    val codePrompt by share.codePrompt.collectAsState()
+    codePrompt?.let { p ->
+        var code by remember(p.key) { mutableStateOf("") }
+        AlertDialog(
+            onDismissRequest = {},
+            containerColor = colors.background,
+            modifier = Modifier.testTag("share_pair_enter"),
+            icon = { Icon(Icons.Filled.Lock, null, tint = colors.accent) },
+            title = { Text(stringResource(R.string.v54_share_pair_title)) },
+            text = {
+                Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                    Text(stringResource(R.string.v54_share_pair_enter, p.name), translate = false)
+                    androidx.compose.material3.OutlinedTextField(
+                        value = code,
+                        onValueChange = { v -> code = v.filter { it.isDigit() }.take(com.karapp.drawguidance.data.share.SharePairing.CODE_DIGITS) },
+                        singleLine = true,
+                        keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(keyboardType = androidx.compose.ui.text.input.KeyboardType.NumberPassword),
+                        textStyle = MaterialTheme.typography.headlineSmall,
+                        modifier = Modifier.fillMaxWidth().testTag("share_pair_input"),
+                    )
+                }
+            },
+            confirmButton = {
+                TextButton(
+                    onClick = { share.submitCode(code) },
+                    enabled = code.length == com.karapp.drawguidance.data.share.SharePairing.CODE_DIGITS,
+                    modifier = Modifier.testTag("share_pair_submit"),
+                ) { Text(stringResource(R.string.v54_share_pair_connect)) }
+            },
+            dismissButton = { TextButton(onClick = { share.cancelCode() }) { Text(stringResource(R.string.v53_cancel)) } },
+        )
     }
 
     offer?.let { o ->

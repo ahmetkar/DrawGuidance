@@ -61,7 +61,8 @@ final class ImageController: ObservableObject {
             defer { filtering = false }
             let result: (PreparedImage, Float)? = await Task.detached(priority: .userInitiated) { () -> (PreparedImage, Float)? in
                 guard let img = CanvasImageCache.get(assetId) ?? assets.bytes(assetId).flatMap({ CanvasImageCache.decode($0) }) else { return nil }
-                let maxSide = Budget3D.tier == .LOW ? 1100 : 1600
+                // v54 eklenen resimler 3000 px'e kadar: işlem boyu cihaz sınıfına göre
+                let maxSide = Budget3D.tier == .LOW ? 1400 : Budget3D.tier == .MID ? 2000 : 3000
                 guard let tex = PixelCodec.texture(img, maxSide: maxSide) else { return nil }
                 let (out, ratio) = transform(tex.px, tex.w, tex.h)
                 let opaque = out.allSatisfy { $0 >> 24 == 0xFF }

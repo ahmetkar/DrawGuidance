@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- v54: tools/i18n-v53/strings_v54.py ile üretildi; elle değiştirmeyin -->
+<resources>
+    <string name="v53_sg_airplane">Самолёт</string>
+    <string name="v53_sg_backpack">Рюкзак</string>
+    <string name="v53_sg_bicycle">Велосипед</string>
+    <string name="v53_sg_bird_fly">Птица (в полёте)</string>
+    <string name="v53_sg_box_1p">Коробка (1 точка)</string>
+    <string name="v53_sg_butterfly">Бабочка</string>
+    <string name="v53_sg_camera">Фотоаппарат</string>
+    <string name="v53_sg_cat_walk">Кошка (идёт)</string>
+    <string name="v53_sg_clock">Часы</string>
+    <string name="v53_sg_cow">Корова</string>
+    <string name="v53_sg_cylinder_lying">Лежащий цилиндр</string>
+    <string name="v53_sg_dog_sit">Собака (сидит)</string>
+    <string name="v53_sg_dragon">Дракон</string>
+    <string name="v53_sg_elephant">Слон</string>
+    <string name="v53_sg_face_3q">Лицо (вполоборота)</string>
+    <string name="v53_sg_guitar">Гитара</string>
+    <string name="v53_sg_hand_open">Открытая ладонь</string>
+    <string name="v53_sg_headphones">Наушники</string>
+    <string name="v53_sg_house_2p">Дом (2 точки)</string>
+    <string name="v53_sg_human_3q">Человек (вполоборота)</string>
+    <string name="v53_sg_human_run">Человек (бег)</string>
+    <string name="v53_sg_human_sit">Человек (сидя)</string>
+    <string name="v53_sg_laptop">Ноутбук</string>
+    <string name="v53_sg_rabbit">Кролик</string>
+    <string name="v53_sg_rose">Роза</string>
+    <string name="v53_sg_ship">Корабль</string>
+    <string name="v53_sg_sofa">Диван</string>
+    <string name="v53_sg_street_1p">Улица (1 точка)</string>
+    <string name="v53_sg_teapot">Чайник</string>
+    <string name="v53_sg_tower">Башня</string>
+    <string name="v53_sg_umbrella">Зонт</string>
+    <string name="v53_sg_wine_glass">Бокал</string>
+    <string name="v54_image_err_dimensions" formatted="true">Слишком высокое разрешение (%1$d×%2$d). Стороны — не более 8192 px, общий размер — не более 64 MP.</string>
+    <string name="v54_image_err_suspicious">Это небезопасное изображение: внутри код или другой файл. Не добавлено.</string>
+    <string name="v54_image_err_too_large" formatted="true">Файл слишком большой: %1$s. Максимум — 10 MB.</string>
+    <string name="v54_image_warn_near_limit" formatted="true">Размер файла близок к пределу в 10 MB (%1$s).</string>
+    <string name="v54_share_pair_connect">Подключить</string>
+    <string name="v54_share_pair_enter" formatted="true">Введите 6-значный код сопряжения с экрана %1$s.</string>
+    <string name="v54_share_pair_old">Приложение на другом устройстве устарело; обновите его для зашифрованной передачи.</string>
+    <string name="v54_share_pair_renew">Нужно обновить сопряжение: подключитесь снова и введите код.</string>
+    <string name="v54_share_pair_show" formatted="true">%1$s хочет подключиться. Введите этот код на том устройстве:</string>
+    <string name="v54_share_pair_show_note">Код действует только для этого подключения; передача шифруется.</string>
+    <string name="v54_share_pair_title">Код сопряжения</string>
+    <string name="v54_share_pair_wrong">Неверный код сопряжения; попробуйте снова.</string>
+    <string name="v54_template_choose_canvas">Выбрать на холсте</string>
+    <string name="v54_template_choose_message">Для шаблона ничего не выбрано. Выберите помощник рисования или фигуру либо коснитесь фигуры на холсте.</string>
+    <string name="v54_template_choose_shapes">Фигуры</string>
+    <string name="v54_template_helper_hint">Линии выбранного помощника станут шаблоном; рисуйте рядом с ними, чтобы обвести.</string>
+</resources>

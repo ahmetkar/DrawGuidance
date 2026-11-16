@@ -28,7 +28,11 @@ tasks.withType<Test>().configureEach {
     // v38 -PtrainNets38=1: 4+ elemanlı şekil ağları (ART/NOTES/COMIC/KIDS) ve yazı ağının "yazı mı" kapısı yeniden
     // eğitilir (bkz. testlerdeki ModeNetsV38Training, TextGateTraining)
     project.findProperty("trainNets38")?.let { systemProperty("trainNets38", it.toString()) }
-    maxHeapSize = if (project.hasProperty("trainTextNet") || project.hasProperty("retrainNets") || project.hasProperty("trainNets38")) "3g" else "1g"
+    // v54 -PtrainNets54=1: yeni şablonlarla şekil ağları yeniden eğitilir (bkz. testlerdeki ModeNetsV54Training);
+    // -Pv54Preview=<png>: v54 şablonlarının önizlemesi
+    project.findProperty("trainNets54")?.let { systemProperty("trainNets54", it.toString()) }
+    project.findProperty("v54Preview")?.let { systemProperty("v54Preview", it.toString()) }
+    maxHeapSize = if (project.hasProperty("trainTextNet") || project.hasProperty("retrainNets") || project.hasProperty("trainNets38") || project.hasProperty("trainNets54")) "3g" else "1g"
     // v24 ekran kartı testi: Mesa EGL ekransız (pencere/ekran gerekmez)
     environment("EGL_PLATFORM", "surfaceless")
 }

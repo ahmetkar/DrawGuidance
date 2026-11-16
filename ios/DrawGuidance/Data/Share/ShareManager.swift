@@ -37,6 +37,11 @@ struct ShareReceived: Identifiable, Equatable {
     let canvasId: String?
 }
 
+/// v54 kabul eden cihazda gösterilen eşleşme şifresi.
+struct SharePairShow: Identifiable, Equatable { let peerId: String; let name: String; let code: String; var id: String { peerId } }
+/// v54 bağlanan cihazda eşleşme şifresi sorusu.
+struct ShareCodePrompt: Identifiable, Equatable { let peerId: String; let name: String; var id: String { peerId } }
+
 /// Düzenleyicide açılacak tuval (yayın başlatan taraf ya da alınan tuval).
 struct ShareOpenCanvas: Identifiable, Equatable { let id: String }
 
@@ -66,6 +71,9 @@ final class ShareManager: ObservableObject {
     @Published var openCanvas: ShareOpenCanvas?
     @Published var toast: String?
     @Published private(set) var error: String?
+    /// v54 eşleşme şifresi (kabul eden: gösterilir; bağlanan: girilir).
+    @Published var pairShow: SharePairShow?
+    @Published var codePrompt: ShareCodePrompt?
 
     private struct Outgoing { let peerId: String; let type: String; let title: String; let canvasId: String?; let image: SavedImage? }
     private var outgoing: [String: Outgoing] = [:]
@@ -230,6 +238,36 @@ final class ShareManager: ObservableObject {
 
     func clearError() { error = nil }
 
+    // MARK: v54 eşleşme şifresi
+
+    /// Karşı cihazın ekranındaki şifre girildi.
+    func submitCode(_ code: String) {
+        guard let p = codePrompt else { return }
+        codePrompt = nil
+        transport.submitCode(p.peerId, code)
+    }
+
+    /// Bağlanan cihazda eşleşmeden vazgeçildi.
+    func cancelCode() {
+        guard let p = codePrompt else { return }
+        codePrompt = nil
+        transport.cancelCode(p.peerId)
+    }
+
+    /// Kabul eden cihazda şifre gösterilirken vazgeçildi.
+    func cancelPair() {
+        guard let p = pairShow else { return }
+        pairShow = nil
+        transport.reject(p.peerId)
+    }
+
+    fileprivate func pairCode(_ id: String, _ name: String, _ code: String?) {
+        setState(id, .connecting, name: name)
+        if let code { pairShow = SharePairShow(peerId: id, name: name, code: code) }
+    }
+
+    fileprivate func codeNeeded(_ id: String, _ name: String) { codePrompt = ShareCodePrompt(peerId: id, name: name) }
+
     // MARK: Gelen mesajlar
 
     fileprivate func found(_ id: String, _ name: String, _ platform: String) {
@@ -243,6 +281,7 @@ final class ShareManager: ObservableObject {
     fileprivate func lost(_ id: String) { peers.removeAll { $0.id == id && $0.state == .found } }
 
     fileprivate func connected(_ id: String, _ name: String, _ platform: String) {
+        if pairShow?.peerId == id { pairShow = nil }
         setState(id, .connected, name: name, platform: platform)
         let version = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? ""
         send(id, ShareWire.encode(ShareWire.HELLO, ShareHello(name: settings.deviceName, platform: "ios", app: version)))
@@ -252,6 +291,8 @@ final class ShareManager: ObservableObject {
     fileprivate func disconnected(_ id: String) {
         let peer = peers.first { $0.id == id }
         let wasConnected = peer?.state == .connected
+        if pairShow?.peerId == id { pairShow = nil }
+        if codePrompt?.peerId == id { codePrompt = nil }
         if active {
             if let i = peers.firstIndex(where: { $0.id == id }) { peers[i].state = .found }
         } else {
@@ -271,7 +312,18 @@ final class ShareManager: ObservableObject {
         status?.progress = fraction
     }
 
-    fileprivate func failed(_ message: String) { error = message }
+    fileprivate func failed(_ message: String) {
+        // v54 eşleşme hataları kullanıcının dilinde; sayfa kapalıyken de görünsün
+        let text: String
+        switch message {
+        case "Eşleşme şifresi yanlış": text = L("v54_share_pair_wrong")
+        case "Eşleşme yenilenmeli": text = L("v54_share_pair_renew")
+        case "Karşı cihazın uygulaması güncel değil": text = L("v54_share_pair_old")
+        default: error = message; return
+        }
+        error = text
+        toast = text
+    }
 
     fileprivate func message(_ id: String, _ bytes: Data) {
         guard let m = try? ShareWire.decode(bytes) else { return }
@@ -413,7 +465,14 @@ final class ShareManager: ObservableObject {
         let from = h.from.isEmpty ? peerName(id) : h.from
         if h.type == ShareWire.TYPE_IMAGE {
             guard let repo = EditorDependencies.shared.images else { throw ShareError.failed("images") }
-            _ = try repo.saveReceived(pkg.content, title: h.name, mime: h.mime ?? "image/png", width: h.imageW, height: h.imageH,
+            // v54 gelen resim: türü dosyanın imzasından; yapı ve gömülü kod denetiminden geçmeli
+            guard let mime = ImageImportValidator.sniffMime(pkg.content), ImageSecurity.inspect(pkg.content, mime: mime) == .CLEAN else {
+                send(id, ShareWire.encode(ShareWire.REJECT, ShareReply(id: h.id, canvasId: nil)))
+                status = nil
+                fail(L("v54_image_err_suspicious"))
+                return
+            }
+            _ = try repo.saveReceived(pkg.content, title: h.name, mime: mime, width: h.imageW, height: h.imageH,
                                       source: "share:" + from)
             send(id, ShareWire.encode(ShareWire.RECEIVED, ShareReply(id: h.id, canvasId: nil)))
             status = nil
@@ -469,4 +528,6 @@ extension ShareManager: LanTransportDelegate {
     nonisolated func lanMessage(_ endpoint: String, _ bytes: Data) { main { $0.message(endpoint, bytes) } }
     nonisolated func lanProgress(_ endpoint: String, _ fraction: Double) { main { $0.progress(endpoint, fraction) } }
     nonisolated func lanError(_ message: String) { main { $0.failed(message) } }
+    nonisolated func lanPairCode(_ endpoint: String, name: String, code: String?) { main { $0.pairCode(endpoint, name, code) } }
+    nonisolated func lanCodeNeeded(_ endpoint: String, name: String) { main { $0.codeNeeded(endpoint, name) } }
 }

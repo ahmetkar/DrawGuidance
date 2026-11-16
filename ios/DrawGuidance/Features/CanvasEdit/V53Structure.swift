@@ -27,6 +27,39 @@ final class StructureGuideState: ObservableObject {
     func clear() { guideId = nil }
 }
 
+/// v54 çizim yardımcısının çizgileri tuval koordinatında kontur olarak (şekil kalıbı için): çizgiler, çokgenler, daireler ve
+/// elipsler; eksen, ölçü çizgileri ve eklem noktaları alınmaz. Kutunun ortası `center`, yüksekliği `height` (Android ile aynı).
+enum StructureContours {
+    static func of(_ g: StructureGuide, center: P, height: Float) -> [Contour] {
+        let left = center.x - height * g.aspect / 2
+        let top = center.y - height / 2
+        func map(_ pts: [Float]) -> [Float] { pts.enumerated().map { i, v in i % 2 == 0 ? left + v * height : top + v * height } }
+        func oval(_ x: Float, _ y: Float, _ rx: Float, _ ry: Float, _ deg: Float) -> [Float] {
+            let n = 40
+            let a = Double(deg) * .pi / 180
+            var out = [Float](repeating: 0, count: n * 2)
+            for k in 0..<n {
+                let t = 2 * Double.pi * Double(k) / Double(n)
+                let ex = Double(rx) * cos(t), ey = Double(ry) * sin(t)
+                out[2 * k] = left + (x + Float(ex * cos(a) - ey * sin(a))) * height
+                out[2 * k + 1] = top + (y + Float(ex * sin(a) + ey * cos(a))) * height
+            }
+            return out
+        }
+        var out: [Contour] = []
+        for p in g.prims {
+            switch p {
+            case let .line(pts), let .poly(pts): out.append((map(pts), false))
+            case let .polygon(pts): out.append((map(pts), true))
+            case let .circle(x, y, r): out.append((oval(x, y, r, r, 0), true))
+            case let .ellipse(x, y, rx, ry, d): out.append((oval(x, y, rx, ry, d), true))
+            default: break
+            }
+        }
+        return out
+    }
+}
+
 /// Kılavuzun çizimi (SwiftUI Canvas ve küçük resimlerde ortak).
 enum StructurePainter {
     static func draw(_ ctx: inout GraphicsContext, _ g: StructureGuide, rect: CGRect, flipped: Bool, color: Color, lineWidth: CGFloat) {
@@ -143,6 +176,8 @@ struct StructureOverlay: View {
 struct StructureGuideSheet: View {
     @ObservedObject var state: StructureGuideState
     let canvas: CanvasUi?
+    /// v54 şekil kalıbı için seçim: verilirse seçilen yardımcı tuvale konmaz, buna verilir.
+    var onPick: ((StructureGuide) -> Void)? = nil
     @Environment(\.dismiss) private var dismiss
     @State private var group: StructureGroup = .LIVING
 
@@ -150,7 +185,7 @@ struct StructureGuideSheet: View {
         NavigationStack {
             ScrollView {
                 VStack(alignment: .leading, spacing: 14) {
-                    Text(L("v53_struct_hint")).font(.footnote).foregroundStyle(.secondary)
+                    Text(L(onPick != nil ? "v54_template_helper_hint" : "v53_struct_hint")).font(.footnote).foregroundStyle(.secondary)
                     Picker("", selection: $group) {
                         ForEach(StructureGroup.allCases, id: \.self) { Text(L("v53_struct_group_" + $0.rawValue.lowercased())).tag($0) }
                     }
@@ -159,14 +194,14 @@ struct StructureGuideSheet: View {
                     LazyVGrid(columns: [GridItem(.adaptive(minimum: 96), spacing: 12)], spacing: 12) {
                         ForEach(StructureGuides.byGroup(group)) { g in
                             Button {
-                                if let canvas { state.place(g.id, canvas: canvas) }
+                                if let onPick { onPick(g) } else if let canvas { state.place(g.id, canvas: canvas) }
                                 dismiss()
                             } label: { card(g) }
                             .buttonStyle(.plain)
                             .accessibilityIdentifier("structure_\(g.id)")
                         }
                     }
-                    if state.active {
+                    if state.active && onPick == nil {
                         PropSection(title: L("v53_struct_settings")) {
                             PropSlider(label: L("v53_struct_opacity"), value: $state.opacity, range: 0.15...1, format: { "\(Int($0 * 100))%" }, id: "structure_opacity")
                             Toggle(L("v53_struct_flip"), isOn: $state.flipped).accessibilityIdentifier("structure_flip")
@@ -187,7 +222,7 @@ struct StructureGuideSheet: View {
     }
 
     private func card(_ g: StructureGuide) -> some View {
-        let selected = state.guideId == g.id
+        let selected = onPick == nil && state.guideId == g.id
         return VStack(spacing: 6) {
             Canvas { ctx, size in
                 let h = min(size.height, size.width / CGFloat(max(g.aspect, 0.1))) * 0.9
@@ -202,5 +237,41 @@ struct StructureGuideSheet: View {
         .frame(maxWidth: .infinity, minHeight: 116)
         .background(RoundedRectangle(cornerRadius: 14, style: .continuous).fill(selected ? Color.accentColor.opacity(0.14) : Color.primary.opacity(0.045)))
         .overlay(RoundedRectangle(cornerRadius: 14, style: .continuous).stroke(selected ? Color.accentColor : .clear, lineWidth: 1.5))
+    }
+}
+
+
+/// v54 şekil kalıbı pencereleri (basit ve gelişmiş modlarda ortak): şekil kütüphanesi, seçili şekil/resim yokken
+/// "Çizim yardımcıları" ya da "Şekiller"e yönlendiren uyarı ve kalıp için çizim yardımcısı seçimi.
+struct RulerSheetsHost: ViewModifier {
+    @ObservedObject var vm: EditorViewModel
+    @ObservedObject var ruler: RulerController
+
+    func body(content: Content) -> some View {
+        content
+            .sheet(isPresented: Binding(get: { ruler.libraryOpen }, set: { ruler.libraryOpen = $0 })) {
+                ShapePickerView(kind: vm.store.canvas?.kind ?? .SIMPLE_ART) { id in
+                    let v = vm.viewport
+                    let center = v.toCanvas(P(v.viewSize.w / 2, v.viewSize.h / 2))
+                    _ = ruler.placeLibrary(id, center: center, size: min(v.viewSize.w, v.viewSize.h) * 0.4 / max(v.scale, 0.01))
+                    ruler.libraryOpen = false
+                }
+            }
+            .sheet(isPresented: Binding(get: { ruler.helperPickOpen }, set: { ruler.helperPickOpen = $0 })) {
+                StructureGuideSheet(state: vm.structure, canvas: vm.store.canvas, onPick: { g in
+                    ruler.helperPickOpen = false
+                    RulerOpen.templateFromHelper(vm, ruler, g)
+                })
+            }
+            .alert(L("v40_template"), isPresented: Binding(get: { ruler.chooserOpen }, set: { ruler.chooserOpen = $0 })) {
+                Button(L("v53_struct_title")) { ruler.chooserOpen = false; ruler.helperPickOpen = true }
+                    .accessibilityIdentifier("template_choose_helpers")
+                Button(L("v54_template_choose_shapes")) { ruler.chooserOpen = false; ruler.libraryOpen = true }
+                    .accessibilityIdentifier("template_choose_shapes")
+                Button(L("v54_template_choose_canvas"), role: .cancel) { ruler.chooserOpen = false }
+                    .accessibilityIdentifier("template_choose_canvas")
+            } message: {
+                Text(L("v54_template_choose_message"))
+            }
     }
 }

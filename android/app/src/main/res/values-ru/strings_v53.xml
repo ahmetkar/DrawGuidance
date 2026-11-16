@@ -150,8 +150,8 @@
     <string name="v53_struct_opacity">Видимость</string>
     <string name="v53_struct_remove">Убрать каркас</string>
     <string name="v53_struct_settings">Настройки каркаса</string>
-    <string name="v53_struct_short">Каркас</string>
-    <string name="v53_struct_title">Каркасы</string>
+    <string name="v53_struct_short">Помощник рисования</string>
+    <string name="v53_struct_title">Помощники рисования</string>
     <string name="v53_templates_hint">Выберите раскладку панелей.</string>
     <string name="v53_text_section">Текст</string>
     <string name="v53_text_size">Размер текста</string>

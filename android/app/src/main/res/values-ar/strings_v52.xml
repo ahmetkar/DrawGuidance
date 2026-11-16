@@ -26,8 +26,8 @@
     <string name="v52_temp_edit_failed">تعذر الفتح للتحرير</string>
     <string name="v52_live_paused">البث متوقف مؤقتًا: المرسل يحرر</string>
     <string name="v52_live_paused_badge">البث متوقف مؤقتًا</string>
-    <string name="v52_helpers_title">مساعدات الرسم</string>
-    <string name="v52_helpers_short">المساعدات</string>
+    <string name="v52_helpers_title">التكوين والعرض</string>
+    <string name="v52_helpers_short">التكوين</string>
     <string name="v52_helper_composition">دليل التكوين</string>
     <string name="v52_helper_composition_hint">ضع العنصر الرئيسي على الخطوط وتقاطعاتها؛ لا يُحفظ على الورقة.</string>
     <string name="v52_helper_none">إيقاف</string>

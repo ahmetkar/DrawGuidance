@@ -22,7 +22,7 @@ struct CatalogModeNet: Equatable {
 }
 
 enum CatalogInfo {
-    static let VERSION: Int64 = 43000
+    static let VERSION: Int64 = 54000
     static let MODE_NET_FORMAT = "modenet-int8-v1"
 }
 

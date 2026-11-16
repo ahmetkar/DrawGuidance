@@ -24,7 +24,10 @@ struct SimpleToolbar: View {
     private var erasing: Bool { brush.settings.brushType == .ERASER }
 
     private var addTools: [Tool] {
-        var t = [
+        var t: [Tool] = []
+        // v54 not almada yazı kutusu Ekle menüsünün en başında (Android ile aynı)
+        if notes { t.append(Tool(id: "textbox", icon: "character.textbox", label: L("v53_quick_text"), selected: vm.quickText.active) { vm.toggleQuickText() }) }
+        t += [
             Tool(id: "shape", icon: "square.on.circle", label: L("add_shape")) { vm.shapes.openPicker() },
             Tool(id: "text", icon: "textformat", label: L("add_text"), selected: vm.mode == .TEXT) { vm.startAction(.TEXT, target: []) },
         ]
@@ -36,8 +39,6 @@ struct SimpleToolbar: View {
                 Tool(id: "table", icon: "tablecells", label: L("v52_add_table")) { vm.tables.openCreate() },
                 Tool(id: "diagram", icon: "point.3.connected.trianglepath.dotted", label: L("add_diagram")) { vm.diagrams.openPicker() },
                 Tool(id: "panels", icon: "rectangle.split.2x2", label: L("v45_panels_add")) { addUi.open = .panels },
-                // v53 hızlı yazı kutusu
-                Tool(id: "textbox", icon: "character.textbox", label: L("v53_quick_text"), selected: vm.quickText.active) { vm.toggleQuickText() },
             ]
         }
         t.append(Tool(id: "model3d", icon: "cube.transparent", label: L("add_model3d")) { addUi.open = .model3d })
@@ -69,7 +70,7 @@ struct SimpleToolbar: View {
         })
         t.append(Tool(id: "template", icon: "star.square.on.square", label: L("v40_template"),
                       selected: ruler.session == .TEMPLATE || ruler.session == .TEMPLATE_PICK) {
-            if ruler.session == .TEMPLATE || ruler.session == .TEMPLATE_PICK { ruler.finish() } else { ruler.openTemplate(); ruler.libraryOpen = true }
+            RulerOpen.template(vm, ruler)
         })
         if store.canvas?.kind == .SIMPLE_ART {
             // v50 yetişkin çizim alıştırmaları
@@ -121,11 +122,12 @@ struct SimpleToolbar: View {
                 .accessibilityIdentifier("simple_tool_image")
                 .tutorialAnchor(TutorialAnchor.simple("image"))
             }
-            menu("simple_menu_draw", fixed: [
-                Tool(id: "undo", icon: "arrow.uturn.backward", label: L("undo"), enabled: store.canUndo) { vm.undo() },
-                Tool(id: "redo", icon: "arrow.uturn.forward", label: L("redo"), enabled: store.canRedo) { vm.redo() },
-            ]) {
-                ForEach(drawTools) { pill($0) }
+            // v54 geri al / yinele Çiz menüsünün başında ama sabit değil: öteki düğmelerle birlikte kaydırılır
+            menu("simple_menu_draw", fixed: []) {
+                ForEach([
+                    Tool(id: "undo", icon: "arrow.uturn.backward", label: L("undo"), enabled: store.canUndo) { vm.undo() },
+                    Tool(id: "redo", icon: "arrow.uturn.forward", label: L("redo"), enabled: store.canRedo) { vm.redo() },
+                ] + drawTools) { pill($0) }
             }
             // v53 seçili aracın ayarları menülerin altında (cetvel, fırça boyu, ekleme modlarında Bitti)
             ToolOptionsStrip(vm: vm, store: store, brush: brush, ruler: ruler, shapes: vm.shapes)
@@ -138,14 +140,6 @@ struct SimpleToolbar: View {
         .padding(.bottom, 6)
         .accessibilityElement(children: .contain)
         .accessibilityIdentifier("simple_tool_row")
-        .sheet(isPresented: Binding(get: { ruler.libraryOpen }, set: { ruler.libraryOpen = $0 })) {
-            ShapePickerView(kind: store.canvas?.kind ?? .SIMPLE_ART) { id in
-                let v = vm.viewport
-                let center = v.toCanvas(P(v.viewSize.w / 2, v.viewSize.h / 2))
-                _ = ruler.placeLibrary(id, center: center, size: min(v.viewSize.w, v.viewSize.h) * 0.4 / max(v.scale, 0.01))
-                ruler.libraryOpen = false
-            }
-        }
         .onChange(of: photo) { _, item in
             guard let item else { return }
             Task {

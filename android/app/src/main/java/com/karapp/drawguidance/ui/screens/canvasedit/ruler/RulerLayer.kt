@@ -19,6 +19,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Accessibility
 import androidx.compose.material.icons.filled.Category
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Lock
@@ -109,8 +110,13 @@ fun rememberRulerActions(viewModel: CanvasEditViewModel, viewport: ViewportState
                 controller.openRuler(center, visible, GuideMetrics.THICKNESS_DP * density / s)
             }
         val openTemplate = {
+                // v54 seçili şekil ya da resim varsa kalıp doğrudan ondan; yoksa çizim modlarında ve çizgi romanda
+                // "Çizim yardımcıları" ya da "Şekiller"den seçmeye yönlendiren uyarı açılır
+                val selected = viewModel.selectedTemplateStrokes()
                 toDraw()
                 controller.openTemplate()
+                if (selected.isNotEmpty() && controller.templateFrom(selected)) Unit
+                else if (!viewModel.tutorialRunning() && viewModel.canvas.value?.kind?.base == CanvasKind.ART) controller.chooserOpen.value = true
             }
         RulerActions(
             openRuler = openRuler,
@@ -168,6 +174,7 @@ fun RulerLayer(viewModel: CanvasEditViewModel, viewport: ViewportState, actions:
     val ghost by controller.template.collectAsState()
     val locked by controller.locked.collectAsState()
     val libraryOpen by controller.libraryOpen.collectAsState()
+    val chooserOpen by controller.chooserOpen.collectAsState()
     LaunchedEffect(mode) { if (mode != EditMode.DRAW) controller.finish() }
     val colors = NeuTheme.colors
     val accent = colors.accent
@@ -185,6 +192,30 @@ fun RulerLayer(viewModel: CanvasEditViewModel, viewport: ViewportState, actions:
             if (shape != null) RulerHandleChips(controller, shape, settings, viewport)
             GuideBar(controller, session, settings, shape, locked)
         }
+    }
+    if (chooserOpen) {
+        // v54 kalıp için seçili şekil/resim yok: çizim yardımcılarından ya da şekillerden biri seçilir
+        androidx.compose.material3.AlertDialog(
+            onDismissRequest = { controller.chooserOpen.value = false },
+            title = { Text(stringResource(R.string.v40_template)) },
+            text = { Text(stringResource(R.string.v54_template_choose_message), modifier = Modifier.testTag("template_chooser")) },
+            confirmButton = {
+                androidx.compose.foundation.layout.Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                    NeuButton(stringResource(R.string.v53_struct_title), {
+                        controller.chooserOpen.value = false; controller.helperPickOpen.value = true
+                    }, icon = Icons.Filled.Accessibility, modifier = Modifier.testTag("template_choose_helpers"))
+                    NeuButton(stringResource(R.string.v54_template_choose_shapes), {
+                        controller.chooserOpen.value = false; controller.libraryOpen.value = true
+                    }, primary = true, icon = Icons.Filled.Category, modifier = Modifier.testTag("template_choose_shapes"))
+                }
+            },
+            dismissButton = {
+                androidx.compose.material3.TextButton({ controller.chooserOpen.value = false }, Modifier.testTag("template_choose_canvas")) {
+                    Text(stringResource(R.string.v54_template_choose_canvas))
+                }
+            },
+            containerColor = colors.background,
+        )
     }
     if (libraryOpen) {
         com.karapp.drawguidance.ui.screens.canvasedit.components.ShapePickerModal(

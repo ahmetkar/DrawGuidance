@@ -76,7 +76,8 @@ class V53FeaturesTest {
     @Test
     fun structureGuidesLoadAllGroups() {
         val all = StructureGuides.all
-        assertEquals(27, all.size)
+        // v54 32 yeni karmaşık çizim yardımcısı (insan pozları, hayvanlar, perspektif, taşıtlar, eşyalar)
+        assertEquals(59, all.size)
         assertEquals(all.size, all.map { it.id }.toSet().size)
         for (g in StructureGroup.entries) assertTrue(g.name, StructureGuides.byGroup(g).size >= 6)
         all.forEach { assertTrue(it.id, it.prims.size >= 4); assertTrue(it.aspect in 0.2f..2.5f) }

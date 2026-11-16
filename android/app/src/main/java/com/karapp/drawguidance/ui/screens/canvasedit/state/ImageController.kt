@@ -107,7 +107,12 @@ class ImageController(
                         ?: return@withContext null
                     val source = com.karapp.drawguidance.platform.Compat.readable(bmp)
                     // Çok büyük resimler küçültülür (bellek ve süre; giriş düzeyi cihazlar)
-                    val maxSide = if (com.karapp.drawguidance.platform.DeviceCaps.tier == com.karapp.drawguidance.platform.DeviceCaps.Tier.LOW) 1100f else 1600f
+                    // v54 eklenen resimler 3000 px'e kadar: işlem boyu cihaz sınıfına göre
+                    val maxSide = when (com.karapp.drawguidance.platform.DeviceCaps.tier) {
+                        com.karapp.drawguidance.platform.DeviceCaps.Tier.LOW -> 1400f
+                        com.karapp.drawguidance.platform.DeviceCaps.Tier.MID -> 2000f
+                        com.karapp.drawguidance.platform.DeviceCaps.Tier.HIGH -> 3000f
+                    }
                     val scale = minOf(1f, maxSide / maxOf(source.width, source.height))
                     val src = if (scale < 1f) android.graphics.Bitmap.createScaledBitmap(source, (source.width * scale).toInt().coerceAtLeast(1), (source.height * scale).toInt().coerceAtLeast(1), true) else source
                     val w = src.width; val h = src.height

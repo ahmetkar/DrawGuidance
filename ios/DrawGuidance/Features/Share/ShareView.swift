@@ -341,8 +341,18 @@ private struct ImagePickSheet: View {
 struct ShareHostModifier: ViewModifier {
     @ObservedObject private var share = ShareManager.shared
 
+    static func spaced(_ code: String) -> String { code.count == 6 ? String(code.prefix(3)) + " " + String(code.suffix(3)) : code }
+
     func body(content: Content) -> some View {
         content
+            // v54 eşleşme şifresi: kabul eden cihazda gösterilir, bağlanan cihazda girilir
+            .alert(L("v54_share_pair_title"), isPresented: Binding(get: { share.pairShow != nil }, set: { if !$0 && share.pairShow != nil { share.cancelPair() } }),
+                   presenting: share.pairShow) { _ in
+                Button(L("v53_cancel"), role: .cancel) { share.cancelPair() }
+            } message: { p in
+                Text(L("v54_share_pair_show", p.name) + "\n\n" + Self.spaced(p.code) + "\n\n" + L("v54_share_pair_show_note"))
+            }
+            .sheet(item: $share.codePrompt) { p in PairCodeEntry(prompt: p) }
             .alert(L("v51_share_offer_title"), isPresented: Binding(get: { share.offer != nil }, set: { if !$0 && share.offer != nil { share.answerOffer(false) } }),
                    presenting: share.offer) { _ in
                 Button(L("v51_share_accept")) { share.answerOffer(true) }
@@ -499,5 +509,43 @@ struct LiveInfoBar: View {
             .background(Capsule().fill(out.paused ? Color(red: 0.55, green: 0.43, blue: 0) : Color(red: 0.78, green: 0.16, blue: 0.16)).opacity(0.94))
         }
         .onAppear { withAnimation(.easeInOut(duration: 0.8).repeatForever(autoreverses: true)) { pulse = true } }
+    }
+}
+
+/// v54 bağlanan cihazda eşleşme şifresinin girildiği küçük pencere.
+private struct PairCodeEntry: View {
+    let prompt: ShareCodePrompt
+    @State private var code = ""
+    @FocusState private var focused: Bool
+
+    var body: some View {
+        NavigationStack {
+            VStack(spacing: 18) {
+                Image(systemName: "lock.fill").font(.largeTitle).foregroundStyle(Color.accentColor)
+                Text(L("v54_share_pair_enter", prompt.name)).multilineTextAlignment(.center)
+                TextField("000000", text: $code)
+                    .keyboardType(.numberPad).textContentType(.oneTimeCode)
+                    .font(.system(size: 34, weight: .bold, design: .monospaced)).multilineTextAlignment(.center)
+                    .focused($focused)
+                    .onChange(of: code) { _, v in
+                        let d = String(v.filter { $0.isASCII && $0.isNumber }.prefix(SharePairing.CODE_DIGITS))
+                        if d != v { code = d }
+                    }
+                    .padding(12).background(RoundedRectangle(cornerRadius: 12).fill(Color.primary.opacity(0.06)))
+                    .accessibilityIdentifier("share_pair_input")
+                Button(L("v54_share_pair_connect")) { ShareManager.shared.submitCode(code) }
+                    .buttonStyle(.borderedProminent)
+                    .disabled(code.count != SharePairing.CODE_DIGITS)
+                    .accessibilityIdentifier("share_pair_submit")
+                Spacer()
+            }
+            .padding(24)
+            .navigationTitle(L("v54_share_pair_title"))
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar { ToolbarItem(placement: .cancellationAction) { Button(L("v53_cancel")) { ShareManager.shared.cancelCode() } } }
+            .onAppear { focused = true }
+        }
+        .presentationDetents([.medium])
+        .interactiveDismissDisabled()
     }
 }

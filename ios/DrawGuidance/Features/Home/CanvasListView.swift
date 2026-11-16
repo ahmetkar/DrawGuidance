@@ -72,6 +72,8 @@ struct CanvasListView: View {
     @State private var editing: CanvasUi?
     @State private var deleting: CanvasUi?
     @State private var message: String?
+    @State private var showShare = false
+    @State private var showLive = false
 
     private var shown: [CanvasUi] {
         let q = query.trimmingCharacters(in: .whitespaces)
@@ -115,17 +117,19 @@ struct CanvasListView: View {
                 Button { creating = true } label: { Label(L("new_canvas"), systemImage: "plus") }
                     .accessibilityIdentifier("canvas_list_new")
             }
-            // v51 paylaşım sayfası (sağ üst köşe)
+            // v54 Android ile aynı düzen: Yeni tuval ve "Diğer" menüsü (paylaşım, canlı yayın)
             ToolbarItem(placement: .primaryAction) {
-                NavigationLink { ShareView(mode: .send) } label: { Label(L("v52_share_send_title"), systemImage: "square.and.arrow.up") }
-                    .accessibilityIdentifier("canvas_list_share")
-            }
-            // v52 canlı yayın ayrı düğme
-            ToolbarItem(placement: .primaryAction) {
-                NavigationLink { ShareView(mode: .live) } label: { Label(L("v52_share_live_title"), systemImage: "dot.radiowaves.left.and.right") }
-                    .accessibilityIdentifier("canvas_list_live")
+                Menu {
+                    Button { showShare = true } label: { Label(L("v52_share_send_title"), systemImage: "square.and.arrow.up") }
+                        .accessibilityIdentifier("canvas_list_share")
+                    Button { showLive = true } label: { Label(L("v52_share_live_title"), systemImage: "dot.radiowaves.left.and.right") }
+                        .accessibilityIdentifier("canvas_list_live")
+                } label: { Label(L("more_options"), systemImage: "ellipsis.circle") }
+                    .accessibilityIdentifier("canvas_list_more")
             }
         }
+        .navigationDestination(isPresented: $showShare) { ShareView(mode: .send) }
+        .navigationDestination(isPresented: $showLive) { ShareView(mode: .live) }
         .overlay(alignment: .bottom) {
             if let message {
                 Text(message).font(.subheadline).foregroundStyle(.white).padding(.horizontal, 16).padding(.vertical, 10)

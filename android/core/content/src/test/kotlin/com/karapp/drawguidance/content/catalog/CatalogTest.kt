@@ -45,7 +45,7 @@ class CatalogTest {
         assertTrue(n.weights.contentEquals(bytes))
         // v37: sunucunun yalnız daha yeni sürümdeki ağı öncelikli; aynı ya da eski sürüm (ör. v36 tohumundaki 1) kurulmaz
         val bundled = ShapeNet.modeNetVersion(ShapeMode.ART)
-        assertEquals(ShapeNet.V38, bundled)
+        assertEquals(ShapeNet.V54, bundled)
         assertTrue(ShapeNet.installRemote(ShapeMode.ART, bundled + 1, bytes))
         assertEquals(bundled + 1, ShapeNet.baseFor(ShapeMode.ART).second)
         assertTrue(ShapeNet.installRemote(ShapeMode.ART, ShapeNet.MODE_NET_VERSION, bytes))
@@ -57,7 +57,7 @@ class CatalogTest {
     /** v37 tohumda her modun ağı kendi sürümüyle ve not alma modunun yazı ağı ayrı kayıt olarak bulunur. */
     @Test
     fun seedCarriesTextNet() {
-        assertEquals(43000L, CatalogInfo.VERSION)
+        assertEquals(54000L, CatalogInfo.VERSION)
         val nets = CatalogCodec.bundledModeNets()
         assertEquals(ShapeMode.entries.map { it.name }.toSet() + CatalogInfo.TEXT_NET_MODE, nets.map { it.mode }.toSet())
         for (n in nets) {
@@ -67,7 +67,7 @@ class CatalogTest {
         }
         val art = nets.first { it.mode == "ART" }; val kids = nets.first { it.mode == "KIDS" }; val text = nets.first { it.mode == CatalogInfo.TEXT_NET_MODE }
         // v38 bütün mod ağları (çocuk dahil) 38
-        assertEquals(ShapeNet.V38, art.version); assertEquals(ShapeNet.V38, kids.version)
+        assertEquals(ShapeNet.V54, art.version); assertEquals(ShapeNet.V54, kids.version)
         assertEquals(HandwritingNet.VERSION, text.version); assertEquals(CatalogInfo.TEXT_NET_FORMAT, text.format)
         assertNotNull(HandwritingNet.decode(text.weights))
         // v38 yazı ağında "yazı mı" kapısı var (sürüm 2)

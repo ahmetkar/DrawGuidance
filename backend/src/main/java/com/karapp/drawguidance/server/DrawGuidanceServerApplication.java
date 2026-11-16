@@ -34,6 +34,11 @@ public class DrawGuidanceServerApplication {
             com.karapp.drawguidance.server.distribution.cli.DistributionCli.help(System.out);
             return argv.length == 0 ? 2 : 0;
         }
+        // v54 yönetim şifresi: özet üretme dışında her komut şifre doğrulanınca çalışır
+        if (java.util.Set.of("sifre-ozeti", "password-hash").contains(argv[0])) {
+            return com.karapp.drawguidance.server.distribution.cli.CliAuth.printNewHash(System.out);
+        }
+        if (!com.karapp.drawguidance.server.distribution.cli.CliAuth.authenticate(System.getenv(), System.out)) return 4;
         try (var ctx = new org.springframework.boot.builder.SpringApplicationBuilder(DrawGuidanceServerApplication.class)
                 .web(org.springframework.boot.WebApplicationType.NONE)
                 .bannerMode(org.springframework.boot.Banner.Mode.OFF)

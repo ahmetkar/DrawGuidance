@@ -398,6 +398,8 @@ public class DistributionCli {
         out.println("""
                 DrawGuidance yönetim komutları (v43)
                 Kullanım: java -jar drawguidance-server.jar cli <komut>   (yerel sunucuda: Yonetim.bat <komut>)
+                v54: her komut yönetim şifresi sorulup doğrulanınca çalışır (özet: CLI_PASSWORD_HASH_FILE).
+                  sifre-ozeti                              yeni şifrenin özetini üretir (Docker sırrı olarak verilir)
 
                 PAKETLER (mod: COMIC, NOTES, ART)
                   paket pencereler                         modlar ve pencereleri

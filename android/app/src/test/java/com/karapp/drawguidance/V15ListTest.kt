@@ -1,6 +1,7 @@
 package com.karapp.drawguidance
 
 import androidx.compose.ui.semantics.SemanticsActions
+import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.hasClickAction
 import androidx.compose.ui.test.hasSetTextAction
 import androidx.compose.ui.test.hasText
@@ -57,7 +58,7 @@ class V15CanvasFoldersTest : V15ListBase() {
         waitForText("1600×1000 · ", substring = true)
 
         // Yeni klasör
-        compose.onNodeWithContentDescription("Yeni klasör").performClick()
+        compose.onNodeWithTag("canvas_list_more", useUnmergedTree = true).performClick(); compose.waitForIdle(); compose.onNodeWithTag("canvas_list_new_folder", useUnmergedTree = true).performClick()
         waitForText("Klasör adı")
         compose.onNode(hasSetTextAction()).performTextInput("Dersler")
         compose.onNodeWithText("Tamam").performClick()

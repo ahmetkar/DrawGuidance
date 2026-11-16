@@ -101,8 +101,8 @@ enum class PremiumFeature {
  *   geçişli olanlar (Noir'dan sonrakiler; bulanıklık, keskinlik, vinyet, gren, solukluk) gelişmiş. Çizgi roman
  *   filtrelerinden "Çizgi roman" temel, ötekiler gelişmiş.
  * - Şekiller (Şekil ekle): v40 sahibin isteğiyle hepsi açık (kilit yok).
- * - Şekil önerileri: yerleşik geometrik şekle (daire, kare, yıldız…) dönüştürme temel; çok parçalı şablonlar (en az
- *   [ADVANCED_SUGGEST_PARTS] çizgi), kütüphane çizimleri ve 3B cisim önerileri gelişmiş (gösterilir, uygulanamaz).
+ * - Şekil önerileri: v54 hepsi Free (çok parçalı şablonlar ve kütüphane çizimleri dahil); yalnız 3B cisim önerileri
+ *   gelişmiş (gösterilir, uygulanamaz).
  * - Diyagramlar: v40 sahibin isteğiyle hepsi açık (kilit yok).
  * - Çizgi roman efektleri: Aksiyon, Duygu ve Ses grupları temel; Büyü/enerji ve Atmosfer gelişmiş. Odak çizgilerinde
  *   ilk dört tür (yatay/dikey hız, odak, patlama) temel.
@@ -139,9 +139,9 @@ object PremiumRules {
      * ya da [parts] ≥ [ADVANCED_SUGGEST_PARTS] parçalı şablon gelişmiş.
      */
     fun isAdvancedSuggestion(vector: Boolean, solid: String?, parts: Int): Boolean {
-        if (vector) return solid == null || solid.startsWith(ShapeLibrary.PREFIX)
-        if (solid != null) return true
-        return parts >= ADVANCED_SUGGEST_PARTS
+        // v54 sahibin isteğiyle şekil ve yazı önerileri Free; yalnız 3B cisim önerileri (çizimi 3B cisme çevirme) Premium
+        if (vector) return false
+        return solid != null
     }
 
     fun isAdvancedEffectGroup(group: EffectGroup): Boolean = group == EffectGroup.MAGIC || group == EffectGroup.ATMOSPHERE

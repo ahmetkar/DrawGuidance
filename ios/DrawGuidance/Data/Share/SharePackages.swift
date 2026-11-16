@@ -63,10 +63,23 @@ final class SharePackages {
     func install(_ pkg: SharePackage, ids: inout [String: String], existingId: String? = nil) throws -> String {
         let h = pkg.header
         let localId = existingId ?? UUID().uuidString.lowercased()
+        // v54 resimler yalnız gerçek ve temiz resim dosyasıysa (imza, yapı ve gömülü kod denetimi); tür dosyanın imzasından.
+        // Biri bile uymazsa paket kurulmaz
+        var mimes: [String] = []
+        for (i, a) in h.assets.enumerated() {
+            let bytes = pkg.assets[i]
+            let sniffed = ImageImportValidator.sniffMime(bytes)
+            if a.mime.hasPrefix("image/") || sniffed != nil {
+                guard let sniffed, ImageSecurity.inspect(bytes, mime: sniffed) == .CLEAN else { throw ShareError.failed(L("v54_image_err_suspicious")) }
+                mimes.append(sniffed)
+            } else {
+                mimes.append(a.mime)
+            }
+        }
         for (i, a) in h.assets.enumerated() {
             let newId = ids[a.id] ?? UUID().uuidString.lowercased()
             ids[a.id] = newId
-            assets.saveData(localId, pkg.assets[i], a.mime, id: newId, width: a.w, height: a.h)
+            assets.saveData(localId, pkg.assets[i], mimes[i], id: newId, width: a.w, height: a.h)
             CanvasImageCache.loader?(newId)
         }
         let doc = try ContentCodec.decodeDocument(pkg.content)

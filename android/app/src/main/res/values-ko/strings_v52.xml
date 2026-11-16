@@ -26,8 +26,8 @@
     <string name="v52_temp_edit_failed">편집용으로 열 수 없습니다</string>
     <string name="v52_live_paused">방송 일시 중지: 보내는 사람이 편집 중</string>
     <string name="v52_live_paused_badge">방송 일시 중지</string>
-    <string name="v52_helpers_title">그리기 도우미</string>
-    <string name="v52_helpers_short">도우미</string>
+    <string name="v52_helpers_title">구도와 보기</string>
+    <string name="v52_helpers_short">구도</string>
     <string name="v52_helper_composition">구도 가이드</string>
     <string name="v52_helper_composition_hint">주요 대상을 선과 교차점 위에 두세요. 종이에는 저장되지 않습니다.</string>
     <string name="v52_helper_none">끔</string>

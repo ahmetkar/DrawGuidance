@@ -126,7 +126,7 @@ abstract class V52StoreShotsBase : V32EditorBase() {
             SharePeer("LAN:1", ShareRoute.LAN, "1", t("peer_tablet"), "android", PeerState.CONNECTED),
             SharePeer("LAN:2", ShareRoute.LAN, "2", t("peer_phone"), "ios", PeerState.FOUND),
         )
-        compose.onNodeWithTag("canvas_list_share", useUnmergedTree = true).performClick()
+        compose.onNodeWithTag("canvas_list_more", useUnmergedTree = true).performClick(); compose.waitForIdle(); compose.onNodeWithTag("canvas_list_share", useUnmergedTree = true).performClick()
         waitFor { exists("share_peers") }
         settleFor(1500)
         shot(shotName("15-paylasim"))

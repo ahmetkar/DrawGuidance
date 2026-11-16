@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- v54: tools/i18n-v53/strings_v54.py ile üretildi; elle değiştirmeyin -->
+<resources>
+    <string name="v53_sg_airplane">Uçak</string>
+    <string name="v53_sg_backpack">Sırt çantası</string>
+    <string name="v53_sg_bicycle">Bisiklet</string>
+    <string name="v53_sg_bird_fly">Kuş (uçan)</string>
+    <string name="v53_sg_box_1p">Kutu (tek kaçış noktası)</string>
+    <string name="v53_sg_butterfly">Kelebek</string>
+    <string name="v53_sg_camera">Fotoğraf makinesi</string>
+    <string name="v53_sg_cat_walk">Kedi (yürüyen)</string>
+    <string name="v53_sg_clock">Saat</string>
+    <string name="v53_sg_cow">İnek</string>
+    <string name="v53_sg_cylinder_lying">Yatık silindir</string>
+    <string name="v53_sg_dog_sit">Köpek (oturan)</string>
+    <string name="v53_sg_dragon">Ejderha</string>
+    <string name="v53_sg_elephant">Fil</string>
+    <string name="v53_sg_face_3q">Yüz (yarım yan)</string>
+    <string name="v53_sg_guitar">Gitar</string>
+    <string name="v53_sg_hand_open">Açık el</string>
+    <string name="v53_sg_headphones">Kulaklık</string>
+    <string name="v53_sg_house_2p">Ev (iki kaçış noktası)</string>
+    <string name="v53_sg_human_3q">İnsan (yarım yan)</string>
+    <string name="v53_sg_human_run">İnsan (koşan)</string>
+    <string name="v53_sg_human_sit">İnsan (oturan)</string>
+    <string name="v53_sg_laptop">Dizüstü bilgisayar</string>
+    <string name="v53_sg_rabbit">Tavşan</string>
+    <string name="v53_sg_rose">Gül</string>
+    <string name="v53_sg_ship">Gemi</string>
+    <string name="v53_sg_sofa">Kanepe</string>
+    <string name="v53_sg_street_1p">Sokak (tek kaçış noktası)</string>
+    <string name="v53_sg_teapot">Çaydanlık</string>
+    <string name="v53_sg_tower">Kule</string>
+    <string name="v53_sg_umbrella">Şemsiye</string>
+    <string name="v53_sg_wine_glass">Kadeh</string>
+    <string name="v54_image_err_dimensions" formatted="true">Çözünürlük çok yüksek (%1$d×%2$d). Kenarlar en fazla 8192 px, toplam en fazla 64 MP olmalı.</string>
+    <string name="v54_image_err_suspicious">Bu dosya güvenli bir resim değil: içinde kod ya da başka bir dosya var. Eklenmedi.</string>
+    <string name="v54_image_err_too_large" formatted="true">Dosya çok büyük: %1$s. En fazla 10 MB olabilir.</string>
+    <string name="v54_image_warn_near_limit" formatted="true">Dosya 10 MB sınırına yakın (%1$s).</string>
+    <string name="v54_share_pair_connect">Bağlan</string>
+    <string name="v54_share_pair_enter" formatted="true">%1$s cihazının ekranındaki 6 haneli eşleşme şifresini gir.</string>
+    <string name="v54_share_pair_old">Karşı cihazdaki uygulama güncel değil; şifreli paylaşım için güncelleyin.</string>
+    <string name="v54_share_pair_renew">Eşleşme yenilenmeli; yeniden bağlan ve şifreyi gir.</string>
+    <string name="v54_share_pair_show" formatted="true">%1$s bağlanmak istiyor. Bu şifreyi o cihaza gir:</string>
+    <string name="v54_share_pair_show_note">Şifre yalnız bu bağlantı içindir; aktarım şifrelenir.</string>
+    <string name="v54_share_pair_title">Eşleşme şifresi</string>
+    <string name="v54_share_pair_wrong">Eşleşme şifresi yanlış; yeniden dene.</string>
+    <string name="v54_template_choose_canvas">Tuvalden seç</string>
+    <string name="v54_template_choose_message">Kalıp için seçili bir şekil ya da resim yok. Çizim yardımcılarından ya da şekillerden birini seç; istersen tuvaldeki bir şekle de dokunabilirsin.</string>
+    <string name="v54_template_choose_shapes">Şekiller</string>
+    <string name="v54_template_helper_hint">Seçtiğin çizim yardımcısının çizgileri şekil kalıbı olur; kenarına yakın çizerek izleyebilirsin.</string>
+</resources>

@@ -150,8 +150,8 @@
     <string name="v53_struct_opacity">濃さ</string>
     <string name="v53_struct_remove">ガイドを外す</string>
     <string name="v53_struct_settings">ガイド設定</string>
-    <string name="v53_struct_short">構造ガイド</string>
-    <string name="v53_struct_title">構造ガイド</string>
+    <string name="v53_struct_short">描画ヘルパー</string>
+    <string name="v53_struct_title">描画ヘルパー</string>
     <string name="v53_templates_hint">ページのコマ割りを選びます。</string>
     <string name="v53_text_section">文字</string>
     <string name="v53_text_size">文字サイズ</string>

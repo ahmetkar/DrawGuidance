@@ -460,6 +460,9 @@ class CanvasEditViewModel(
     /** v32 eğitim sürüyor mu (eğitimin önerileri modelleri eğitmez, kullanıcının öneri ayarlarına bakılmaz). */
     private fun inTutorial(): Boolean = tutorialOrNull?.active == true
 
+    /** v54 eğitim sürerken (kalıbı eğitim kendisi seçer; kalıp uyarısı açılmaz). */
+    fun tutorialRunning(): Boolean = inTutorial()
+
     /** v32 eğitimdeki kabul/retler kullanıcının modunu eğitmez (sayaçlar ve sinir ağı değişmez). */
     private val learningTemplates: com.karapp.drawguidance.data.repository.TemplateSource? = modeTemplates?.let { base ->
         object : com.karapp.drawguidance.data.repository.TemplateSource {
@@ -479,7 +482,15 @@ class CanvasEditViewModel(
     private fun inChallenge(): Boolean =
         (store.canvas.value?.kind == com.karapp.drawguidance.data.model.CanvasKind.KIDS && challenge.active.value) ||
             // v50 yetişkin alıştırması sürerken de öneri verilmez (öneri çizimi hazır şekille değiştirirdi)
-            (practiceCreated && practice.active)
+            (practiceCreated && practice.active) ||
+            // v54 şekil kalıbıyla çizerken (kalıp seçilirken de) şekil, yazı ve çizgi önerisi verilmez
+            onTemplateSession()
+
+    /** v54 şekil kalıbı oturumu açık mı (kalıp seçimi ya da kalıpla çizim). */
+    private fun onTemplateSession(): Boolean = ruler.session.value.let {
+        it == com.karapp.drawguidance.ui.screens.canvasedit.ruler.GuideSession.TEMPLATE ||
+            it == com.karapp.drawguidance.ui.screens.canvasedit.ruler.GuideSession.TEMPLATE_PICK
+    }
 
     /** v50 alıştırma denetleyicisi kuruldu mu (öneri denetimi denetleyiciyi gereksiz yere kurmasın). */
     @Volatile private var practiceCreated = false
@@ -708,6 +719,15 @@ class CanvasEditViewModel(
     val elements: StateFlow<ElementIndex> = store.elements.asStateFlow()
     /** Seçili çizim kimlikleri — her zaman elemanlarının ve gruplarının tüm üyelerini içerir. */
     val selectedIds: StateFlow<Set<String>> = store.selectedIds.asStateFlow()
+
+    /** v54 şekil kalıbı için seçili elemanların (grupları dahil) görünür çizimleri; seçim yoksa boş. */
+    fun selectedTemplateStrokes(): List<com.karapp.drawguidance.data.model.Stroke> {
+        val ids = store.selectedIds.value
+        if (ids.isEmpty()) return emptyList()
+        val index = store.currentIndex()
+        val all = index.expand(ids)
+        return index.strokes.filter { it.id in all && !it.hidden && it.brushType != com.karapp.drawguidance.data.model.BrushType.ERASER }
+    }
     val visualVersion: StateFlow<Long> = store.visualVersion.asStateFlow()
     val canUndo: StateFlow<Boolean> = store.canUndo.asStateFlow()
     val canRedo: StateFlow<Boolean> = store.canRedo.asStateFlow()
@@ -795,8 +815,9 @@ class CanvasEditViewModel(
     }
 
     override fun onInk(stroke: Stroke) {
-        // v44 görev sırasında öneri yok (çizgi görevin değerlendirmesine kalır)
-        if (inChallenge()) return
+        // v44 görev sırasında öneri yok (çizgi görevin değerlendirmesine kalır); v54 kalıpla çizilen çizgi sonra da
+        // öneriye katılmaz
+        if (inChallenge()) { if (onTemplateSession()) handwriting.exclude(stroke); return }
         // v43 şekil kalıbının üzerinde çizilene öneri yok (kalıbın dışındakilere her zamanki gibi)
         val p = stroke.points
         if (ruler.onTemplate(FloatArray(p.size) { p[it].x }, FloatArray(p.size) { p[it].y })) handwriting.exclude(stroke)

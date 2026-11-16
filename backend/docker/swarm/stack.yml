@@ -151,6 +151,8 @@ services:
       APPLE_IAP_ISSUER_ID: 9c6a0a17-8b74-4124-a44d-0e2101126b6a
       APPLE_IAP_KEY_ID: MTT897CZ3J
       APPLE_IAP_PRIVATE_KEY_FILE: /run/secrets/apple_iap.p8
+      # v54 yönetim komut satırının şifre özeti (cli sifre-ozeti ile üretilir)
+      CLI_PASSWORD_HASH_FILE: /run/secrets/cli_password_hash
     secrets:
       - { source: mongo_app_password, target: mongo_app_password, uid: "10001", gid: "10001", mode: 0400 }
       - { source: play_service_account, target: play.json, uid: "10001", gid: "10001", mode: 0400 }
@@ -159,6 +161,7 @@ services:
       - { source: gcs_service_account, target: gcs.json, uid: "10001", gid: "10001", mode: 0400 }
       - { source: device_data_key, target: device_data_key, uid: "10001", gid: "10001", mode: 0400 }
       - { source: apple_iap_key, target: apple_iap.p8, uid: "10001", gid: "10001", mode: 0400 }
+      - { source: cli_password_hash, target: cli_password_hash, uid: "10001", gid: "10001", mode: 0400 }
     networks: [edge, backend]
     # Salt okunur kök dosya sistemi; yazılabilir tek yer /tmp (Tomcat geçici dosyaları)
     read_only: true
@@ -345,6 +348,8 @@ secrets:
   device_data_key: { external: true }
   # v50 App Store Server API anahtarı (SubscriptionKey_XXXX.p8)
   apple_iap_key: { external: true }
+  # v54 yönetim komut satırı şifresinin özeti
+  cli_password_hash: { external: true }
 
 # Swarm config'leri değiştirilemez: dosya değişince CONFIG_VERSION artırılır (yeni ad)
 configs:

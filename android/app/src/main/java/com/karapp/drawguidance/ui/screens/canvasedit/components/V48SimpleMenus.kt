@@ -24,15 +24,16 @@ import com.karapp.drawguidance.ui.screens.canvasedit.tutorial.tutorialAnchor
 /**
  * v48 basit resim ve basit not alma, dikey ekran: üç menü alt alta. Her düğmede simge ve adı yan yana (gelişmiş
  * modların dikey ekranındaki gibi). v49: her menü tek satır; satır ekrana sığmazsa yatay kaydırılır (alt satıra
- * sarmaz, gruplama yok). Çiz menüsünde geri al / yinele satırın başında sabit kalır (kaydırılmaz).
- * 1. Ekle: şekil, yazı, formül, diyagram, paket, panel, arka plan, resim, 3B.
+ * sarmaz, gruplama yok). v54 geri al / yinele Çiz menüsünün başında, öteki düğmelerle birlikte kaydırılır (sabit değil).
+ * 1. Ekle: (notta yazı kutusu), şekil, yazı, formül, diyagram, paket, panel, arka plan, resim, 3B.
  * 2. Çiz: geri al, yinele, kalem, silgi, boya, damlalık, cetvel, kalıp.
  * 3. Seç ve düzenle: seç, taşı, şekil düzenle, dikdörtgen seçim, genişlet; Elemanlar, Katmanlar, Özellikler.
  */
 object SimpleMenus {
     enum class Menu(val tag: String) { ADD("simple_menu_add"), DRAW("simple_menu_draw"), EDIT("simple_menu_edit") }
 
-    private val ADD_IDS = setOf("shape", "text", "formula", "graph", "table", "diagram", "packs", "panels", "background", "image", "model3d")
+    // v54 not almada yazı kutusu Ekle menüsünün başında
+    private val ADD_IDS = setOf("textbox", "shape", "text", "formula", "graph", "table", "diagram", "packs", "panels", "background", "image", "model3d")
     private val DRAW_IDS = setOf("brush", "eraser", "paint", "paint_brush", "eyedropper", "ruler", "template")
 
     /** Aracın menüsü (bilinmeyen araçlar düzen menüsüne). */
@@ -66,10 +67,9 @@ fun SimpleMenuColumn(
     val menus = SimpleMenus.split(items) { it.id }
     Column(modifier.fillMaxWidth().testTag("simple_tool_row"), verticalArrangement = Arrangement.spacedBy(6.dp)) {
         SimpleMenus.Menu.entries.forEach { menu ->
-            // Çiz menüsünde geri al / yinele satırın başında sabit; ötekiler kaydırılan bölümde
-            val fixed = if (menu == SimpleMenus.Menu.DRAW) history else emptyList()
-            val scrollable = menus.getValue(menu)
-            if (fixed.isEmpty() && scrollable.isEmpty()) return@forEach
+            // v54 Çiz menüsünde geri al / yinele satırın başında ama sabit değil: öteki düğmelerle birlikte kaydırılır
+            val scrollable = if (menu == SimpleMenus.Menu.DRAW) history + menus.getValue(menu) else menus.getValue(menu)
+            if (scrollable.isEmpty()) return@forEach
             @Composable
             fun pill(item: SimpleTool) {
                 val anchor = when (item.id) { "undo" -> TutorialAnchor.UNDO; "redo" -> TutorialAnchor.REDO; else -> TutorialAnchor.simple(item.id) }
@@ -81,7 +81,6 @@ fun SimpleMenuColumn(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.spacedBy(6.dp),
                 ) {
-                    fixed.forEach { pill(it) }
                     // Tek satır; sığmazsa yatay kaydırılır (alt satıra sarmaz)
                     Row(
                         Modifier.weight(1f).horizontalScroll(rememberScrollState()),

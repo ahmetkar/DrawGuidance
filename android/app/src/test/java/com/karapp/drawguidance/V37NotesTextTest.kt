@@ -77,8 +77,10 @@ class V37NotesTextTest : V33EditorBase() {
     fun simpleNotesRowStartsWithTextDiagramFormula() {
         open("Basit not menü", CanvasKind.NOTES)
         waitFor { exists("simple_tool_text") }
-        val order = listOf("text", "diagram", "formula", "brush", "eraser").map { left("simple_tool_$it") }
-        assertEquals("yazı, diyagram, formül, fırça, silgi", order.sorted(), order)
+        // v54 yazı kutusu Ekle menüsünün başında; ardından yazı, diyagram, formül (fırça ve silgi Çiz menüsünde)
+        val order = listOf("textbox", "text", "diagram", "formula").map { left("simple_tool_$it") }
+        assertEquals("yazı kutusu, yazı, diyagram, formül", order.sorted(), order)
+        assertTrue(left("simple_tool_brush") < left("simple_tool_eraser"))
     }
 
     @Test

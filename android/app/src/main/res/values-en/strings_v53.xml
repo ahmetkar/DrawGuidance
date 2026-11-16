@@ -150,8 +150,8 @@
     <string name="v53_struct_opacity">Visibility</string>
     <string name="v53_struct_remove">Remove guide</string>
     <string name="v53_struct_settings">Guide settings</string>
-    <string name="v53_struct_short">Structure guide</string>
-    <string name="v53_struct_title">Structure guides</string>
+    <string name="v53_struct_short">Drawing helper</string>
+    <string name="v53_struct_title">Drawing helpers</string>
     <string name="v53_templates_hint">Choose a panel layout for the page.</string>
     <string name="v53_text_section">Text</string>
     <string name="v53_text_size">Text size</string>

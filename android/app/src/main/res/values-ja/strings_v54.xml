@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- v54: tools/i18n-v53/strings_v54.py ile üretildi; elle değiştirmeyin -->
+<resources>
+    <string name="v53_sg_airplane">飛行機</string>
+    <string name="v53_sg_backpack">リュック</string>
+    <string name="v53_sg_bicycle">自転車</string>
+    <string name="v53_sg_bird_fly">鳥（飛ぶ）</string>
+    <string name="v53_sg_box_1p">箱（一点透視）</string>
+    <string name="v53_sg_butterfly">チョウ</string>
+    <string name="v53_sg_camera">カメラ</string>
+    <string name="v53_sg_cat_walk">猫（歩く）</string>
+    <string name="v53_sg_clock">時計</string>
+    <string name="v53_sg_cow">牛</string>
+    <string name="v53_sg_cylinder_lying">横たわる円柱</string>
+    <string name="v53_sg_dog_sit">犬（座り）</string>
+    <string name="v53_sg_dragon">ドラゴン</string>
+    <string name="v53_sg_elephant">ゾウ</string>
+    <string name="v53_sg_face_3q">顔（斜め）</string>
+    <string name="v53_sg_guitar">ギター</string>
+    <string name="v53_sg_hand_open">開いた手</string>
+    <string name="v53_sg_headphones">ヘッドホン</string>
+    <string name="v53_sg_house_2p">家（二点透視）</string>
+    <string name="v53_sg_human_3q">人物（斜め）</string>
+    <string name="v53_sg_human_run">人物（走る）</string>
+    <string name="v53_sg_human_sit">人物（座る）</string>
+    <string name="v53_sg_laptop">ノートパソコン</string>
+    <string name="v53_sg_rabbit">ウサギ</string>
+    <string name="v53_sg_rose">バラ</string>
+    <string name="v53_sg_ship">船</string>
+    <string name="v53_sg_sofa">ソファ</string>
+    <string name="v53_sg_street_1p">街並み（一点透視）</string>
+    <string name="v53_sg_teapot">ティーポット</string>
+    <string name="v53_sg_tower">塔</string>
+    <string name="v53_sg_umbrella">傘</string>
+    <string name="v53_sg_wine_glass">グラス</string>
+    <string name="v54_image_err_dimensions" formatted="true">解像度が高すぎます（%1$d×%2$d）。各辺は最大8192 px、合計は最大64 MPにしてください。</string>
+    <string name="v54_image_err_suspicious">このファイルは安全な画像ではありません（コードや別のファイルが含まれています）。追加しませんでした。</string>
+    <string name="v54_image_err_too_large" formatted="true">ファイルが大きすぎます：%1$s。上限は10 MBです。</string>
+    <string name="v54_image_warn_near_limit" formatted="true">ファイルが10 MBの上限に近づいています（%1$s）。</string>
+    <string name="v54_share_pair_connect">接続</string>
+    <string name="v54_share_pair_enter" formatted="true">%1$s に表示されている6桁のペアリングコードを入力してください。</string>
+    <string name="v54_share_pair_old">相手の端末のアプリが古いため、暗号化共有のために更新してください。</string>
+    <string name="v54_share_pair_renew">ペアリングの更新が必要です。再接続してコードを入力してください。</string>
+    <string name="v54_share_pair_show" formatted="true">%1$s が接続しようとしています。このコードをその端末に入力してください：</string>
+    <string name="v54_share_pair_show_note">コードはこの接続専用です。転送は暗号化されます。</string>
+    <string name="v54_share_pair_title">ペアリングコード</string>
+    <string name="v54_share_pair_wrong">ペアリングコードが違います。もう一度お試しください。</string>
+    <string name="v54_template_choose_canvas">キャンバスから選ぶ</string>
+    <string name="v54_template_choose_message">型にする図形や画像が選択されていません。描画ヘルパーか図形から選ぶか、キャンバス上の図形をタップしてください。</string>
+    <string name="v54_template_choose_shapes">図形</string>
+    <string name="v54_template_helper_hint">選んだヘルパーの線が図形の型になります。線の近くに描くとなぞれます。</string>
+</resources>

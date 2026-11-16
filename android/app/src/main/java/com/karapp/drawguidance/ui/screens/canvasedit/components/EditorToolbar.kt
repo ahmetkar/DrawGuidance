@@ -1028,8 +1028,8 @@ data class SimpleTool(
     val enabled: Boolean = true,
 )
 
-/** v37 not tuvallerinde menünün başındakiler (bu sırayla). */
-val NOTES_FIRST = listOf("text", "diagram", "formula")
+/** v37 not tuvallerinde menünün başındakiler (bu sırayla); v54 yazı kutusu en başta. */
+val NOTES_FIRST = listOf("textbox", "text", "diagram", "formula")
 
 /** v37 not tuvallerinde yazı, diyagram ve formül menünün başına alınır; ötekilerin sırası değişmez. */
 fun <T> notesFirst(items: List<T>, id: (T) -> String): List<T> =

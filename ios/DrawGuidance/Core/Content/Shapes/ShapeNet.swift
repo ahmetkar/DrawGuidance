@@ -72,7 +72,9 @@ final class ShapeNet: ShapeClassifier {
     private static let MAGIC: Int32 = 0x5348_4E54
     static let MODE_NET_VERSION = 1
     static let V38 = 38
-    static func modeNetVersion(_ mode: ShapeMode) -> Int { V38 }
+    /// v54: yeni çizim şablonlarıyla yeniden eğitilen ağlar (Android ShapeNet.V54).
+    static let V54 = 54
+    static func modeNetVersion(_ mode: ShapeMode) -> Int { V54 }
     static func resetBelow(_ mode: ShapeMode) -> Int { mode == .NOTES ? 37 : 0 }
 
     private static let lock = NSLock()

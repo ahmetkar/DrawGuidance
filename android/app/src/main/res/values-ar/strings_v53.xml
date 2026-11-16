@@ -150,8 +150,8 @@
     <string name="v53_struct_opacity">الوضوح</string>
     <string name="v53_struct_remove">إزالة الدليل</string>
     <string name="v53_struct_settings">إعدادات الدليل</string>
-    <string name="v53_struct_short">دليل البنية</string>
-    <string name="v53_struct_title">أدلة البنية</string>
+    <string name="v53_struct_short">مساعد الرسم</string>
+    <string name="v53_struct_title">مساعدات الرسم</string>
     <string name="v53_templates_hint">اختر تخطيط لوحات للصفحة.</string>
     <string name="v53_text_section">النص</string>
     <string name="v53_text_size">حجم النص</string>

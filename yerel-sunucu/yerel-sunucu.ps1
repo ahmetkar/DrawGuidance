@@ -7,6 +7,7 @@
 #   gunluk  : API'nin son kayitlari (logs\api.log)
 #   sifirla : kapsayicilari ve VERITABANINI siler (onay ister)
 #   yonetim : v43 paket/bildirim/duyuru/surum yonetim komutlari (calisan sunucunun kapsayicisinda; Yonetim.bat)
+#             v54 her komut yonetim sifresi ister (.env'deki CLI_PASSWORD_HASH; 'Yonetim.bat sifre-ozeti' ile uretilir)
 # Windows ayarlarina dokunmaz: guvenlik duvari izni gerekiyorsa nasil verilecegi yazilir.
 # Not: [Parameter] kullanilmaz (gelismis betik "--baslik" gibi argumanlari parametre sanar); kalanlar $args'ta
 param([ValidateSet('baslat', 'durdur', 'durum', 'gunluk', 'sifirla', 'yonetim')][string]$Komut = 'baslat')
@@ -211,7 +212,13 @@ try {
             try { [Console]::OutputEncoding = [System.Text.Encoding]::UTF8 } catch { }
             $old = $ErrorActionPreference
             $ErrorActionPreference = 'Continue'
-            try { & $docker @cmd 2>&1 | ForEach-Object { "$_" } } finally { $ErrorActionPreference = $old }
+            # v54 yonetim sifresi: gizli sorulur ve kapsayiciya standart girdiden verilir (komut satirinda gorunmez)
+            $first = if ($Rest.Count -gt 0) { "$($Rest[0])" } else { '' }
+            $secure = if ($first -in @('yardim', 'help', '')) { $null }
+                      elseif ($first -in @('sifre-ozeti', 'password-hash')) { Read-Host 'Yeni yonetim sifresi (en az 10 karakter)' -AsSecureString }
+                      else { Read-Host 'Yonetim sifresi' -AsSecureString }
+            $plain = if ($secure) { [System.Net.NetworkCredential]::new('', $secure).Password } else { '' }
+            try { $plain | & $docker @cmd 2>&1 | ForEach-Object { "$_" } } finally { $ErrorActionPreference = $old; $plain = $null }
             $code = $LASTEXITCODE
             try { Stop-Transcript | Out-Null } catch { }
             exit $code

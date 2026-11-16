@@ -78,6 +78,8 @@ public class BaseSeeder {
                 String rel = i.path("file").asText();
                 Path f = base.resolve(rel).normalize();
                 if (!f.startsWith(base) || !Files.isRegularFile(f)) throw new IllegalArgumentException("Dosya yok ya da klasör dışında: " + rel);
+                // v54 yalnız gerçek ve temiz resim dosyaları yüklenir (imza, uzantı, yapı, gömülü kod, boyut)
+                com.karapp.drawguidance.server.distribution.ImageSafety.check(Files.readAllBytes(f), f.getFileName().toString());
                 String object = "base/" + id + "/" + rel.replace('\\', '/');
                 files.add(f);
                 objects.add(object);
@@ -209,7 +211,8 @@ public class BaseSeeder {
                     if (md5.equals(gcs.md5(storage.bucket(), object))) {
                         skipped.incrementAndGet();
                     } else {
-                        gcs.upload(storage.bucket(), object, data, contentType(f));
+                        // Tür dosyanın imzasından (uzantıya güvenilmez)
+                        gcs.upload(storage.bucket(), object, data, com.karapp.drawguidance.server.distribution.ImageSafety.sniff(data));
                         sent.incrementAndGet();
                     }
                     return null;

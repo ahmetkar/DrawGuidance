@@ -2,6 +2,7 @@ package com.karapp.drawguidance
 
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.semantics.SemanticsActions
+import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onAllNodesWithTag
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithText
@@ -63,7 +64,7 @@ abstract class V14ShotsBase : V13ShotsBase() {
         waitFor { compose.onAllNodesWithTag("canvas_gallery").fetchSemanticsNodes().isNotEmpty() }
         repeat(6) { Thread.sleep(120); compose.waitForIdle(); org.robolectric.Shadows.shadowOf(android.os.Looper.getMainLooper()).idle() }
         shot("$prefix-1-canvas-gallery")
-        compose.onNodeWithContentDescription("Liste görünümü").performClick()
+        compose.onNodeWithTag("canvas_list_more", useUnmergedTree = true).performClick(); compose.waitForIdle(); compose.onNodeWithTag("canvas_list_view", useUnmergedTree = true).performClick()
         compose.waitForIdle()
         shot("$prefix-2-canvas-list")
     }

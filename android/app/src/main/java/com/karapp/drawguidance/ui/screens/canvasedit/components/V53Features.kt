@@ -211,6 +211,38 @@ class StructureGuideState {
 @Composable
 fun rememberStructureGuide(): StructureGuideState = remember { StructureGuideState() }
 
+/**
+ * v54 çizim yardımcısının çizgileri tuval koordinatında kontur olarak (şekil kalıbı için): yapı çizgileri, çokgenler,
+ * daireler ve elipsler; eksen, ölçü çizgileri ve eklem noktaları alınmaz. Kutunun ortası [center], yüksekliği [height].
+ */
+fun structureContours(g: StructureGuide, center: Offset, height: Float): List<Pair<FloatArray, Boolean>> {
+    val left = center.x - height * g.aspect / 2f
+    val top = center.y - height / 2f
+    fun map(pts: FloatArray) = FloatArray(pts.size) { i -> if (i % 2 == 0) left + pts[i] * height else top + pts[i] * height }
+    fun oval(x: Float, y: Float, rx: Float, ry: Float, deg: Float): FloatArray {
+        val n = 40
+        val a = Math.toRadians(deg.toDouble())
+        val out = FloatArray(n * 2)
+        for (k in 0 until n) {
+            val t = 2 * Math.PI * k / n
+            val ex = rx * kotlin.math.cos(t); val ey = ry * kotlin.math.sin(t)
+            out[2 * k] = left + (x + (ex * kotlin.math.cos(a) - ey * kotlin.math.sin(a)).toFloat()) * height
+            out[2 * k + 1] = top + (y + (ex * kotlin.math.sin(a) + ey * kotlin.math.cos(a)).toFloat()) * height
+        }
+        return out
+    }
+    return g.prims.mapNotNull { p ->
+        when (p) {
+            is StructurePrim.Line -> map(p.pts) to false
+            is StructurePrim.Poly -> map(p.pts) to false
+            is StructurePrim.Polygon -> map(p.pts) to true
+            is StructurePrim.Circle -> oval(p.x, p.y, p.r, p.r, 0f) to true
+            is StructurePrim.Ellipse -> oval(p.x, p.y, p.rx, p.ry, p.deg) to true
+            else -> null
+        }
+    }
+}
+
 /** Kılavuzun çizimi (tuval üstü ve küçük resimlerde ortak). */
 fun DrawScope.drawStructure(g: StructureGuide, rect: Rect, flipped: Boolean, color: Color, lineWidth: Float) {
     val s = rect.height
@@ -297,16 +329,23 @@ private fun Handle(icon: androidx.compose.ui.graphics.vector.ImageVector, tag: S
 
 /** Kılavuz seçimi: Canlılar, Nesneler, Eşyalar; küçük resim ve ad. Seçiliyken görünürlük ve aynalama. */
 @Composable
-fun StructureGuideSheet(state: StructureGuideState, canvasW: Int, canvasH: Int) {
+fun StructureGuideSheet(
+    state: StructureGuideState, canvasW: Int, canvasH: Int,
+    /** v54 şekil kalıbı için seçim: verilirse seçilen yardımcı tuvale konmaz, buna verilir. */
+    onPick: ((StructureGuide) -> Unit)? = null,
+    onDismiss: () -> Unit = { state.sheet = false },
+) {
     var group by remember { mutableStateOf(StructureGroup.LIVING) }
     val accent = NeuTheme.colors.accent
-    ComicSheetFrame(stringResource(R.string.v53_struct_title), stringResource(R.string.v53_struct_hint), "structure_sheet", { state.sheet = false }) { columns ->
+    ComicSheetFrame(stringResource(R.string.v53_struct_title), stringResource(if (onPick != null) R.string.v54_template_helper_hint else R.string.v53_struct_hint), "structure_sheet", onDismiss) { columns ->
         PillTabs(
             StructureGroup.entries.map { Triple(it, dynString("v53_struct_group_" + it.name.lowercase()), Icons.Filled.DragIndicator) },
             group, "structure_group_",
         ) { group = it }
         Grid(StructureGuides.byGroup(group), columns.coerceAtMost(4)) { g, m ->
-            ComicTile(dynString(g.nameKey), state.guideId == g.id, { state.place(g.id, canvasW, canvasH); state.sheet = false }, m, "structure_${g.id}") {
+            ComicTile(dynString(g.nameKey), onPick == null && state.guideId == g.id, {
+                if (onPick != null) onPick(g) else { state.place(g.id, canvasW, canvasH); state.sheet = false }
+            }, m, "structure_${g.id}") {
                 Canvas(Modifier.fillMaxWidth().height(72.dp)) {
                     val hh = minOf(size.height, size.width / g.aspect.coerceAtLeast(0.1f)) * 0.9f
                     val ww = hh * g.aspect
@@ -314,7 +353,7 @@ fun StructureGuideSheet(state: StructureGuideState, canvasW: Int, canvasH: Int) 
                 }
             }
         }
-        if (state.active) {
+        if (state.active && onPick == null) {
             Text(stringResource(R.string.v53_struct_settings), style = MaterialTheme.typography.titleSmall)
             LabeledSlider(stringResource(R.string.v53_struct_opacity), state.opacity, 0.15f..1f, "${(state.opacity * 100).roundToInt()}%", "structure_opacity") { state.opacity = it }
             Row(verticalAlignment = Alignment.CenterVertically) {

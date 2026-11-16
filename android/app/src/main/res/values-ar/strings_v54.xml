@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- v54: tools/i18n-v53/strings_v54.py ile üretildi; elle değiştirmeyin -->
+<resources>
+    <string name="v53_sg_airplane">طائرة</string>
+    <string name="v53_sg_backpack">حقيبة ظهر</string>
+    <string name="v53_sg_bicycle">دراجة</string>
+    <string name="v53_sg_bird_fly">طائر (يطير)</string>
+    <string name="v53_sg_box_1p">صندوق (نقطة تلاشٍ واحدة)</string>
+    <string name="v53_sg_butterfly">فراشة</string>
+    <string name="v53_sg_camera">كاميرا</string>
+    <string name="v53_sg_cat_walk">قطة (تمشي)</string>
+    <string name="v53_sg_clock">ساعة</string>
+    <string name="v53_sg_cow">بقرة</string>
+    <string name="v53_sg_cylinder_lying">أسطوانة أفقية</string>
+    <string name="v53_sg_dog_sit">كلب (جالس)</string>
+    <string name="v53_sg_dragon">تنين</string>
+    <string name="v53_sg_elephant">فيل</string>
+    <string name="v53_sg_face_3q">وجه (ثلاثة أرباع)</string>
+    <string name="v53_sg_guitar">غيتار</string>
+    <string name="v53_sg_hand_open">يد مفتوحة</string>
+    <string name="v53_sg_headphones">سماعات</string>
+    <string name="v53_sg_house_2p">منزل (نقطتا تلاشٍ)</string>
+    <string name="v53_sg_human_3q">إنسان (ثلاثة أرباع)</string>
+    <string name="v53_sg_human_run">إنسان (يركض)</string>
+    <string name="v53_sg_human_sit">إنسان (جالس)</string>
+    <string name="v53_sg_laptop">حاسوب محمول</string>
+    <string name="v53_sg_rabbit">أرنب</string>
+    <string name="v53_sg_rose">وردة</string>
+    <string name="v53_sg_ship">سفينة</string>
+    <string name="v53_sg_sofa">أريكة</string>
+    <string name="v53_sg_street_1p">شارع (نقطة تلاشٍ واحدة)</string>
+    <string name="v53_sg_teapot">إبريق شاي</string>
+    <string name="v53_sg_tower">برج</string>
+    <string name="v53_sg_umbrella">مظلة</string>
+    <string name="v53_sg_wine_glass">كأس</string>
+    <string name="v54_image_err_dimensions" formatted="true">الدقة مرتفعة جدًا (%1$d×%2$d). يجب ألا يزيد طول الحواف عن 8192 px، وألا يتجاوز المجموع 64 MP.</string>
+    <string name="v54_image_err_suspicious">هذا الملف ليس صورة آمنة: يحتوي على شيفرة أو ملف آخر. لم تتم إضافته.</string>
+    <string name="v54_image_err_too_large" formatted="true">الملف كبير جدًا: %1$s. الحد الأقصى 10 MB.</string>
+    <string name="v54_image_warn_near_limit" formatted="true">الملف قريب من حد 10 MB (%1$s).</string>
+    <string name="v54_share_pair_connect">اتصال</string>
+    <string name="v54_share_pair_enter" formatted="true">أدخل رمز الاقتران المكون من 6 أرقام الظاهر على %1$s.</string>
+    <string name="v54_share_pair_old">التطبيق على الجهاز الآخر قديم؛ حدّثه للمشاركة المشفرة.</string>
+    <string name="v54_share_pair_renew">يجب تجديد الاقتران؛ اتصل مجددًا وأدخل الرمز.</string>
+    <string name="v54_share_pair_show" formatted="true">يريد %1$s الاتصال. أدخل هذا الرمز على ذلك الجهاز:</string>
+    <string name="v54_share_pair_show_note">الرمز لهذا الاتصال فقط؛ ويتم تشفير النقل.</string>
+    <string name="v54_share_pair_title">رمز الاقتران</string>
+    <string name="v54_share_pair_wrong">رمز الاقتران غير صحيح؛ حاول مرة أخرى.</string>
+    <string name="v54_template_choose_canvas">اختر من اللوحة</string>
+    <string name="v54_template_choose_message">لا يوجد شكل أو صورة محددة للقالب. اختر أحد مساعدات الرسم أو الأشكال، أو المس شكلًا على اللوحة.</string>
+    <string name="v54_template_choose_shapes">الأشكال</string>
+    <string name="v54_template_helper_hint">تصبح خطوط المساعد الذي تختاره قالب الشكل؛ ارسم بالقرب منها لتتبعها.</string>
+</resources>

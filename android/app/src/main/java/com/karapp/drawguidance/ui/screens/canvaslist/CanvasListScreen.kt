@@ -228,16 +228,12 @@ fun CanvasListScreen(
                         NeuIconButton(Icons.AutoMirrored.Filled.ArrowBack, stringResource(R.string.folder_up), { viewModel.openFolder(null) })
                     },
                     actions = {
-                        NeuIconButton(
-                            if (gridView) Icons.AutoMirrored.Filled.ViewList else Icons.Filled.GridView,
-                            stringResource(if (gridView) R.string.images_view_list else R.string.images_view_grid),
-                            { gridView = !gridView },
-                        )
+                        // v54 üst menü sade: Yeni tuval ve "Diğer" (görünüm, paylaşım, canlı yayın)
                         NeuIconButton(Icons.Filled.Add, stringResource(R.string.new_canvas), { showCreateModal = true }, tint = colors.accent)
-                        // v51 cihazlar arası paylaşım (sağ üst köşe; çocuk kilidinde yok)
-                        if (onOpenShare != null && !kidsLocked) NeuIconButton(Icons.Filled.Share, stringResource(R.string.v52_share_send_title), onOpenShare, modifier = Modifier.testTag("canvas_list_share"))
-                        // v52 canlı yayın ayrı düğme
-                        if (onOpenLiveShare != null && !kidsLocked) NeuIconButton(Icons.Filled.Cast, stringResource(R.string.v52_share_live_title), onOpenLiveShare, modifier = Modifier.testTag("canvas_list_live"))
+                        ListMoreMenu(
+                            gridView = gridView, onToggleView = { gridView = !gridView },
+                            onShare = onOpenShare?.takeIf { !kidsLocked }, onLive = onOpenLiveShare?.takeIf { !kidsLocked },
+                        )
                     },
                 )
             } else {
@@ -250,30 +246,25 @@ fun CanvasListScreen(
                         }
                     },
                     actions = {
-                        if (canvases.isNotEmpty()) {
-                            Box {
-                                NeuIconButton(Icons.AutoMirrored.Filled.Sort, stringResource(R.string.images_sort), { sortMenu = true })
-                                DropdownMenu(expanded = sortMenu, onDismissRequest = { sortMenu = false }, containerColor = colors.background) {
-                                    CanvasSort.entries.forEach { option ->
-                                        DropdownMenuItem(
-                                            text = { Text(stringResource(option.label), color = if (option == sort) colors.accent else colors.content) },
-                                            onClick = { sort = option; sortMenu = false },
-                                        )
-                                    }
+                        // v54 üst menüde simgeler birikmesin: Yeni tuval ve "Diğer" menüsü (sıralama, görünüm, yeni klasör,
+                        // paylaşım, canlı yayın)
+                        NeuIconButton(Icons.Filled.Add, stringResource(R.string.new_canvas), { showCreateModal = true }, tint = colors.accent)
+                        Box {
+                            ListMoreMenu(
+                                gridView = gridView, onToggleView = { gridView = !gridView }.takeIf { canvases.isNotEmpty() },
+                                onSort = { sortMenu = true }.takeIf { canvases.isNotEmpty() },
+                                onNewFolder = { newFolderOpen = true }.takeIf { canvases.isNotEmpty() },
+                                onShare = onOpenShare?.takeIf { !kidsLocked }, onLive = onOpenLiveShare?.takeIf { !kidsLocked },
+                            )
+                            DropdownMenu(expanded = sortMenu, onDismissRequest = { sortMenu = false }, containerColor = colors.background) {
+                                CanvasSort.entries.forEach { option ->
+                                    DropdownMenuItem(
+                                        text = { Text(stringResource(option.label), color = if (option == sort) colors.accent else colors.content) },
+                                        onClick = { sort = option; sortMenu = false },
+                                    )
                                 }
                             }
-                            NeuIconButton(
-                                if (gridView) Icons.AutoMirrored.Filled.ViewList else Icons.Filled.GridView,
-                                stringResource(if (gridView) R.string.images_view_list else R.string.images_view_grid),
-                                { gridView = !gridView },
-                            )
-                            NeuIconButton(Icons.Filled.CreateNewFolder, stringResource(R.string.folder_new), { newFolderOpen = true })
                         }
-                        NeuIconButton(Icons.Filled.Add, stringResource(R.string.new_canvas), { showCreateModal = true }, tint = colors.accent)
-                        // v51 cihazlar arası paylaşım (sağ üst köşe; çocuk kilidinde yok)
-                        if (onOpenShare != null && !kidsLocked) NeuIconButton(Icons.Filled.Share, stringResource(R.string.v52_share_send_title), onOpenShare, modifier = Modifier.testTag("canvas_list_share"))
-                        // v52 canlı yayın ayrı düğme
-                        if (onOpenLiveShare != null && !kidsLocked) NeuIconButton(Icons.Filled.Cast, stringResource(R.string.v52_share_live_title), onOpenLiveShare, modifier = Modifier.testTag("canvas_list_live"))
                     },
                 )
             }
@@ -581,4 +572,44 @@ enum class CanvasSort(val label: Int) {
 
     /** Bölümlemede kullanılan tarih. */
     fun timeOf(canvas: CanvasUi): Long = if (this == NEWEST) canvas.createdAt else canvas.updatedAt
+}
+
+/**
+ * v54 Tuvallerim üst menüsünün "Diğer" düğmesi: verilen işlemler (null olanlar gösterilmez) açılan menüde sıralanır.
+ * Menüdeki öğelerin test etiketleri eski düğmelerinkiyle aynıdır.
+ */
+@Composable
+private fun ListMoreMenu(
+    gridView: Boolean,
+    onToggleView: (() -> Unit)?,
+    onSort: (() -> Unit)? = null,
+    onNewFolder: (() -> Unit)? = null,
+    onShare: (() -> Unit)? = null,
+    onLive: (() -> Unit)? = null,
+) {
+    if (onToggleView == null && onSort == null && onNewFolder == null && onShare == null && onLive == null) return
+    val colors = NeuTheme.colors
+    var open by remember { mutableStateOf(false) }
+    Box {
+        NeuIconButton(Icons.Filled.MoreVert, stringResource(R.string.more_options), { open = true }, modifier = Modifier.testTag("canvas_list_more"))
+        DropdownMenu(expanded = open, onDismissRequest = { open = false }, containerColor = colors.background) {
+            @Composable
+            fun item(icon: androidx.compose.ui.graphics.vector.ImageVector, label: String, tag: String, action: () -> Unit) = DropdownMenuItem(
+                text = { Text(label, color = colors.content) },
+                leadingIcon = { Icon(icon, contentDescription = null, tint = colors.content) },
+                onClick = { open = false; action() },
+                modifier = Modifier.testTag(tag),
+            )
+            onSort?.let { item(Icons.AutoMirrored.Filled.Sort, stringResource(R.string.images_sort), "canvas_list_sort", it) }
+            onToggleView?.let {
+                item(
+                    if (gridView) Icons.AutoMirrored.Filled.ViewList else Icons.Filled.GridView,
+                    stringResource(if (gridView) R.string.images_view_list else R.string.images_view_grid), "canvas_list_view", it,
+                )
+            }
+            onNewFolder?.let { item(Icons.Filled.CreateNewFolder, stringResource(R.string.folder_new), "canvas_list_new_folder", it) }
+            onShare?.let { item(Icons.Filled.Share, stringResource(R.string.v52_share_send_title), "canvas_list_share", it) }
+            onLive?.let { item(Icons.Filled.Cast, stringResource(R.string.v52_share_live_title), "canvas_list_live", it) }
+        }
+    }
 }

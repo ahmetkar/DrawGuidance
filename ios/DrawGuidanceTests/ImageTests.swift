@@ -57,14 +57,17 @@ final class ImageTests: XCTestCase {
     }
 
     func testLargeImageIsDownscaled() {
-        let data = png(2400, 1200) { c in
-            c.setFillColor(ArgbColor.cgColor(0xFFFF_FFFF)); c.fill(CGRect(x: 0, y: 0, width: 2400, height: 1200))
-            c.setFillColor(ArgbColor.cgColor(0xFF33_66CC)); c.fill(CGRect(x: 600, y: 300, width: 1200, height: 600))
+        // v54 saklanan uzun kenar cihaza göre 3000/2000 px; burada açıkça 2000
+        let data = png(4000, 2000) { c in
+            c.setFillColor(ArgbColor.cgColor(0xFFFF_FFFF)); c.fill(CGRect(x: 0, y: 0, width: 4000, height: 2000))
+            c.setFillColor(ArgbColor.cgColor(0xFF33_66CC)); c.fill(CGRect(x: 1000, y: 500, width: 2000, height: 1000))
         }
-        let r = ImageImportValidator.check(data)
+        let r = ImageImportValidator.check(data, storeSide: 2000)
         XCTAssertTrue(r.accepted, "\(r.errors)")
-        XCTAssertEqual(r.image?.width, 1600); XCTAssertEqual(r.image?.height, 800)
-        XCTAssertTrue(r.warnings.contains(.willDownscale(2400, 1200, 1600, 800)))
+        XCTAssertEqual(r.image?.width, 2000); XCTAssertEqual(r.image?.height, 1000)
+        XCTAssertTrue(r.warnings.contains(.willDownscale(4000, 2000, 2000, 1000)))
+        // v54 8192 px'e kadar kabul, üstü reddedilir
+        XCTAssertTrue(ImageImportValidator.check(png(9000, 20) { _ in }).errors.contains(.dimensionsTooLarge(9000, 20)))
     }
 
     func testAffineDetection() {

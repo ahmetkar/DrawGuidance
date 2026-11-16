@@ -321,8 +321,17 @@ class InboxRepository(
         }
     }
 
-    /** Resim mi (başlığı çözülebiliyor mu); boyutları. Değilse bozuk içerik. */
+    /**
+     * Resim mi (başlığı çözülebiliyor mu); boyutları. Değilse bozuk içerik. v54 dosya imzası (PNG, JPEG, WEBP) ve yapı
+     * denetimi: içinde kod ya da başka bir dosya olan resim kurulmaz.
+     */
     private fun requireImage(f: File): Pair<Int, Int> {
+        val bytes = f.readBytes()
+        val mime = com.karapp.drawguidance.data.images.ImageImportValidator.sniffMime(bytes)
+        if (mime == null || com.karapp.drawguidance.data.images.ImageSecurity.inspect(bytes, mime) != com.karapp.drawguidance.data.images.ImageSecurity.Verdict.CLEAN) {
+            f.delete()
+            throw IllegalArgumentException("Güvenli resim değil")
+        }
         val o = android.graphics.BitmapFactory.Options().apply { inJustDecodeBounds = true }
         android.graphics.BitmapFactory.decodeFile(f.absolutePath, o)
         if (o.outWidth <= 0 || o.outHeight <= 0) {

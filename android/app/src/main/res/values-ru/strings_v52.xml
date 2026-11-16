@@ -26,8 +26,8 @@
     <string name="v52_temp_edit_failed">Не удалось открыть для редактирования</string>
     <string name="v52_live_paused">Трансляция на паузе: отправитель редактирует</string>
     <string name="v52_live_paused_badge">Трансляция на паузе</string>
-    <string name="v52_helpers_title">Помощники рисования</string>
-    <string name="v52_helpers_short">Помощники</string>
+    <string name="v52_helpers_title">Композиция и вид</string>
+    <string name="v52_helpers_short">Композиция</string>
     <string name="v52_helper_composition">Сетка композиции</string>
     <string name="v52_helper_composition_hint">Размещайте главный объект на линиях и их пересечениях; на бумаге не сохраняется.</string>
     <string name="v52_helper_none">Выкл.</string>

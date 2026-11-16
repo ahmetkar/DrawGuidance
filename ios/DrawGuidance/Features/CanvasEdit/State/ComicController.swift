@@ -100,7 +100,7 @@ final class ComicController {
         balloon.strokeHex = style == .PHONE ? Self.PHONE_BORDER : "#111111"
         let font = options?.font ?? Self.balloonFont(style)
         var spec = TextSpec(content: content, font: font, align: options?.align ?? .CENTER,
-                            box: TextBox(width: width, balloon: balloon, effects: settings.spec.box?.effects))
+                            box: TextBox(width: width, balloon: balloon, effects: Self.balloonEffects(style, settings.spec.box?.effects)))
         if options?.font == nil && (style == .SHOUT || style == .FLASH || style == .ELECTRIC) { spec.bold = true }
         if options?.font == nil && style == .WHISPER { spec.italic = true }
         let (w, h) = TextRenderer.measure(spec, size)
@@ -117,8 +117,28 @@ final class ComicController {
         case .WHISPER: return .PATRICK_HAND
         case .NARRATION: return .COMIC_RELIEF_BOLD
         case .PHONE: return .SANS
-        default: return .COMIC_RELIEF
+        // v53 çizgi roman harflemesi: kalın, okunaklı (büyük harfle)
+        default: return .COMIC_RELIEF_BOLD
         }
+    }
+
+    /// v53 çizgi roman efekt yazısının biçimi: kalın yazı tipi, gradyan dolgu, kalın koyu harf kenarı, beyaz dış kenar,
+    /// sert gölge ve büyük harf. Pencerelerdeki önizlemeler de bunu çizer.
+    static func sfxSpec(_ preset: SfxPreset, size: Float, text: String? = nil) -> TextSpec {
+        let font = TextFont(rawValue: preset.font) ?? .BANGERS
+        let shadow: String? = preset.shadow.count == 7 || !preset.shadow.hasSuffix("00000000") ? preset.shadow : nil
+        return TextSpec(content: text ?? I18n.tr(preset.text), font: font, align: .CENTER, outlineColorHex: preset.outline, outlineWidth: size * 0.085,
+                        box: TextBox(effects: TextEffects(shadowHex: shadow, shadowDx: 0.06, shadowDy: 0.09,
+                                                          gradient: GradientSpec(colors: preset.colors, angle: 90), caps: true, letterSpacing: 0.04,
+                                                          outerHex: preset.outer, outerWidth: 0.075)))
+    }
+
+    /// v53 balon yazısının efektleri: diyaloglar büyük harfle (telefon mesajı hariç); diğer efektler korunur.
+    static func balloonEffects(_ style: BalloonStyle, _ base: TextEffects?) -> TextEffects? {
+        if style == .PHONE { return base }
+        var e = base ?? TextEffects()
+        e.caps = true
+        return e
     }
 
     /// v53 balon yazısının varsayılan boyu: sayfanın kısa kenarına göre, bağırmada büyük, fısıltıda küçük.
@@ -269,11 +289,7 @@ final class ComicController {
         guard let current = store.canvas else { return nil }
         let size = size0 ?? (texts.defaults.sizePx * 2.4).coerceIn(24, 400)
         let c = center ?? P(Float(current.width) / 2, Float(current.height) / 2)
-        let font = TextFont(rawValue: preset.font) ?? .BANGERS
-        let shadow: String? = preset.shadow.count == 7 || !preset.shadow.hasSuffix("00000000") ? preset.shadow : nil
-        let spec = TextSpec(content: I18n.tr(preset.text), font: font, align: .CENTER, outlineColorHex: preset.outline, outlineWidth: size * 0.07,
-                            box: TextBox(effects: TextEffects(shadowHex: shadow, shadowDx: 0.07, shadowDy: 0.08,
-                                                              gradient: GradientSpec(colors: preset.colors, angle: 90), caps: true, letterSpacing: 0.02)))
+        let spec = Self.sfxSpec(preset, size: size)
         let (w, h) = TextRenderer.measure(spec, size)
         let a = Double(preset.tilt) * .pi / 180
         let ca = Float(cos(a)), sa = Float(sin(a))

@@ -329,7 +329,6 @@ class V42ComicPropsUiTest : V33EditorBase() {
         open("Efekt resmi v42")
         addMenu("Efektler")
         waitFor { exists("effects_sheet") }
-        click("effects_tab_images")
         waitFor { exists("fximg") }
         click("fximg_style_manga")
         val fx = ComicAssets.props(ComicAssetKind.EFFECT, ComicStyle.MANGA, "patlama").first()

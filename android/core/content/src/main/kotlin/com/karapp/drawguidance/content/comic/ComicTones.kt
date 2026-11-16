@@ -103,7 +103,8 @@ object ComicTones {
         val pattern = id.startsWith("pat_")
         val step0 = if (pattern) s * 5f else s
         // Öğe sayısı sınırı: alan / aralık² çok büyükse aralık büyür
-        val cells = (w / step0) * (h / step0)
+        // Desenlerde hücre başına birkaç öğe (çiçek: 6) çıkar: sınır öğe sayısına göre
+        val cells = (w / step0) * (h / step0) * (if (pattern) 7f else 1.6f)
         if (cells > MAX_PRIMS) s *= sqrt(cells / MAX_PRIMS)
         val out = ArrayList<Prim>()
         val rng = Rng(seed)

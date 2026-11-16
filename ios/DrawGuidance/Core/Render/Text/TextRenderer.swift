@@ -32,7 +32,9 @@ enum TextRenderer {
     /// İç boşluklar (sol, üst, sağ, alt).
     static func pads(_ spec: TextSpec, _ sizePx: Float) -> [Float] {
         let size = effectiveSize(spec, sizePx)
-        let base = size * PADDING
+        // v53 dış kenarlık harflerin çevresinde yer kaplar
+        let outer: Float = (spec.box?.effects?.outerHex != nil) ? (spec.box?.effects?.outerWidth ?? 0) * size : 0
+        let base = size * PADDING + outer
         guard let box = spec.box else { return [base, base, base, base] }
         if let b = box.balloon { return BalloonRenderer.pads(b, box.width ?? size * 8, size) }
         if let p = box.padding { return [p, p, p, p] }
@@ -41,9 +43,15 @@ enum TextRenderer {
         return [p, p, p, p]
     }
 
+    /// v53 büyük harf: Türkçe yazıda (Türkçe harf içeriyorsa ya da uygulama Türkçeyse) i → İ, diğer dillerde i → I.
+    static func upper(_ t: String) -> String {
+        let turkish = t.contains(where: { "çğıöşüÇĞİÖŞÜ".contains($0) }) || Locale.current.language.languageCode?.identifier == "tr"
+        return t.uppercased(with: turkish ? TR : Locale(identifier: "en_US_POSIX"))
+    }
+
     static func displayText(_ spec: TextSpec) -> String {
         let t = spec.content.isEmpty ? " " : spec.content
-        return spec.box?.effects?.caps == true ? t.uppercased(with: TR) : t
+        return spec.box?.effects?.caps == true ? upper(t) : t
     }
 
     private static func attributes(_ spec: TextSpec, _ sizePx: Float) -> ([NSAttributedString.Key: Any], CTFont, Bool) {
@@ -181,9 +189,20 @@ enum TextRenderer {
         }
         let outline = spec.outlineColorHex
         let hasOutline = outline != nil && spec.outlineWidth > 0.05
-        if hasOutline {
+        // v53 dış kenarlık (çıkartma kenarı): en altta, gölgeyle birlikte
+        let outer = (fx?.outerWidth ?? 0) > 0 ? fx?.outerHex : nil
+        if let outer {
             c.saveGState()
             if let s = shadow { setShadow(c, s) }
+            c.setLineJoin(.round)
+            c.setLineWidth(CGFloat((hasOutline ? spec.outlineWidth : 0) * 2 + fx!.outerWidth * size * 2))
+            c.setStrokeColor(ArgbColor.cgColor(ArgbColor.withAlpha(ArgbColor.hex(outer), alpha)))
+            drawFrame(c, l, mode: .stroke, color: nil)
+            c.restoreGState()
+        }
+        if hasOutline {
+            c.saveGState()
+            if outer == nil, let s = shadow { setShadow(c, s) }
             c.setLineJoin(.round)
             c.setLineWidth(CGFloat(spec.outlineWidth * 2))
             c.setStrokeColor(ArgbColor.cgColor(coverage ? ArgbColor.black : ArgbColor.withAlpha(ArgbColor.hex(outline!), alpha)))
@@ -191,7 +210,7 @@ enum TextRenderer {
             c.restoreGState()
         }
         c.saveGState()
-        if !hasOutline, let s = shadow { setShadow(c, s) }
+        if !hasOutline, outer == nil, let s = shadow { setShadow(c, s) }
         if let g = fx?.gradient, g.valid {
             // Gradyan dolgu: yazının biçimi kırpma olarak kullanılır
             c.beginTransparencyLayer(auxiliaryInfo: nil)
@@ -262,7 +281,7 @@ enum TextRenderer {
 
     static func singleLine(_ spec: TextSpec) -> String {
         let t = spec.content.replacingOccurrences(of: "\n", with: " ")
-        return spec.box?.effects?.caps == true ? t.uppercased(with: TR) : t
+        return spec.box?.effects?.caps == true ? upper(t) : t
     }
 
     private static func pathPoints(_ p: TextPathSpec) -> [CGPoint] {
@@ -334,6 +353,15 @@ enum TextRenderer {
                     c.restoreGState()
                 }
             }
+        }
+        if let outer = fx?.outerHex, (fx?.outerWidth ?? 0) > 0 {
+            c.saveGState()
+            c.setLineJoin(.round)
+            c.setLineWidth(CGFloat((spec.outlineColorHex != nil ? spec.outlineWidth : 0) * 2) + CGFloat(fx!.outerWidth) * size * 2)
+            c.setStrokeColor(ArgbColor.cgColor(ArgbColor.withAlpha(ArgbColor.hex(outer), alpha)))
+            glyphs(.stroke)
+            c.restoreGState()
+            c.setShadow(offset: .zero, blur: 0, color: nil)
         }
         if let outline = spec.outlineColorHex, spec.outlineWidth > 0.05 {
             c.saveGState()

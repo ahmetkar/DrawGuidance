@@ -75,7 +75,7 @@ class ComicController(
         val size = options?.sizePx?.coerceIn(TextController.MIN_TEXT_SIZE, TextController.MAX_TEXT_SIZE)
             ?: balloonTextSize(style, current.width.toFloat(), current.height.toFloat())
         val c = center ?: Offset(current.width / 2f, current.height / 2f)
-        val width = (min(current.width, current.height) * 0.36f).coerceIn(size * 6f, size * 14f)
+        val width = options?.width?.coerceAtLeast(size * 3f) ?: (min(current.width, current.height) * 0.36f).coerceIn(size * 6f, size * 14f)
         val tails = when {
             style == BalloonStyle.FREE -> emptyList()
             style == BalloonStyle.NARRATION && speakers == 0 -> emptyList()
@@ -92,7 +92,7 @@ class ComicController(
         val font = options?.font ?: balloonFont(style)
         val spec = TextSpec(
             content = content, font = font, align = options?.align ?: TextAlignKind.CENTER,
-            box = TextBox(width = width, balloon = balloon, effects = settings.spec.box?.effects),
+            box = TextBox(width = width, balloon = balloon, effects = balloonEffects(style, settings.spec.box?.effects)),
             bold = options?.font == null && (style == BalloonStyle.SHOUT || style == BalloonStyle.FLASH || style == BalloonStyle.ELECTRIC),
             italic = options?.font == null && style == BalloonStyle.WHISPER,
         )
@@ -262,12 +262,7 @@ class ComicController(
      */
     fun insertSfxText(options: BalloonTextOptions, center: Offset?) {
         val current = store.canvas.value ?: return
-        val base = ComicSfx.presets.first()
-        val color = options.colorHex?.uppercase()
-        val preset = SfxPreset(
-            options.content.trim().ifEmpty { base.text }, options.font?.name ?: base.font,
-            color?.let { listOf(lighter(it), it) } ?: base.colors, color?.let { darker(it) } ?: base.outline, base.shadow, base.tilt,
-        )
+        val preset = sfxPresetFor(options.content, options.font, options.colorHex)
         val stroke = sfxStroke(preset, center, options.sizePx?.let { (it * 2.4f).coerceIn(24f, 400f) }) ?: return
         store.commit(current.strokes + stroke)
         host.inserted(setOf(stroke.id))
@@ -278,13 +273,7 @@ class ComicController(
         val current = store.canvas.value ?: return null
         val size = size0 ?: (texts.defaults.value.sizePx * 2.4f).coerceIn(24f, 400f)
         val c = center ?: Offset(current.width / 2f, current.height / 2f)
-        val font = runCatching { TextFont.valueOf(preset.font) }.getOrDefault(TextFont.BANGERS)
-        val shadow = preset.shadow.takeIf { it.length == 7 || !it.endsWith("00000000") }
-        val spec = TextSpec(
-            content = com.karapp.drawguidance.i18n.I18n.tr(preset.text), font = font, align = TextAlignKind.CENTER,
-            outlineColorHex = preset.outline, outlineWidth = size * 0.07f,
-            box = TextBox(effects = TextEffects(shadowHex = shadow, shadowDx = 0.07f, shadowDy = 0.08f, gradient = GradientSpec(preset.colors, 90f), caps = true, letterSpacing = 0.02f)),
-        )
+        val spec = sfxSpec(preset, size)
         val (w, h) = TextRenderer.measure(spec, size)
         val a = Math.toRadians(preset.tilt.toDouble())
         val ca = cos(a).toFloat(); val sa = sin(a).toFloat()
@@ -498,8 +487,33 @@ class ComicController(
             BalloonStyle.WHISPER -> TextFont.PATRICK_HAND
             BalloonStyle.NARRATION -> TextFont.COMIC_RELIEF_BOLD
             BalloonStyle.PHONE -> TextFont.SANS
-            else -> TextFont.COMIC_RELIEF
+            // v53 çizgi roman harflemesi: kalın, okunaklı el yazısı tadında (büyük harfle)
+            else -> TextFont.COMIC_RELIEF_BOLD
         }
+
+        /**
+         * v53 çizgi roman efekt yazısının biçimi: kalın gösterişli yazı tipi, gradyan dolgu, kalın koyu harf kenarı,
+         * beyaz dış (çıkartma) kenarı, sert gölge ve büyük harf. Pencerelerdeki önizlemeler de bunu çizer.
+         */
+        fun sfxSpec(preset: SfxPreset, size: Float, text: String = com.karapp.drawguidance.i18n.I18n.tr(preset.text)): TextSpec {
+            val font = runCatching { TextFont.valueOf(preset.font) }.getOrDefault(TextFont.BANGERS)
+            val shadow = preset.shadow.takeIf { it.length == 7 || !it.endsWith("00000000") }
+            return TextSpec(
+                content = text, font = font, align = TextAlignKind.CENTER,
+                outlineColorHex = preset.outline, outlineWidth = size * 0.085f,
+                box = TextBox(effects = TextEffects(
+                    shadowHex = shadow, shadowDx = 0.06f, shadowDy = 0.09f, gradient = GradientSpec(preset.colors, 90f), caps = true,
+                    letterSpacing = 0.04f, outerHex = preset.outer, outerWidth = 0.075f,
+                )),
+            )
+        }
+
+        /**
+         * v53 balon yazısının efektleri: çizgi roman ve mangada diyaloglar büyük harfle yazılır (telefon mesajı hariç);
+         * kullanıcının seçtiği diğer efektler korunur.
+         */
+        fun balloonEffects(style: BalloonStyle, base: TextEffects?): TextEffects? =
+            if (style == BalloonStyle.PHONE) base else (base ?: TextEffects()).copy(caps = true)
 
         /** v53 balon yazısının varsayılan boyu: sayfanın kısa kenarına göre; bağırmada büyük, fısıltıda küçük. */
         fun balloonTextSize(style: BalloonStyle, w: Float, h: Float): Float {
@@ -525,6 +539,19 @@ class ComicController(
         const val MAX_THICKNESS = 4f
         const val MIN_EFFECT_SIZE = 0.08f
         const val MAX_EFFECT_SIZE = 1f
+
+        /**
+         * v36 balon penceresinin efekt yazısı: [content] (boşsa "BAM!") ilk hazırın biçimiyle; yazı tipi ve renk
+         * seçildiyse onlarla (renk açıktan koyuya gradyan, kenar rengin koyu tonu). Pencerenin önizlemesi de bunu çizer.
+         */
+        fun sfxPresetFor(content: String, font: TextFont?, colorHex: String?): SfxPreset {
+            val base = ComicSfx.presets.first()
+            val color = colorHex?.uppercase()
+            return SfxPreset(
+                content.trim().ifEmpty { base.text }, font?.name ?: base.font,
+                color?.let { listOf(lighter(it), it) } ?: base.colors, color?.let { darker(it) } ?: base.outline, base.shadow, base.tilt,
+            )
+        }
 
         /** Rengin koyu tonu (efektlerin kenar çizgisi). */
         fun darker(hex: String): String {
@@ -579,6 +606,8 @@ data class BalloonTextOptions(
     val tail: TailDirection = TailDirection.BOTTOM_LEFT,
     val length: Float = DEFAULT_TAIL_LENGTH,
     val curve: Float = DEFAULT_TAIL_CURVE,
+    /** v53 balonun eni (tuval birimi; yoksa sayfaya ve yazı boyuna göre). Hazır şablonlar karenin içinde kalsın diye verir. */
+    val width: Float? = null,
 ) {
     val customTail: Boolean get() = tail != TailDirection.BOTTOM_LEFT || length != DEFAULT_TAIL_LENGTH || curve != DEFAULT_TAIL_CURVE
 

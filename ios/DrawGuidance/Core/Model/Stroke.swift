@@ -373,19 +373,25 @@ struct TextEffects: Codable, Equatable {
     var gradient: GradientSpec? = nil
     var caps = false
     var letterSpacing: Float = 0
+    /// v53 ikinci (dış) kenarlık: efekt yazılarının beyaz "çıkartma" kenarı (kalınlık yazı boyunun oranı).
+    var outerHex: String? = nil
+    var outerWidth: Float = 0
 
     init(shadowHex: String? = nil, shadowDx: Float = 0.06, shadowDy: Float = 0.06, shadowBlur: Float = 0,
-         gradient: GradientSpec? = nil, caps: Bool = false, letterSpacing: Float = 0) {
+         gradient: GradientSpec? = nil, caps: Bool = false, letterSpacing: Float = 0,
+         outerHex: String? = nil, outerWidth: Float = 0) {
         self.shadowHex = shadowHex; self.shadowDx = shadowDx; self.shadowDy = shadowDy; self.shadowBlur = shadowBlur
         self.gradient = gradient; self.caps = caps; self.letterSpacing = letterSpacing
+        self.outerHex = outerHex; self.outerWidth = outerWidth
     }
 
-    var isEmpty: Bool { shadowHex == nil && gradient?.valid != true && !caps && letterSpacing == 0 }
+    var isEmpty: Bool { shadowHex == nil && gradient?.valid != true && !caps && letterSpacing == 0 && outerHex == nil }
 
     init(from decoder: Decoder) throws {
         let c = try decoder.container(keyedBy: AnyKey.self)
         shadowHex = c.o("shadowHex"); shadowDx = c.v("shadowDx", 0.06); shadowDy = c.v("shadowDy", 0.06)
         shadowBlur = c.v("shadowBlur", 0); gradient = c.o("gradient"); caps = c.v("caps", false); letterSpacing = c.v("letterSpacing", 0)
+        outerHex = c.o("outerHex"); outerWidth = c.v("outerWidth", 0)
     }
 
     func encode(to encoder: Encoder) throws {
@@ -393,6 +399,7 @@ struct TextEffects: Codable, Equatable {
         try c.o(shadowHex, "shadowHex"); try c.e(shadowDx, "shadowDx", 0.06); try c.e(shadowDy, "shadowDy", 0.06)
         try c.e(shadowBlur, "shadowBlur", 0); try c.o(gradient, "gradient"); try c.e(caps, "caps", false)
         try c.e(letterSpacing, "letterSpacing", 0)
+        try c.o(outerHex, "outerHex"); try c.e(outerWidth, "outerWidth", 0)
     }
 }
 

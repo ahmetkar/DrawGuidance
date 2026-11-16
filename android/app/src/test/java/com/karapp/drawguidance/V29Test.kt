@@ -268,9 +268,8 @@ class V29ComicTest : V29EditorBase() {
     fun linesDensityAndBalloonSize() {
         createComicCanvasAndOpen("Çizgiler")
         // v36 odak çizgileri Efektler penceresinin ikinci sekmesinde
-        addMenu("Efektler")
-        waitFor { chip("effects_sheet") }
-        compose.onNodeWithTag("effects_tab_lines").performSemanticsAction(SemanticsActions.OnClick)
+        // v53 odak çizgileri kendi düğmesi ve penceresinde
+        addMenu("Odak çizgileri")
         waitFor { chip("lines_sheet") }
         // v50 çizgi roman ve manga bölümleri; her türün kendi ayarları (tür seçilir, ayarlanır, "Ekle")
         compose.onNodeWithTag("lines_style_comic").performSemanticsAction(SemanticsActions.OnClick)

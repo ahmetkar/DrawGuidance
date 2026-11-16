@@ -104,6 +104,15 @@ struct CanvasEditScreen: View {
         .navigationBarBackButtonHidden(true)
         .toolbar(.hidden, for: .navigationBar)
         .onAppear { if actions == nil { actions = vm.makeCanvasActions(ui) } }
+        #if DEBUG
+        // CI tanısı: `-dgPanel BRUSH` ile sağ panel açılışta açılır (ekran görüntüsü için)
+        .task {
+            let a = ProcessInfo.processInfo.arguments
+            guard let i = a.firstIndex(of: "-dgPanel"), i + 1 < a.count, let t = PanelTab(rawValue: a[i + 1]) else { return }
+            try? await Task.sleep(nanoseconds: 4_000_000_000)
+            if vm.panel != t { vm.togglePanel(t) }
+        }
+        #endif
         .onDisappear {
             let temp = vm.isTempImageEdit
             vm.close()

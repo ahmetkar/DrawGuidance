@@ -74,7 +74,8 @@ enum ComicTones {
         var s = BASE_SPACING * scale.coerceIn(0.3, 6)
         let pattern = id.hasPrefix("pat_")
         let step0 = pattern ? s * 5 : s
-        let cells = (w / step0) * (h / step0)
+        // Desenlerde hücre başına birkaç öğe (çiçek: 6) çıkar: sınır öğe sayısına göre
+        let cells = (w / step0) * (h / step0) * (pattern ? 7 : 1.6)
         if cells > Float(MAX_PRIMS) { s *= (cells / Float(MAX_PRIMS)).squareRoot() }
         var out: [Prim] = []
         var rng = Rng(seed)

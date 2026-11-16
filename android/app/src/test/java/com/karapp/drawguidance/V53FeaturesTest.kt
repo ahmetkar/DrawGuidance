@@ -37,7 +37,7 @@ class V53FeaturesTest {
             val b = ComicTones.prims(p.id, p.density, p.scale, p.angle, 0f, 0f, 600f, 400f)
             assertTrue("${p.key} boş", a.isNotEmpty())
             assertEquals("${p.key} aynı girdide aynı sonuç vermeli", a.size, b.size)
-            assertEquals(a.first(), b.first())
+            assertEquals(a.first().toString(), b.first().toString())
         }
         // Çok büyük alanda bile öğe sayısı sınırlı kalır (bellek) ve hızlı üretilir
         val ms = measureTimeMillis {
@@ -126,10 +126,24 @@ class V53FeaturesTest {
     fun balloonTextFollowsTheBalloon() {
         assertEquals(TextFont.BANGERS, ComicController.balloonFont(BalloonStyle.SHOUT))
         assertEquals(TextFont.SHANTELL, ComicController.balloonFont(BalloonStyle.THOUGHT))
-        assertEquals(TextFont.COMIC_RELIEF, ComicController.balloonFont(BalloonStyle.SPEECH))
+        assertEquals(TextFont.COMIC_RELIEF_BOLD, ComicController.balloonFont(BalloonStyle.SPEECH))
+        assertEquals(true, ComicController.balloonEffects(BalloonStyle.SPEECH, null)?.caps)
+        assertEquals(null, ComicController.balloonEffects(BalloonStyle.PHONE, null))
         val speech = ComicController.balloonTextSize(BalloonStyle.SPEECH, 1200f, 1800f)
         assertTrue(ComicController.balloonTextSize(BalloonStyle.SHOUT, 1200f, 1800f) > speech)
         assertTrue(ComicController.balloonTextSize(BalloonStyle.WHISPER, 1200f, 1800f) < speech)
         assertTrue(ComicController.balloonTextSize(BalloonStyle.SPEECH, 3000f, 3000f) > speech)
+    }
+
+    @Test
+    fun comicSfxHaveStickerOutlineAndTurkishCaps() {
+        val p = com.karapp.drawguidance.content.comic.ComicSfx.presets.first { it.text == "HAHAHA" }
+        val spec = ComicController.sfxSpec(p, 100f)
+        assertEquals("#FFFFFF", spec.box?.effects?.outerHex)
+        assertTrue((spec.box?.effects?.outerWidth ?: 0f) > 0.05f)
+        assertTrue(spec.outlineWidth >= 8f)
+        assertEquals(true, spec.box?.effects?.caps)
+        assertTrue(com.karapp.drawguidance.content.comic.ComicSfx.presets.none { it.font == "RUBIK_BUBBLES" || it.font == "BUNGEE_SHADE" })
+        assertEquals("ÇİÇEK", com.karapp.drawguidance.ui.drawing.TextRenderer.upper("çiçek"))
     }
 }

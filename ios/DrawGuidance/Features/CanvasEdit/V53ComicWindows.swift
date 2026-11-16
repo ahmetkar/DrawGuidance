@@ -330,10 +330,16 @@ struct SfxWindow: View {
             LazyVGrid(columns: [GridItem(.adaptive(minimum: 120), spacing: 10)], spacing: 10) {
                 ForEach(Array(ComicSfx.presets.enumerated()), id: \.offset) { _, p in
                     Button { vm.insertSfx(p); dismiss() } label: {
-                        Text(p.text).font(.title2.weight(.black)).italic()
-                            .foregroundStyle(Color(hex: p.colors.first ?? "#000000") ?? .primary)
-                            .shadow(color: .black.opacity(0.25), radius: 0, x: 1.5, y: 1.5)
-                            .frame(maxWidth: .infinity, minHeight: 72)
+                        // v53 tuvaldeki biçimiyle (gradyan, koyu kenar, beyaz dış kenar, gölge)
+                        Group {
+                            if let img = PickerThumbs.sfx(p) {
+                                Image(uiImage: img).resizable().scaledToFit().padding(8)
+                            } else {
+                                Text(p.text).font(.title2.weight(.black))
+                            }
+                        }
+                        .rotationEffect(.degrees(Double(p.tilt)))
+                        .frame(maxWidth: .infinity, minHeight: 72, maxHeight: 72)
                             .background(RoundedRectangle(cornerRadius: 14, style: .continuous).fill(Color(uiColor: .secondarySystemGroupedBackground)))
                     }
                     .buttonStyle(.plain)

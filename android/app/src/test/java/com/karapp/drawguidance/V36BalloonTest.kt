@@ -188,7 +188,9 @@ class V36BalloonTest : V33EditorBase() {
         val text = "Çığlık! İĞÜŞÖÇ ışık"
         compose.onNodeWithTag("balloon_text").performScrollTo().performTextInput(text)
         compose.waitForIdle()
-        waitFor { compose.onAllNodes(hasTestTag("balloon_preview_text") and hasText(text)).fetchSemanticsNodes().isNotEmpty() }
+        // v53 balon yazısı büyük harfle gösterilir (içerik değişmez)
+        val shown = com.karapp.drawguidance.ui.drawing.TextRenderer.upper(text)
+        waitFor { compose.onAllNodes(hasTestTag("balloon_preview_text") and hasText(shown)).fetchSemanticsNodes().isNotEmpty() }
         click("balloon_font_BANGERS")
         slide("balloon_text_size", 60f)
         swatch("balloon_text_color", "#E53935")

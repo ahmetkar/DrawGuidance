@@ -74,7 +74,7 @@ struct BrushSettings: Equatable {
     var params: BrushParams? { tuning.params(brushType) }
 }
 
-enum PanelTab { case BRUSH, ELEMENTS, LAYERS }
+enum PanelTab: String { case BRUSH, ELEMENTS, LAYERS }
 
 /// Mod oturumu politikası (Android `ModeKind`).
 enum ModeKind { case BASE, INSERT, EDIT, TOOL }

@@ -227,15 +227,13 @@ class V48LandscapeTest : V47MenuBase() {
         waitFor { exists("effects_sheet") }
         // Resimli efektler ("Efektler" adıyla) açık; çizilen efekt grupları ve ses yazıları yok
         waitFor { exists("fximg") }
-        assertTrue(exists("effects_tab_images") && exists("effects_tab_lines"))
+        // v53 sekme yok: odak çizgileri ayrı düğmede
+        assertFalse(exists("effects_tab_images") || exists("effects_tab_lines"))
         assertFalse(exists("effects_tab_effects"))
         assertTrue(compose.onAllNodes(SemanticsMatcher("group") { it.config.getOrNull(SemanticsProperties.TestTag)?.startsWith("effects_group_") == true }).fetchSemanticsNodes().isEmpty())
         assertFalse(exists("sfx_sheet"))
         assertTrue(compose.onAllNodes(androidx.compose.ui.test.hasText("Resimli efektler")).fetchSemanticsNodes().isEmpty())
         shot("v48-effects-window")
-        compose.onNodeWithTag("effects_tab_lines").performSemanticsAction(SemanticsActions.OnClick)
-        compose.waitForIdle()
-        assertFalse(exists("fximg"))
     }
 }
 

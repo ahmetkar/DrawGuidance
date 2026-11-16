@@ -38,7 +38,8 @@ object TextRenderer {
      */
     fun pads(spec: TextSpec, sizePx: Float): FloatArray {
         val size = effectiveSize(spec, sizePx)
-        val base = size * PADDING
+        // v53 dış kenarlık harflerin çevresinde yer kaplar
+        val base = size * PADDING + (spec.box?.effects?.takeIf { it.outerHex != null }?.let { it.outerWidth * size } ?: 0f)
         val box = spec.box ?: return floatArrayOf(base, base, base, base)
         // v27 konuşma balonu: yazı balonun içinde kalsın (oval biçimlerde kenarlar daha geniş)
         box.balloon?.let { b -> return BalloonRenderer.pads(b, box.width ?: (size * 8f), size) }
@@ -55,6 +56,14 @@ object TextRenderer {
     init { com.karapp.drawguidance.platform.DeviceCaps.cache(editor = true) { synchronized(layouts) { layouts.evictAll() } } }
 
     private val TR = java.util.Locale("tr", "TR")
+
+    /**
+     * v53 büyük harf: Türkçe yazıda (Türkçe harf içeriyorsa ya da uygulama Türkçeyse) i → İ, diğer dillerde i → I.
+     */
+    fun upper(text: String): String {
+        val turkish = text.any { it in "çğıöşüÇĞİÖŞÜ" } || java.util.Locale.getDefault().language == "tr"
+        return text.uppercase(if (turkish) TR else java.util.Locale.ROOT)
+    }
 
     private fun typeface(spec: TextSpec): Typeface {
         val bold = spec.bold || spec.paragraph.heading
@@ -87,7 +96,7 @@ object TextRenderer {
             spec.box?.effects?.letterSpacing?.takeIf { it != 0f }?.let { letterSpacing = it.coerceIn(-0.2f, 1f) }
         }
         // v27 büyük harf (Türkçe kurallarıyla: i → İ)
-        val text = spec.content.ifEmpty { " " }.let { if (spec.box?.effects?.caps == true) it.uppercase(TR) else it }
+        val text = spec.content.ifEmpty { " " }.let { if (spec.box?.effects?.caps == true) upper(it) else it }
         // v23 genişliği verilmiş yazı kutusunda satırlar kutuya göre kaydırılır
         val boxWidth = spec.box?.width?.let { bw ->
             val pad = pads(spec, sizePx)
@@ -200,6 +209,19 @@ object TextRenderer {
             // Harf kenarlığı: önce kalın çizgi (yarısı dışarıda kalır), üstüne dolgu (yazı rengi)
             val outline = spec.outlineColorHex
             val hasOutline = outline != null && spec.outlineWidth > 0.05f
+            // v53 dış kenarlık (çıkartma kenarı): en altta, gölgeyle birlikte; harf kenarlığının dışına taşar
+            val outer = fx?.outerHex?.takeIf { fx.outerWidth > 0f }
+            if (outer != null) {
+                val style = paint.style; val color = paint.color; val width = paint.strokeWidth; val join = paint.strokeJoin
+                paint.style = Paint.Style.STROKE
+                paint.strokeJoin = Paint.Join.ROUND
+                paint.strokeWidth = (if (hasOutline) spec.outlineWidth else 0f) * 2f + fx.outerWidth * size * 2f
+                paint.color = (com.karapp.drawguidance.ui.common.hexToColor(outer).toArgb() and 0x00FFFFFF) or (alpha shl 24)
+                shadow?.let { paint.setShadowLayer(it[0], it[1], it[2], it[3].toRawBits()) }
+                l.draw(canvas)
+                paint.clearShadowLayer()
+                paint.style = style; paint.color = color; paint.strokeWidth = width; paint.strokeJoin = join
+            }
             if (hasOutline) {
                 val style = paint.style
                 val color = paint.color
@@ -210,7 +232,7 @@ object TextRenderer {
                 paint.strokeWidth = spec.outlineWidth * 2f
                 paint.color = if (coverage) 0xFF000000.toInt()
                 else (com.karapp.drawguidance.ui.common.hexToColor(outline!!).toArgb() and 0x00FFFFFF) or (alpha shl 24)
-                shadow?.let { paint.setShadowLayer(it[0], it[1], it[2], it[3].toRawBits()) }
+                if (outer == null) shadow?.let { paint.setShadowLayer(it[0], it[1], it[2], it[3].toRawBits()) }
                 l.draw(canvas)
                 paint.clearShadowLayer()
                 paint.style = style
@@ -221,7 +243,7 @@ object TextRenderer {
             // v27 gradyan dolgu: yazı bloğunun kutusuna göre
             val gradient = fx?.gradient?.let { Gradients.shader(it, 0f, 0f, l.width.toFloat(), l.height.toFloat(), alpha / 255f) }
             if (gradient != null) paint.shader = gradient
-            if (!hasOutline) shadow?.let { paint.setShadowLayer(it[0], it[1], it[2], it[3].toRawBits()) }
+            if (!hasOutline && outer == null) shadow?.let { paint.setShadowLayer(it[0], it[1], it[2], it[3].toRawBits()) }
             l.draw(canvas)
             paint.clearShadowLayer()
             paint.shader = null
@@ -259,6 +281,15 @@ object TextRenderer {
             paint.setShadowLayer(max(0.01f, fx.shadowBlur * size), fx.shadowDx * size, fx.shadowDy * size, (((c ushr 24) * alpha / 255) shl 24) or (c and 0x00FFFFFF))
         }
         val outline = spec.outlineColorHex
+        fx?.outerHex?.takeIf { fx.outerWidth > 0f }?.let { outer ->
+            val o = Paint(paint)
+            o.style = Paint.Style.STROKE
+            o.strokeJoin = Paint.Join.ROUND
+            o.strokeWidth = (if (outline != null) spec.outlineWidth else 0f) * 2f + fx.outerWidth * size * 2f
+            o.color = (com.karapp.drawguidance.ui.common.hexToColor(outer).toArgb() and 0x00FFFFFF) or (alpha shl 24)
+            canvas.drawTextOnPath(text, path, h, v, o)
+            paint.clearShadowLayer()
+        }
         if (outline != null && spec.outlineWidth > 0.05f) {
             val o = Paint(paint)
             o.style = Paint.Style.STROKE
@@ -295,7 +326,7 @@ object TextRenderer {
     /** Yol yazısı tek satır (satır sonları boşluk olur); büyük harf efekti uygulanır. */
     fun singleLine(spec: TextSpec): String {
         val t = spec.content.replace('\n', ' ')
-        return if (spec.box?.effects?.caps == true) t.uppercase(java.util.Locale.getDefault()) else t
+        return if (spec.box?.effects?.caps == true) upper(t) else t
     }
 
     /** Yazının yoldaki başlangıcı (yatay) ve yola uzaklığı (dikey): hizalama ve [com.karapp.drawguidance.data.model.TextPathSpec.below]. */

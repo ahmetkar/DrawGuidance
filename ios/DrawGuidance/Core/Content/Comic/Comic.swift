@@ -633,24 +633,29 @@ struct SfxPreset {
     let outline: String
     let shadow: String
     let tilt: Float
+    /// v53 dış (çıkartma) kenarının rengi.
+    var outer: String = "#FFFFFF"
 }
 
 enum ComicSfx {
+    /// v53 kalın yazı tipi, gradyan dolgu, kalın koyu harf kenarı, beyaz dış kenar ve sert gölge.
     static let presets: [SfxPreset] = [
-        SfxPreset(text: "BAM!", font: "BANGERS", colors: ["#FFEB3B", "#FF5722"], outline: "#1A1A1A", shadow: "#000000", tilt: -8),
-        SfxPreset(text: "POW!", font: "LUCKIEST_GUY", colors: ["#FFFFFF", "#29B6F6"], outline: "#0D47A1", shadow: "#000000", tilt: 6),
-        SfxPreset(text: "BOOM!", font: "BUNGEE", colors: ["#FFD54F", "#E53935"], outline: "#3E2723", shadow: "#000000", tilt: -5),
-        SfxPreset(text: "ZAP!", font: "BANGERS", colors: ["#B2FF59", "#00C853"], outline: "#1B5E20", shadow: "#000000", tilt: 10),
-        SfxPreset(text: "ŞAK!", font: "LUCKIEST_GUY", colors: ["#FFF176", "#FB8C00"], outline: "#4E342E", shadow: "#000000", tilt: -10),
-        SfxPreset(text: "VUUUŞ", font: "BANGERS", colors: ["#E1F5FE", "#4FC3F7"], outline: "#01579B", shadow: "#00000000", tilt: 0),
-        SfxPreset(text: "KRAK!", font: "BUNGEE_SHADE", colors: ["#FFFFFF", "#BDBDBD"], outline: "#212121", shadow: "#000000", tilt: 4),
-        SfxPreset(text: "HAHAHA", font: "RUBIK_BUBBLES", colors: ["#F8BBD0", "#EC407A"], outline: "#880E4F", shadow: "#000000", tilt: -4),
-        SfxPreset(text: "AAAA!", font: "BANGERS", colors: ["#FFFFFF", "#FF1744"], outline: "#B71C1C", shadow: "#000000", tilt: 8),
-        SfxPreset(text: "ZZZ…", font: "GRANDSTANDER", colors: ["#E8EAF6", "#7986CB"], outline: "#1A237E", shadow: "#00000000", tilt: -6),
-        SfxPreset(text: "GÜM!", font: "BUNGEE", colors: ["#FFCC80", "#EF6C00"], outline: "#3E2723", shadow: "#000000", tilt: 7),
-        SfxPreset(text: "TIK TAK", font: "BOOGALOO", colors: ["#FFFFFF", "#90A4AE"], outline: "#263238", shadow: "#00000000", tilt: 0),
-        SfxPreset(text: "CRASH!", font: "BUNGEE", colors: ["#FFF59D", "#FF7043"], outline: "#3E2723", shadow: "#000000", tilt: -7),
-        SfxPreset(text: "WHOOSH!", font: "BANGERS", colors: ["#E0F7FA", "#26C6DA"], outline: "#006064", shadow: "#00000000", tilt: 5),
+        SfxPreset(text: "BAM!", font: "BANGERS", colors: ["#FFF176", "#FF6D00"], outline: "#111111", shadow: "#000000", tilt: -8),
+        SfxPreset(text: "POW!", font: "LUCKIEST_GUY", colors: ["#FFFFFF", "#40C4FF"], outline: "#0A1F44", shadow: "#0A1F44", tilt: 6),
+        SfxPreset(text: "BOOM!", font: "BANGERS", colors: ["#FFE082", "#FF3D00"], outline: "#111111", shadow: "#000000", tilt: -5),
+        SfxPreset(text: "ZAP!", font: "BANGERS", colors: ["#F4FF81", "#64DD17"], outline: "#102A0C", shadow: "#000000", tilt: 10),
+        SfxPreset(text: "ŞAK!", font: "LUCKIEST_GUY", colors: ["#FFF59D", "#FF9100"], outline: "#111111", shadow: "#000000", tilt: -10),
+        SfxPreset(text: "VUUUŞ", font: "BANGERS", colors: ["#FFFFFF", "#80D8FF"], outline: "#0B2545", shadow: "#0B2545", tilt: -4),
+        SfxPreset(text: "KRAK!", font: "BANGERS", colors: ["#FFFFFF", "#B0BEC5"], outline: "#111111", shadow: "#000000", tilt: 4),
+        SfxPreset(text: "HAHAHA", font: "LUCKIEST_GUY", colors: ["#FFF9C4", "#FFC400"], outline: "#111111", shadow: "#000000", tilt: -6),
+        SfxPreset(text: "AAAA!", font: "BANGERS", colors: ["#FFFFFF", "#FF1744"], outline: "#111111", shadow: "#000000", tilt: 8),
+        SfxPreset(text: "ZZZ…", font: "LUCKIEST_GUY", colors: ["#FFFFFF", "#9FA8DA"], outline: "#1A237E", shadow: "#00000000", tilt: -6),
+        SfxPreset(text: "GÜM!", font: "BUNGEE", colors: ["#FFD180", "#E65100"], outline: "#111111", shadow: "#000000", tilt: 7),
+        SfxPreset(text: "TIK TAK", font: "LUCKIEST_GUY", colors: ["#FFFFFF", "#CFD8DC"], outline: "#111111", shadow: "#00000000", tilt: 0),
+        SfxPreset(text: "CRASH!", font: "BANGERS", colors: ["#FFFF8D", "#FF6E40"], outline: "#111111", shadow: "#000000", tilt: -7),
+        SfxPreset(text: "WHOOSH!", font: "BANGERS", colors: ["#FFFFFF", "#84FFFF"], outline: "#0B2545", shadow: "#0B2545", tilt: -5),
+        SfxPreset(text: "DOKİ DOKİ", font: "LUCKIEST_GUY", colors: ["#FFFFFF", "#FF80AB"], outline: "#5C0A2B", shadow: "#5C0A2B", tilt: -6),
+        SfxPreset(text: "GOGOGO", font: "BANGERS", colors: ["#616161", "#000000"], outline: "#000000", shadow: "#00000000", tilt: 0),
     ]
 
     static let featured = ["POW!", "BAM!", "BOOM!", "CRASH!", "WHOOSH!", "ZAP!"]

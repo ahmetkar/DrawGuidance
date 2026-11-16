@@ -707,25 +707,34 @@ object ComicLines {
 }
 
 /** Efekt yazısı (ses efekti) hazırı: yazı, yazı tipi adı, gradyan renkleri, kenarlık rengi ve eğim (derece). */
-class SfxPreset(val text: String, val font: String, val colors: List<String>, val outline: String, val shadow: String, val tilt: Float)
+class SfxPreset(
+    val text: String, val font: String, val colors: List<String>, val outline: String, val shadow: String, val tilt: Float,
+    /** v53 dış (çıkartma) kenarının rengi. */
+    val outer: String = "#FFFFFF",
+)
 
 object ComicSfx {
+    /**
+     * v53 çizgi roman efekt yazıları: kalın gösterişli yazı tipi, açıktan doygun renge gradyan dolgu, kalın koyu harf
+     * kenarı, beyaz dış (çıkartma) kenarı ve sert gölge. Son ikisi manga tarzı (kalp atışı, ürkütücü uğultu).
+     */
     val presets: List<SfxPreset> = listOf(
-        SfxPreset("BAM!", "BANGERS", listOf("#FFEB3B", "#FF5722"), "#1A1A1A", "#000000", -8f),
-        SfxPreset("POW!", "LUCKIEST_GUY", listOf("#FFFFFF", "#29B6F6"), "#0D47A1", "#000000", 6f),
-        SfxPreset("BOOM!", "BUNGEE", listOf("#FFD54F", "#E53935"), "#3E2723", "#000000", -5f),
-        SfxPreset("ZAP!", "BANGERS", listOf("#B2FF59", "#00C853"), "#1B5E20", "#000000", 10f),
-        SfxPreset("ŞAK!", "LUCKIEST_GUY", listOf("#FFF176", "#FB8C00"), "#4E342E", "#000000", -10f),
-        SfxPreset("VUUUŞ", "BANGERS", listOf("#E1F5FE", "#4FC3F7"), "#01579B", "#00000000", 0f),
-        SfxPreset("KRAK!", "BUNGEE_SHADE", listOf("#FFFFFF", "#BDBDBD"), "#212121", "#000000", 4f),
-        SfxPreset("HAHAHA", "RUBIK_BUBBLES", listOf("#F8BBD0", "#EC407A"), "#880E4F", "#000000", -4f),
-        SfxPreset("AAAA!", "BANGERS", listOf("#FFFFFF", "#FF1744"), "#B71C1C", "#000000", 8f),
-        SfxPreset("ZZZ…", "GRANDSTANDER", listOf("#E8EAF6", "#7986CB"), "#1A237E", "#00000000", -6f),
-        SfxPreset("GÜM!", "BUNGEE", listOf("#FFCC80", "#EF6C00"), "#3E2723", "#000000", 7f),
-        SfxPreset("TIK TAK", "BOOGALOO", listOf("#FFFFFF", "#90A4AE"), "#263238", "#00000000", 0f),
-        // v36 Ses efektleri sekmesindeki eksikler
-        SfxPreset("CRASH!", "BUNGEE", listOf("#FFF59D", "#FF7043"), "#3E2723", "#000000", -7f),
-        SfxPreset("WHOOSH!", "BANGERS", listOf("#E0F7FA", "#26C6DA"), "#006064", "#00000000", 5f),
+        SfxPreset("BAM!", "BANGERS", listOf("#FFF176", "#FF6D00"), "#111111", "#000000", -8f),
+        SfxPreset("POW!", "LUCKIEST_GUY", listOf("#FFFFFF", "#40C4FF"), "#0A1F44", "#0A1F44", 6f),
+        SfxPreset("BOOM!", "BANGERS", listOf("#FFE082", "#FF3D00"), "#111111", "#000000", -5f),
+        SfxPreset("ZAP!", "BANGERS", listOf("#F4FF81", "#64DD17"), "#102A0C", "#000000", 10f),
+        SfxPreset("ŞAK!", "LUCKIEST_GUY", listOf("#FFF59D", "#FF9100"), "#111111", "#000000", -10f),
+        SfxPreset("VUUUŞ", "BANGERS", listOf("#FFFFFF", "#80D8FF"), "#0B2545", "#0B2545", -4f),
+        SfxPreset("KRAK!", "BANGERS", listOf("#FFFFFF", "#B0BEC5"), "#111111", "#000000", 4f),
+        SfxPreset("HAHAHA", "LUCKIEST_GUY", listOf("#FFF9C4", "#FFC400"), "#111111", "#000000", -6f),
+        SfxPreset("AAAA!", "BANGERS", listOf("#FFFFFF", "#FF1744"), "#111111", "#000000", 8f),
+        SfxPreset("ZZZ…", "LUCKIEST_GUY", listOf("#FFFFFF", "#9FA8DA"), "#1A237E", "#00000000", -6f),
+        SfxPreset("GÜM!", "BUNGEE", listOf("#FFD180", "#E65100"), "#111111", "#000000", 7f),
+        SfxPreset("TIK TAK", "LUCKIEST_GUY", listOf("#FFFFFF", "#CFD8DC"), "#111111", "#00000000", 0f),
+        SfxPreset("CRASH!", "BANGERS", listOf("#FFFF8D", "#FF6E40"), "#111111", "#000000", -7f),
+        SfxPreset("WHOOSH!", "BANGERS", listOf("#FFFFFF", "#84FFFF"), "#0B2545", "#0B2545", -5f),
+        SfxPreset("DOKİ DOKİ", "LUCKIEST_GUY", listOf("#FFFFFF", "#FF80AB"), "#5C0A2B", "#5C0A2B", -6f),
+        SfxPreset("GOGOGO", "BANGERS", listOf("#616161", "#000000"), "#000000", "#00000000", 0f),
     )
 
     /** v36 Efektler penceresinin Ses bölümünde ilk sırada gösterilen yazılar (geri kalanlar ardından). */

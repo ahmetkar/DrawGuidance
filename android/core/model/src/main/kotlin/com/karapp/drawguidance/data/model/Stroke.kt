@@ -374,8 +374,14 @@ data class TextEffects(
     @EncodeDefault(EncodeDefault.Mode.NEVER) val gradient: GradientSpec? = null,
     @EncodeDefault(EncodeDefault.Mode.NEVER) val caps: Boolean = false,
     @EncodeDefault(EncodeDefault.Mode.NEVER) val letterSpacing: Float = 0f,
+    /**
+     * v53 ikinci (dış) kenarlık: harf kenarlığının da dışında, çizgi roman efekt yazılarındaki beyaz "çıkartma"
+     * kenarı. Kalınlık yazı boyunun oranı.
+     */
+    @EncodeDefault(EncodeDefault.Mode.NEVER) val outerHex: String? = null,
+    @EncodeDefault(EncodeDefault.Mode.NEVER) val outerWidth: Float = 0f,
 ) {
-    val isEmpty: Boolean get() = shadowHex == null && gradient?.valid != true && !caps && letterSpacing == 0f
+    val isEmpty: Boolean get() = shadowHex == null && gradient?.valid != true && !caps && letterSpacing == 0f && outerHex == null
 }
 
 /**

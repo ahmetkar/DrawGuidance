@@ -86,6 +86,12 @@ class V36EffectsTest : V33EditorBase() {
         waitFor { exists("effects_sheet") }
     }
 
+    /** v53 odak çizgileri Ekle menüsünde kendi düğmesi ve penceresinde. */
+    private fun openLines() {
+        addMenu("Odak çizgileri")
+        waitFor { exists("effects_sheet") }
+    }
+
     @Test
     fun oneButtonOneWindowPictureEffectsAndLines() {
         openComic("Efektler")
@@ -96,9 +102,9 @@ class V36EffectsTest : V33EditorBase() {
         assertTrue(compose.onAllNodes(hasContentDescription("Efekt yazısı")).fetchSemanticsNodes().isEmpty())
         assertTrue(compose.onAllNodes(hasContentDescription("Hız ve odak çizgileri")).fetchSemanticsNodes().isEmpty())
         openEffects()
-        // v48 yalnız iki sekme: Efektler (resimli efektler) ve Odak çizgileri; çizilen efektler ve ses yazıları yok
+        // v53 pencere tek işe ayrıldı: yalnız resimli efektler (sekme yok); odak çizgileri kendi penceresinde
         waitFor { exists("fximg") }
-        assertTrue(exists("effects_tab_images") && exists("effects_tab_lines"))
+        assertFalse(exists("effects_tab_images") || exists("effects_tab_lines"))
         assertFalse(exists("effects_tab_effects"))
         assertFalse(exists("effect_explosion") || exists("effects_group_fx_magic") || exists("effects_group_fx_sound") || exists("sfx_sheet"))
         shot("v36-effects-sheet")
@@ -107,8 +113,7 @@ class V36EffectsTest : V33EditorBase() {
     @Test
     fun focusLinesWithFocalPointColorAndSelectedGroup() {
         openComic("Odak")
-        openEffects()
-        click("effects_tab_lines")
+        openLines()
         waitFor { exists("lines_sheet") }
         click("lines_style_comic")
         waitFor { exists("lines_ZOOM") }

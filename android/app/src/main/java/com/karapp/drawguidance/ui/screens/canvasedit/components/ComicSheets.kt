@@ -337,7 +337,7 @@ fun BalloonSheet(
                 val shownFont = font ?: defaultFont
                 val shownSize = textSize ?: sizePx
                 val autoInk = if (shownType == BalloonStyle.PHONE.name) "#FFFFFF" else "#111111"
-                BalloonLivePreview(shownSpec, shownType == SFX_TYPE, content, shownFont, textColor ?: autoInk, align)
+                BalloonLivePreview(shownSpec, shownType == SFX_TYPE, content, shownFont, textColor ?: autoInk, align, font, textColor, shownType == BalloonStyle.PHONE.name)
                 com.karapp.drawguidance.ui.components.NeuTextField(
                     value = content,
                     onValueChange = { v -> content = v; if (editing && v.isNotBlank()) onText?.invoke(v, null, null, null, null) },
@@ -519,17 +519,39 @@ private fun TypePreview(type: String, speakers: Int, font: TextFont) {
  * kuyruk ayarları balonda görünür. SFX yazısı büyük harfle (Türkçe kurallarıyla: i → İ).
  */
 @Composable
-private fun BalloonLivePreview(spec: BalloonSpec?, sfx: Boolean, content: String, font: TextFont, colorHex: String, align: TextAlignKind) {
-    val tr = java.util.Locale.forLanguageTag("tr-TR")
+private fun BalloonLivePreview(
+    spec: BalloonSpec?, sfx: Boolean, content: String, font: TextFont, colorHex: String, align: TextAlignKind,
+    sfxFont: TextFont? = null, sfxColor: String? = null, phone: Boolean = false,
+) {
+    // v53 balon yazısı büyük harfle (telefon mesajı hariç; Türkçe kurallarıyla: i → İ)
     val text = when {
-        sfx -> content.trim().ifEmpty { "BAM!" }.uppercase(tr)
-        else -> content.ifBlank { "Merhaba! Çağrı, ışık, İğne, öğüş" }
+        sfx -> content.trim().ifEmpty { "BAM!" }
+        phone -> content.ifBlank { "Merhaba! Çağrı, ışık, İğne, öğüş" }
+        else -> com.karapp.drawguidance.ui.drawing.TextRenderer.upper(content.ifBlank { "Merhaba! Çağrı, ışık, İğne, öğüş" })
     }
     androidx.compose.foundation.layout.Box(
         Modifier.fillMaxWidth().height(130.dp).clip(RoundedCornerShape(16.dp)).background(Color(0xFFF1F3F5)).testTag("balloon_preview"),
         contentAlignment = Alignment.Center,
     ) {
-        if (spec != null && !sfx) {
+        if (sfx) {
+            // v53 efekt yazısı tuvaldeki gibi çizilir: gradyan dolgu, koyu kenar, beyaz dış kenar ve sert gölge
+            val preset = remember(text, sfxFont, sfxColor) { com.karapp.drawguidance.ui.screens.canvasedit.state.ComicController.sfxPresetFor(text, sfxFont, sfxColor) }
+            Canvas(Modifier.fillMaxWidth().height(130.dp).testTag("balloon_preview_text")) {
+                val spec0 = com.karapp.drawguidance.ui.screens.canvasedit.state.ComicController.sfxSpec(preset, 100f, preset.text)
+                val (w0, h0) = com.karapp.drawguidance.ui.drawing.TextRenderer.measure(spec0, 100f)
+                val k = minOf(size.width * 0.86f / w0, size.height * 0.8f / h0)
+                val sz = 100f * k
+                val spec = com.karapp.drawguidance.ui.screens.canvasedit.state.ComicController.sfxSpec(preset, sz, preset.text)
+                val (w, h) = com.karapp.drawguidance.ui.drawing.TextRenderer.measure(spec, sz)
+                val pts = com.karapp.drawguidance.ui.drawing.TextRenderer.quadAt(spec, sz, (size.width - w) / 2f, (size.height - h) / 2f)
+                val stroke = com.karapp.drawguidance.data.model.Stroke(
+                    "sfx_preview", pts, preset.colors.last(), com.karapp.drawguidance.data.model.BrushType.TEXT, sz, 1f, 0, text = spec,
+                )
+                drawIntoCanvas { c -> com.karapp.drawguidance.ui.drawing.TextRenderer.draw(c.nativeCanvas, stroke, hexToColor(preset.colors.last()).toArgb()) }
+            }
+            return@Box
+        }
+        if (spec != null) {
             Canvas(Modifier.fillMaxWidth().height(130.dp)) {
                 val w = size.width * 0.56f; val h = size.height * 0.36f
                 drawIntoCanvas { c ->
@@ -543,10 +565,10 @@ private fun BalloonLivePreview(spec: BalloonSpec?, sfx: Boolean, content: String
         }
         Text(
             text, translate = false, fontFamily = composeFamily(font), color = hexToColor(colorHex),
-            fontSize = if (sfx) 34.sp else 15.sp, maxLines = 2, lineHeight = if (sfx) 36.sp else 18.sp,
+            fontSize = 15.sp, maxLines = 2, lineHeight = 18.sp,
             textAlign = when (align) { TextAlignKind.LEFT -> TextAlign.Left; TextAlignKind.RIGHT -> TextAlign.Right; TextAlignKind.CENTER -> TextAlign.Center },
             overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis,
-            modifier = Modifier.fillMaxWidth(if (sfx) 0.9f else 0.46f).testTag("balloon_preview_text"),
+            modifier = Modifier.fillMaxWidth(0.46f).testTag("balloon_preview_text"),
         )
     }
 }

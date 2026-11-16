@@ -155,17 +155,17 @@ abstract class TemplateExportBase : V32EditorBase() {
         compose.waitForIdle()
     }
 
-    protected fun balloon(at: Offset, text: String, style: BalloonStyle = BalloonStyle.SPEECH, tail: TailDirection = TailDirection.BOTTOM_LEFT, size: Float? = null, speakers: Int = 1) {
+    protected fun balloon(at: Offset, text: String, style: BalloonStyle = BalloonStyle.SPEECH, tail: TailDirection = TailDirection.BOTTOM_LEFT, size: Float? = null, speakers: Int = 1, width: Float? = null) {
         val before = strokes().size
         compose.runOnIdle {
             vm().addHere("balloon", at)
-            vm().insertBalloon(style, speakers, BalloonTextOptions(content = text, tail = tail, sizePx = size))
+            vm().insertBalloon(style, speakers, BalloonTextOptions(content = text, tail = tail, sizePx = size, width = width))
         }
         waitFor { strokes().size > before }
         compose.runOnIdle { vm().finishAction(); vm().clearSelection() }
     }
 
-    protected fun narration(at: Offset, text: String, size: Float? = null) = balloon(at, text, BalloonStyle.NARRATION, size = size, speakers = 0)
+    protected fun narration(at: Offset, text: String, size: Float? = null, width: Float? = null) = balloon(at, text, BalloonStyle.NARRATION, size = size, speakers = 0, width = width)
 
     protected fun sfx(text: String, at: Offset, size: Float) {
         val preset = ComicSfx.presets.first { it.text == text }

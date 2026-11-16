@@ -305,6 +305,23 @@ enum PickerThumbs {
         return img
     }
 
+    /// v53 efekt yazısı hazırının önizlemesi (tuvaldeki biçimiyle, eğimsiz).
+    static func sfx(_ p: SfxPreset) -> UIImage? {
+        let key = "s-\(p.text)-\(p.font)" as NSString
+        if let hit = cache.object(forKey: key) { return hit }
+        let size: Float = 44
+        let spec = ComicController.sfxSpec(p, size: size)
+        let (w, h) = TextRenderer.measure(spec, size)
+        let quad = TextRenderer.quadAt(spec, size, 0, 0)
+        let stroke = Stroke(id: "thumb-s-\(p.text)", points: quad, colorHex: p.colors.last ?? "#111111", brushType: .TEXT, sizePx: size, opacity: 1, order: 0,
+                            text: spec)
+        let img = UIGraphicsImageRenderer(size: CGSize(width: CGFloat(w), height: CGFloat(h))).image { r in
+            TextRenderer.draw(r.cgContext, stroke, color: ArgbColor.hex(p.colors.last ?? "#111111"))
+        }
+        cache.setObject(img, forKey: key)
+        return img
+    }
+
     static func formula(_ t: FormulaTemplate) -> UIImage? {
         let key = "f-\(t.id)" as NSString
         if let hit = cache.object(forKey: key) { return hit }

@@ -61,7 +61,9 @@ final class V53FeaturesTests: XCTestCase {
 
     func testBalloonTextFollowsBalloon() {
         XCTAssertEqual(ComicController.balloonFont(.SHOUT), .BANGERS)
-        XCTAssertEqual(ComicController.balloonFont(.SPEECH), .COMIC_RELIEF)
+        XCTAssertEqual(ComicController.balloonFont(.SPEECH), .COMIC_RELIEF_BOLD)
+        XCTAssertEqual(ComicController.balloonEffects(.SPEECH, nil)?.caps, true)
+        XCTAssertNil(ComicController.balloonEffects(.PHONE, nil))
         let speech = ComicController.balloonTextSize(.SPEECH, 1200, 1800)
         XCTAssertGreaterThan(ComicController.balloonTextSize(.SHOUT, 1200, 1800), speech)
         XCTAssertLessThan(ComicController.balloonTextSize(.WHISPER, 1200, 1800), speech)

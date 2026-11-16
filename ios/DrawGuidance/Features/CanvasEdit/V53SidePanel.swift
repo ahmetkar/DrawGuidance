@@ -27,7 +27,7 @@ struct EditorSidePanelHost: View {
                 .accessibilityIdentifier("side_panel")
             }
         }
-        .animation(.snappy(duration: 0.25), value: vm.panel)
+        .animation(.easeOut(duration: 0.25), value: vm.panel)
     }
 }
 

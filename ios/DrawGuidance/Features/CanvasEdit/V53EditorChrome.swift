@@ -248,7 +248,7 @@ struct AdvancedMenus: View {
             Rectangle().fill(Color.primary.opacity(0.12)).frame(width: 1, height: 34)
             ForEach(Self.panelTabs, id: \.0) { tab in
                 ChromeButton(icon: tab.1, label: L(tab.2), selected: vm.panel == tab.0, labelStyle: .below,
-                             id: "panel_btn_\(tab.0)", anchor: tab.3) { withAnimation(.snappy(duration: 0.25)) { vm.togglePanel(tab.0) } }
+                             id: "panel_btn_\(tab.0)", anchor: tab.3) { withAnimation(.easeOut(duration: 0.25)) { vm.togglePanel(tab.0) } }
                     .frame(maxWidth: .infinity)
             }
         }

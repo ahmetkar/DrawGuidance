@@ -99,9 +99,9 @@ struct SimpleToolbar: View {
             Tool(id: "expand", icon: "aspectratio", label: L("mode_expand"), selected: vm.mode == .EXPAND,
                  enabled: !has || vm.mode == .EXPAND) { vm.chooseMode(.EXPAND) },
             // v53 Elemanlar, Katmanlar ve Özellikler sağdan açılan panelde
-            Tool(id: "elements", icon: "square.grid.2x2", label: L("tab_elements"), selected: vm.panel == .ELEMENTS) { withAnimation(.snappy(duration: 0.25)) { vm.togglePanel(.ELEMENTS) } },
-            Tool(id: "layers", icon: "square.3.layers.3d", label: L("tab_layers"), selected: vm.panel == .LAYERS) { withAnimation(.snappy(duration: 0.25)) { vm.togglePanel(.LAYERS) } },
-            Tool(id: "brush_settings", icon: "slider.horizontal.3", label: L("tab_brush"), selected: vm.panel == .BRUSH) { withAnimation(.snappy(duration: 0.25)) { vm.togglePanel(.BRUSH) } },
+            Tool(id: "elements", icon: "square.grid.2x2", label: L("tab_elements"), selected: vm.panel == .ELEMENTS) { withAnimation(.easeOut(duration: 0.25)) { vm.togglePanel(.ELEMENTS) } },
+            Tool(id: "layers", icon: "square.3.layers.3d", label: L("tab_layers"), selected: vm.panel == .LAYERS) { withAnimation(.easeOut(duration: 0.25)) { vm.togglePanel(.LAYERS) } },
+            Tool(id: "brush_settings", icon: "slider.horizontal.3", label: L("tab_brush"), selected: vm.panel == .BRUSH) { withAnimation(.easeOut(duration: 0.25)) { vm.togglePanel(.BRUSH) } },
         ]
         if notes && (store.canvas?.guide.kind ?? .NONE) != .NONE {
             // v51 not almada kılavuz aracı yok: eski notlarda kalan kılavuz çizgileri buradan kaldırılır

@@ -20,8 +20,9 @@ class ModeNetsV38Test {
         assertEquals(SuggestRules.SHAPE_MIN, ShapeComplexity.NET_MIN_ELEMENTS)
         assertTrue(!ShapeComplexity.usesNet(3) && ShapeComplexity.usesNet(4))
         for (mode in ShapeMode.entries) {
-            assertEquals(ShapeNet.V38, ShapeNet.modeNetVersion(mode))
-            assertEquals("$mode ağı gizli katmanı 320", 320, ShapeNet.bundledFor(mode)!!.hidden)
+            // v54 160+ yeni şablonla yeniden eğitildi; gizli katman 384
+            assertEquals(ShapeNet.V54, ShapeNet.modeNetVersion(mode))
+            assertEquals("$mode ağı gizli katmanı 384", 384, ShapeNet.bundledFor(mode)!!.hidden)
         }
     }
 

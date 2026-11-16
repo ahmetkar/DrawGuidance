@@ -64,7 +64,7 @@ management:
       enabled: false
 
 drawguidance:
-  version: 50.0.0
+  version: 54.0.0
   mongo:
     max-pool-size: ${MONGO_MAX_POOL:200}
     min-pool-size: ${MONGO_MIN_POOL:10}

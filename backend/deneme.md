@@ -4,7 +4,7 @@ Bu rehberde; komutları kısaltan pratik Windows ve Linux betiklerini, her komut
 
 ---
 
-# 📖 DrawGuidance API CLI Yönetim Rehberi (v43/v44)
+# 📖 DrawGuidance API CLI Yönetim Rehberi (v43/v44, v54 şifreli)
 
 ---
 
@@ -57,6 +57,32 @@ docker exec -it "$CONTAINER_ID" sh -c "exec java \
 *Dosyayı kaydettikten sonra VM terminalinde şu komutla çalıştırma yetkisi verin:* `chmod +x dg-cli.sh`
 
 > **Pratik Kullanım:** Aşağıda anlatılan tüm test komutlarını Windows'ta `./dg-cli.bat <komut>`, Linux'ta ise `./dg-cli.sh <komut>` şeklinde doğrudan koşturabilirsiniz!
+
+---
+
+## 🔐 1.1 Yönetim Şifresi (v54)
+
+v54'ten itibaren **her CLI komutu yönetim şifresi doğrulanınca çalışır** (paket, bildirim, duyuru, sürüm, gönderim, kullanıcı, cihaz…). Şifrenin kendisi sunucuda tutulmaz; yalnız PBKDF2 özeti Docker sırrı olarak verilir (`CLI_PASSWORD_HASH_FILE=/run/secrets/cli_password_hash`).
+
+- `dg-cli.sh` / `dg-cli.bat` `docker exec -it` ile çalıştığı için şifre terminalde **gizli** sorulur (ekranda görünmez, komut satırına yazılmaz).
+- Terminal yoksa (betik/otomasyon) şifre standart girdinin ilk satırından okunur: `printf '%s\n' "$SIFRE" | docker exec -i <kapsayıcı> java -jar /app/app.jar cli <komut>`
+- 3 yanlış denemede komut çıkar (her yanlıştan sonra 2 sn bekler). Şifre en az 10 karakter.
+
+**İlk kurulum (yeni imaj dağıtılmadan önce, bir kez):**
+
+```bash
+# 1) Yeni imajla şifre özeti üret (şifre iki kez gizli sorulur; çıktı "pbkdf2-sha256:..." satırı)
+docker run --rm -it --entrypoint java ghcr.io/ahmetkar/drawguidance-server:<API_TAG> -jar /app/app.jar cli sifre-ozeti
+
+# 2) Özeti Docker sırrı yap (tek tırnak içinde; sonda satır sonu olmasın)
+printf '%s' 'pbkdf2-sha256:...' | docker secret create cli_password_hash -
+
+# 3) Yığını yeni imajla güncelle (stack.yml artık cli_password_hash sırrını bekler)
+```
+
+**Şifreyi değiştirmek:** yeni özet üretin, `docker secret create cli_password_hash_v2 -` ile yeni sır oluşturup `stack.yml`'de `source:` adını değiştirin ve yığını güncelleyin (Swarm sırları değiştirilemez).
+
+**Yerel sunucu (Windows):** `Yonetim.bat sifre-ozeti` ile özet üretin, `.env` dosyasına `CLI_PASSWORD_HASH=pbkdf2-sha256:...` satırını ekleyip sunucuyu yeniden başlatın. Sonraki her `Yonetim.bat <komut>` şifreyi gizli sorar.
 
 ---
 

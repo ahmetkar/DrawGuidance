@@ -78,7 +78,9 @@ class V37NotesTextTest : V33EditorBase() {
         open("Basit not menü", CanvasKind.NOTES)
         waitFor { exists("simple_tool_text") }
         // v54 yazı kutusu Ekle menüsünün başında; ardından yazı, diyagram, formül (fırça ve silgi Çiz menüsünde)
-        val order = listOf("textbox", "text", "diagram", "formula").map { left("simple_tool_$it") }
+        // Kırpılmamış konum (satır kaydırılmış olabilir)
+        fun pos(tag: String) = compose.onNodeWithTag(tag, useUnmergedTree = true).fetchSemanticsNode().positionInRoot.let { it.y * 10000f + it.x }
+        val order = listOf("textbox", "text", "diagram", "formula").map { pos("simple_tool_$it") }
         assertEquals("yazı kutusu, yazı, diyagram, formül", order.sorted(), order)
         assertTrue(left("simple_tool_brush") < left("simple_tool_eraser"))
     }

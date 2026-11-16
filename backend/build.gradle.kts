@@ -6,7 +6,7 @@ plugins {
 }
 
 group = "com.karapp.drawguidance"
-version = "50.0.0"
+version = "54.0.0"
 
 java {
     toolchain { languageVersion = JavaLanguageVersion.of(21) }

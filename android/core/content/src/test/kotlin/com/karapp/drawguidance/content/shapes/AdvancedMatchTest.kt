@@ -169,7 +169,9 @@ class AdvancedMatchTest {
         assertNotNull("shape_net.bin uygulamayla gelmeli", net)
         val rnd = java.util.Random(4)
         var hit = 0; var n = 0; var time = 0L
-        for (t in ShapeTemplates.all.shuffled(rnd).take(200)) {
+        // Genel ağ eski şablonlarla eğitildi (v54 yeni şablonlar modların ağlarında): yalnız ağın bildiği şablonlar
+        val known = net!!.keys.toSet()
+        for (t in ShapeTemplates.all.filter { it.key in known }.shuffled(rnd).take(200)) {
             val x = ShapeNet.inputOf(ShapeAugment.handDrawn(t.strokes, rnd)) ?: continue
             val t0 = System.nanoTime()
             val p = net!!.probs(x)

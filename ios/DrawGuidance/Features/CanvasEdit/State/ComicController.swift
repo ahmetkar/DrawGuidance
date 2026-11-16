@@ -110,7 +110,7 @@ final class ComicController {
     }
 
     /// v53 balonun türüne uygun yazı tipi (çizgi roman yazı tipleri).
-    static func balloonFont(_ style: BalloonStyle) -> TextFont {
+    nonisolated static func balloonFont(_ style: BalloonStyle) -> TextFont {
         switch style {
         case .SHOUT, .ELECTRIC, .FLASH, .ROUGH, .ICICLE, .DRIP: return .BANGERS
         case .THOUGHT, .WAVY, .HEART: return .SHANTELL
@@ -142,7 +142,7 @@ final class ComicController {
     }
 
     /// v53 balon yazısının varsayılan boyu: sayfanın kısa kenarına göre, bağırmada büyük, fısıltıda küçük.
-    static func balloonTextSize(_ style: BalloonStyle, _ w: Float, _ h: Float) -> Float {
+    nonisolated static func balloonTextSize(_ style: BalloonStyle, _ w: Float, _ h: Float) -> Float {
         let base = (min(w, h) * 0.034).coerceIn(18, 64)
         let k: Float
         switch style {

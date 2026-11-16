@@ -25,7 +25,7 @@ final class V53FeaturesTests: XCTestCase {
         let plain = try JSONEncoder().encode(ShapeStyle())
         XCTAssertFalse(String(decoding: plain, as: UTF8.self).contains("tone"))
         // Android'in yazdığı (varsayılanları atlanmış) ton
-        let android = Data(#"{"strokeColorHex":"#111111","tone":{"id":"tone_dot"}}"#.utf8)
+        let android = Data(##"{"strokeColorHex":"#111111","tone":{"id":"tone_dot"}}"##.utf8)
         let t = try JSONDecoder().decode(ShapeStyle.self, from: android).tone
         XCTAssertEqual(t?.id, "tone_dot")
         XCTAssertEqual(t?.density, 0.3)
@@ -67,5 +67,17 @@ final class V53FeaturesTests: XCTestCase {
         let speech = ComicController.balloonTextSize(.SPEECH, 1200, 1800)
         XCTAssertGreaterThan(ComicController.balloonTextSize(.SHOUT, 1200, 1800), speech)
         XCTAssertLessThan(ComicController.balloonTextSize(.WHISPER, 1200, 1800), speech)
+    }
+
+    func testComicSfxHaveStickerOutline() {
+        let p = ComicSfx.presets.first { $0.text == "HAHAHA" }!
+        let spec = ComicController.sfxSpec(p, size: 100)
+        XCTAssertEqual(spec.box?.effects?.outerHex, "#FFFFFF")
+        XCTAssertEqual(spec.box?.effects?.caps, true)
+        XCTAssertGreaterThanOrEqual(spec.outlineWidth, 8)
+        XCTAssertEqual(TextRenderer.upper("çiçek"), "ÇİÇEK")
+        let plainBox = TextBox(effects: TextEffects())
+        var plain = spec; plain.box = plainBox
+        XCTAssertGreaterThan(TextRenderer.pads(spec, 100)[0], TextRenderer.pads(plain, 100)[0])
     }
 }

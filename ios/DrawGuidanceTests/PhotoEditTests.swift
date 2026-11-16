@@ -39,7 +39,13 @@ final class PhotoEditTests: XCTestCase {
 
     func testLightAndBrush() {
         let lit = PhotoOps.render(src, w, h, PhotoEdit(light: PhotoLight(exposure: 0.5)))
-        XCTAssertGreaterThan(zip(lit.px, src).filter { ($0.0 >> 16 & 0xFF) > ($0.1 >> 16 & 0xFF) }.count, src.count / 2)
+        var brighter = 0
+        for i in 0..<src.count {
+            let a: UInt32 = (lit.px[i] >> 16) & 0xFF
+            let b: UInt32 = (src[i] >> 16) & 0xFF
+            if a > b { brighter += 1 }
+        }
+        XCTAssertGreaterThan(brighter, src.count / 2)
         let s = PhotoStroke(brush: .PAINT, points: [0.5, 0.5, 0.6, 0.5], size: 0.3, strength: 1, color: 0xFFFF0000)
         let painted = PhotoOps.render(src, w, h, PhotoEdit(strokes: [s]))
         XCTAssertNotEqual(src[10 * w + 20], painted.px[10 * w + 20])

@@ -24,6 +24,10 @@ on:
         description: "v53 hızlı denetim: yalnız simülatör derlemesi ve her tuval türünde düzenleyici ekran görüntüleri"
         type: boolean
         default: false
+      tests_only:
+        description: "v53 yalnız birim ve arayüz testleri (Release derleme, .ipa ve açılış tanısı atlanır)"
+        type: boolean
+        default: false
       diag_args:
         description: "Hızlı denetimde uygulamaya verilecek ek açılış argümanları (ör. -dgPanel ELEMENTS)"
         type: string
@@ -81,7 +85,7 @@ jobs:
           xcrun simctl list devices | grep "$ID"
 
       - name: Cihaz için Release derleme (imzasız)
-        if: ${{ !inputs.ui_only && !inputs.quick }}
+        if: ${{ !inputs.ui_only && !inputs.quick && !inputs.tests_only }}
         run: |
           mkdir -p build
           xcodebuild build -project DrawGuidance.xcodeproj -scheme DrawGuidance \
@@ -93,7 +97,7 @@ jobs:
           tail -5 build/release.log
 
       - name: .ipa paketle
-        if: ${{ !inputs.ui_only && !inputs.quick }}
+        if: ${{ !inputs.ui_only && !inputs.quick && !inputs.tests_only }}
         run: |
           APP=build/dd/Build/Products/Release-iphoneos/DrawGuidance.app
           test -d "$APP"
@@ -104,7 +108,7 @@ jobs:
           echo "Sembol kontrolü (ilk 20):"; nm -U "$APP/DrawGuidance" | head -20 || true
 
       - name: .ipa yükle (testlerden önce)
-        if: ${{ !inputs.ui_only && !inputs.quick }}
+        if: ${{ !inputs.ui_only && !inputs.quick && !inputs.tests_only }}
         uses: actions/upload-artifact@v4
         with:
           name: ios-ipa
@@ -134,7 +138,7 @@ jobs:
           grep -iE "fault|crash|fatal" build/diag/quick-app.log | head -20 || true
 
       - name: Açılış tanısı (simülatör, ekran görüntüsü ve ana iş parçacığı örneği)
-        if: success() && !inputs.ui_only && !inputs.quick
+        if: success() && !inputs.ui_only && !inputs.quick && !inputs.tests_only
         continue-on-error: true
         run: |
           mkdir -p build/diag

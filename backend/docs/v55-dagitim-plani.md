@@ -15,6 +15,8 @@ Uygulama sürümleri:
 - Eski sunucuyla da açılırlar. Yalnız iOS aboneliğinin sunucuda doğrulanması, cihaz devralma koruması ve yönetim
   şifresi çalışmaz.
 
+Sunucuda `docker` `sudo` ile çalışıyorsa bütün `docker` komutlarının başına `sudo` ekleyin.
+
 **Sıra önemli:** önce iki sır (adım 1), sonra imaj (adım 2), sonra dağıtım (adım 3). Sırlar yoksa `stack deploy`
 `secret not found` hatasıyla durur.
 
@@ -114,15 +116,20 @@ docker secret ls                                   # apple_iap_key ve cli_passwo
 
 ## 2. İmaj
 
-`backend/` klasöründe (Docker açık olmalı):
+`backend/` klasöründe (Dockerfile'ın bulunduğu yer). Klasör `sudo` ile kopyalandıysa önce sahipliği alın:
+`sudo chown -R "$USER":"$USER" <klasör>`.
 
 ```bash
-./gradlew test                                     # Testcontainers: Docker gerekir
 export REGISTRY=ghcr.io/ahmetkar API_TAG=54.0.0
-echo "$GHCR_PAT" | docker login ghcr.io -u ahmetkar --password-stdin
-docker build -t "$REGISTRY/drawguidance-server:$API_TAG" .
-docker push "$REGISTRY/drawguidance-server:$API_TAG"
+sudo docker build -t "$REGISTRY/drawguidance-server:$API_TAG" .
+# Birden çok düğüm varsa ya da imaj ghcr'den çekiliyorsa:
+echo "$GHCR_PAT" | sudo docker login ghcr.io -u ahmetkar --password-stdin
+sudo docker push "$REGISTRY/drawguidance-server:$API_TAG"
 ```
+
+- Dockerfile kaynağı kendi içinde derler (`bootJar -x test`). Sunucuda Java ya da Gradle gerekmez.
+- `./gradlew test` isteğe bağlıdır. Testcontainers ile MongoDB başlattığı için Docker'a doğrudan erişim ister; kullanıcı
+  docker grubunda değilse düşer. Testleri Docker Desktop'lı bir geliştirme makinesinde çalıştırın.
 
 Ardından 1b'yi yapın.
 

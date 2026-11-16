@@ -70,14 +70,19 @@ cli_password_hash -> /run/secrets/cli_password_hash
    docker service inspect drawguidance_api --format '{{.Spec.TaskTemplate.ContainerSpec.Image}}'
    curl -fsS https://drawapi.ahmetkar.com/api/health        # "version":"44.2.0"
    ```
-2. **MongoDB yedeği.** Göç yok, ama sürüm atlaması büyük olduğu için yedek alın:
+2. **MongoDB yedeği.** Göç yok, ama sürüm atlaması büyük olduğu için yedek alın. Kimlik doğrulama açık olduğu için
+   yedek kullanıcısı `dgbackup` kullanılır. Parolası `mongo1` kapsayıcısındaki Docker sırrından okunur; komut satırına
+   ya da geçmişe yazılmaz:
    ```bash
-   C=$(docker ps -qf name=drawguidance_mongo | head -1)
-   docker exec "$C" sh -c 'mongodump --archive=/tmp/v44-oncesi.gz --gzip'
-   docker cp "$C":/tmp/v44-oncesi.gz ./v44-oncesi-$(date +%F).gz
+   C=$(sudo docker ps -qf name=drawguidance_mongo1 | head -1)
+   sudo docker exec "$C" bash -c 'umask 077; printf "password: \"%s\"\n" "$(cat /run/secrets/mongo_backup_password)" > /tmp/dump.yml; mongodump --quiet --config=/tmp/dump.yml --uri="mongodb://dgbackup@localhost:27017/?authSource=admin&directConnection=true" --oplog --gzip --archive=/tmp/v44-oncesi.gz; rc=$?; rm -f /tmp/dump.yml; exit $rc'
+   sudo docker cp "$C":/tmp/v44-oncesi.gz ./v44-oncesi-$(date +%F).gz && sudo docker exec "$C" rm -f /tmp/v44-oncesi.gz
+   ls -lh ./v44-oncesi-*.gz
    ```
-   - Kimlik doğrulama açıksa komuta `--uri` ya da `-u/-p` ekleyin.
-   - Şifreyi komut geçmişine yazmamak için `read -s` ile değişkene alın.
+   Ayrıca `mongo-backup` servisi her gece 03:00 (UTC) yedek alır. Son gecenin yedeğini görmek için:
+   ```bash
+   sudo docker exec $(sudo docker ps -qf name=drawguidance_mongo-backup | head -1) ls -lh /backups
+   ```
 3. **Kod:** PC'deki proje klasöründeki `backend/` (54.0.0) ya da GitHub `claude/v55` dalı. Yönetici düğüme güncel
    `backend/docker/swarm/stack.yml` kopyalanacak.
 4. **App Store anahtarı:** `yayin-anahtari\SubscriptionKey_MTT897CZ3J.p8` dosyasını yönetici düğüme geçici olarak
@@ -228,6 +233,6 @@ Eski `stack.yml` ile tam dönüş için o dosyayla `docker stack deploy` yapın.
 
 ## Dikkat
 
-- Hız sınırı sayaçları kopya başına bellekte tutulur. API kopya sayısını 1'in üstüne çıkarırsanız merkezi sayaç (Redis)
-  gerekir.
+- Hız sınırı sayaçları kopya başına bellekte tutulur. Yığında API iki kopya çalıştığından gerçek sınır ayarlananın en
+  çok iki katıdır. Tam sınır gerekirse merkezi sayaç (Redis) eklenmeli.
 - Uygulama içi satın almanın `ASC_*` değişkenlerine dokunulmaz.

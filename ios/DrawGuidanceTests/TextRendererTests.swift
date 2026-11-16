@@ -66,9 +66,10 @@ final class TextRendererTests: XCTestCase {
     }
 
     func testEffectsOutlineGradientAndCaps() {
-        var spec = TextSpec(content: "istanbul")
+        // v53 Türkçe harf içeren yazıda Türkçe büyük harf (i → İ); diğer dillerde i → I
+        var spec = TextSpec(content: "istanbul ışık")
         spec.box = TextBox(effects: TextEffects(gradient: GradientSpec(colors: ["#FF0000", "#0000FF"]), caps: true))
-        XCTAssertEqual(TextRenderer.displayText(spec), "İSTANBUL")
+        XCTAssertEqual(TextRenderer.displayText(spec), "İSTANBUL IŞIK")
         spec.outlineColorHex = "#00FF00"; spec.outlineWidth = 3
         let s = Stroke(id: "t", points: TextRenderer.quadAt(spec, 40, 10, 10), colorHex: "#000000", brushType: .TEXT, sizePx: 40, opacity: 1, order: 0, text: spec)
         let px = pixels(400, 120) { StrokeRenderer.drawStroke($0, s) }

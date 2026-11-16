@@ -90,7 +90,8 @@ final class LaunchUITests: XCTestCase {
         XCTAssertTrue(canvas.waitForExistence(timeout: 10))
         canvas.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.5)).tap()
 
-        let undo = app.buttons["undo"]
+        // v53 basit modda geri al düğmesi alt menüde (başlıkta yalnız ad, Eğitim, Kaydet ve diğer ayarlar)
+        let undo = app.buttons["simple_tool_undo"]
         expectation(for: NSPredicate(format: "isEnabled == true"), evaluatedWith: undo)
         waitForExpectations(timeout: 5)
 
@@ -111,8 +112,9 @@ final class LaunchUITests: XCTestCase {
         menu.tap()
         let marker = app.descendants(matching: .any)["brush_MARKER"].firstMatch
         // v53 fırça penceresi yalnız fırça seçimidir (ayarlar Özellikler'de); kart aşağıdaysa kaydırılır
-        XCTAssertTrue(marker.waitForExistence(timeout: 10))
-        for _ in 0..<6 where !marker.isHittable { app.swipeUp() }
+        XCTAssertTrue(app.descendants(matching: .any)["brush_PENCIL"].firstMatch.waitForExistence(timeout: 10))
+        for _ in 0..<8 where !(marker.exists && marker.isHittable) { app.swipeUp() }
+        XCTAssertTrue(marker.waitForExistence(timeout: 5))
         marker.tap()
 
         let canvas = app.descendants(matching: .any)["drawing_canvas"].firstMatch

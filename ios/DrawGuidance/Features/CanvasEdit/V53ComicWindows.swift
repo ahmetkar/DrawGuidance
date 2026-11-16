@@ -409,7 +409,8 @@ struct ToneWindow: View {
     var body: some View {
         WindowFrame(title: L(group == .TONE ? "v53_tones" : "v53_patterns"), hint: L(group == .TONE ? "v53_tones_hint" : "v53_patterns_hint")) {
             LazyVGrid(columns: [GridItem(.adaptive(minimum: 104), spacing: 10)], spacing: 10) {
-                ForEach(presets) { p in
+                // Kimlik hazırın anahtarı: aynı ton türünü (ör. nokta) kullanan hazırlar ayrı kartlar
+                ForEach(presets, id: \.key) { p in
                     Button { select(p) } label: {
                         ThumbCard(title: L(p.nameKey), subtitle: L(p.usageKey), selected: preset?.key == p.key) {
                             TonePreview(tone: ToneFill(id: p.id, density: p.density, scale: p.scale * 0.6, angle: p.angle))

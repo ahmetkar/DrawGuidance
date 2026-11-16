@@ -135,15 +135,19 @@ Ardından 1b'yi yapın.
 
 ## 3. Dağıtım
 
-Yönetici düğümde, güncel `stack.yml` ile:
+Yönetici düğümde, güncel `stack.yml`'nin bulunduğu klasörde. Config dosyaları göreli yolla okunur. `sudo`, `export`
+edilmiş değişkenleri komuta geçirmez; değişkenleri `sudo env` ile aynı satırda verin:
 
 ```bash
-export REGISTRY=ghcr.io/ahmetkar API_TAG=54.0.0 ACME_EMAIL=ahmetkar.1258@gmail.com
-docker stack deploy -c stack.yml --with-registry-auth --detach=false drawguidance
-docker service ps drawguidance_api
+cd <proje>/backend/docker/swarm
+sudo env REGISTRY=ghcr.io/ahmetkar API_TAG=54.0.0 ACME_EMAIL=ahmetkar.1258@gmail.com \
+  docker stack deploy -c stack.yml --with-registry-auth --detach=false drawguidance
+sudo docker service ps drawguidance_api
 ```
 
-Kopyalar birer birer güncellenir. Sağlık denetimi geçmezse Swarm kendiliğinden eski sürüme döner.
+- Kopyalar birer birer güncellenir. Sağlık denetimi geçmezse Swarm kendiliğinden eski sürüme döner.
+- Daha önce `CONFIG_VERSION` ile dağıttıysanız aynı değeri de verin (ör. `CONFIG_VERSION=2`). Yoksa
+  `only updates to Labels are allowed` hatası çıkar. 44.2.0'dan bu yana config dosyalarının içeriği değişmedi.
 
 ## 4. Doğrulama (yaklaşık 10 dk)
 

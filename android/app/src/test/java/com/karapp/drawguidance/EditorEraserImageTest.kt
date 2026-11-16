@@ -115,14 +115,14 @@ class EditorEraserImageTest : EditorTestBase() {
         compose.onNodeWithText("Tamam").clickInPopup()
         waitFor { compose.onAllNodesWithText("Resim eklenemedi").fetchSemanticsNodes().isEmpty() }
 
-        // 1 MB'yi aşan dosya reddedilir
-        val huge = File(dir, "buyuk.png").apply { writeBytes(ImageImportValidatorTest.png(ImageImportValidatorTest.noise(1024, 1024))) }
+        // v54 10 MB'yi aşan dosya reddedilir
+        val huge = File(dir, "buyuk.png").apply { writeBytes(ImageImportValidatorTest.png(ImageImportValidatorTest.noise(2048, 2048))) }
         pickImage(huge)
         waitForText("Dosya çok büyük", substring = true)
         compose.onNodeWithText("Tamam").clickInPopup()
 
         // Yüksek çözünürlüklü sade resim: uyarı + onayla eklenir, küçültülüp saklanır
-        val wide = File(dir, "logo.jpg").apply { writeBytes(ImageImportValidatorTest.jpeg(ImageImportValidatorTest.simpleDrawing(3200, 1600))) }
+        val wide = File(dir, "logo.jpg").apply { writeBytes(ImageImportValidatorTest.jpeg(ImageImportValidatorTest.simpleDrawing(4000, 2000))) }
         pickImage(wide)
         waitForText("Resim eklenmeden önce")
         waitForText("küçültülecek", substring = true)
@@ -131,7 +131,8 @@ class EditorEraserImageTest : EditorTestBase() {
         val image = canvas().strokes.single { it.brushType == BrushType.IMAGE }
         assertEquals(4, image.points.size)
         val assets = runBlocking { GlobalContext.get().get<CanvasAssetDao>().getByIds(listOf(image.assetId!!)) }
-        assertEquals(1600, assets.single().width)
+        // v54 saklanan uzun kenar 3000 px (test cihazı orta sınıf)
+        assertEquals(3000, assets.single().width)
         assertTrue("saklanan resim orijinalden büyük olmamalı", assets.single().data.size <= wide.length())
         waitForText("Resim eklendi", substring = true)
         clickElements()

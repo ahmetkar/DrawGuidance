@@ -99,7 +99,9 @@ class ShareProtocolTest {
         val repo = CanvasRepository(sender.canvasDao(), CanvasAssetStore(sender.canvasAssetDao()), sender)
         val canvas = repo.createCanvas("Ders notu", 800, 1100, "#FFFDF5", aiEnabled = true, kind = CanvasKind.NOTES, pageCount = 2)
         val assetId = "11111111-2222-3333-4444-555555555555"
-        sender.canvasAssetDao().insert(CanvasAssetEntity(assetId, canvas.localId, "image/png", 4, 4, byteArrayOf(1, 2, 3, 4), 0))
+        // v54 alıcı yalnız gerçek resim kabul eder: 1×1 PNG
+        val pngBytes = byteArrayOf(-119, 80, 78, 71, 13, 10, 26, 10, 0, 0, 0, 13, 73, 72, 68, 82, 0, 0, 0, 1, 0, 0, 0, 1, 8, 6, 0, 0, 0, 31, 21, -60, -119, 0, 0, 0, 13, 73, 68, 65, 84, 120, -100, 99, -8, -49, -64, -16, 31, 0, 5, 0, 1, -1, -119, -103, 61, 29, 0, 0, 0, 0, 73, 69, 78, 68, -82, 66, 96, -126)
+        sender.canvasAssetDao().insert(CanvasAssetEntity(assetId, canvas.localId, "image/png", 1, 1, pngBytes, 0))
         val q = ContentCodec::quantize
         val image = Stroke(
             id = "img", points = listOf(StrokePoint(q(0f), q(0f)), StrokePoint(q(40f), q(0f)), StrokePoint(q(40f), q(40f)), StrokePoint(q(0f), q(40f))),
@@ -130,7 +132,10 @@ class ShareProtocolTest {
         val newAsset = ids.getValue(assetId)
         assertNotEquals(assetId, newAsset)
         assertEquals(newAsset, got.pages[0].first { it.brushType == BrushType.IMAGE }.assetId)
-        assertArrayEquals(byteArrayOf(1, 2, 3, 4), receiver.canvasAssetDao().getByIds(listOf(newAsset)).single().data)
+        assertArrayEquals(pngBytes, receiver.canvasAssetDao().getByIds(listOf(newAsset)).single().data)
+        // Resim olmayan ya da içinde kod olan "resim" kurulmaz
+        val evil = SharePackage(decoded.header, decoded.content, listOf(pngBytes + "<script>x</script>".toByteArray()))
+        assertTrue(runCatching { packages(receiver).install(evil, HashMap()) }.isFailure)
         // "Paylaşılanlar" klasörüne kondu
         val folder = receiver.folderDao().get(got.folderId!!)
         assertEquals("Paylaşılanlar", folder?.name)

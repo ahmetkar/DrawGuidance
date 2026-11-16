@@ -88,12 +88,24 @@ object DeviceIdentity {
         return prefs.getString("device", null) ?: java.util.UUID.randomUUID().toString().also { prefs.edit().putString("device", it).apply() }
     }
 
+    /**
+     * v54 cihazın gizli anahtarı: güvenli rastgele 32 bayt (base64url), uygulamaya özel tercihlerde. Sunucu yalnız
+     * özetini saklar; cihaz kaydı başka hesaba ancak bu anahtarla geçer.
+     */
+    fun secret(context: Context): String {
+        val prefs = context.getSharedPreferences("sync_permit", Context.MODE_PRIVATE)
+        return prefs.getString("device_secret", null) ?: ByteArray(32).also { java.security.SecureRandom().nextBytes(it) }
+            .let { android.util.Base64.encodeToString(it, android.util.Base64.URL_SAFE or android.util.Base64.NO_PADDING or android.util.Base64.NO_WRAP) }
+            .also { prefs.edit().putString("device_secret", it).apply() }
+    }
+
     fun info(context: Context): InboxRepository.DeviceInfo = InboxRepository.DeviceInfo(
         deviceId = id(context),
         versionCode = com.karapp.drawguidance.BuildConfig.VERSION_CODE.toLong(),
         versionName = com.karapp.drawguidance.BuildConfig.VERSION_NAME,
         model = Build.MODEL, manufacturer = Build.MANUFACTURER, sdkInt = Build.VERSION.SDK_INT,
         locale = { java.util.Locale.getDefault().toLanguageTag() },
+        deviceSecret = secret(context),
     )
 }
 

@@ -75,6 +75,8 @@ class InboxRepository(
     data class DeviceInfo(
         val deviceId: String, val versionCode: Long, val versionName: String, val model: String?, val manufacturer: String?,
         val sdkInt: Int?, val locale: () -> String?,
+        /** v54 cihazın gizli anahtarı (güvenli rastgele; yalnız bu cihazda). */
+        val deviceSecret: String? = null,
     )
 
     enum class Outcome { DONE, NOT_MODIFIED, SIGNED_OUT, OFFLINE, HELD, ERROR }
@@ -158,7 +160,7 @@ class InboxRepository(
     private fun registration(): DeviceRegistration = DeviceRegistration(
         deviceId = device.deviceId, appVersionCode = device.versionCode, appVersionName = device.versionName,
         model = device.model, manufacturer = device.manufacturer, sdkInt = device.sdkInt, locale = device.locale(),
-        packages = packs.installed(),
+        packages = packs.installed(), deviceSecret = device.deviceSecret,
     )
 
     private suspend fun ensureRegistered(r: RemoteStore, token: String, force: Boolean) {

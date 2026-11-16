@@ -283,6 +283,28 @@ class DistributionApiTest extends ApiContextTest {
         assertEquals("CANCELLED", mongo.findById(d, Document.class, Dist.DELIVERIES).getString("stage"));
     }
 
+    /** v54 cihaz gizli anahtarı ve gelen kutusunun sahiplik denetimi. */
+    @Test
+    void deviceSecretPreventsTakeoverAndInboxIsOwnerOnly() {
+        String owner = uid();
+        String dev = deviceId();
+        String secret = "s" + UUID.randomUUID().toString().replace("-", "") + "x";
+        assertEquals(200, register(owner, dev, "\"deviceSecret\":\"" + secret + "\"").status());
+        String attacker = uid();
+        // Cihaz kimliğini bilen başkası: gelen kutusu durumunu öğrenemez (kayıtsız gibi 404), kaydı devralamaz
+        assertEquals(404, inbox(attacker, dev, null, null).status());
+        assertEquals(409, register(attacker, dev, null).status());
+        assertEquals(409, register(attacker, dev, "\"deviceSecret\":\"" + "y".repeat(40) + "\"").status());
+        assertEquals(owner, mongo.getCollection(Dist.DEVICES).find(new Document("uid", owner)).first().getString("uid"));
+        assertEquals(200, inbox(owner, dev, null, null).status());
+        // Aynı cihazda başka hesapla giriş (aynı anahtar): geçiş olur
+        assertEquals(200, register(attacker, dev, "\"deviceSecret\":\"" + secret + "\"").status());
+        assertEquals(200, inbox(attacker, dev, null, null).status());
+        assertEquals(404, inbox(owner, dev, null, null).status());
+        // Geçersiz biçimli anahtar 400
+        assertEquals(400, register(owner, deviceId(), "\"deviceSecret\":\"kisa\"").status());
+    }
+
     @Test
     void cancelDispatchAndValidation() {
         String uid = uid();
@@ -314,9 +336,16 @@ class DistributionApiTest extends ApiContextTest {
 
         Path dir = tmp.resolve("taban");
         Files.createDirectories(dir.resolve("art/shapes"));
+        // v54 yalnız gerçek ve temiz resim dosyaları: önce sahte içerik reddedilir
         Files.write(dir.resolve("art/shapes/kare.png"), new byte[]{1, 2, 3});
         Files.writeString(dir.resolve("manifest.json"), "{\"packages\":[{\"id\":\"base-art-test\",\"name\":\"Resim temel\",\"mode\":\"ART\","
                 + "\"items\":[{\"id\":\"kare\",\"window\":\"shapes\",\"title\":\"Kare\",\"category\":\"Temel\",\"file\":\"art/shapes/kare.png\"}]}]}");
+        ByteArrayOutputStream rejected = new ByteArrayOutputStream();
+        assertEquals(1, cli.run(new String[]{"taban-paket", "--klasor", dir.toString(), "--kuru"}, new PrintStream(rejected, true, StandardCharsets.UTF_8)));
+        assertTrue(rejected.toString(StandardCharsets.UTF_8).contains("Resim değil"), rejected.toString(StandardCharsets.UTF_8));
+        java.io.ByteArrayOutputStream png = new java.io.ByteArrayOutputStream();
+        javax.imageio.ImageIO.write(new java.awt.image.BufferedImage(32, 32, java.awt.image.BufferedImage.TYPE_INT_ARGB), "png", png);
+        Files.write(dir.resolve("art/shapes/kare.png"), png.toByteArray());
         String dry = runCli("taban-paket", "--klasor", dir.toString(), "--kuru");
         assertTrue(dry.contains("base-art-test (ART): 1 öğe"), dry);
         assertNull(mongo.findById("base-art-test", Document.class, Dist.PACKAGES), "kuru çalışma yazmaz");

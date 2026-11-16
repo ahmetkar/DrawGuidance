@@ -71,6 +71,8 @@ public class InboxController {
         DeviceService.Registration body = forms.readJson(request, DeviceService.Registration.class);
         try {
             devices.register(jwt.getSubject(), body);
+        } catch (DeviceService.DeviceOwnedException e) {
+            throw ApiException.conflict("device_owned", "Bu cihaz başka bir hesaba kayıtlı");
         } catch (IllegalArgumentException e) {
             throw ApiException.badRequest("invalid_device", e.getMessage());
         }
@@ -89,7 +91,7 @@ public class InboxController {
                                         @RequestHeader(value = "If-None-Match", required = false) String ifNoneMatch,
                                         @RequestParam(value = "wait", required = false) Integer waitSeconds) {
         String key = key(deviceId);
-        long version = devices.inboxVersion(key);
+        long version = devices.inboxVersion(jwt.getSubject(), key);
         if (version < 0) throw ApiException.notFound("device_not_registered", "Önce cihaz kaydı gerekli (PUT /api/v1/devices/me)");
         String etag = etag(version);
         if (etag.equals(ifNoneMatch)) {
@@ -99,7 +101,7 @@ public class InboxController {
             if (f == null) return notModified(etag); // yük atma: bekleyen sınırı dolu
             try {
                 // Kayıttan önce değişmiş olabilir
-                long now = devices.inboxVersion(key);
+                long now = devices.inboxVersion(jwt.getSubject(), key);
                 if (now == version) f.get(wait, TimeUnit.SECONDS);
             } catch (TimeoutException e) {
                 return notModified(etag);
@@ -111,7 +113,7 @@ public class InboxController {
             } finally {
                 signals.unregister(key, f);
             }
-            version = devices.inboxVersion(key);
+            version = devices.inboxVersion(jwt.getSubject(), key);
             etag = etag(version);
             if (etag.equals(ifNoneMatch)) return notModified(etag);
         }

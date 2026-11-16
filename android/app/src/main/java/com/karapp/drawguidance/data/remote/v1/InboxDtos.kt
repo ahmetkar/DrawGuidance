@@ -13,6 +13,8 @@ data class DeviceRegistration(
     val sdkInt: Int? = null,
     val locale: String? = null,
     val packages: List<InstalledPackageDto> = emptyList(),
+    /** v54 cihazın gizli anahtarı: kayıt yalnız bununla başka hesaba geçer (sunucuda özeti saklanır). */
+    val deviceSecret: String? = null,
 )
 
 @Serializable

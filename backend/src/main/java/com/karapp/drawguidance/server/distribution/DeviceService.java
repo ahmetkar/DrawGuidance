@@ -28,6 +28,11 @@ import java.util.regex.Pattern;
  *
  * <p>Aynı cihazda başka hesapla giriş yapılırsa belge yeni kullanıcıya geçer; eski kullanıcının o cihazdaki bitmemiş
  * teslimatları iptal edilir.
+ *
+ * <p>v54 cihaz gizli anahtarı: cihaz ilk kayıtta kendi ürettiği rastgele {@code deviceSecret} (en az 32 karakter)
+ * gönderir; sunucu yalnız SHA-256 özetini saklar. Kayıt başka bir hesaba ancak aynı gizli anahtarla geçebilir (yalnız
+ * cihaz kimliğini bilen biri cihazı kendi hesabına alamaz, eski hesabın teslimatlarını iptal ettiremez). Gizli anahtarı
+ * olmayan eski kayıtlar ilk kayıtta anahtarı alır. Gelen kutusu yalnız cihazın sahibi hesapla okunur.
  */
 @Service
 public class DeviceService {
@@ -37,7 +42,16 @@ public class DeviceService {
 
     /** Cihazın gönderdiği kayıt gövdesi. */
     public record Registration(String deviceId, Long appVersionCode, String appVersionName, String model,
-                               String manufacturer, Integer sdkInt, String locale, List<InstalledPackage> packages) {}
+                               String manufacturer, Integer sdkInt, String locale, List<InstalledPackage> packages,
+                               /** v54 cihazın gizli anahtarı (yalnız özeti saklanır). */
+                               String deviceSecret) {}
+
+    private static final Pattern DEVICE_SECRET = Pattern.compile("^[A-Za-z0-9_\\-]{32,128}$");
+
+    /** v54 cihaz başka bir hesabın ve gizli anahtar uyuşmuyor: kayıt devredilmez. */
+    public static final class DeviceOwnedException extends RuntimeException {
+        public DeviceOwnedException() { super("Cihaz başka bir hesaba kayıtlı"); }
+    }
 
     public record InstalledPackage(String id, Integer version) {}
 
@@ -62,6 +76,19 @@ public class DeviceService {
         if (r == null) throw new IllegalArgumentException("Gövde boş");
         String key = key(r.deviceId());
         Document existing = mongo.findById(key, Document.class, Dist.DEVICES);
+        String secretHash = null;
+        if (r.deviceSecret() != null) {
+            if (!DEVICE_SECRET.matcher(r.deviceSecret()).matches()) throw new IllegalArgumentException("Geçersiz cihaz anahtarı");
+            secretHash = sha256(r.deviceSecret());
+        }
+        String owner = existing == null ? null : existing.getString("uid");
+        String storedHash = existing == null ? null : existing.getString("secretHash");
+        // v54 başka hesaba (ya da hesapsız kalmış kayda) geçiş yalnız aynı gizli anahtarla
+        if (existing != null && !uid.equals(owner) && storedHash != null
+                && (secretHash == null || !java.security.MessageDigest.isEqual(storedHash.getBytes(java.nio.charset.StandardCharsets.US_ASCII),
+                secretHash.getBytes(java.nio.charset.StandardCharsets.US_ASCII)))) {
+            throw new DeviceOwnedException();
+        }
         Date now = ContentService.now();
         Map<String, Object> info = new LinkedHashMap<>();
         put(info, "model", r.model());
@@ -73,6 +100,8 @@ public class DeviceService {
                 .set("info", crypto.encrypt(toJson(info), key));
         if (r.appVersionCode() != null && r.appVersionCode() > 0) u.set("appVersionCode", r.appVersionCode());
         u.setOnInsert("inboxVersion", 0L);
+        // Sahibi aynı hesapsa anahtar yenilenebilir (yeniden kurulum); yoksa yalnız ilk kez yazılır
+        if (secretHash != null && (storedHash == null || uid.equals(owner))) u.set("secretHash", secretHash);
         if (r.packages() != null) {
             if (r.packages().size() > MAX_PACKAGES) throw new IllegalArgumentException("Çok fazla paket");
             Document pk = new Document();
@@ -123,14 +152,26 @@ public class DeviceService {
                 new Update().inc("inboxVersion", 1L).set("inboxChangedAt", ContentService.now()), Dist.DEVICES);
     }
 
-    /** Gelen kutusunun sürümü (cihaz yoksa -1). Yalnız bu alan okunur. */
-    public long inboxVersion(String key) {
-        Query q = Query.query(Criteria.where("_id").is(key));
+    /**
+     * Gelen kutusunun sürümü (cihaz yoksa ya da bu hesabın değilse -1; v54 başka hesabın cihazının durumu ve sürümü
+     * öğrenilemez). Yalnız bu alan okunur.
+     */
+    public long inboxVersion(String uid, String key) {
+        Query q = Query.query(Criteria.where("_id").is(key).and("uid").is(uid));
         q.fields().include("inboxVersion");
         Document d = mongo.findOne(q, Document.class, Dist.DEVICES);
         if (d == null) return -1;
         Object v = d.get("inboxVersion");
         return v instanceof Number n ? n.longValue() : 0;
+    }
+
+    private static String sha256(String v) {
+        try {
+            byte[] d = java.security.MessageDigest.getInstance("SHA-256").digest(v.getBytes(java.nio.charset.StandardCharsets.UTF_8));
+            return java.util.HexFormat.of().formatHex(d);
+        } catch (java.security.NoSuchAlgorithmException e) {
+            throw new IllegalStateException(e);
+        }
     }
 
     /** [since] sonrası gelen kutusu değişen cihazlar (en çok [limit]). */

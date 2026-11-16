@@ -178,7 +178,7 @@ class V43InboxTest {
     private fun repo(policy: SyncPolicy, packs: PackStore, downloader: InboxRepository.Downloader, shown: Shown, now: () -> Long = { 1_800_000_000_000L }) = InboxRepository(
         dao = db.syncEventDao(), remote = remote(), auth = TestAccount.auth, policy = policy, connectivity = TestAccount.connectivity,
         packs = packs, downloader = downloader, notifier = shown,
-        device = InboxRepository.DeviceInfo("dev-1", 43, "1.1.0", "Pixel", "Google", 34) { "tr-TR" },
+        device = InboxRepository.DeviceInfo("dev-1", 43, "1.1.0", "Pixel", "Google", 34, locale = { "tr-TR" }, deviceSecret = "s".repeat(43)),
         prefs = context.getSharedPreferences("inbox-test-" + System.nanoTime(), Context.MODE_PRIVATE),
         announcementsDir = File(root, "announcements"), clock = now, random = Random(1),
     )

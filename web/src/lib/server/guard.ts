@@ -1,7 +1,7 @@
 import "server-only";
 import { headers } from "next/headers";
 import { SITE_URL } from "@/lib/config";
-import { clientIp, ipHash, sameOrigin } from "@/lib/security";
+import { clientIp, ipHash, ipSalt, sameOrigin, trustedHops } from "@/lib/security";
 import { db } from "./db";
 
 // v42 istek denetimleri: köken (CSRF), IP özeti, istek sınırı ve yönetim kayıtları.
@@ -19,9 +19,9 @@ export function allowedOrigins(): string[] {
 
 export async function requestInfo(): Promise<{ ipHash: string; userAgent: string; sameOrigin: boolean }> {
   const h = await headers();
-  const salt = process.env.IP_HASH_SALT || process.env.ADMIN_SETUP_TOKEN || "drawguidance-web";
+  const salt = ipSalt(process.env);
   return {
-    ipHash: ipHash(clientIp(h), salt),
+    ipHash: ipHash(clientIp(h, trustedHops(process.env)), salt),
     userAgent: (h.get("user-agent") || "").slice(0, 300),
     sameOrigin: sameOrigin(h, allowedOrigins()),
   };

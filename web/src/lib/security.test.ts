@@ -1,7 +1,7 @@
 // v42 web güvenlik yardımcılarının testleri: node --experimental-strip-types --test
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { clean, clientIp, contactSchema, ipHash, newToken, safeEqual, sameOrigin, sha256, singleLine, strongSecret } from "./security.ts";
+import { clean, clientIp, contactSchema, ipHash, ipSalt, newToken, safeEqual, sameOrigin, sha256, singleLine, strongSecret, trustedHops } from "./security.ts";
 
 const headers = (h: Record<string, string>) => ({ get: (n: string) => h[n.toLowerCase()] ?? null });
 
@@ -58,4 +58,18 @@ test("iletişim formu doğrulaması: kontrol karakterleri, uzunluk, e-posta, tuz
 test("XSS: iletişim alanları HTML'i reddetmez ama metin olarak saklanır (React kaçırır)", () => {
   const parsed = contactSchema.parse({ name: "<b>Ad</b>", email: "a@example.com", subject: "<script>x</script>", message: "<img src=x onerror=alert(1)> merhaba", locale: "en" });
   assert.equal(parsed.subject, "<script>x</script>");
+});
+
+test("v54 IP: güvenilen vekil sayısıyla sağdan, sahte başlık atlanır; üretimde tuz zorunlu", () => {
+  const h = headers({ "x-forwarded-for": "1.2.3.4, 203.0.113.5, 10.0.0.1" });
+  assert.equal(clientIp(h), "1.2.3.4");
+  assert.equal(clientIp(h, 1), "10.0.0.1");
+  assert.equal(clientIp(h, 2), "203.0.113.5");
+  assert.equal(clientIp(h, 9), "1.2.3.4");
+  assert.equal(trustedHops({ TRUSTED_PROXY_HOPS: "2" }), 2);
+  assert.equal(trustedHops({ TRUSTED_PROXY_HOPS: "x" }), 0);
+  assert.throws(() => ipSalt({ NODE_ENV: "production" }));
+  assert.throws(() => ipSalt({ NODE_ENV: "production", IP_HASH_SALT: "kisa" }));
+  assert.equal(ipSalt({ NODE_ENV: "production", IP_HASH_SALT: "x".repeat(32) }), "x".repeat(32));
+  assert.equal(ipSalt({ NODE_ENV: "development" }), "drawguidance-web-dev");
 });

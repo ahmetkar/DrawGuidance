@@ -69,6 +69,10 @@ public class ErrorReportController {
         RateLimiter.Decision install = limiter.acquire("install:" + report.installId(), limits.perInstallLimit(), limits.window());
         if (!install.allowed()) return tooMany(install);
         Identity who = identify(request.getHeader(HttpHeaders.AUTHORIZATION));
+        // v54 kapalı kalır (fail-closed): doğrulanmış kimlik yoksa rapor kaydedilmez
+        if (!AUTH_VALID.equals(who.auth())) {
+            throw new com.karapp.drawguidance.server.common.ApiException(HttpStatus.UNAUTHORIZED, "unauthorized", "Hata raporu için giriş gerekli");
+        }
         ErrorReportService.Stored stored = reports.store(report, who.uid(), who.auth(), who.email());
         return ResponseEntity.status(HttpStatus.ACCEPTED).contentType(MediaType.APPLICATION_JSON).body(new Accepted(stored.id()));
     }
@@ -115,7 +119,8 @@ public class ErrorReportController {
 
     /**
      * v40 kimlik: güvenlik süzgecinin doğruladığı jeton (uç artık giriş ister). Süzgeç dışında çağrılırsa (ör. eski
-     * yapılandırma) Bearer jetonu yine kendisi çözer: geçerliyse {@code sub}; değilse kimliksiz.
+     * yapılandırma) Bearer jetonu yine kendisi çözer: geçerliyse {@code sub}; değilse kimliksiz. v54 kimliksiz, geçersiz
+     * ya da doğrulanamayan jetonla gelen rapor {@code 401} ile reddedilir ([post]).
      */
     Identity identify(String header) {
         var current = org.springframework.security.core.context.SecurityContextHolder.getContext().getAuthentication();

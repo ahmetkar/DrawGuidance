@@ -13,7 +13,11 @@ Sıra önemli: **önce sır (1), sonra imaj (2), sonra dağıtım (3)**. 1. adı
 | Sürüm | `54.0.0` (`/api/health`). |
 | Yönetim şifresi | `cli` komutlarının hepsi şifre doğrulanınca çalışır. Şifrenin PBKDF2-SHA256 özeti (`pbkdf2-sha256:<tur>:<tuz>:<özet>`) Docker sırrı `cli_password_hash` → `CLI_PASSWORD_HASH_FILE`. Şifre terminalde gizli sorulur ya da standart girdiden okunur; komut satırı argümanında kabul edilmez. 3 yanlış denemede çıkar. Yeni komut: `cli sifre-ozeti`. |
 | Taban paket resimleri | `taban-paket --yukle` her dosyayı yüklemeden önce denetler: yalnız PNG/JPEG/WEBP (imzadan; uzantı uyuşmalı), en çok 20 MB ve 8192 px, parça/segment yapısı tutarlı, üst veride ya da dosya sonunda betik/HTML/PHP, çalıştırılabilir, arşiv imzası yok. Cloud Storage'a içerik türü dosyanın imzasından yazılır. |
-| Veritabanı | Göç yok. |
+| Gelen kutusu sahipliği | `GET /api/v1/inbox` cihazın sürümünü yalnız cihazın kayıtlı olduğu hesapla okur; başka hesabın cihaz kimliğiyle gelen istek kayıtsız cihaz gibi `404` alır (durum/ETag sızmaz, uzun yoklama açılmaz). |
+| Cihaz devralma koruması | `PUT /api/v1/devices/me` gövdesine `deviceSecret` (cihazda güvenli rastgele, en az 32 karakter) eklendi; sunucu yalnız SHA-256 özetini (`secretHash`) saklar. Kayıt başka hesaba ancak aynı anahtarla geçer, yoksa `409 device_owned` (eski hesabın teslimatları iptal edilemez). Anahtarı olmayan eski kayıtlar ilk kayıtta anahtarı alır. |
+| Hata raporu | `POST /api/v1/reports` doğrulanmış jeton yoksa `401` (kimliksiz geri dönüş kaldırıldı). |
+| Hız sınırı (bilgi) | `ApiRateLimitInterceptor` ve rapor sınırlayıcısı kopya başına bellekte çalışır; yığın 1 API kopyasıyla çalıştığı sürece sorun yok. Kopya sayısı artarsa merkezi sayaç (ör. Redis) gerekir. |
+| Veritabanı | Göç yok (`devices.secretHash` alanı kendiliğinden eklenir). |
 
 ## 1. Bir kezlik: yönetim şifresi sırrı
 

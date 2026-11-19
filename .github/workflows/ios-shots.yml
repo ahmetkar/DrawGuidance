@@ -1,0 +1,80 @@
+name: iOS mağaza ekran görüntüleri
+
+# iPhone (1179x2556) ve iPad (2048x2732) simülatörlerinde, uygulama dillerinde gerçek iOS ekran görüntüleri alır.
+on:
+  workflow_dispatch:
+    inputs:
+      langs:
+        description: "Diller (boşlukla ayrılmış)"
+        type: string
+        default: "tr en ar ja ko ru zh"
+      wait:
+        description: "Her sahnede açılış bekleme süresi (sn)"
+        type: string
+        default: "30"
+
+jobs:
+  shots:
+    runs-on: macos-15-intel
+    timeout-minutes: 170
+    defaults:
+      run:
+        working-directory: ios
+    steps:
+      - uses: actions/checkout@v4
+      - name: Xcode 26 seç
+        run: |
+          X=$(ls -d /Applications/Xcode_26*.app 2>/dev/null | sort -V | tail -1)
+          sudo xcode-select -s "$X"; xcodebuild -version
+      - name: XcodeGen
+        run: brew install xcodegen && xcodegen generate
+      - name: Simülatör için derle
+        run: |
+          mkdir -p build
+          xcodebuild build -project DrawGuidance.xcodeproj -scheme DrawGuidance -configuration Debug \
+            -destination "generic/platform=iOS Simulator" -derivedDataPath build/sim \
+            CODE_SIGNING_ALLOWED=NO DG_GOOGLE_URL_SCHEME="" > build/sim-build.log 2>&1 \
+            || { grep -E "error:" build/sim-build.log | sort -u | head -50; exit 1; }
+      - name: Ekran görüntüleri
+        env:
+          LANGS: ${{ inputs.langs }}
+          WAIT: ${{ inputs.wait }}
+        run: |
+          xcrun simctl list devices available | grep -E "iPhone|iPad" | head -40
+          pick() { xcrun simctl list devices available -j | python3 -c '
+          import json,sys,re
+          pat=sys.argv[1]
+          d=json.load(sys.stdin)["devices"]
+          c=[(r,x) for r,l in d.items() if "iOS" in r for x in l if re.search(pat,x["name"])]
+          c.sort(key=lambda t:t[0]); print(c[-1][1]["udid"] if c else "")' "$1"; }
+          PHONE=$(pick '^iPhone 1[5-6]$'); [ -z "$PHONE" ] && PHONE=$(pick '^iPhone 1[5-7]( Pro)?$')
+          PAD=$(pick 'iPad Pro 12.9'); [ -z "$PAD" ] && PAD=$(pick 'iPad Pro 13')
+          echo "phone=$PHONE pad=$PAD"
+          mkdir -p out
+          APP=build/sim/Build/Products/Debug-iphonesimulator/DrawGuidance.app
+          # sahne adı:başlatma argümanları
+          SCENES="01-ana-sayfa: 02-resim:-dgOpenNew ART 03-cizgi-roman:-dgOpenNew COMIC 04-not:-dgOpenNew NOTES 05-basit-resim:-dgOpenNew SIMPLE_ART 06-basit-not:-dgOpenNew SIMPLE_NOTES 07-cocuk:-dgOpenNew KIDS 08-firca-paneli:-dgOpenNew ART -dgPanel BRUSH"
+          for DEV in phone pad; do
+            if [ $DEV = phone ]; then UDID=$PHONE; else UDID=$PAD; fi
+            [ -z "$UDID" ] && { echo "::warning::$DEV simülatörü yok"; continue; }
+            xcrun simctl boot "$UDID" || true
+            xcrun simctl bootstatus "$UDID" -b
+            xcrun simctl status_bar "$UDID" override --time "9:41" --batteryState charged --batteryLevel 100 --cellularBars 4 --wifiBars 3 || true
+            xcrun simctl install "$UDID" "$APP"
+            for L in $LANGS; do
+              mkdir -p out/$DEV/$L
+              for S in $SCENES; do
+                NAME=${S%%:*}; ARGS=${S#*:}
+                xcrun simctl terminate "$UDID" com.karapp.drawguidance || true
+                xcrun simctl launch "$UDID" com.karapp.drawguidance -AppleLanguages "($L)" -AppleLocale $L -uiTesting $ARGS
+                sleep "$WAIT"
+                xcrun simctl io "$UDID" screenshot out/$DEV/$L/$NAME.png || true
+              done
+            done
+            xcrun simctl shutdown "$UDID" || true
+          done
+          find out -name '*.png' | head -3 | while read f; do sips -g pixelWidth -g pixelHeight "$f"; done
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ios-ekran-goruntuleri
+          path: ios/out

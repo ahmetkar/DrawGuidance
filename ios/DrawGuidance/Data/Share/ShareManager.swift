@@ -487,6 +487,15 @@ final class ShareManager: ObservableObject {
         }
     }
 
+    #if DEBUG
+    /// Mağaza görüntüsü: ağ olmadan, verilen tuvali canlı yayın izleme ekranındaymış gibi gösterir.
+    func debugShowLive(_ c: CanvasUi, peer: String) {
+        CanvasAssetStore.shared.ensureLoaded(c)
+        liveIn = ShareLiveIn(canvasId: c.localId, peerId: "debug", peerName: peer)
+        liveCanvas = c
+    }
+    #endif
+
     private func refreshLiveCanvas(_ canvasId: String) {
         guard let c = store.getCanvas(canvasId) else { return }
         CanvasAssetStore.shared.ensureLoaded(c)

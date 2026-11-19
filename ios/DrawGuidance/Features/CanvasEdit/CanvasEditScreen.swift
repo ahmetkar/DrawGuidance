@@ -114,6 +114,24 @@ struct CanvasEditScreen: View {
             try? await Task.sleep(nanoseconds: 4_000_000_000)
             if vm.panel != t { vm.togglePanel(t) }
         }
+        // Mağaza görüntüsü: `-dgTutorial GRUP [-dgSteps N]` eğitimi hızlı oynatır; `-dgChallenge` çocuk görevini başlatır
+        .task {
+            let a = ProcessInfo.processInfo.arguments
+            if a.contains("-dgChallenge") {
+                try? await Task.sleep(nanoseconds: 3_000_000_000)
+                vm.challenge.start()
+            }
+            guard let i = a.firstIndex(of: "-dgTutorial"), i + 1 < a.count, let kind = vm.store.canvas?.kind,
+                  let g = vm.tutorial.groups(kind).first(where: { $0.id == a[i + 1] }) else { return }
+            let steps = a.firstIndex(of: "-dgSteps").flatMap { $0 + 1 < a.count ? Int(a[$0 + 1]) : nil } ?? 0
+            try? await Task.sleep(nanoseconds: 3_000_000_000)
+            vm.tutorial.fast = true
+            vm.tutorial.start(g)
+            for _ in 0..<steps {
+                try? await Task.sleep(nanoseconds: 2_500_000_000)
+                vm.tutorial.next()
+            }
+        }
         #endif
         .onDisappear {
             let temp = vm.isTempImageEdit

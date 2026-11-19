@@ -62,6 +62,9 @@ private struct HomeTab: View {
     enum Group { case simple, advanced }
     @State private var expanded: Group?
     @State private var createKind: CanvasKind?
+    #if DEBUG
+    @State private var debugLive = false
+    #endif
     @State private var new3d = false
 
     private var leftOff: [(CanvasUi, Int64)] {
@@ -109,9 +112,29 @@ private struct HomeTab: View {
             let a = ProcessInfo.processInfo.arguments
             guard let i = a.firstIndex(of: "-dgOpenNew"), i + 1 < a.count, let k = CanvasKind(rawValue: a[i + 1]) else { return }
             try? await Task.sleep(nanoseconds: 1_000_000_000)
-            onOpen(CanvasCreator.create(CanvasFormResult(name: "Tanı", width: k.defaultSize.width, height: k.defaultSize.height,
-                                                         paperHex: "#FFFFFF", aiEnabled: true, kind: k), store: store))
+            let name = a.firstIndex(of: "-dgName").flatMap { $0 + 1 < a.count ? a[$0 + 1] : nil } ?? "Tanı"
+            let c = CanvasCreator.create(CanvasFormResult(name: name, width: k.defaultSize.width, height: k.defaultSize.height,
+                                                          paperHex: "#FFFFFF", aiEnabled: true, kind: k), store: store)
+            // Mağaza görüntüsü: `-dgPractice N` ile düzenleyici N. alıştırmayla açılır
+            if let p = a.firstIndex(of: "-dgPractice"), p + 1 < a.count, let n = Int(a[p + 1]) { PracticeHandoff.put(c.localId, n) }
+            onOpen(c)
         }
+        // Mağaza görüntüsü: `-dgTemplate ID` hazır şablondan tuval açar; `-dgLive` ile tuval canlı yayın izleme ekranında gösterilir
+        .task {
+            let a = ProcessInfo.processInfo.arguments
+            guard let i = a.firstIndex(of: "-dgTemplate"), i + 1 < a.count, let e = CanvasTemplates.find(a[i + 1]) else { return }
+            try? await Task.sleep(nanoseconds: 1_000_000_000)
+            let k = CanvasKind.parse(e.kind)
+            let c = CanvasCreator.create(CanvasFormResult(name: CanvasTemplates.name(e), width: e.width > 0 ? e.width : k.defaultSize.width,
+                                                          height: e.height > 0 ? e.height : k.defaultSize.height, paperHex: "#FFFFFF",
+                                                          aiEnabled: true, kind: k, templateId: e.id), store: store)
+            if a.contains("-dgLive") {
+                let peer = a.firstIndex(of: "-dgPeer").flatMap { $0 + 1 < a.count ? a[$0 + 1] : nil } ?? "iPad"
+                ShareManager.shared.debugShowLive(c, peer: peer)
+                debugLive = true
+            } else { onOpen(c) }
+        }
+        .fullScreenCover(isPresented: $debugLive) { LiveCanvasView() }
         #endif
     }
 

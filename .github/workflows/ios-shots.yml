@@ -18,6 +18,10 @@ on:
 
 jobs:
   shots:
+    strategy:
+      fail-fast: false
+      matrix:
+        dev: [phone, pad]
     runs-on: macos-15-intel
     timeout-minutes: 170
     defaults:
@@ -41,7 +45,7 @@ jobs:
       - name: Ekran görüntüleri
         env:
           LANGS: ${{ inputs.langs || 'tr en ar ja ko ru zh' }}
-          WAIT: ${{ inputs.wait || '30' }}
+          WAIT: ${{ inputs.wait || '22' }}
         run: |
           xcrun simctl list devices available | grep -E "iPhone|iPad" | head -40
           pick() { xcrun simctl list devices available -j | python3 -c '
@@ -57,7 +61,7 @@ jobs:
           APP=build/sim/Build/Products/Debug-iphonesimulator/DrawGuidance.app
           # sahne adı:başlatma argümanları
           SCENES="01-ana-sayfa: 02-resim:-dgOpenNew ART 03-cizgi-roman:-dgOpenNew COMIC 04-not:-dgOpenNew NOTES 05-basit-resim:-dgOpenNew SIMPLE_ART 06-basit-not:-dgOpenNew SIMPLE_NOTES 07-cocuk:-dgOpenNew KIDS 08-firca-paneli:-dgOpenNew ART -dgPanel BRUSH"
-          for DEV in phone pad; do
+          for DEV in ${{ matrix.dev }}; do
             if [ $DEV = phone ]; then UDID=$PHONE; else UDID=$PAD; fi
             [ -z "$UDID" ] && { echo "::warning::$DEV simülatörü yok"; continue; }
             xcrun simctl boot "$UDID" || true
@@ -78,6 +82,7 @@ jobs:
           done
           find out -name '*.png' | head -3 | while read f; do sips -g pixelWidth -g pixelHeight "$f"; done
       - uses: actions/upload-artifact@v4
+        if: always()
         with:
-          name: ios-ekran-goruntuleri
+          name: ios-ekran-goruntuleri-${{ matrix.dev }}
           path: ios/out

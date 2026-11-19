@@ -73,8 +73,16 @@ jobs:
           shot() { NAME=$1; shift
             timeout 30 xcrun simctl terminate "$UDID" com.karapp.drawguidance || true
             timeout 60 xcrun simctl launch "$UDID" com.karapp.drawguidance -AppleLanguages "($L)" -AppleLocale $L -uiTesting "$@" || true
-            sleep 25
-            timeout 60 xcrun simctl io "$UDID" screenshot out/$DEV/$L/$NAME.png || true
+            # Yükleniyor ekranı küçük PNG verir (~120 KB): görüntü 200 KB'ı geçip iki çekimde aynı boyda kalana dek bekle
+            F=out/$DEV/$L/$NAME.png; PREV=0
+            for i in $(seq 1 16); do
+              sleep 8
+              timeout 60 xcrun simctl io "$UDID" screenshot "$F" >/dev/null 2>&1 || continue
+              SZ=$(stat -f %z "$F")
+              if [ "$SZ" -gt 200000 ] && [ $(( SZ - PREV )) -lt 3000 ] && [ $(( PREV - SZ )) -lt 3000 ]; then break; fi
+              PREV=$SZ
+            done
+            sleep 3; timeout 60 xcrun simctl io "$UDID" screenshot "$F" || true
             ls -la out/$DEV/$L/$NAME.png || true; }
           shot 01-ana-sayfa
           shot 02-resim -dgOpenNew ART

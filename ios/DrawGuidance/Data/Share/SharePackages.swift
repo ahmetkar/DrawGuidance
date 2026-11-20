@@ -42,6 +42,63 @@ final class SharePackages {
         return package(c, type: ShareWire.TYPE_LIVE, id: id, seq: seq, assets: list, datas: datas, from: from, peerCodec: peerCodec)
     }
 
+    /// v56 2C-1 fark paketi (Android `liveDiffPackage`): içerik yalnız eklenen/değişen çizgiler (tek sayfa).
+    nonisolated func liveDiffPackage(_ c: CanvasUi, page: Int, diff d: LiveDiff.Diff, id: String, seq: Int64, base: Int64,
+                                     sent: inout Set<String>, from: String) -> SharePackage {
+        var datas: [Data] = []
+        var list: [ShareAsset] = []
+        for m in assets.metas(forCanvas: c.localId) where !sent.contains(m.id) {
+            guard let data = assets.bytes(m.id) else { continue }
+            datas.append(data)
+            list.append(ShareAsset(id: m.id, mime: m.mimeType, w: m.width, h: m.height, len: data.count))
+            sent.insert(m.id)
+        }
+        let content = ContentCodec.encodePages([d.upserts], layers: c.layers)
+        var h = SharePackageHeader(id: id, type: ShareWire.TYPE_LIVE, name: c.name)
+        h.canvasKind = c.kind.rawValue
+        h.width = c.width; h.height = c.height
+        h.currentPage = c.currentPage
+        h.contentLen = content.count
+        h.assets = list
+        h.seq = seq
+        h.from = from
+        h.diffPage = page; h.diffBase = base; h.removed = d.removed; h.order = d.order
+        return SharePackage(header: h, content: content, assets: datas)
+    }
+
+    /// v56 fark paketini bellekteki yayın tuvaline uygular (Android `applyLiveDiff`); kaydetmez ([persistLive]).
+    func applyLiveDiff(_ pkg: SharePackage, ids: inout [String: String], current: CanvasUi) throws -> CanvasUi {
+        let h = pkg.header
+        guard let page = h.diffPage, current.pages.indices.contains(page) else { throw ShareError.failed("page") }
+        for (i, a) in h.assets.enumerated() {
+            let bytes = pkg.assets[i]
+            let sniffed = ImageImportValidator.sniffMime(bytes)
+            var mime = a.mime
+            if a.mime.hasPrefix("image/") || sniffed != nil {
+                guard let sniffed, ImageSecurity.inspect(bytes, mime: sniffed) == .CLEAN else { throw ShareError.failed(L("v54_image_err_suspicious")) }
+                mime = sniffed
+            }
+            let newId = ids[a.id] ?? UUID().uuidString.lowercased()
+            ids[a.id] = newId
+            assets.saveData(current.localId, bytes, mime, id: newId, width: a.w, height: a.h)
+            CanvasImageCache.loader?(newId)
+        }
+        let map = ids
+        let upserts = (try ContentCodec.decodeDocument(pkg.content).pages.first ?? []).map { Self.remap($0, map) }
+        var c = current
+        c.pages[page] = LiveDiff.apply(c.pages[page], LiveDiff.Diff(upserts: upserts, removed: h.removed ?? [], order: h.order))
+        c.updatedAt = CanvasStore.nowMs()
+        return c
+    }
+
+    /// v56 bellekteki yayın tuvali kaydedilir (toplu, 2 sn'de bir).
+    func persistLive(_ c: CanvasUi) {
+        var saved = store.getCanvas(c.localId) ?? c
+        saved.pages = c.pages
+        saved.updatedAt = c.updatedAt
+        store.save(saved)
+    }
+
     nonisolated private func package(_ c: CanvasUi, type: String, id: String, seq: Int64, assets list: [ShareAsset], datas: [Data], from: String,
                                      peerCodec: Int = ContentCodec.LATEST_VERSION) -> SharePackage {
         // v56 V11 bilmeyen cihaza düzleştirilmiş içerik

@@ -24,6 +24,10 @@ enum ShareWire {
     static let LIVE_RESUME: UInt8 = 14
     /// v56 çizilmekte olan çizginin yeni noktaları (`ShareInk`); eski sürümler bilinmeyen türü yok sayar.
     static let LIVE_INK: UInt8 = 15
+    /// v56 2C-1 fark paketi: yalnız değişen sayfanın değişen çizgileri (yalnız içerik sürümü 11+ olan karşı tarafa).
+    static let LIVE_DIFF: UInt8 = 16
+    /// v56 alan taraf farkı uygulayamadı: sonraki kare tam paket gönderilir.
+    static let LIVE_RESYNC: UInt8 = 17
     static let BYE: UInt8 = 20
 
     static let TYPE_CANVAS = "canvas"
@@ -225,6 +229,11 @@ struct SharePackageHeader: Codable {
     var imageW = 0
     var imageH = 0
     var from = ""
+    /// v56 fark paketi (`LIVE_DIFF`): değişen sayfa, farkın dayandığı kare, silinen kimlikler, yeni sıra.
+    var diffPage: Int?
+    var diffBase: Int64?
+    var removed: [String]?
+    var order: [String]?
 
     init(id: String, type: String, name: String) { self.id = id; self.type = type; self.name = name }
 
@@ -248,6 +257,10 @@ struct SharePackageHeader: Codable {
         imageW = try c.decodeIfPresent(Int.self, forKey: .imageW) ?? 0
         imageH = try c.decodeIfPresent(Int.self, forKey: .imageH) ?? 0
         from = try c.decodeIfPresent(String.self, forKey: .from) ?? ""
+        diffPage = try c.decodeIfPresent(Int.self, forKey: .diffPage)
+        diffBase = try c.decodeIfPresent(Int64.self, forKey: .diffBase)
+        removed = try c.decodeIfPresent([String].self, forKey: .removed)
+        order = try c.decodeIfPresent([String].self, forKey: .order)
     }
 }
 

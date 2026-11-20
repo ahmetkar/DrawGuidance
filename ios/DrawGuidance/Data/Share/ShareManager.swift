@@ -98,6 +98,13 @@ final class ShareManager: ObservableObject {
     private var liveOfferId: String?
     private var liveSent = Set<String>()
     private var liveSeqOut: Int64 = 0
+    /// v56 fark paketi: son gönderilen kare, sırası, son tam paketten beri kare sayısı, tam paket isteği.
+    private var liveLastSent: CanvasUi?
+    private var liveLastSeq: Int64 = 0
+    private var liveSinceFull = 0
+    private var liveResync = false
+    /// v56 alan tarafta farkla güncellenen tuvalin toplu kaydı.
+    private var livePersistTask: Task<Void, Never>?
     private var liveFrame: CanvasUi?
     private var liveTask: Task<Void, Never>?
     private var foreground = true
@@ -233,6 +240,11 @@ final class ShareManager: ObservableObject {
     /// Yayını alan taraf yayından ayrılır (tuval kayıtlı kalır).
     func leaveLive() {
         guard let inn = liveIn else { return }
+        // v56 farkla güncellenip henüz kaydedilmemiş çizimler kaybolmasın
+        if livePersistTask != nil {
+            livePersistTask?.cancel(); livePersistTask = nil
+            if let c = liveCanvas, c.localId == inn.canvasId { packages.persistLive(c) }
+        }
         liveIn = nil
         liveCanvas = nil
         liveInk = [:]
@@ -494,10 +506,38 @@ final class ShareManager: ObservableObject {
             let pkg = try SharePackage.decode(m)
             guard pkg.header.seq > liveSeqIn else { return }
             liveSeqIn = pkg.header.seq
+            livePersistTask?.cancel(); livePersistTask = nil
             _ = try packages.install(pkg, ids: &liveIds, existingId: inn.canvasId)
             refreshLiveCanvas(inn.canvasId)
             // v56 biten çizgiler artık tuvalde: geçici mürekkep temizlenir
             liveInk = [:]
+        case ShareWire.LIVE_DIFF:
+            guard let inn = liveIn, inn.peerId == id, !inn.ended else { return }
+            let pkg = try SharePackage.decode(m)
+            let h = pkg.header
+            guard h.seq > liveSeqIn else { return }
+            guard let cur = liveCanvas, cur.localId == inn.canvasId, h.diffBase == liveSeqIn,
+                  let page = h.diffPage, cur.pages.indices.contains(page) else {
+                // Arada kare kaçtı: gönderen sonraki karede tam paket yollar
+                send(id, ShareWire.encode(ShareWire.LIVE_RESYNC, Data("{}".utf8)))
+                return
+            }
+            let updated = try packages.applyLiveDiff(pkg, ids: &liveIds, current: cur)
+            liveSeqIn = h.seq
+            if !h.assets.isEmpty { CanvasAssetStore.shared.ensureLoaded(updated) }
+            liveCanvas = updated
+            liveInk = [:]
+            if livePersistTask == nil {
+                let canvasId = inn.canvasId
+                livePersistTask = Task { [weak self] in
+                    try? await Task.sleep(nanoseconds: 2_000_000_000)
+                    guard let self, !Task.isCancelled else { return }
+                    self.livePersistTask = nil
+                    if let c = self.liveCanvas, c.localId == canvasId { self.packages.persistLive(c) }
+                }
+            }
+        case ShareWire.LIVE_RESYNC:
+            if liveOut?.peerId == id { liveResync = true }
         case ShareWire.LIVE_INK:
             guard let inn = liveIn, inn.peerId == id, !inn.ended else { return }
             let ink = try m.header(ShareInk.self)
@@ -559,6 +599,7 @@ final class ShareManager: ObservableObject {
             noteFlattened(pkg, out.peerId)
             liveSent = Set(pkg.header.assets.map(\.id))
             liveSeqOut = 0
+            liveLastSent = nil; liveLastSeq = 0; liveSinceFull = 0; liveResync = false
             liveOfferId = id
             send(out.peerId, pkg.encode(ShareWire.LIVE_START))
             liveOut = ShareLiveOut(canvasId: cid, peerId: out.peerId, peerName: peerName(out.peerId))
@@ -580,20 +621,43 @@ final class ShareManager: ObservableObject {
                 guard let self, let out = self.liveOut else { return }
                 if let frame = self.liveFrame, frame.localId == out.canvasId {
                     self.liveFrame = nil
-                    self.liveSeqOut += 1
-                    let seq = self.liveSeqOut
                     let before = self.liveSent
                     let from = self.settings.deviceName
                     let codec = self.codecOf(out.peerId)
-                    // Paket arka planda hazırlanır (içerik kodlama ve resim okuma)
-                    let (pkg, newSent) = await Task.detached(priority: .userInitiated) { () -> (SharePackage, Set<String>) in
-                        var sent = before
-                        let p = packages.livePackage(frame, id: id, seq: seq, sent: &sent, from: from, peerCodec: codec)
-                        return (p, sent)
-                    }.value
-                    guard !Task.isCancelled, self.liveOut == out else { return }
-                    self.liveSent = newSent
-                    self.send(out.peerId, pkg.encode(ShareWire.LIVE_UPDATE))
+                    // v56 2C-1 karşı taraf fark paketini biliyorsa (içerik sürümü 11+) yalnız değişen sayfanın farkı gider;
+                    // her 20 karede bir, sayfa ya da tuval ayarı değişince ve alan taraf isteyince tam paket
+                    let prev = self.liveLastSent
+                    var page: Int?
+                    if let prev, codec >= 11, !self.liveResync, self.liveSinceFull < LiveDiff.FULL_EVERY { page = LiveDiff.changedPage(prev, frame) }
+                    if page == -1 {
+                        // Değişiklik yok
+                    } else {
+                        self.liveSeqOut += 1
+                        let seq = self.liveSeqOut
+                        let base = self.liveLastSeq
+                        let diffPage = page
+                        // Paket arka planda hazırlanır (içerik kodlama ve resim okuma)
+                        let (pkg, newSent) = await Task.detached(priority: .userInitiated) { () -> (SharePackage, Set<String>) in
+                            var sent = before
+                            if let p = diffPage, let prev {
+                                let d = LiveDiff.diff(prev.pages[p], frame.pages[p])
+                                return (packages.liveDiffPackage(frame, page: p, diff: d, id: id, seq: seq, base: base, sent: &sent, from: from), sent)
+                            }
+                            return (packages.livePackage(frame, id: id, seq: seq, sent: &sent, from: from, peerCodec: codec), sent)
+                        }.value
+                        guard !Task.isCancelled, self.liveOut == out else { return }
+                        self.liveSent = newSent
+                        if diffPage != nil {
+                            self.send(out.peerId, pkg.encode(ShareWire.LIVE_DIFF))
+                            self.liveSinceFull += 1
+                        } else {
+                            self.send(out.peerId, pkg.encode(ShareWire.LIVE_UPDATE))
+                            self.liveSinceFull = 0
+                            self.liveResync = false
+                        }
+                        self.liveLastSent = frame
+                        self.liveLastSeq = seq
+                    }
                 }
                 let interval = self.settings.liveInterval
                 try? await Task.sleep(nanoseconds: UInt64(interval * 1_000_000_000))

@@ -56,7 +56,7 @@ final class ImageExporter {
                                    paper: paper, cover: canvas.hasCover)
         }
         c.beginTransparencyLayer(auxiliaryInfo: nil)
-        StrokeRenderer.drawStrokeList(c, strokes)
+        StrokeRenderer.drawStrokeList(c, strokes, layers: canvas.layers)
         c.endTransparencyLayer()
         c.restoreGState()
     }

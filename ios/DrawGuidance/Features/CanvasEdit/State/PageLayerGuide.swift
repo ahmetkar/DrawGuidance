@@ -166,6 +166,27 @@ final class LayerController {
         store.select(store.selection)
     }
 
+    /// v56 katman opaklığı (0..1); kaydırırken tek geri alma adımı.
+    func setOpacity(_ id: String, _ opacity: Float) {
+        let v = min(max(opacity, 0), 1)
+        store.commitLayers(layers().map { l in var c = l; if l.id == id { c.opacity = v }; return c }, coalesce: "layer-opacity-\(id)")
+    }
+
+    /// v56 katman karışım modu.
+    func setBlend(_ id: String, _ blend: LayerBlend) {
+        store.commitLayers(layers().map { l in var c = l; if l.id == id { c.blend = blend }; return c })
+    }
+
+    /// v56 alfa kilidi.
+    func toggleAlphaLock(_ id: String) {
+        store.commitLayers(layers().map { l in var c = l; if l.id == id { c.alphaLock.toggle() }; return c })
+    }
+
+    /// v56 alttakine kırp (en alttaki katmanda etkisiz).
+    func toggleClip(_ id: String) {
+        store.commitLayers(layers().map { l in var c = l; if l.id == id { c.clipToBelow.toggle() }; return c })
+    }
+
     func move(_ id: String, _ direction: Int) {
         var current = layers()
         guard let i = current.firstIndex(where: { $0.id == id }) else { return }

@@ -69,8 +69,19 @@ enum StrokeRenderer {
     }
 
     /// Silgiler yalnız kendi katmanlarındaki, kendilerinden önceki fırça izlerini siler; nesneler etkilenmez.
-    static func drawStrokeList(_ c: CGContext, _ strokes: [Stroke]) {
-        if !strokes.contains(where: { $0.brushType == .ERASER || $0.brushType.isRaster }) {
+    /// v56 `layers`: opaklık, karışım modu ya da kırpma varsa katman katman birleştirilir (`LayerCompositor`).
+    static func drawStrokeList(_ c: CGContext, _ strokes: [Stroke], layers: [Layer] = []) {
+        if !strokes.isEmpty && LayerCompositor.needed(layers) {
+            LayerCompositor.drawLayered(c, strokes, layers) { drawPlainList(c, $0) }
+            return
+        }
+        drawPlainList(c, strokes)
+    }
+
+    private static func isLocked(_ s: Stroke) -> Bool { s.params?.alphaLocked == true }
+
+    private static func drawPlainList(_ c: CGContext, _ strokes: [Stroke]) {
+        if !strokes.contains(where: { $0.brushType == .ERASER || $0.brushType.isRaster || isLocked($0) }) {
             for s in strokes where !s.hidden { drawStroke(c, s) }
             return
         }
@@ -102,7 +113,22 @@ enum StrokeRenderer {
     /// (nesneler dahil) okuyarak çizilir; diğerleri her zamanki gibi.
     private static func drawInRun(_ c: CGContext, _ strokes: [Stroke], _ m: Int, _ layer: String) {
         let s = strokes[m]
+        if isLocked(s) && s.brushType != .ERASER {
+            // v56 alfa kilidi: yalnız katmanda önceden boyanmış yerlerde
+            c.saveGState()
+            c.setBlendMode(.sourceAtop)
+            c.beginTransparencyLayer(auxiliaryInfo: nil)
+            if s.brushType.isRaster { drawRaster(c, strokes, m, layer) } else { drawStroke(c, s) }
+            c.endTransparencyLayer()
+            c.restoreGState()
+            return
+        }
         guard s.brushType.isRaster else { drawStroke(c, s); return }
+        drawRaster(c, strokes, m, layer)
+    }
+
+    private static func drawRaster(_ c: CGContext, _ strokes: [Stroke], _ m: Int, _ layer: String) {
+        let s = strokes[m]
         var context: [Stroke] = []
         context.reserveCapacity(m)
         for q in 0..<m {
@@ -114,7 +140,7 @@ enum StrokeRenderer {
 
     /// Kağıt rengi + arka plan (gradyan, resim, desen) + çizimler (silgi kâğıdı silmesin diye çizimler ayrı katmanda).
     static func drawCanvasContent(_ c: CGContext, paper: UInt32, strokes: [Stroke], width: CGFloat, height: CGFloat,
-                                  decor: BackgroundSpec? = nil) {
+                                  decor: BackgroundSpec? = nil, layers: [Layer] = []) {
         c.setFillColor(ArgbColor.cgColor(paper | 0xFF00_0000))
         c.fill(CGRect(x: 0, y: 0, width: width, height: height))
         if let decor, !decor.isEmpty {
@@ -122,7 +148,7 @@ enum StrokeRenderer {
         }
         c.beginTransparencyLayer(auxiliaryInfo: nil)
         // v52 piksel fırçaları bu çizimin kağıdını okur
-        RasterStrokes.withPaper(paper | 0xFF00_0000) { drawStrokeList(c, strokes) }
+        RasterStrokes.withPaper(paper | 0xFF00_0000) { drawStrokeList(c, strokes, layers: layers) }
         c.endTransparencyLayer()
     }
 
@@ -147,14 +173,14 @@ enum StrokeRenderer {
 
     /// Çizimleri [w]×[h] piksel görüntüye ([scale] piksel/tuval birimi) çizer (önbellek ve dışa aktarma için).
     static func render(_ strokes: [Stroke], canvasWidth: CGFloat, canvasHeight: CGFloat, scale: CGFloat, paper: UInt32? = nil,
-                       decor: BackgroundSpec? = nil) -> CGImage {
+                       decor: BackgroundSpec? = nil, layers: [Layer] = []) -> CGImage {
         let w = max(1, Int((canvasWidth * scale).rounded())), h = max(1, Int((canvasHeight * scale).rounded()))
         return Bitmaps.draw(w, h) { c in
             c.scaleBy(x: scale, y: scale)
             if let paper {
-                drawCanvasContent(c, paper: paper, strokes: strokes, width: canvasWidth, height: canvasHeight, decor: decor)
+                drawCanvasContent(c, paper: paper, strokes: strokes, width: canvasWidth, height: canvasHeight, decor: decor, layers: layers)
             } else {
-                drawStrokeList(c, strokes)
+                drawStrokeList(c, strokes, layers: layers)
             }
         }
     }

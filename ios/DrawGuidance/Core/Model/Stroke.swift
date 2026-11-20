@@ -696,13 +696,17 @@ struct BrushParams: Codable, Equatable {
     /// v56 gren ve resimden fırça (fırça ucu bir resim varlığı).
     var grain: GrainSpec? = nil
     var stampAssetId: String? = nil
+    /// v56 alfa kilidi: çizgi alfa kilitli katmanda çizildi; yalnız katmanda önceden boyanmış yerlerde görünür.
+    var alphaLocked = false
 
     init(spacing: Float? = nil, tiltWidth: Float? = nil, tiltLight: Float? = nil, tiltThreshold: Float = 0,
          nibFollow: Bool = false, tube: TubeParams? = nil, depth3d: Depth3D? = nil, comicLines: ComicLinesParams? = nil,
-         tip: TipParams? = nil, pen: PenDynamics? = nil, fx: FxParams? = nil, grain: GrainSpec? = nil, stampAssetId: String? = nil) {
+         tip: TipParams? = nil, pen: PenDynamics? = nil, fx: FxParams? = nil, grain: GrainSpec? = nil, stampAssetId: String? = nil,
+         alphaLocked: Bool = false) {
         self.spacing = spacing; self.tiltWidth = tiltWidth; self.tiltLight = tiltLight; self.tiltThreshold = tiltThreshold
         self.nibFollow = nibFollow; self.tube = tube; self.depth3d = depth3d; self.comicLines = comicLines
         self.tip = tip; self.pen = pen; self.fx = fx; self.grain = grain; self.stampAssetId = stampAssetId
+        self.alphaLocked = alphaLocked
     }
 
     init(from decoder: Decoder) throws {
@@ -711,6 +715,7 @@ struct BrushParams: Codable, Equatable {
         tiltThreshold = c.v("tiltThreshold", 0); nibFollow = c.v("nibFollow", false); tube = c.o("tube")
         depth3d = c.o("depth3d"); comicLines = c.o("comicLines")
         tip = c.o("tip"); pen = c.o("pen"); fx = c.o("fx"); grain = c.o("grain"); stampAssetId = c.o("stampAssetId")
+        alphaLocked = c.v("alphaLocked", false)
     }
 
     func encode(to encoder: Encoder) throws {
@@ -719,6 +724,7 @@ struct BrushParams: Codable, Equatable {
         try c.e(tiltThreshold, "tiltThreshold", 0); try c.e(nibFollow, "nibFollow", false); try c.o(tube, "tube")
         try c.o(depth3d, "depth3d"); try c.o(comicLines, "comicLines")
         try c.o(tip, "tip"); try c.o(pen, "pen"); try c.o(fx, "fx"); try c.o(grain, "grain"); try c.o(stampAssetId, "stampAssetId")
+        try c.e(alphaLocked, "alphaLocked", false)
     }
 }
 

@@ -16,7 +16,8 @@ enum ColorSampler {
             ctx.scaleBy(x: 1, y: -1)
             ctx.translateBy(x: CGFloat(1 - x), y: CGFloat(1 - y))
             StrokeRenderer.drawCanvasContent(ctx, paper: ArgbColor.parse(canvas.paperOf(pg)) ?? ArgbColor.white, strokes: strokes,
-                                             width: CGFloat(canvas.width), height: CGFloat(canvas.height), decor: canvas.backgroundOf(pg))
+                                             width: CGFloat(canvas.width), height: CGFloat(canvas.height), decor: canvas.backgroundOf(pg),
+                                             layers: canvas.layers)
             return true
         }
         if !ok { return nil }

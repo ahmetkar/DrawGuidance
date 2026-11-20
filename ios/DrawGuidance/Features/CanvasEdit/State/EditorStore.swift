@@ -166,10 +166,26 @@ final class EditorStore: ObservableObject {
     /// Açık sayfanın çizimlerini değiştirir (geri alınabilir).
     func commit(_ updated: [Stroke], coalesce: String? = nil) {
         guard let current = canvas else { return }
-        let placed = placeNewInActiveLayer(current.strokes, updated, current.layers)
+        let placed = markAlphaLocked(current.strokes, placeNewInActiveLayer(current.strokes, updated, current.layers), current.layers)
         var pages = current.pages
         if pages.indices.contains(current.currentPage) { pages[current.currentPage] = placed } else { pages.append(placed) }
         commit(pages: pages, width: current.width, height: current.height, background: current.backgroundColorHex, coalesce: coalesce)
+    }
+
+    /// v56 alfa kilitli katmana yeni eklenen fırça izleri işaretlenir (`BrushParams.alphaLocked`); nesneler ve silgiler hariç.
+    private func markAlphaLocked(_ before: [Stroke], _ after: [Stroke], _ layers: [Layer]) -> [Stroke] {
+        let locked = Set(layers.filter(\.alphaLock).map(\.id))
+        if locked.isEmpty { return after }
+        let known = Set(before.map(\.id))
+        return after.map { s in
+            if known.contains(s.id) || s.brushType.isObject || s.brushType == .ERASER || s.params?.alphaLocked == true ||
+                !locked.contains(Layers.of(s, layers)) { return s }
+            var c = s
+            var p = c.params ?? BrushParams()
+            p.alphaLocked = true
+            c.params = p
+            return c
+        }
     }
 
     private func placeNewInActiveLayer(_ before: [Stroke], _ after: [Stroke], _ layers: [Layer]) -> [Stroke] {

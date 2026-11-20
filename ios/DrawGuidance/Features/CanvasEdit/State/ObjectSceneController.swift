@@ -210,7 +210,7 @@ final class ObjectSceneController: ObservableObject {
             ctx.scaleBy(x: CGFloat(k), y: CGFloat(k))
             ctx.translateBy(x: CGFloat(-region.left), y: CGFloat(-region.top))
             StrokeRenderer.drawCanvasContent(ctx, paper: paper, strokes: below, width: CGFloat(c.width), height: CGFloat(c.height),
-                                             decor: c.backgroundOf(c.currentPage))
+                                             decor: c.backgroundOf(c.currentPage), layers: c.layers)
         }
         return SceneAnalyzer.Pixels(px: HarmonyRenderer.argbPixels(img, w, h), w: w, h: h)
     }

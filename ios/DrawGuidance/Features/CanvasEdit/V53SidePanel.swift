@@ -203,7 +203,20 @@ struct LayersList: View {
 
     private func row(_ layer: Layer) -> some View {
         let active = store.activeLayer == layer.id
-        return HStack(spacing: 8) {
+        let kind = store.canvas?.kind ?? .ART
+        let index = store.canvas?.layers.firstIndex(where: { $0.id == layer.id }) ?? 0
+        return VStack(alignment: .leading, spacing: 8) {
+            rowHeader(layer, active)
+            if active { LayerLookRow(vm: vm, layer: layer, index: index, kind: kind) }
+        }
+        .buttonStyle(.borderless)
+        .padding(10)
+        .background(RoundedRectangle(cornerRadius: 12).fill(active ? Color.accentColor.opacity(0.1) : Color.primary.opacity(0.04)))
+        .accessibilityIdentifier("layer_\(layer.id)")
+    }
+
+    private func rowHeader(_ layer: Layer, _ active: Bool) -> some View {
+        HStack(spacing: 8) {
             Button { vm.layers.setActive(layer.id) } label: {
                 Image(systemName: active ? "largecircle.fill.circle" : "circle").foregroundStyle(active ? Color.accentColor : .secondary)
             }
@@ -225,10 +238,55 @@ struct LayersList: View {
                 }
             } label: { Image(systemName: "ellipsis.circle") }
         }
-        .buttonStyle(.borderless)
-        .padding(10)
-        .background(RoundedRectangle(cornerRadius: 12).fill(active ? Color.accentColor.opacity(0.1) : Color.primary.opacity(0.04)))
-        .accessibilityIdentifier("layer_\(layer.id)")
+    }
+}
+
+/// v56 karışım modunun adı (Android `layerBlendLabel`).
+func layerBlendLabel(_ b: LayerBlend) -> String { L("v56_blend_" + b.rawValue.lowercased()) }
+
+/// v56 etkin katmanın altında: opaklık, karışım modu, alfa kilidi, alttakine kırp (mod kuralı: `V56Flags`).
+struct LayerLookRow: View {
+    @ObservedObject var vm: EditorViewModel
+    let layer: Layer
+    let index: Int
+    let kind: CanvasKind
+    @State private var opacity: Float = 1
+
+    var body: some View {
+        let blend = V56Flags.enabled(.LAYER_BLEND, kind), lockClip = V56Flags.enabled(.ALPHA_LOCK_CLIP, kind)
+        VStack(alignment: .leading, spacing: 6) {
+            if blend {
+                Text(L("v56_layer_opacity", Int((opacity * 100).rounded()))).font(.caption).foregroundStyle(.secondary)
+                Slider(value: Binding(get: { Double(opacity) }, set: { opacity = Float($0); vm.layers.setOpacity(layer.id, Float($0)) }), in: 0...1)
+                    .accessibilityIdentifier("layer_opacity")
+                Menu {
+                    ForEach(LayerBlend.allCases, id: \.self) { b in
+                        Button { vm.layers.setBlend(layer.id, b) } label: {
+                            if b == layer.blend { Label(layerBlendLabel(b), systemImage: "checkmark") } else { Text(layerBlendLabel(b)) }
+                        }
+                    }
+                } label: {
+                    Label(L("v56_layer_blend") + ": " + layerBlendLabel(layer.blend), systemImage: "square.2.layers.3d")
+                        .font(.caption.weight(.semibold))
+                }
+                .accessibilityIdentifier("layer_blend")
+            }
+            if lockClip {
+                HStack(spacing: 8) {
+                    Toggle(L("v56_layer_alpha_lock"), isOn: Binding(get: { layer.alphaLock }, set: { _ in vm.layers.toggleAlphaLock(layer.id) }))
+                        .toggleStyle(.button).font(.caption).accessibilityIdentifier("layer_alpha_lock")
+                    if index > 0 {
+                        Toggle(L("v56_layer_clip"), isOn: Binding(get: { layer.clipToBelow }, set: { _ in vm.layers.toggleClip(layer.id) }))
+                            .toggleStyle(.button).font(.caption).accessibilityIdentifier("layer_clip")
+                    }
+                }
+                if layer.clipToBelow && index > 0 {
+                    Text(L("v56_layer_clip_hint")).font(.caption2).foregroundStyle(.secondary)
+                }
+            }
+        }
+        .onChangeCompat(of: layer.opacity, initial: true) { _, new in opacity = new }
+        .accessibilityIdentifier("layer_look")
     }
 }
 

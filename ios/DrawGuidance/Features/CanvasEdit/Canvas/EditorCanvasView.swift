@@ -92,6 +92,8 @@ final class EditorCanvasView: UIView {
     // MARK: Önbellek
     private struct CacheKey: Equatable {
         let w: Int, h: Int, scale: Float, offset: P, canvasW: Int, canvasH: Int, excluded: Set<String>, page: Int
+        /// v56 katman görünümü (opaklık, mod, alfa kilidi, kırpma) değişince görüntü baştan üretilir.
+        var layers: [Layer] = []
     }
     private var cacheImage: CGImage?
     private var cacheKey: CacheKey?
@@ -477,6 +479,12 @@ final class EditorCanvasView: UIView {
         return []
     }
 
+    /// v56 elemanın katmanı (ilk katmanın elemanlarında kimlik yok).
+    private func layerOf(_ c: CanvasUi, _ id: String?) -> Layer? {
+        if let id, let l = c.layers.first(where: { $0.id == id }) { return l }
+        return id == nil ? c.layers.first : nil
+    }
+
     private static func isAppend(_ previous: [Stroke], _ next: [Stroke]) -> Bool {
         if next.count < previous.count { return false }
         for i in previous.indices where previous[i] != next[i] { return false }
@@ -490,7 +498,7 @@ final class EditorCanvasView: UIView {
             if cacheVersion == version { cacheDrawn = target; return }
             if Self.isAppend(cacheDrawn, target) {
                 let added = Array(target[cacheDrawn.count...])
-                if !added.contains(where: { $0.brushType == .ERASER || $0.brushType.isRaster }) {
+                if !added.contains(where: { $0.brushType == .ERASER || $0.brushType.isRaster }) && LayerCompositor.appendSafe(added, key.layers) {
                     let px = contentScaleFactor
                     cacheImage = Bitmaps.draw(img.width, img.height) { g in
                         Bitmaps.drawUpright(g, img, in: CGRect(x: 0, y: 0, width: img.width, height: img.height))
@@ -498,7 +506,7 @@ final class EditorCanvasView: UIView {
                         Self.clipPaper(g, key)
                         g.translateBy(x: CGFloat(key.offset.x), y: CGFloat(key.offset.y))
                         g.scaleBy(x: CGFloat(key.scale), y: CGFloat(key.scale))
-                        StrokeRenderer.drawStrokeList(g, added)
+                        StrokeRenderer.drawStrokeList(g, added, layers: key.layers)
                     }
                     cacheDrawn = target
                     cacheVersion = version
@@ -520,7 +528,7 @@ final class EditorCanvasView: UIView {
                     g.translateBy(x: CGFloat(key.offset.x), y: CGFloat(key.offset.y))
                     g.scaleBy(x: CGFloat(key.scale), y: CGFloat(key.scale))
                     g.beginTransparencyLayer(auxiliaryInfo: nil)
-                    StrokeRenderer.drawStrokeList(g, target)
+                    StrokeRenderer.drawStrokeList(g, target, layers: key.layers)
                     g.endTransparencyLayer()
                 }
             }.value
@@ -552,7 +560,8 @@ final class EditorCanvasView: UIView {
         let excluded = excludedIds(c, selected, ap)
         let target = excluded.isEmpty ? visible : visible.filter { !excluded.contains($0.id) }
         let key = CacheKey(w: Int(bounds.width), h: Int(bounds.height), scale: viewport.settledScale, offset: viewport.settledOffset,
-                           canvasW: c.width, canvasH: c.height, excluded: excluded, page: c.currentPage)
+                           canvasW: c.width, canvasH: c.height, excluded: excluded, page: c.currentPage,
+                           layers: LayerCompositor.needed(c.layers) || c.layers.contains(where: { $0.alphaLock }) ? c.layers : [])
         updateCache(key, target, vm.store.visualVersion)
         // Önbellek güncellendiyse canlı katman bırakılır
         if live.finished && cacheVersion == vm.store.visualVersion && cacheKey == key { live.release() }
@@ -611,7 +620,9 @@ final class EditorCanvasView: UIView {
         g.translateBy(x: CGFloat(offset.x), y: CGFloat(offset.y))
         g.scaleBy(x: CGFloat(scale), y: CGFloat(scale))
         if isolate { g.setAlpha(SelectionIsolation.DIM) }
-        for s in pending where !(liveVisible && s.id == live.strokeId) { StrokeRenderer.drawStroke(g, s) }
+        for s in pending where !(liveVisible && s.id == live.strokeId) {
+            LayerCompositor.withLayerLook(g, layerOf(c, s.layerId)) { StrokeRenderer.drawStroke(g, s) }
+        }
         if isolate {
             g.setAlpha(1)
             if !mode.transformsSelection {
@@ -619,7 +630,7 @@ final class EditorCanvasView: UIView {
             }
         }
         drawPreviewShapes(g, ap, scale, accent)
-        if !moving.isEmpty { drawMoving(g, moving, ap) }
+        if !moving.isEmpty { drawMoving(g, moving, ap, layers: c.layers) }
         if overlay.formulaSlots, let f = c.strokes.first(where: { selected.contains($0.id) && $0.brushType == .FORMULA }) {
             FormulaRenderer.drawSlots(g, f, activeSlot: overlay.formulaSlot, color: accent.argb)
         }
@@ -637,7 +648,9 @@ final class EditorCanvasView: UIView {
             g.setLineDash(phase: 0, lengths: [CGFloat(12 / scale), CGFloat(7 / scale)]); g.strokePath()
             g.setLineDash(phase: 0, lengths: [])
         }
-        if liveVisible, let s = live.stroke() { StrokeRenderer.drawLive(g, s) }
+        if liveVisible, let s = live.stroke() {
+            LayerCompositor.withLayerLook(g, live.isEraser ? nil : layerOf(c, vm.store.activeLayer)) { StrokeRenderer.drawLive(g, s) }
+        }
         // Silgi nesneleri silmez: silerken nesneler canlı silginin üstünde gösterilir
         if liveVisible && live.isEraser {
             for s in visible where s.brushType.isObject && !s.hidden { StrokeRenderer.drawStroke(g, s) }
@@ -689,22 +702,24 @@ final class EditorCanvasView: UIView {
     }
 
     /// Taşı/Döndür önizlemesi tuval dönüşümüyle çizilir (her karede bütün noktalar yeniden hesaplanmaz).
-    private func drawMoving(_ g: CGContext, _ moving: [Stroke], _ ap: CanvasPreview?) {
+    private func drawMoving(_ g: CGContext, _ moving: [Stroke], _ ap: CanvasPreview?, layers all: [Layer] = []) {
+        // v56 opaklık ve mod önizlemede de (kırpma tabanı önizlemede olmadığından yok)
+        let layers = LayerCompositor.needed(all) ? all.map { l -> Layer in var c = l; c.clipToBelow = false; return c } : []
         g.saveGState()
         g.beginTransparencyLayer(auxiliaryInfo: nil)
         switch ap {
         case let .move(d)?:
-            g.translateBy(x: CGFloat(d.x), y: CGFloat(d.y)); StrokeRenderer.drawStrokeList(g, moving)
+            g.translateBy(x: CGFloat(d.x), y: CGFloat(d.y)); StrokeRenderer.drawStrokeList(g, moving, layers: layers)
         case let .rotate(deg, pv)?:
             g.translateBy(x: CGFloat(pv.x), y: CGFloat(pv.y)); g.rotate(by: CGFloat(deg) * .pi / 180)
-            g.translateBy(x: -CGFloat(pv.x), y: -CGFloat(pv.y)); StrokeRenderer.drawStrokeList(g, moving)
+            g.translateBy(x: -CGFloat(pv.x), y: -CGFloat(pv.y)); StrokeRenderer.drawStrokeList(g, moving, layers: layers)
         case let .scale(sx, sy, pv)?:
             let ids = Set(moving.map(\.id))
-            StrokeRenderer.drawStrokeList(g, ElementOps.scale(moving, ids, sx, sy, pivot: pv))
+            StrokeRenderer.drawStrokeList(g, ElementOps.scale(moving, ids, sx, sy, pivot: pv), layers: layers)
         case let .shapeEdit(s)?:
-            StrokeRenderer.drawStrokeList(g, moving.map { $0.id == s.id ? s : $0 })
+            StrokeRenderer.drawStrokeList(g, moving.map { $0.id == s.id ? s : $0 }, layers: layers)
         default:
-            StrokeRenderer.drawStrokeList(g, moving)
+            StrokeRenderer.drawStrokeList(g, moving, layers: layers)
         }
         g.endTransparencyLayer()
         g.restoreGState()

@@ -812,10 +812,108 @@ modunda yok (çıktı resim).
 | 9 | Dışa aktarma **+ PSD ve DXF** (2D-3); SVG zaten bu aşamada | 2–7 |
 | 9A | **E-posta/şifre girişi** (2D-2, Android + iOS) | — (paralel) |
 | 9B | **Mağaza flavor'ları, Huawei ve Samsung abonelik, freeRASP mağaza listesi, sunucu 56.0.0** (2D-1) | 9A |
+| 3C | **2E seçim:** grup içi seçim, sihirli değnek, kırpma maskesi | 3 |
+| 6A | **2E dönüştürme:** yansıt/çevir, kaydır/eğ, referans noktası, G/Y/açı, her birini dönüştür, dönüşümü tekrarla; hizala ve dağıt; vektör girdap/büzüştür/şişir | 6 |
+| 8A | **2E Özellikler ve nesne:** dolgu/kontur/görünüm seçenekleri, bağlı kopya, opaklık maskesi, tekrarla | 7, 8 |
+| 9C | **2E vektör:** yol işlemleri, şekil oluşturucu, düğüm türleri ve tutamaklar, yol işlemleri, bıçak, efektler | 8A |
 
-Kontrol noktalarına etkisi: K0'a aşama 0A eklenir; K3 (2B tamam) aşama 9A ve 9B'yi de kapsar. Sunucu değiştiği için 9. bölümdeki
+Kontrol noktalarına etkisi: K0'a aşama 0A eklenir; K3 aşama 9A ve 9B'yi de kapsar; 2E araçları K1, K2, K3 ve yeni **K3A** durağına dağıtılır (2B, K3A'da tamamlanır). Sunucu değiştiği için 9. bölümdeki
 "Sunucu değişmez (54.0.0)" maddesi "Sunucu 56.0.0: Huawei ve Samsung abonelik doğrulaması" olur. Tahmini büyüklük
 yaklaşık 6–8 bin satır artar (en büyük kalemler: PSD/DXF yazıcıları, mağaza ödeme katmanları, sunucu doğrulamaları).
+
+## 2E. Gelişmiş çizim araçları (Ahmet, 2026-11-20)
+
+_Kapsam: yalnız **Resim (gelişmiş çizim)** modu. Basit resim, çizgi roman, not alma ve çocuk modunda bu bölümdeki yeni
+araçlar yok (2D maddeleri kendi mod kurallarıyla kalır). `V56Flags`'te `ADV_*` özellikleri yalnız `ART` için açıktır._
+
+**Yerleşim kuralları:**
+
+- Uygulamada karşılığı olan araç **yeniden eklenmez**; gerekirse eksik seçeneği mevcut araca eklenir (tabloda "Var").
+- Yeni araçlar ilgili panele ya da menüye girer. Üst menüye en çok **bir** yeni düğme eklenir: **Nesne** açılır menüsü.
+  Altında gruplar: *Hizala ve dağıt*, *Yol işlemleri* (Pathfinder), *Tekrarla*, *Efektler*, *Yol düzenle*. Üst menünün
+  geri kalanı aynı kalır.
+- Dönüştürme seçenekleri **Dönüştür panelinde** (Seç modu, 2A): kipler üstte, sayısal alanlar ve ayarlar alt panelde.
+- Dolgu, kontur ve görünüm seçenekleri **Özellikler penceresinde** (seçili nesne ya da katman; 2D-4 ile aynı pencere).
+- Katman işlemleri **Katmanlar panelinde**; nesne işlemleri **seçim menüsünde** (uzun basma / seçim çubuğu).
+- **Çizim sırasında gereken seçenekler alt panelde** çıkar: simetri ve canlı ayna, sihirli değnek toleransı, bıçak, düğüm
+  türü ve Bezier tutamakları, tekrar adımı. Araç seçilince alt panel açılır, araç bırakılınca kapanır.
+
+| # | Araç | Durum | Yeri | Durak |
+|---|---|---|---|---|
+| **1. Seçim** | | | | |
+| 1.1 | Doğrudan seçim (düğüm ve segment) | Var (Yol düzenle / düğümler); segment seçimi eklenir | Yol düzenle | K3A |
+| 1.2 | Grup içi seçim | Yeni: grupta çift dokunuş grubun içine girer | Seç modu | K1 |
+| 1.3 | Kement | Var (Kement seçimi); düğüm seçimi Yol düzenle'de | Seç modu | — |
+| 1.4 | Sihirli değnek (benzer renk/kontur/görünüm) | Yeni; tolerans ve ölçüt alt panelde | Seç modu kipleri | K1 |
+| 1.5 | Dikdörtgen seçim | Var | Seç modu | — |
+| 1.6–1.8 | Tümünü seç, seçimi kaldır, ters çevir | Seçimi kaldır var; ötekiler aşama 3'te | Seçim menüsü | K1 |
+| **2. Dönüştürme** | | | | |
+| 2.1–2.3 | Taşı, döndür, ölçekle (orantılı/bağımsız) | Var (Taşı, Döndür, Ölçekle kipleri) | Dönüştür paneli | — |
+| 2.4–2.6 | Yansıt (eksene göre), yatay/dikey çevir | Yeni (nesne düzeyinde; fotoğraf düzenleyicideki çevirme ayrı) | Dönüştür alt paneli | K2 |
+| 2.7–2.8 | Kaydır (Shear), eğ (Skew) | Yeni kip | Dönüştür paneli | K2 |
+| 2.9–2.11 | Serbest dönüştür, perspektif, serbest bozma | Planda (Serbest, Bozma kipleri, 2A) | Dönüştür paneli | K2 |
+| 2.12 | Referans noktası (9 nokta + serbest) | Yeni | Dönüştür alt paneli | K2 |
+| 2.13–2.15 | X/Y, genişlik/yükseklik, açı | X/Y var (Konum); G/Y ve açı eklenir | Dönüştür alt paneli | K2 |
+| 2.16 | Her birini dönüştür | Yeni | Dönüştür alt paneli | K2 |
+| **3. Hizala ve dağıt** | | | | |
+| 3.1–3.6 | Sola, ortaya, sağa, üste, dikey ortaya, alta | Sol/orta/sağ var; üst/dikey orta/alt eklenir | Nesne › Hizala ve dağıt | K2 |
+| 3.7–3.9 | Kâğıda, seçime, ana nesneye göre | Yeni (ana nesne: seçimde bir nesneye dokunulur) | Aynı menü | K2 |
+| 3.10–3.12 | Yatay/dikey dağıt, boşlukları eşitle | Yeni | Aynı menü | K2 |
+| **4. Yol işlemleri** | | | | |
+| 4.1–4.4 | Birleştir, önden çıkar, kesişim, dışla | Yeni (vektör şekil ve yollar; 3B'deki karşılıklar ayrı) | Nesne › Yol işlemleri | K3A |
+| 4.5–4.9 | Böl, kırp (trim), birleştir (merge), kırp (crop), anahat | Yeni | Aynı menü | K3A |
+| 4.10 | Şekil oluşturucu | Yeni araç (kesişen bölgeye dokun/sürükle: birleştir; uzun bas: çıkar) | Nesne › Yol işlemleri | K3A |
+| **5. Dolgu, kontur, görünüm** | | | | |
+| 5.1–5.3 | Düz renk, doğrusal, dairesel gradyan | Var (Dolgu › Gradyan) | Özellikler | — |
+| 5.4 | Serbest gradyan (kontrol noktaları) | Yeni | Özellikler › Dolgu | K3 |
+| 5.5–5.7 | Desen dolgu, dolgu yok, dolgu opaklığı | Yeni seçenekler (desen: hazır doku paketi, aşama 5) | Özellikler › Dolgu | K3 |
+| 5.8–5.9 | Kontur rengi ve kalınlığı | Var | Özellikler › Kontur | — |
+| 5.10–5.12 | Uç biçimi, köşe biçimi, köşe sınırı | Yeni | Özellikler › Kontur | K3 |
+| 5.13 | Kesikli çizgi | Var (kesikli); tire/boşluk uzunluğu eklenir | Özellikler › Kontur | K3 |
+| 5.14 | Kontur hizası (iç/dış/orta) | Yeni | Özellikler › Kontur | K3 |
+| 5.15 | Ok uçları (baş/son) | Yeni (şekilden ok çıkarma ayrı kalır) | Özellikler › Kontur | K3 |
+| 5.16 | Konturu yola çevir | Yeni | Nesne › Yol düzenle | K3A |
+| 5.17–5.18 | Nesne opaklığı, karışım modu | Opaklık var; nesne karışım modu eklenir (katman modu K1) | Özellikler › Görünüm | K3 |
+| 5.19–5.20 | Çoklu dolgu, çoklu kontur | Yeni (liste; sıra değiştirilebilir) | Özellikler › Görünüm | K3 |
+| **6. Yol ve düğüm düzenleme** | | | | |
+| 6.1–6.2 | Düğüm ekle, sil | Var | Yol düzenle | — |
+| 6.3–6.6 | Düğüm türü (köşe/yumuşak), Bezier tutamakları | Yeni (tutamaklar alt panelde) | Yol düzenle | K3A |
+| 6.7–6.10 | Yolları birleştir, yolu ayır, kapat, yönü ters çevir | Birleştirme (bağla) var; ayır, kapat, ters çevir eklenir | Yol düzenle | K3A |
+| 6.11–6.12 | Sadeleştir, yumuşat | Var (Sadeleştir, Yumuşat) | Yol düzenle | — |
+| 6.13 | Yolu uzat | Yeni (uç düğümden sürükle) | Yol düzenle | K3A |
+| 6.14 | Makas | Var (Kes) | Yol düzenle | — |
+| 6.15 | Bıçak (serbest kesim) | Yeni araç | Nesne › Yol düzenle | K3A |
+| **7. Katman ve nesne** | | | | |
+| 7.1–7.6 | Yeni/sil/çoğalt/yeniden adlandır, kilitle, gizle | Çoğaltma dışında var; çoğaltma 2D-4'te | Katmanlar paneli | K3 |
+| 7.7–7.9 | Grupla, grubu çöz, nesneyi çoğalt | Var | Seçim menüsü | — |
+| 7.10 | Bağlı kopya (klon) | Yeni (kaynak değişince kopyalar güncellenir) | Seçim menüsü | K3 |
+| 7.11–7.14 | En öne, en arkaya, bir öne, bir arkaya | Var | Seçim menüsü | — |
+| 7.15 | Kırpma maskesi (üstteki nesnenin sınırı) | Yeni (seçim maskesi altyapısıyla) | Seçim menüsü | K1 |
+| 7.16 | Opaklık maskesi | Yeni (maske nesnesinin parlaklığı) | Seçim menüsü | K3 |
+| **8. Tekrarla ve simetri** | | | | |
+| 8.1–8.4 | Doğrusal, ızgara, dairesel, aynalı tekrar | Yeni (canlı: kaynak değişince tekrarlar güncellenir) | Nesne › Tekrarla | K3 |
+| 8.5–8.6 | Canlı ayna, simetrik çizim | Planda (simetri kılavuzu, aşama 8); "aynalı bakış" yardımcısı ayrı kalır | Kılavuzlar + alt panel | K3 |
+| 8.7–8.8 | Dönüşümü çoğalt, dönüşümü tekrarla | Yeni (son dönüşüm kaydedilir) | Dönüştür alt paneli | K2 |
+| 8.9 | Adımla çoğalt (mesafe/açı/adet) | Yeni | Nesne › Tekrarla | K3 |
+| **9. Efekt ve deformasyon** | | | | |
+| 9.1 | Yolu öteleme (offset) | Yeni | Nesne › Efektler | K3A |
+| 9.2 | Zarf bozma (başka şeklin geometrisi) | Yeni | Nesne › Efektler | K3A |
+| 9.3–9.6 | Bükme (warp), ağ bükme, perspektif, serbest bozma | Planda (Çarpıtma, Bozma kipleri) | Dönüştür paneli | K2 |
+| 9.7 | Kıvırma (bend, yön ve miktar) | Yeni hazır çarpıtma | Nesne › Efektler | K3A |
+| 9.8–9.10 | Girdap, büzüştür, şişir | Raster katmanda sıvılaştır (planda); vektörde yeni efekt | Nesne › Efektler | K2 |
+| 9.11–9.12 | Pürüzlendir, zikzak/dalga | Yeni | Nesne › Efektler | K3A |
+
+**Veri modeli etkisi (V11 içinde, ek sürüm yok):** `Stroke.style2: VectorStyle?` (uç/köşe biçimi, köşe sınırı, kontur hizası,
+tire dizisi, ok uçları, çoklu dolgu/kontur, serbest gradyan, desen dolgu, nesne karışım modu, opaklık maskesi kaynağı);
+`Stroke.cloneOf` (bağlı kopya), `Stroke.repeat: RepeatSpec?` (canlı tekrar), `Stroke.effects: List<VectorEffect>?`
+(offset, bend, girdap, büzüştür, şişir, pürüz, zikzak; kalıcı ve sonradan değiştirilebilir); düğüm türleri ve Bezier
+tutamakları `ShapeSpec` alt yollarında (`nodeTypes`, `handles`). Hepsi V10'a düzleştirmede yola çevrilerek korunur.
+
+**Testler:** her yol işleminin bilinen şekillerle alan/köşe sayısı testi; hizala/dağıt koordinat testi; tekrar ve klonun
+kaynak değişince güncellenmesi; V11 gidiş-dönüş; düzleştirme sonrası görünür sonuç; iOS XCTest karşılıkları.
+
+**Tahmini büyüklük:** yaklaşık 7–9 bin satır (en büyük kalemler: yol işlemleri ve şekil oluşturucu, düğüm türleri ve
+tutamaklar, çoklu dolgu/kontur çizimi).
 
 ## 3. Veri modeli (tek değişiklik paketi)
 
@@ -928,9 +1026,10 @@ bir yerdir.
 | Durak | Ne zaman | Durumu |
 |---|---|---|
 | **K0** | Aşama 0 bitti: canlı yayın ara-verme hatası, canlı mürekkep, yayın onayı (Android + iOS) | Bildirilen yayın hataları düzeldi |
-| **K1** | Aşama 1–3B bitti: V11 veri modeli, katman motoru, seçim maskesi, **sayfalar arası kes-yapıştır**, yayın fark paketi (Android + iOS) | 2B temeli |
-| **K2** | Aşama 4–6 bitti: hızlı fırça seçici, gren ve doku, Dönüştür paneli, yansıma, sıvılaştır | 2B araçlarının çoğu |
-| **K3** | Aşama 7–9 bitti: renk ayarları, simetri, dışa aktarma; **2B tamam**, iOS CI yeşil | 2B özellikleri tamam |
+| **K1** | Aşama 1–3B bitti: V11 veri modeli, katman motoru, seçim maskesi, **sayfalar arası kes-yapıştır**, yayın fark paketi (Android + iOS); 2E: grup içi seçim, sihirli değnek, kırpma maskesi | 2B temeli |
+| **K2** | Aşama 4–6 bitti: hızlı fırça seçici, gren ve doku, Dönüştür paneli, yansıma, sıvılaştır; 2E: yansıt/çevir, kaydır/eğ, referans noktası, sayısal G/Y/açı, her birini dönüştür, dönüşümü tekrarla, hizala ve dağıt (Nesne menüsü), vektör girdap/büzüştür/şişir | 2B araçlarının çoğu |
+| **K3** | Aşama 7–9B bitti: renk ayarları, simetri, dışa aktarma, e-posta girişi, mağazalar; 2E: dolgu/kontur/görünüm seçenekleri, katman çoğalt, bağlı kopya, opaklık maskesi, tekrarla (doğrusal/ızgara/dairesel/aynalı/adımla) | 2B özelliklerinin çoğu |
+| **K3A** | Aşama 9C bitti (2E): yol işlemleri ve şekil oluşturucu, düğüm türleri ve Bezier tutamakları, yol birleştir/ayır/kapat/ters çevir/uzat, bıçak, konturu yola çevir, efektler (öteleme, zarf, kıvırma, pürüz, zikzak); **2B tamam** | 2B tamam |
 | **K4** | Aşama 10 bitti: 3B temizlik ve tuvalde yeni ekleme akışı | Eski 3B düzenleyiciye giden yollar kapalı |
 | **K5** | Aşama 11 bitti: 3B Çizim temeli ve **Metal çizicinin ilk hali**, iOS CI yeşil | 3B çizim çalışıyor |
 | **K6** | Aşama 12–13 bitti: dolgu, toon, yüzeye boya, video; telefon düzeni | 3B tamam |

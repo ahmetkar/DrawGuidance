@@ -2,4 +2,11 @@
 <!-- v56 metinleri -->
 <resources>
     <string name="v56_practice_reward_nofill">当前没有可播放的广告。已为你解锁该练习。</string>
+    <string name="v56_live_req_title">直播请求</string>
+    <string name="v56_live_req_body">%1$s 想要向你直播画布“%2$s”。</string>
+    <string name="v56_live_rejected">直播被拒绝</string>
+    <string name="v56_live_no_answer">对方设备没有回应</string>
+    <string name="v56_live_blocked">被拒绝的请求过多：请几分钟后再试</string>
+    <string name="v56_live_always_asks">直播总会先征求你的同意；接受后才会显示配对码。</string>
+    <string name="v56_live_elsewhere">主播在其他界面</string>
 </resources>

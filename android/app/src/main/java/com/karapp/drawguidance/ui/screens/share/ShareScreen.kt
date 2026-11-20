@@ -306,7 +306,6 @@ fun ShareSettingsCard(settings: ShareSettings = koinInject(), onOpenShare: (() -
 /** v52 canlı tuval yayını ayarları kartı (yayın sayfasında ve Ayarlar → Bağlantı'da). */
 @Composable
 fun LiveSettingsCard(settings: ShareSettings = koinInject(), onOpenLive: (() -> Unit)? = null) {
-    val askLive by settings.askBeforeLive.collectAsState()
     val autoOpen by settings.liveAutoOpen.collectAsState()
     val smooth by settings.liveSmooth.collectAsState()
     val visible by settings.discoverable.collectAsState()
@@ -318,7 +317,11 @@ fun LiveSettingsCard(settings: ShareSettings = koinInject(), onOpenLive: (() -> 
     ) {
         if (onOpenLive != null) NeuButton(stringResource(R.string.v52_share_live_open), onOpenLive, Modifier.fillMaxWidth().testTag("settings_open_live"), primary = true, icon = Icons.Filled.Cast)
         SettingSwitchRow(stringResource(R.string.v51_share_discoverable), stringResource(R.string.v51_share_discoverable_hint), visible, settings::setDiscoverable, divider = onOpenLive != null)
-        SettingSwitchRow(stringResource(R.string.v52_live_ask), stringResource(R.string.v52_live_ask_hint), askLive, settings::setAskBeforeLive)
+        // v56 canlı yayın teklifi her zaman sorulur (ayar kalktı)
+        Column(Modifier.fillMaxWidth().padding(vertical = 8.dp).testTag("live_always_asks")) {
+            Text(stringResource(R.string.v52_live_ask), style = MaterialTheme.typography.bodyLarge)
+            Text(stringResource(R.string.v56_live_always_asks), style = MaterialTheme.typography.bodySmall, color = NeuTheme.colors.contentMuted)
+        }
         SettingSwitchRow(stringResource(R.string.v52_live_auto_open), stringResource(R.string.v52_live_auto_open_hint), autoOpen, settings::setLiveAutoOpen)
         SettingSwitchRow(stringResource(R.string.v51_share_smooth), stringResource(R.string.v51_share_smooth_hint), smooth, settings::setLiveSmooth)
     }

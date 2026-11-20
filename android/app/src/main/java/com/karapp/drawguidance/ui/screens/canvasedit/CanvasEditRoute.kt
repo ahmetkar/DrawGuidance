@@ -121,6 +121,13 @@ private fun androidx.compose.foundation.layout.BoxScope.LiveBroadcastBridge(canv
         share.resumeLive(canvasLocalId, owner)
         vm.canvas.collect { c -> if (c != null) share.publishLive(c) }
     }
+    // v56 canlı mürekkep: çizilmekte olan çizgi karşı cihaza küçük paketlerle gider
+    androidx.compose.runtime.LaunchedEffect(canvasLocalId, live.peerKey) {
+        vm.inkProgress.collect { ink ->
+            val b = vm.brushSettings.value
+            share.publishInk(canvasLocalId, ink.strokeId, b.brushType.name, b.colorHex, b.sizePx, b.opacity, ink.points, vm.canvas.value?.currentPage ?: -1)
+        }
+    }
     // v56 düzenleyiciden ayrılınca ara, sahip kaydının silinmesiyle (detachEditor) kendiliğinden verilir; uygulama
     // arka plana alınınca bu örnek ara verir, öne gelince kaldırır
     val lifecycle = androidx.lifecycle.compose.LocalLifecycleOwner.current.lifecycle

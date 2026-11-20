@@ -1042,6 +1042,14 @@ class CanvasEditViewModel(
 
     // --- Çizim ve komutlar ---
 
+    /** v56 çizilmekte olan çizgi (canlı yayında canlı mürekkep; yalnız yayın varken dinlenir). */
+    data class InkProgress(val strokeId: String, val points: List<StrokePoint>)
+    private val _inkProgress = kotlinx.coroutines.flow.MutableSharedFlow<InkProgress>(
+        extraBufferCapacity = 1, onBufferOverflow = kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST,
+    )
+    val inkProgress: kotlinx.coroutines.flow.SharedFlow<InkProgress> = _inkProgress
+    fun onStrokeProgress(strokeId: String, points: List<StrokePoint>) { _inkProgress.tryEmit(InkProgress(strokeId, points)) }
+
     fun onStrokeFinished(points: List<StrokePoint>, strokeId: String? = null, penEraser: Boolean = false) =
         drawing.onStrokeFinished(points, strokeId, penEraser)
 

@@ -2,4 +2,11 @@
 <!-- v56 metinleri -->
 <resources>
     <string name="v56_practice_reward_nofill">No ad is available right now. The practice has been unlocked for you.</string>
+    <string name="v56_live_req_title">Live broadcast request</string>
+    <string name="v56_live_req_body">%1$s wants to broadcast the canvas “%2$s” to you live.</string>
+    <string name="v56_live_rejected">The broadcast was declined</string>
+    <string name="v56_live_no_answer">No answer from the other device</string>
+    <string name="v56_live_blocked">Too many declined requests: try again in a few minutes</string>
+    <string name="v56_live_always_asks">Live broadcasts are always asked first; the pairing code appears only after you accept.</string>
+    <string name="v56_live_elsewhere">The broadcaster is on another screen</string>
 </resources>

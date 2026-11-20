@@ -2,4 +2,11 @@
 <!-- v56 metinleri -->
 <resources>
     <string name="v56_practice_reward_nofill">Şu an gösterilecek reklam bulunamadı. Alıştırma senin için açıldı.</string>
+    <string name="v56_live_req_title">Canlı yayın isteği</string>
+    <string name="v56_live_req_body">%1$s, «%2$s» tuvalini size canlı yayınlamak istiyor.</string>
+    <string name="v56_live_rejected">Yayın reddedildi</string>
+    <string name="v56_live_no_answer">Karşı cihazdan yanıt yok</string>
+    <string name="v56_live_blocked">Çok sayıda reddedilen istek: birkaç dakika sonra yeniden dene</string>
+    <string name="v56_live_always_asks">Canlı yayın her zaman önce sorulur; eşleşme şifresi ancak kabul edince gösterilir.</string>
+    <string name="v56_live_elsewhere">Yayıncı başka bir ekranda</string>
 </resources>

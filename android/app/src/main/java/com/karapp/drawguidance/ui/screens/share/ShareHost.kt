@@ -40,6 +40,11 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.clipToBounds
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.foundation.gestures.detectTransformGestures
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
@@ -84,6 +89,21 @@ fun ShareHost(onOpenCanvas: (String) -> Unit, onOpenLive: (String) -> Unit, shar
                 is ShareEvent.Disconnected -> toast(context, context.getString(R.string.v51_share_disconnected, e.name))
             }
         }
+    }
+
+    // v56 canlı yayın onayı: şifreden önce sorulur; kabul edilirse (ilk eşleşmede) şifre ondan sonra gösterilir
+    val liveRequest by share.liveRequest.collectAsState()
+    liveRequest?.let { r ->
+        AlertDialog(
+            onDismissRequest = {},
+            containerColor = colors.background,
+            modifier = Modifier.testTag("share_live_request"),
+            icon = { Icon(Icons.Filled.Cast, null, tint = colors.accent) },
+            title = { Text(stringResource(R.string.v56_live_req_title)) },
+            text = { Text(stringResource(R.string.v56_live_req_body, r.name, r.title.ifBlank { "—" }), translate = false) },
+            confirmButton = { TextButton(onClick = { share.answerLiveRequest(true) }, modifier = Modifier.testTag("share_live_request_accept")) { Text(stringResource(R.string.v51_share_accept)) } },
+            dismissButton = { TextButton(onClick = { share.answerLiveRequest(false) }, modifier = Modifier.testTag("share_live_request_reject")) { Text(stringResource(R.string.v51_share_reject)) } },
+        )
     }
 
     // v54 eşleşme şifresi: kabul eden cihazda gösterilir, bağlanan cihazda girilir
@@ -205,6 +225,12 @@ fun LiveCanvasScreen(canvasId: String, onBack: () -> Unit, onEdit: (String) -> U
     val canvas by share.liveCanvas.collectAsState()
     val live = liveIn?.takeIf { it.canvasId == canvasId }
     val ended = live == null || live.ended
+    val ink by share.liveInk.collectAsState()
+    // v56 gönderen 5 sn'den uzun ara verirse "Yayıncı başka bir ekranda" yazısı
+    val now by androidx.compose.runtime.produceState(System.currentTimeMillis(), live?.paused) {
+        while (live?.paused == true) { value = System.currentTimeMillis(); kotlinx.coroutines.delay(500) }
+    }
+    val longPause = live?.paused == true && live.pausedAt > 0 && now - live.pausedAt >= 5_000
     Scaffold(
         containerColor = colors.background,
         topBar = {
@@ -227,6 +253,8 @@ fun LiveCanvasScreen(canvasId: String, onBack: () -> Unit, onEdit: (String) -> U
                     style = MaterialTheme.typography.labelLarge, color = if (ended || live?.paused == true) colors.contentMuted else colors.content,
                     modifier = Modifier.testTag("share_live_state"),
                 )
+                if (longPause) Text("· " + stringResource(R.string.v56_live_elsewhere), style = MaterialTheme.typography.labelLarge, color = colors.contentMuted,
+                    modifier = Modifier.testTag("share_live_elsewhere"))
                 canvas?.takeIf { it.pageCount > 1 }?.let {
                     Text("· ${it.currentPage + 1}/${it.pageCount}", style = MaterialTheme.typography.labelLarge, color = colors.contentMuted, translate = false)
                 }
@@ -240,7 +268,7 @@ fun LiveCanvasScreen(canvasId: String, onBack: () -> Unit, onEdit: (String) -> U
                     }
                 }
             } else {
-                LiveCanvas(c, Modifier.fillMaxWidth().weight(1f))
+                LiveCanvas(c, ink.values.filter { it.page < 0 || it.page == c.currentPage }, Modifier.fillMaxWidth().weight(1f))
             }
             if (ended) NeuButton(stringResource(R.string.v51_share_live_edit), { onEdit(canvasId) }, Modifier.fillMaxWidth(), primary = true, icon = Icons.Filled.Edit)
         }
@@ -248,20 +276,57 @@ fun LiveCanvasScreen(canvasId: String, onBack: () -> Unit, onEdit: (String) -> U
 }
 
 @Composable
-private fun LiveCanvas(c: CanvasUi, modifier: Modifier) {
-    Box(modifier, contentAlignment = Alignment.Center) {
+private fun LiveCanvas(c: CanvasUi, ink: List<com.karapp.drawguidance.data.share.LiveInkStroke>, modifier: Modifier) {
+    // v56 yakınlaştırılabilir (iki parmak) ve kaydırılabilir; çift dokunuş sığdırır
+    var zoom by remember(c.localId) { mutableStateOf(1f) }
+    var pan by remember(c.localId) { mutableStateOf(androidx.compose.ui.geometry.Offset.Zero) }
+    Box(
+        modifier
+            .clipToBounds()
+            .pointerInputZoom(c.localId, onZoom = { z, p -> zoom = (zoom * z).coerceIn(1f, 8f); pan = if (zoom == 1f) androidx.compose.ui.geometry.Offset.Zero else pan + p }, onReset = { zoom = 1f; pan = androidx.compose.ui.geometry.Offset.Zero }),
+        contentAlignment = Alignment.Center,
+    ) {
         NeuSurface(
-            Modifier.fillMaxWidth().aspectRatio(c.width.toFloat() / c.height.coerceAtLeast(1), matchHeightConstraintsFirst = c.height > c.width),
+            Modifier.fillMaxWidth().aspectRatio(c.width.toFloat() / c.height.coerceAtLeast(1), matchHeightConstraintsFirst = c.height > c.width)
+                .graphicsLayer { scaleX = zoom; scaleY = zoom; translationX = pan.x; translationY = pan.y },
             elevation = 6.dp, shape = RoundedCornerShape(8.dp),
         ) {
-            CanvasThumbnail(
-                c.width, c.height, c.pagePaperHex,
-                remember(c.strokes, c.layers) { com.karapp.drawguidance.data.model.Layers.visible(c.strokes, c.layers) },
-                Modifier.fillMaxSize().clip(RoundedCornerShape(8.dp)), c.pageBackground,
-            )
+            Box(Modifier.fillMaxSize()) {
+                CanvasThumbnail(
+                    c.width, c.height, c.pagePaperHex,
+                    remember(c.strokes, c.layers) { com.karapp.drawguidance.data.model.Layers.visible(c.strokes, c.layers) },
+                    Modifier.fillMaxSize().clip(RoundedCornerShape(8.dp)), c.pageBackground,
+                )
+                // v56 canlı mürekkep: gönderenin çizmekte olduğu çizgi (kaydedilmeden, geçici)
+                if (ink.isNotEmpty()) androidx.compose.foundation.Canvas(Modifier.fillMaxSize().testTag("share_live_ink")) {
+                    val k = size.width / c.width.coerceAtLeast(1)
+                    ink.forEach { s ->
+                        if (s.pts.size < 3) return@forEach
+                        val path = androidx.compose.ui.graphics.Path()
+                        var i = 0
+                        while (i + 1 < s.pts.size) {
+                            val x = s.pts[i] * k; val y = s.pts[i + 1] * k
+                            if (i == 0) path.moveTo(x, y) else path.lineTo(x, y)
+                            i += 3
+                        }
+                        val color = runCatching { com.karapp.drawguidance.ui.common.hexToColor(s.color) }.getOrDefault(Color.Black)
+                        drawPath(
+                            path, color.copy(alpha = color.alpha * s.opacity.coerceIn(0.05f, 1f)),
+                            style = androidx.compose.ui.graphics.drawscope.Stroke(
+                                width = (s.size * k).coerceAtLeast(1f),
+                                cap = androidx.compose.ui.graphics.StrokeCap.Round, join = androidx.compose.ui.graphics.StrokeJoin.Round,
+                            ),
+                        )
+                    }
+                }
+            }
         }
     }
 }
+
+private fun Modifier.pointerInputZoom(key: Any, onZoom: (Float, androidx.compose.ui.geometry.Offset) -> Unit, onReset: () -> Unit): Modifier = this
+    .pointerInput(key) { detectTransformGestures { _, p, z, _ -> onZoom(z, p) } }
+    .pointerInput(key, "tap") { detectTapGestures(onDoubleTap = { onReset() }) }
 
 /** v51 yayın yapılan tuvalin düzenleyicisinde küçük "Yayında" etiketi (dokununca yayın durdurulabilir). */
 @Composable

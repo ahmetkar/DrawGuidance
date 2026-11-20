@@ -123,3 +123,58 @@ object SharePairing {
 
     fun hmac(key: ByteArray, data: ByteArray): ByteArray = Mac.getInstance("HmacSHA256").run { init(SecretKeySpec(key, "HmacSHA256")); doFinal(data) }
 }
+
+/**
+ * v56 eşleşme şifresinin kapısı: şifre, gelen bağlantı kullanıcı tarafından onaylanmadan **üretilmez**. Daha önce
+ * eşleşmiş cihazda ([known]) şifre hiç üretilmez. (Eskiden şifre bağlantı isteği gelir gelmez üretilip gösteriliyordu.)
+ */
+class PairingCodeGate(val known: Boolean, private val generate: () -> String = SharePairing::newCode) {
+    /** Onaydan sonra üretilen şifre (onaydan önce ve eşleşmiş cihazda null). */
+    var code: String? = null
+        private set
+    var approved: Boolean = false
+        private set
+
+    /** Kullanıcı onayladı: eşleşmemiş cihazda şifre şimdi üretilir. */
+    fun approve(): String? {
+        if (!approved) { approved = true; if (!known) code = generate() }
+        return code
+    }
+}
+
+/**
+ * v56 canlı yayın onay kuralları (saf, testli): yayın teklifi her zaman sorulur; 60 sn'de yanıt yoksa zaman aşımı;
+ * aynı cihaz 1 dakikada 3 kez reddedilirse 5 dakika boyunca isteği sorulmadan geri çevrilir; bağlanırken onaylanan
+ * yayın teklifi bağlantıdan sonra (3 dk içinde) yeniden sorulmaz.
+ */
+class LiveApprovalPolicy(private val clock: () -> Long = System::currentTimeMillis) {
+    private val rejections = HashMap<String, ArrayDeque<Long>>()
+    private val blockedUntil = HashMap<String, Long>()
+    private val approvedAt = HashMap<String, Long>()
+
+    @Synchronized fun isBlocked(peer: String): Boolean = (blockedUntil[peer] ?: 0L) > clock()
+
+    @Synchronized fun onRejected(peer: String) {
+        val now = clock()
+        val q = rejections.getOrPut(peer) { ArrayDeque() }
+        q.addLast(now)
+        while (q.isNotEmpty() && now - q.first() > WINDOW_MS) q.removeFirst()
+        if (q.size >= MAX_REJECTIONS) { blockedUntil[peer] = now + BLOCK_MS; q.clear() }
+    }
+
+    @Synchronized fun onApproved(peer: String) { approvedAt[peer] = clock() }
+
+    /** Bağlantıdan sonra gelen yayın teklifi zaten onaylandı mı (bir kez kullanılır). */
+    @Synchronized fun consumeApproval(peer: String): Boolean {
+        val at = approvedAt.remove(peer) ?: return false
+        return clock() - at <= APPROVAL_VALID_MS
+    }
+
+    companion object {
+        const val ANSWER_TIMEOUT_MS = 60_000L
+        const val WINDOW_MS = 60_000L
+        const val MAX_REJECTIONS = 3
+        const val BLOCK_MS = 5 * 60_000L
+        const val APPROVAL_VALID_MS = 3 * 60_000L
+    }
+}

@@ -268,6 +268,17 @@ internal class DrawTool(private val penEraser: Boolean = false) : CanvasTool() {
     /** v20 sabitleme ve çizim hızı süzgeci (fırçada kapalıysa null; silgide yok). */
     private var filter: com.karapp.drawguidance.ui.drawing.InkFilter? = null
     private var lastRaw: com.karapp.drawguidance.ui.drawing.InkFilter.Point? = null
+    /** v56 son canlı mürekkep bildiriminin zamanı. */
+    private var progressAt = 0L
+
+    /** v56 çizilmekte olan çizgi en çok 50 ms'de bir bildirilir (silgi hariç). */
+    private fun progress(ctx: GestureContext) {
+        if (penEraser || ctx.brush.brushType == com.karapp.drawguidance.data.model.BrushType.ERASER) return
+        val id = ctx.live.strokeId ?: return
+        if (ctx.eventTime - progressAt < 50) return
+        progressAt = ctx.eventTime
+        ctx.actions.onStrokeProgress(id, ctx.live.points())
+    }
 
     override val needsTicks: Boolean get() = filter?.needsTicks == true
 
@@ -345,6 +356,7 @@ internal class DrawTool(private val penEraser: Boolean = false) : CanvasTool() {
         if (f != null) emit(ctx, f.move(p, ctx.eventTime)) else add(ctx, p.x, p.y, p.pressure, p.tilt, p.orient)
         ctx.setFinger(position)
         ctx.refreshLive()
+        progress(ctx)
     }
 
     override fun tick(ctx: GestureContext, time: Long) {

@@ -2,4 +2,11 @@
 <!-- v56 metinleri -->
 <resources>
     <string name="v56_practice_reward_nofill">لا يتوفر إعلان الآن. تم فتح التمرين لك.</string>
+    <string name="v56_live_req_title">طلب بث مباشر</string>
+    <string name="v56_live_req_body">يريد %1$s بث اللوحة «%2$s» إليك مباشرةً.</string>
+    <string name="v56_live_rejected">تم رفض البث</string>
+    <string name="v56_live_no_answer">لا يوجد رد من الجهاز الآخر</string>
+    <string name="v56_live_blocked">طلبات مرفوضة كثيرة: أعد المحاولة بعد بضع دقائق</string>
+    <string name="v56_live_always_asks">يُسأل دائمًا عن البث المباشر أولًا؛ ولا يظهر رمز الاقتران إلا بعد القبول.</string>
+    <string name="v56_live_elsewhere">المُذيع في شاشة أخرى</string>
 </resources>

@@ -14,11 +14,13 @@ interface ShareTransport {
         fun onFound(route: ShareRoute, endpoint: String, name: String, platform: String)
         fun onLost(route: ShareRoute, endpoint: String)
         /**
-         * Karşı cihaz bağlanmak istiyor: [ShareTransport.accept] ya da [ShareTransport.reject] çağrılır (paylaşım sayfası
-         * kendiliğinden kabul eder; gelen her teklif ayrıca onaylanır). v54 [code]: ekranda gösterilecek eşleşme şifresi
-         * (daha önce eşleşmiş cihazda null).
+         * Karşı cihaz bağlanmak istiyor: [ShareTransport.accept] ya da [ShareTransport.reject] çağrılır. v56: eşleşme
+         * şifresi artık burada verilmez; kabul edilince ve gerekiyorsa [onPairCode] ile gelir. [intent] = "live" ise
+         * bağlantı canlı yayın içindir ([title] yayınlanacak tuvalin adı) ve kabulden önce kullanıcıya sorulur.
          */
-        fun onRequest(route: ShareRoute, endpoint: String, name: String, platform: String, code: String?)
+        fun onRequest(route: ShareRoute, endpoint: String, name: String, platform: String, needsCode: Boolean, intent: String?, title: String?)
+        /** v56 kabul edilen eşleşmemiş cihaz için şimdi üretilen şifre: ekranda gösterilir, karşı cihazda girilir. */
+        fun onPairCode(route: ShareRoute, endpoint: String, name: String, platform: String, code: String) {}
         fun onConnected(route: ShareRoute, endpoint: String, name: String, platform: String)
         fun onDisconnected(route: ShareRoute, endpoint: String)
         fun onMessage(route: ShareRoute, endpoint: String, bytes: ByteArray)
@@ -34,9 +36,11 @@ interface ShareTransport {
     /** Görünür ol ve yakındaki cihazları ara. */
     fun start(name: String, instanceId: String)
     fun stop()
-    fun connect(endpoint: String)
+    /** v56 [intent]/[title]: bağlantının amacı karşı cihaza tanışmada bildirilir (canlı yayın onayı için). */
+    fun connect(endpoint: String, intent: String? = null, title: String? = null)
     fun accept(endpoint: String)
-    fun reject(endpoint: String)
+    /** v56 [reason]: "rejected", "timeout" ya da "blocked" (bağlanan cihazda uygun yazı gösterilir). */
+    fun reject(endpoint: String, reason: String = REJECT_REASON)
     fun disconnect(endpoint: String)
     /** v54 eşleşme şifresi girildi / vazgeçildi. */
     fun submitCode(endpoint: String, code: String) {}
@@ -45,3 +49,9 @@ interface ShareTransport {
     /** Her şeyi kapatır (bağlantılar dahil). */
     fun shutdown()
 }
+
+/** v56 bağlantı amacı: canlı yayın. */
+const val CONNECT_INTENT_LIVE = "live"
+const val REJECT_REASON = "rejected"
+const val REJECT_TIMEOUT = "timeout"
+const val REJECT_BLOCKED = "blocked"

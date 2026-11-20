@@ -2,4 +2,11 @@
 <!-- v56 metinleri -->
 <resources>
     <string name="v56_practice_reward_nofill">Сейчас нет доступной рекламы. Упражнение открыто для вас.</string>
+    <string name="v56_live_req_title">Запрос трансляции</string>
+    <string name="v56_live_req_body">%1$s хочет транслировать вам холст «%2$s».</string>
+    <string name="v56_live_rejected">Трансляция отклонена</string>
+    <string name="v56_live_no_answer">Нет ответа от другого устройства</string>
+    <string name="v56_live_blocked">Слишком много отклонённых запросов: повторите через несколько минут</string>
+    <string name="v56_live_always_asks">Трансляция всегда требует подтверждения; код сопряжения показывается только после согласия.</string>
+    <string name="v56_live_elsewhere">Ведущий на другом экране</string>
 </resources>

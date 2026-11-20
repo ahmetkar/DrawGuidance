@@ -188,6 +188,8 @@ class CanvasActions(
     val onPenEditDrag: (point: Offset, done: Boolean) -> Unit = { _, _ -> },
     /** v18 kalemin silgi ucuyla (ya da yan tuşla) çizilen çizgi: silgi olarak kaydedilir. */
     val onPenEraserFinished: (List<StrokePoint>, String) -> Unit = { p, id -> onStrokeFinished(p, id) },
+    /** v56 çizilmekte olan çizginin noktaları (en çok ~50 ms'de bir; canlı yayında canlı mürekkep için). */
+    val onStrokeProgress: (strokeId: String, points: List<StrokePoint>) -> Unit = { _, _ -> },
     /** v18 kalemin silgi ucunun boyu (son kullanılan silgi boyu). */
     val eraserSize: () -> Float = { 24f },
     /** v21 3B çizim modu açıksa düzlem ve derinlik (kapalıysa null). */

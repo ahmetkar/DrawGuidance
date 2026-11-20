@@ -44,10 +44,14 @@ data class SharePeer(
 data class ShareConnectionRequest(val key: String, val name: String, val platform: String, val code: String?)
 /** v54 bağlanan cihazda eşleşme şifresi sorusu (karşı cihazın ekranındaki şifre girilir). */
 data class ShareCodePrompt(val key: String, val name: String, val wrong: Boolean = false)
+/** v56 canlı yayın onay sorusu (şifreden önce): [title] yayınlanacak tuval. */
+data class ShareLiveRequest(val key: String, val name: String, val platform: String, val title: String)
 data class ShareIncomingOffer(val key: String, val peerName: String, val offer: ShareOffer)
 data class ShareTransferStatus(val peerName: String, val title: String, val sending: Boolean, val progress: Float? = null)
 data class ShareLiveOut(val canvasId: String, val peerKey: String, val peerName: String, val paused: Boolean = false, val startedAt: Long = System.currentTimeMillis(), val sentFrames: Int = 0)
-data class ShareLiveIn(val canvasId: String, val peerKey: String, val peerName: String, val ended: Boolean = false, val paused: Boolean = false)
+data class ShareLiveIn(val canvasId: String, val peerKey: String, val peerName: String, val ended: Boolean = false, val paused: Boolean = false, val pausedAt: Long = 0L)
+/** v56 alan tarafta çizilmekte olan (henüz kaydedilmemiş) çizgi: renk, boyut ve noktalar (x, y, basınç). */
+data class LiveInkStroke(val id: String, val brush: String, val color: String, val size: Float, val opacity: Float, val pts: List<Float>, val page: Int)
 
 sealed interface ShareEvent {
     data class Received(val type: String, val title: String, val from: String, val canvasId: String?) : ShareEvent
@@ -88,6 +92,11 @@ class ShareManager(
     val request: StateFlow<ShareConnectionRequest?> = _request.asStateFlow()
     private val _codePrompt = MutableStateFlow<ShareCodePrompt?>(null)
     val codePrompt: StateFlow<ShareCodePrompt?> = _codePrompt.asStateFlow()
+    private val _liveRequest = MutableStateFlow<ShareLiveRequest?>(null)
+    /** v56 alan cihazda canlı yayın onayı: Kabul et / Reddet; şifre ancak kabulden sonra gösterilir. */
+    val liveRequest: StateFlow<ShareLiveRequest?> = _liveRequest.asStateFlow()
+    private val approval = LiveApprovalPolicy()
+    private var liveRequestTimeout: Job? = null
     private val _offer = MutableStateFlow<ShareIncomingOffer?>(null)
     val offer: StateFlow<ShareIncomingOffer?> = _offer.asStateFlow()
     private val _status = MutableStateFlow<ShareTransferStatus?>(null)
@@ -99,6 +108,9 @@ class ShareManager(
     /** Yayını alan tarafta tuvalin son hali (görüntüleyici bunu çizer). */
     private val _liveCanvas = MutableStateFlow<CanvasUi?>(null)
     val liveCanvas: StateFlow<CanvasUi?> = _liveCanvas.asStateFlow()
+    private val _liveInk = MutableStateFlow<Map<String, LiveInkStroke>>(emptyMap())
+    /** v56 alan tarafta canlı mürekkep (geçici katman); LIVE_UPDATE gelince temizlenir. */
+    val liveInk: StateFlow<Map<String, LiveInkStroke>> = _liveInk.asStateFlow()
     private val _events = MutableSharedFlow<ShareEvent>(extraBufferCapacity = 16)
     val events: SharedFlow<ShareEvent> = _events.asSharedFlow()
     private val _errors = MutableStateFlow<String?>(null)
@@ -172,13 +184,13 @@ class ShareManager(
     private val afterConnect = ConcurrentHashMap<String, MutableList<() -> Unit>>()
 
     /** Cihaz bağlıysa [action] hemen; değilse bağlantı kendiliğinden kurulur ve kurulunca yapılır. */
-    private fun whenConnected(key: String, action: () -> Unit) {
+    private fun whenConnected(key: String, intent: String? = null, title: String? = null, action: () -> Unit) {
         val peer = _peers.value.firstOrNull { it.key == key } ?: return fail("Cihaz bulunamadı")
         if (peer.state == PeerState.CONNECTED) { action(); return }
         afterConnect.getOrPut(key) { java.util.Collections.synchronizedList(mutableListOf()) }.add(action)
         if (peer.state != PeerState.CONNECTING) {
             setState(key, PeerState.CONNECTING)
-            transports[peer.route]?.connect(peer.endpoint)
+            transports[peer.route]?.connect(peer.endpoint, intent, title)
         }
     }
 
@@ -187,6 +199,22 @@ class ShareManager(
     fun disconnect(peer: SharePeer) {
         send(peer.key, ShareWire.encode(ShareWire.BYE, "{}"))
         transports[peer.route]?.disconnect(peer.endpoint)
+    }
+
+    /** v56 canlı yayın onayı yanıtlandı: kabulde bağlantı kabul edilir (gerekirse şifre şimdi gösterilir). */
+    fun answerLiveRequest(accept: Boolean) {
+        val r = _liveRequest.value ?: return
+        _liveRequest.value = null
+        liveRequestTimeout?.cancel()
+        val (route, endpoint) = split(r.key) ?: return
+        if (accept) {
+            approval.onApproved(r.key)
+            setState(r.key, PeerState.CONNECTING, r.name, r.platform)
+            transports[route]?.accept(endpoint)
+        } else {
+            approval.onRejected(r.key)
+            transports[route]?.reject(endpoint, REJECT_REASON)
+        }
     }
 
     fun answerRequest(accept: Boolean) {
@@ -225,7 +253,8 @@ class ShareManager(
         val id = UUID.randomUUID().toString()
         outgoing[id] = Outgoing(peerKey, ShareWire.TYPE_LIVE, canvas.name, canvas.localId, null)
         val offer = ShareOffer(id, ShareWire.TYPE_LIVE, canvas.name, packages.canvasSize(canvas.localId), canvas.kind.name)
-        whenConnected(peerKey) { send(peerKey, ShareWire.encode(ShareWire.OFFER, ShareWire.text(offer))) }
+        // v56 bağlantının amacı (canlı yayın) tanışmada bildirilir: alan cihaz şifreden önce onay sorar
+        whenConnected(peerKey, CONNECT_INTENT_LIVE, canvas.name) { send(peerKey, ShareWire.encode(ShareWire.OFFER, ShareWire.text(offer))) }
         _status.value = ShareTransferStatus(peerName(peerKey), canvas.name, sending = true)
     }
 
@@ -242,6 +271,7 @@ class ShareManager(
         val inn = _liveIn.value ?: return
         _liveIn.value = null
         _liveCanvas.value = null
+        _liveInk.value = emptyMap()
         if (!inn.ended) send(inn.peerKey, ShareWire.encode(ShareWire.LIVE_STOP, "{}"))
     }
 
@@ -260,45 +290,24 @@ class ShareManager(
     // düzenleyici kendi adına ara verdiyse durur. Bir düzenleyici yalnız kendi arasını kaldırabilir; ayrılan
     // düzenleyicinin araları da onunla silinir.
 
-    private val editorOwners = HashMap<String, MutableSet<String>>()
-    private val pauseOwners = HashMap<String, MutableSet<String>>()
+    private val owners = LivePauseOwners()
 
     /** v56 [owner] düzenleyicisi [canvasId] tuvalini açtı. */
-    fun attachEditor(canvasId: String, owner: String) {
-        synchronized(editorOwners) { editorOwners.getOrPut(canvasId) { HashSet() } += owner }
-        recomputePause(canvasId)
-    }
+    fun attachEditor(canvasId: String, owner: String) { owners.attach(canvasId, owner); recomputePause(canvasId) }
 
     /** v56 [owner] düzenleyicisi kapandı; onun verdiği aralar da kalkar. */
-    fun detachEditor(canvasId: String, owner: String) {
-        synchronized(editorOwners) {
-            editorOwners[canvasId]?.let { it -= owner; if (it.isEmpty()) editorOwners.remove(canvasId) }
-            pauseOwners[canvasId]?.let { set -> set.removeAll { it == owner || it.startsWith("$owner:") }; if (set.isEmpty()) pauseOwners.remove(canvasId) }
-        }
-        recomputePause(canvasId)
-    }
+    fun detachEditor(canvasId: String, owner: String) { owners.detach(canvasId, owner); recomputePause(canvasId) }
 
     /** v56 tuval şu an bir düzenleyicide açık mı. */
-    fun isOpenInEditor(canvasId: String): Boolean = synchronized(editorOwners) { !editorOwners[canvasId].isNullOrEmpty() }
+    fun isOpenInEditor(canvasId: String): Boolean = owners.isOpen(canvasId)
 
     /** v52 yayına ara ver (notta şekil/resim başka tuvalde düzenleniyor, foto düzenleyici, uygulama arka planda). */
-    fun pauseLive(canvasId: String, owner: String) {
-        synchronized(editorOwners) { pauseOwners.getOrPut(canvasId) { HashSet() } += owner }
-        recomputePause(canvasId)
-    }
+    fun pauseLive(canvasId: String, owner: String) { owners.pause(canvasId, owner); recomputePause(canvasId) }
 
     /** v52 [owner]'ın verdiği ara kalkar; başka ara veren yoksa yayın sürer (düzenleyici son hali [publishLive] ile gönderir). */
-    fun resumeLive(canvasId: String, owner: String) {
-        synchronized(editorOwners) { pauseOwners[canvasId]?.let { it -= owner; if (it.isEmpty()) pauseOwners.remove(canvasId) } }
-        recomputePause(canvasId)
-    }
+    fun resumeLive(canvasId: String, owner: String) { owners.resume(canvasId, owner); recomputePause(canvasId) }
 
-    /** v56 yayının ara durumu sahiplere göre: düzenleyici yoksa ya da açık bir düzenleyici ara verdiyse durur. */
-    internal fun shouldPause(canvasId: String): Boolean = synchronized(editorOwners) {
-        val editors = editorOwners[canvasId].orEmpty()
-        // sahip kimliği "<düzenleyici>" ya da "<düzenleyici>:<neden>" (ör. foto düzenleyici)
-        editors.isEmpty() || pauseOwners[canvasId].orEmpty().any { it.substringBefore(':') in editors }
-    }
+    internal fun shouldPause(canvasId: String): Boolean = owners.shouldPause(canvasId)
 
     private fun recomputePause(canvasId: String) {
         val out = _liveOut.value?.takeIf { it.canvasId == canvasId } ?: return
@@ -306,6 +315,30 @@ class ShareManager(
         if (pause == out.paused) return
         _liveOut.value = out.copy(paused = pause)
         send(out.peerKey, ShareWire.encode(if (pause) ShareWire.LIVE_PAUSE else ShareWire.LIVE_RESUME, "{}"))
+    }
+
+    // ---- v56 canlı mürekkep (gönderen) ----
+    private var inkStroke: String? = null
+    private var inkSent = 0
+    private var inkLastAt = 0L
+
+    /**
+     * v56 düzenleyici çizilmekte olan çizginin noktalarını bildirir; yeni noktalar en çok ~60 ms'de bir küçük pakette
+     * gider. Çizgi bitince normal kare ([publishLive]) gider; alan taraf geçici çizgiyi o zaman siler.
+     */
+    fun publishInk(canvasId: String, strokeId: String, brush: String, colorHex: String, size: Float, opacity: Float, points: List<com.karapp.drawguidance.data.model.StrokePoint>, page: Int = -1) {
+        val out = _liveOut.value ?: return
+        if (out.canvasId != canvasId || out.paused) return
+        val now = System.currentTimeMillis()
+        if (strokeId != inkStroke) { inkStroke = strokeId; inkSent = 0; inkLastAt = 0L }
+        if (now - inkLastAt < INK_INTERVAL_MS || points.size <= inkSent) return
+        val from = inkSent
+        val part = points.subList(from, points.size)
+        val flat = ArrayList<Float>(part.size * 3)
+        part.forEach { flat += it.x; flat += it.y; flat += it.pressure }
+        inkSent = points.size
+        inkLastAt = now
+        send(out.peerKey, ShareWire.encode(ShareWire.LIVE_INK, ShareWire.json.encodeToString(ShareInk.serializer(), ShareInk(strokeId, brush, colorHex, size, opacity, from, flat, page))))
     }
 
     fun isBroadcasting(canvasId: String): Boolean = _liveOut.value?.canvasId == canvasId
@@ -335,13 +368,31 @@ class ShareManager(
         _peers.update { list -> list.filterNot { it.key == key && it.state == PeerState.FOUND } }
     }
 
-    override fun onRequest(route: ShareRoute, endpoint: String, name: String, platform: String, code: String?) {
-        // Bağlantı kendiliğinden kabul edilir; içerik ancak teklif onaylanınca alınır. v54 ilk eşleşmede şifre ekranda
-        // gösterilir (karşı cihazda girilir); doğrulanmadan bağlantı açılmaz
+    override fun onRequest(route: ShareRoute, endpoint: String, name: String, platform: String, needsCode: Boolean, intent: String?, title: String?) {
         val key = key(route, endpoint)
+        if (intent == CONNECT_INTENT_LIVE) {
+            // v56 canlı yayın her zaman önce sorulur; şifre (ilk eşleşmede) ancak kabulden sonra gösterilir
+            if (approval.isBlocked(key)) { transports[route]?.reject(endpoint, REJECT_BLOCKED); return }
+            _liveRequest.value?.let { old -> split(old.key)?.let { (r, e) -> transports[r]?.reject(e, REJECT_REASON) } }
+            _liveRequest.value = ShareLiveRequest(key, name, platform, title.orEmpty())
+            liveRequestTimeout?.cancel()
+            liveRequestTimeout = scope.launch {
+                delay(LiveApprovalPolicy.ANSWER_TIMEOUT_MS)
+                if (_liveRequest.value?.key == key) {
+                    _liveRequest.value = null
+                    transports[route]?.reject(endpoint, REJECT_TIMEOUT)
+                }
+            }
+            return
+        }
+        // Tuval/resim gönderme bağlantısı kendiliğinden kabul edilir; içerik ancak teklif onaylanınca alınır.
+        // İlk eşleşmede şifre kabulden sonra [onPairCode] ile gelir ve ekranda gösterilir
         setState(key, PeerState.CONNECTING, name, platform)
-        if (code != null) _request.value = ShareConnectionRequest(key, name, platform, code)
         transports[route]?.accept(endpoint)
+    }
+
+    override fun onPairCode(route: ShareRoute, endpoint: String, name: String, platform: String, code: String) {
+        _request.value = ShareConnectionRequest(key(route, endpoint), name, platform, code)
     }
 
     override fun onCodeNeeded(route: ShareRoute, endpoint: String, name: String) {
@@ -381,6 +432,7 @@ class ShareManager(
         }
         if (_request.value?.key == key) _request.value = null
         if (_codePrompt.value?.key == key) _codePrompt.value = null
+        if (_liveRequest.value?.key == key) { _liveRequest.value = null; liveRequestTimeout?.cancel() }
         if (afterConnect.remove(key) != null && !wasConnected) _events.tryEmit(ShareEvent.Failed(peer?.name ?: ""))
         if (_offer.value?.key == key) _offer.value = null
         if (_liveOut.value?.peerKey == key) { _liveOut.value = null; liveJob?.cancel(); liveJob = null }
@@ -397,7 +449,10 @@ class ShareManager(
     override fun onError(route: ShareRoute, message: String) {
         _errors.value = localize(message)
         // v54 eşleşme hataları paylaşım sayfası kapalıyken de görünsün
-        if (message.startsWith("Eşleşme") || message.startsWith("Karşı cihazın")) _events.tryEmit(ShareEvent.Failed(localize(message)))
+        if (message.startsWith("Eşleşme") || message.startsWith("Karşı cihazın") || message in V56_PEER_ANSWERS) {
+            _status.value = null
+            _events.tryEmit(ShareEvent.Failed(localize(message)))
+        }
     }
 
     override fun onMessage(route: ShareRoute, endpoint: String, bytes: ByteArray) {
@@ -420,9 +475,12 @@ class ShareManager(
             }
             ShareWire.OFFER -> {
                 val o = ShareWire.header<ShareOffer>(m)
-                // v52 canlı yayın daveti kendi ayarıyla (tuval/resim alma ayarından ayrı)
-                val ask = if (o.type == ShareWire.TYPE_LIVE) settings.askBeforeLive.value else settings.askBeforeReceive.value
-                if (ask) _offer.value = ShareIncomingOffer(key, peerName(key), o)
+                // v56 canlı yayın daveti her zaman sorulur (askBeforeLive ayarı kalktı); bağlanırken onaylandıysa
+                // yeniden sorulmaz. Tuval/resim için askBeforeReceive ayarı geçerli
+                if (o.type == ShareWire.TYPE_LIVE) {
+                    if (approval.consumeApproval(key)) reply(key, o, true)
+                    else _offer.value = ShareIncomingOffer(key, peerName(key), o)
+                } else if (settings.askBeforeReceive.value) _offer.value = ShareIncomingOffer(key, peerName(key), o)
                 else reply(key, o, true)
             }
             ShareWire.ACCEPT -> {
@@ -462,9 +520,21 @@ class ShareManager(
                 liveSeqIn = pkg.header.seq
                 installLock.withLock { packages.install(pkg, liveIds, existingId = inn.canvasId) }
                 refreshLiveCanvas(inn.canvasId)
+                // v56 biten çizgiler artık tuvalde: geçici mürekkep temizlenir
+                _liveInk.value = emptyMap()
+            }
+            ShareWire.LIVE_INK -> {
+                val inn = _liveIn.value ?: return
+                if (inn.peerKey != key || inn.ended) return
+                val ink = ShareWire.json.decodeFromString(ShareInk.serializer(), m.json)
+                _liveInk.update { map -> map + (ink.stroke to LiveInk.merge(map[ink.stroke], ink)) }
             }
             ShareWire.LIVE_PAUSE, ShareWire.LIVE_RESUME -> {
-                _liveIn.value?.takeIf { it.peerKey == key && !it.ended }?.let { _liveIn.value = it.copy(paused = m.type == ShareWire.LIVE_PAUSE) }
+                val pause = m.type == ShareWire.LIVE_PAUSE
+                _liveIn.value?.takeIf { it.peerKey == key && !it.ended }?.let {
+                    _liveIn.value = it.copy(paused = pause, pausedAt = if (pause) (it.pausedAt.takeIf { at -> it.paused && at > 0 } ?: System.currentTimeMillis()) else 0L)
+                }
+                if (pause) _liveInk.value = emptyMap()
             }
             ShareWire.LIVE_STOP -> {
                 _liveIn.value?.takeIf { it.peerKey == key }?.let { _liveIn.value = it.copy(ended = true) }
@@ -479,6 +549,7 @@ class ShareManager(
             // Önceki yayından çıkılır (aynı anda tek yayın alınır)
             leaveLive()
         }
+        if (!accept && o.type == ShareWire.TYPE_LIVE) approval.onRejected(key)
         val type = if (accept) ShareWire.ACCEPT else ShareWire.REJECT
         send(key, ShareWire.encode(type, ShareWire.text(ShareReply(o.id))))
         if (accept) _status.value = ShareTransferStatus(peerName(key), o.title, sending = false)
@@ -590,6 +661,10 @@ class ShareManager(
         "Eşleşme şifresi yanlış" -> context.getString(com.karapp.drawguidance.R.string.v54_share_pair_wrong)
         "Eşleşme yenilenmeli" -> context.getString(com.karapp.drawguidance.R.string.v54_share_pair_renew)
         "Karşı cihazın uygulaması güncel değil" -> context.getString(com.karapp.drawguidance.R.string.v54_share_pair_old)
+        // v56 yayın onayı
+        "Reddedildi" -> context.getString(com.karapp.drawguidance.R.string.v56_live_rejected)
+        "Yanıt yok" -> context.getString(com.karapp.drawguidance.R.string.v56_live_no_answer)
+        "Geçici olarak engellendi" -> context.getString(com.karapp.drawguidance.R.string.v56_live_blocked)
         else -> message
     }
 
@@ -622,5 +697,52 @@ class ShareManager(
         if (i <= 0) return null
         val route = runCatching { ShareRoute.valueOf(key.substring(0, i)) }.getOrNull() ?: return null
         return route to key.substring(i + 1)
+    }
+}
+
+/** v56 bağlanan cihaza karşı cihazın yanıtı (yayın onayı). */
+private val V56_PEER_ANSWERS = setOf("Reddedildi", "Yanıt yok", "Geçici olarak engellendi")
+
+/** v56 canlı mürekkep parçalarının birleştirilmesi (saf, testli). */
+object LiveInk {
+    fun merge(old: LiveInkStroke?, ink: ShareInk): LiveInkStroke {
+        val have = old?.pts ?: emptyList()
+        val haveCount = have.size / 3
+        // Önceki parçaların tekrarı atlanır; kayıp parça varsa yeni noktalar yine eklenir (boşluk düz çizgi olur)
+        val skip = (haveCount - ink.from).coerceAtLeast(0) * 3
+        val add = if (skip >= ink.pts.size) emptyList() else ink.pts.subList(skip, ink.pts.size)
+        return LiveInkStroke(ink.stroke, ink.brush, ink.color, ink.size, ink.opacity, have + add, ink.page)
+    }
+}
+
+private const val INK_INTERVAL_MS = 60L
+
+/**
+ * v56 canlı yayının ara ver / sürdür sahipleri (saf, testli). Düzenleyici örnekleri sahip kimliğiyle kaydolur; ara
+ * kimliği "<düzenleyici>" ya da "<düzenleyici>:<neden>". Yayın, tuval hiçbir düzenleyicide açık değilse ya da açık bir
+ * düzenleyici ara verdiyse durur. Ayrılan düzenleyicinin araları onunla silinir.
+ */
+class LivePauseOwners {
+    private val editors = HashMap<String, MutableSet<String>>()
+    private val pauses = HashMap<String, MutableSet<String>>()
+
+    @Synchronized fun attach(canvasId: String, owner: String) { editors.getOrPut(canvasId) { HashSet() } += owner }
+
+    @Synchronized fun detach(canvasId: String, owner: String) {
+        editors[canvasId]?.let { it -= owner; if (it.isEmpty()) editors.remove(canvasId) }
+        pauses[canvasId]?.let { set -> set.removeAll { it == owner || it.startsWith("$owner:") }; if (set.isEmpty()) pauses.remove(canvasId) }
+    }
+
+    @Synchronized fun pause(canvasId: String, owner: String) { pauses.getOrPut(canvasId) { HashSet() } += owner }
+
+    @Synchronized fun resume(canvasId: String, owner: String) {
+        pauses[canvasId]?.let { it -= owner; if (it.isEmpty()) pauses.remove(canvasId) }
+    }
+
+    @Synchronized fun isOpen(canvasId: String): Boolean = !editors[canvasId].isNullOrEmpty()
+
+    @Synchronized fun shouldPause(canvasId: String): Boolean {
+        val open = editors[canvasId].orEmpty()
+        return open.isEmpty() || pauses[canvasId].orEmpty().any { it.substringBefore(':') in open }
     }
 }

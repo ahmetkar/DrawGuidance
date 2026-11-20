@@ -30,6 +30,11 @@ internal data class LanHello(
     val pk: String? = null,
     val k: Boolean = false,
     val m: String? = null,
+    /** v56 bağlantının amacı ("live") ve yayınlanacak tuvalin adı; eski sürümler yok sayar. */
+    val intent: String? = null,
+    val title: String? = null,
+    /** v56 ret nedeni (HELLO_NO yanıtında). */
+    val reason: String? = null,
 )
 
 /** v54 eşleşmiş cihazların güven anahtarları (cihaz kimliği → anahtar). */
@@ -85,7 +90,7 @@ class LanTransport(context: Context) : ShareTransport {
     private val serviceToEndpoint = ConcurrentHashMap<String, String>()
     private val conns = ConcurrentHashMap<String, Conn>()
     /** Kabul edilmeyi bekleyen gelen bağlantılar (B): soket, tanışma, geçici anahtar, ilk çerçeve, gösterilen şifre. */
-    private class Incoming(val socket: Socket, val hello: LanHello, val request: ByteArray, val keys: java.security.KeyPair, val code: String?)
+    private class Incoming(val socket: Socket, val hello: LanHello, val request: ByteArray, val keys: java.security.KeyPair, val gate: PairingCodeGate)
     private val pending = ConcurrentHashMap<String, Incoming>()
     /** Şifre girilmesini bekleyen giden bağlantılar (A). */
     private class Outgoing(val socket: Socket, val input: DataInputStream, val z: ByteArray, val transcript: ByteArray, val them: LanHello, val name: String, val platform: String)
@@ -193,11 +198,13 @@ class LanTransport(context: Context) : ShareTransport {
                 runCatching { s.close() }
                 return
             }
-            // Daha önce eşleşmişse saklanan anahtar; değilse ekranda gösterilecek yeni şifre
+            // Daha önce eşleşmişse saklanan anahtar; değilse şifre gerekir. v56: şifre ancak kullanıcı kabul edince
+            // üretilir ([PairingCodeGate]); kabul beklenirken karşı taraf en çok 2 dakika bekler
             val known = hello.k && trust.get(hello.id) != null
             pending[hello.id]?.let { runCatching { it.socket.close() } }
-            pending[hello.id] = Incoming(s, hello, first, SharePairing.newKeyPair(), if (known) null else SharePairing.newCode())
-            listener?.onRequest(route, hello.id, hello.name, hello.platform, pending[hello.id]?.code)
+            s.soTimeout = 0
+            pending[hello.id] = Incoming(s, hello, first, SharePairing.newKeyPair(), PairingCodeGate(known))
+            listener?.onRequest(route, hello.id, hello.name, hello.platform, !known, hello.intent, hello.title)
         }.onFailure { runCatching { s.close() } }
     }
 
@@ -215,7 +222,7 @@ class LanTransport(context: Context) : ShareTransport {
         resolveQueue.clear()
     }
 
-    override fun connect(endpoint: String) {
+    override fun connect(endpoint: String, intent: String?, title: String?) {
         val peer = found[endpoint] ?: run { listener?.onDisconnected(route, endpoint); return }
         Thread({
             var socket: Socket? = null
@@ -227,13 +234,19 @@ class LanTransport(context: Context) : ShareTransport {
                 val stored = trust.get(endpoint)
                 val hello = byteArrayOf(HELLO_REQ) + ShareWire.json.encodeToString(
                     LanHello.serializer(),
-                    me.copy(v = SharePairing.VERSION, pk = b64(SharePairing.publicRaw(keys)), k = stored != null),
+                    me.copy(v = SharePairing.VERSION, pk = b64(SharePairing.publicRaw(keys)), k = stored != null, intent = intent, title = title?.take(80)),
                 ).encodeToByteArray()
                 out.writeInt(hello.size); out.write(hello); out.flush()
                 // Karşı taraf kullanıcıya sorar: en çok 2 dakika beklenir
                 s.soTimeout = 120_000
                 val input = DataInputStream(s.getInputStream().buffered(64 * 1024))
                 val reply = readFrame(input, null)
+                if (reply.isNotEmpty() && reply[0] == HELLO_NO) {
+                    // v56 karşı cihaz reddetti / yanıt vermedi / geçici olarak engelledi
+                    val why = runCatching { ShareWire.json.decodeFromString(LanHello.serializer(), reply.copyOfRange(1, reply.size).decodeToString()).reason }.getOrNull()
+                    fail(when (why) { REJECT_TIMEOUT -> "Yanıt yok"; REJECT_BLOCKED -> "Geçici olarak engellendi"; else -> "Reddedildi" }, null)
+                    error("reddedildi")
+                }
                 require(reply.isNotEmpty() && reply[0] == HELLO_OK) { "reddedildi" }
                 val them = ShareWire.json.decodeFromString(LanHello.serializer(), reply.copyOfRange(1, reply.size).decodeToString())
                 if (them.v < SharePairing.VERSION || them.pk.isNullOrBlank()) {
@@ -302,16 +315,19 @@ class LanTransport(context: Context) : ShareTransport {
         val p = pending.remove(endpoint) ?: return
         val s = p.socket
         acceptingSockets[endpoint] = s
+        // v56 şifre şimdi (onaydan sonra) üretilir ve gösterilir
+        val code = p.gate.approve()
+        if (code != null) listener?.onPairCode(route, endpoint, p.hello.name, p.hello.platform, code)
         Thread({
             runCatching {
                 val out = DataOutputStream(s.getOutputStream())
                 val hello = byteArrayOf(HELLO_OK) + ShareWire.json.encodeToString(
                     LanHello.serializer(),
-                    me.copy(v = SharePairing.VERSION, pk = b64(SharePairing.publicRaw(p.keys)), m = if (p.code == null) MODE_KNOWN else MODE_CODE),
+                    me.copy(v = SharePairing.VERSION, pk = b64(SharePairing.publicRaw(p.keys)), m = if (code == null) MODE_KNOWN else MODE_CODE),
                 ).encodeToByteArray()
                 out.writeInt(hello.size); out.write(hello); out.flush()
                 val z = SharePairing.sharedSecret(p.keys, unb64(p.hello.pk!!))
-                val secret = p.code?.encodeToByteArray() ?: trust.get(endpoint) ?: error("güven anahtarı yok")
+                val secret = code?.encodeToByteArray() ?: trust.get(endpoint) ?: error("güven anahtarı yok")
                 val keys = SharePairing.derive(z, secret, SharePairing.transcript(p.request, hello))
                 // Şifrenin girilmesi beklenir (en çok 3 dakika)
                 s.soTimeout = 180_000
@@ -319,8 +335,8 @@ class LanTransport(context: Context) : ShareTransport {
                 val proof = readFrame(input, null)
                 if (proof.isEmpty() || proof[0] != PAIR_PROOF || !SharePairing.same(proof.copyOfRange(1, proof.size), SharePairing.confirmTag(keys, "A"))) {
                     runCatching { val no = byteArrayOf(PAIR_FAIL); out.writeInt(no.size); out.write(no); out.flush() }
-                    if (p.code == null) trust.remove(endpoint)
-                    fail(if (p.code == null) "Eşleşme yenilenmeli" else "Eşleşme şifresi yanlış", null)
+                    if (code == null) trust.remove(endpoint)
+                    fail(if (code == null) "Eşleşme yenilenmeli" else "Eşleşme şifresi yanlış", null)
                     error("doğrulanamadı")
                 }
                 val ok = byteArrayOf(PAIR_OK) + SharePairing.confirmTag(keys, "B")
@@ -333,8 +349,18 @@ class LanTransport(context: Context) : ShareTransport {
         }, "dg-share-acc").apply { isDaemon = true }.start()
     }
 
-    override fun reject(endpoint: String) {
-        pending.remove(endpoint)?.let { runCatching { it.socket.close() } }
+    override fun reject(endpoint: String, reason: String) {
+        pending.remove(endpoint)?.let { p ->
+            // v56 ret nedeni bağlanan cihaza bildirilir (eski sürüm yalnız bağlantının kapandığını görür)
+            Thread({
+                runCatching {
+                    val out = DataOutputStream(p.socket.getOutputStream())
+                    val no = byteArrayOf(HELLO_NO) + ShareWire.json.encodeToString(LanHello.serializer(), me.copy(reason = reason)).encodeToByteArray()
+                    out.writeInt(no.size); out.write(no); out.flush()
+                }
+                runCatching { p.socket.close() }
+            }, "dg-share-rej").apply { isDaemon = true }.start()
+        }
         // Şifre beklenirken vazgeçildi (soket kapanınca kabul iş parçacığı biter)
         if (!conns.containsKey(endpoint)) handshaking(endpoint)
     }
@@ -403,6 +429,8 @@ class LanTransport(context: Context) : ShareTransport {
     private companion object {
         const val HELLO_REQ: Byte = 0x7F
         const val HELLO_OK: Byte = 0x7E
+        /** v56 bağlantı reddedildi (neden JSON'da). */
+        const val HELLO_NO: Byte = 0x7A
         // v54 eşleşme doğrulaması
         const val PAIR_PROOF: Byte = 0x7D
         const val PAIR_FAIL: Byte = 0x7C

@@ -2,4 +2,11 @@
 <!-- v56 metinleri -->
 <resources>
     <string name="v56_practice_reward_nofill">現在表示できる広告がありません。練習をロック解除しました。</string>
+    <string name="v56_live_req_title">ライブ配信のリクエスト</string>
+    <string name="v56_live_req_body">%1$s がキャンバス「%2$s」をあなたにライブ配信しようとしています。</string>
+    <string name="v56_live_rejected">配信は拒否されました</string>
+    <string name="v56_live_no_answer">相手の端末から応答がありません</string>
+    <string name="v56_live_blocked">拒否されたリクエストが多すぎます。数分後にもう一度お試しください</string>
+    <string name="v56_live_always_asks">ライブ配信は必ず先に確認されます。ペアリングコードは承認後にのみ表示されます。</string>
+    <string name="v56_live_elsewhere">配信者は別の画面にいます</string>
 </resources>

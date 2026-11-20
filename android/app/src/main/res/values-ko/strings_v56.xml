@@ -2,4 +2,11 @@
 <!-- v56 metinleri -->
 <resources>
     <string name="v56_practice_reward_nofill">지금 표시할 광고가 없습니다. 연습이 열렸습니다.</string>
+    <string name="v56_live_req_title">라이브 방송 요청</string>
+    <string name="v56_live_req_body">%1$s 님이 캔버스 “%2$s”을(를) 실시간으로 방송하려고 합니다.</string>
+    <string name="v56_live_rejected">방송이 거절되었습니다</string>
+    <string name="v56_live_no_answer">상대 기기에서 응답이 없습니다</string>
+    <string name="v56_live_blocked">거절된 요청이 너무 많습니다. 몇 분 후 다시 시도하세요</string>
+    <string name="v56_live_always_asks">라이브 방송은 항상 먼저 묻습니다. 페어링 코드는 수락한 후에만 표시됩니다.</string>
+    <string name="v56_live_elsewhere">방송자가 다른 화면에 있습니다</string>
 </resources>

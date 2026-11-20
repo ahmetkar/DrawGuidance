@@ -38,6 +38,11 @@ object ShareWire {
     /** v52 yayına ara verildi / sürüyor (gönderen başka tuvalde düzenliyor). */
     const val LIVE_PAUSE = 13
     const val LIVE_RESUME = 14
+    /**
+     * v56 canlı mürekkep: çizilmekte olan çizginin yeni noktaları (~60 ms'de bir). Alan taraf veritabanına yazmadan geçici
+     * katmanda çizer; çizgi bitince gelen LIVE_UPDATE geçici katmanı temizler. Eski sürümler bu türü tanımaz, yok sayar.
+     */
+    const val LIVE_INK = 15
     const val BYE = 20
 
     // Teklif / paket türleri
@@ -185,3 +190,20 @@ class ShareChunker(private val chunkSize: Int) {
     @Synchronized
     fun reset() { partial.clear(); received.clear() }
 }
+
+/**
+ * v56 canlı mürekkep paketi ([ShareWire.LIVE_INK]). [pts] düz dizi: x, y, basınç üçlüleri (tuval pikseli). [from]: bu
+ * parçanın çizgideki ilk noktasının sırası (kayıp parça olursa alan taraf boşluğu düz çizgiyle kapatır).
+ */
+@Serializable
+data class ShareInk(
+    val stroke: String,
+    val brush: String,
+    val color: String,
+    val size: Float,
+    val opacity: Float = 1f,
+    val from: Int = 0,
+    val pts: List<Float> = emptyList(),
+    /** Çizginin çizildiği sayfa (çok sayfalı tuvalde; bilinmiyorsa -1). */
+    val page: Int = -1,
+)

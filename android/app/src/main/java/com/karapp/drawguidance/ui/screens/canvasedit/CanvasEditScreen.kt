@@ -624,6 +624,7 @@ fun CanvasEditScreen(
     val actions = remember(viewModel) {
         CanvasActions(
             onStrokeFinished = { points, id -> viewModel.onStrokeFinished(points, id) },
+            onStrokeProgress = viewModel::onStrokeProgress,
             // Seçili formülün düzenlenebilir kısmına dokunmak düzenlemeyi o kısımla açar
             onSelectAt = { p, tolerance -> viewModel.selectAt(p.x, p.y, tolerance) },
             onDeselectAt = { p, tolerance -> viewModel.deselectAt(p.x, p.y, tolerance) },

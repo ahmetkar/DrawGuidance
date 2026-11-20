@@ -87,6 +87,58 @@ class SharePackages(
     }
 
     /**
+     * v56 2C-1 fark paketi: [page] sayfasının farkı ([d]; içerik yalnız eklenen/değişen çizgiler, tek sayfa) ve henüz
+     * gönderilmemiş resimler. [base]: farkın dayandığı karenin sırası.
+     */
+    suspend fun liveDiffPackage(
+        canvas: CanvasUi, page: Int, d: com.karapp.drawguidance.data.model.LiveDiff.Diff, id: String, seq: Long, base: Long,
+        sent: MutableSet<String>, from: String,
+    ): SharePackage {
+        val content = ContentCodec.encodePages(listOf(d.upserts), layers = canvas.layers)
+        val ids = assetDao.idsForCanvas(canvas.localId).filterNot { it in sent }
+        val assets = if (ids.isEmpty()) emptyList() else assetDao.getByIds(ids)
+        sent += assets.map { it.id }
+        val header = SharePackageHeader(
+            id = id, type = ShareWire.TYPE_LIVE, name = canvas.name, canvasKind = canvas.kind.name, width = canvas.width,
+            height = canvas.height, currentPage = canvas.currentPage, contentLen = content.size,
+            assets = assets.map { ShareAsset(it.id, it.mimeType, it.width, it.height, it.data.size) }, seq = seq, from = from,
+            diffPage = page, diffBase = base, removed = d.removed, order = d.order,
+        )
+        return SharePackage(header, content, assets.map { it.data }, false)
+    }
+
+    /**
+     * v56 fark paketini bellekteki yayın tuvaline ([current]) uygular: resimler (denetimden geçerse) kaydedilir,
+     * kimlikler bu cihazdakilerle değişir. Veritabanına yazmaz ([persistLive]).
+     */
+    suspend fun applyLiveDiff(pkg: SharePackage, ids: MutableMap<String, String>, current: CanvasUi): CanvasUi {
+        val h = pkg.header
+        require(h.diffPage in current.pages.indices) { "sayfa yok" }
+        val now = System.currentTimeMillis()
+        pkg.header.assets.forEachIndexed { i, a ->
+            val bytes = pkg.assets[i]
+            val sniffed = com.karapp.drawguidance.data.images.ImageImportValidator.sniffMime(bytes)
+            val mime = if (a.mime.startsWith("image/") || sniffed != null) {
+                require(sniffed != null) { "resim değil" }
+                require(com.karapp.drawguidance.data.images.ImageSecurity.inspect(bytes, sniffed) == com.karapp.drawguidance.data.images.ImageSecurity.Verdict.CLEAN) { "güvenli resim değil" }
+                sniffed
+            } else a.mime
+            val newId = ids.getOrPut(a.id) { UUID.randomUUID().toString() }
+            assetDao.insert(CanvasAssetEntity(newId, current.localId, mime, a.w, a.h, bytes, now))
+        }
+        val upserts = ContentCodec.decodeDocument(pkg.content).pages.firstOrNull().orEmpty().map { if (ids.isEmpty()) it else remap(it, ids) }
+        val d = com.karapp.drawguidance.data.model.LiveDiff.Diff(upserts, h.removed, h.order)
+        val pages = current.pages.toMutableList()
+        pages[h.diffPage] = com.karapp.drawguidance.data.model.LiveDiff.apply(pages[h.diffPage], d)
+        return current.copy(pages = pages, updatedAt = now)
+    }
+
+    /** v56 bellekteki yayın tuvalinin çizimleri veritabanına yazılır (toplu, 2 sn'de bir). */
+    suspend fun persistLive(canvas: CanvasUi) {
+        canvasDao.updateContent(canvas.localId, ContentCodec.encodePages(canvas.pages, layers = canvas.layers), System.currentTimeMillis())
+    }
+
+    /**
      * Alınan tuvali kaydeder ya da ([existingId] verilirse) canlı yayında günceller. [ids]: gönderenin resim kimliği →
      * bu cihazdaki kimlik (yayın boyunca korunur). Tuvalin kimliğini döner. Bozuk içerik kaydedilmez (istisna).
      */

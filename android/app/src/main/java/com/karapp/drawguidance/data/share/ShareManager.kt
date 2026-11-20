@@ -128,6 +128,13 @@ class ShareManager(
     private var liveOfferId: String? = null
     private val liveSent = HashSet<String>()
     private var liveSeqOut = 0L
+    /** v56 fark paketi: son gönderilen kare, o karenin sırası, son tam paketten beri kare sayısı, tam paket isteği. */
+    private var liveLastSent: CanvasUi? = null
+    private var liveLastSeq = 0L
+    private var liveSinceFull = 0
+    @Volatile private var liveResync = false
+    /** v56 alan tarafta farkla güncellenen tuvalin veritabanına toplu yazımı. */
+    private var livePersistJob: kotlinx.coroutines.Job? = null
     private val liveFrames = Channel<CanvasUi>(Channel.CONFLATED)
     private var liveJob: Job? = null
 
@@ -271,6 +278,11 @@ class ShareManager(
     /** Yayını alan taraf yayından ayrılır (tuval kayıtlı kalır). */
     fun leaveLive() {
         val inn = _liveIn.value ?: return
+        // v56 farkla güncellenip henüz yazılmamış çizimler kaybolmasın
+        if (livePersistJob?.isActive == true) {
+            livePersistJob?.cancel(); livePersistJob = null
+            _liveCanvas.value?.takeIf { it.localId == inn.canvasId }?.let { c -> scope.launch { installLock.withLock { runCatching { packages.persistLive(c) } } } }
+        }
         _liveIn.value = null
         _liveCanvas.value = null
         _liveInk.value = emptyMap()
@@ -522,11 +534,35 @@ class ShareManager(
                 val pkg = SharePackage.decode(m)
                 if (pkg.header.seq <= liveSeqIn) return
                 liveSeqIn = pkg.header.seq
+                livePersistJob?.cancel(); livePersistJob = null
                 installLock.withLock { packages.install(pkg, liveIds, existingId = inn.canvasId) }
                 refreshLiveCanvas(inn.canvasId)
                 // v56 biten çizgiler artık tuvalde: geçici mürekkep temizlenir
                 _liveInk.value = emptyMap()
             }
+            ShareWire.LIVE_DIFF -> {
+                val inn = _liveIn.value ?: return
+                if (inn.peerKey != key || inn.ended) return
+                val pkg = SharePackage.decode(m)
+                val h = pkg.header
+                if (h.seq <= liveSeqIn) return
+                val cur = _liveCanvas.value?.takeIf { it.localId == inn.canvasId }
+                if (cur == null || h.diffBase != liveSeqIn || h.diffPage !in cur.pages.indices) {
+                    // Arada kare kaçtı: gönderen sonraki karede tam paket yollar
+                    send(key, ShareWire.encode(ShareWire.LIVE_RESYNC, "{}"))
+                    return
+                }
+                val updated = installLock.withLock { packages.applyLiveDiff(pkg, liveIds, cur) }
+                liveSeqIn = h.seq
+                if (h.assets.isNotEmpty()) runCatching { assets.ensureLoaded(updated) }
+                _liveCanvas.value = updated
+                _liveInk.value = emptyMap()
+                if (livePersistJob?.isActive != true) livePersistJob = scope.launch {
+                    delay(2_000)
+                    _liveCanvas.value?.takeIf { it.localId == inn.canvasId }?.let { c -> installLock.withLock { runCatching { packages.persistLive(c) } } }
+                }
+            }
+            ShareWire.LIVE_RESYNC -> if (_liveOut.value?.peerKey == key) liveResync = true
             ShareWire.LIVE_INK -> {
                 val inn = _liveIn.value ?: return
                 if (inn.peerKey != key || inn.ended) return
@@ -585,6 +621,10 @@ class ShareManager(
                 val canvasId = out.canvasId ?: return
                 liveSent.clear()
                 liveSeqOut = 0
+                liveLastSent = null
+                liveLastSeq = 0
+                liveSinceFull = 0
+                liveResync = false
                 liveOfferId = id
                 // İlk paket kayıtlı tuvalin tamamı; gönderilen resimler yayın boyunca yeniden gönderilmez
                 val pkg = packages.canvasPackage(canvasId, ShareWire.TYPE_LIVE, id, from, codecOf(out.key)) ?: return fail("Tuval bulunamadı")
@@ -611,8 +651,28 @@ class ShareManager(
                 val out = _liveOut.value ?: break
                 if (frame.localId != out.canvasId) continue
                 runCatching {
-                    val pkg = packages.livePackage(frame, id, ++liveSeqOut, liveSent, settings.deviceName.value, codecOf(out.peerKey))
-                    send(out.peerKey, pkg.encode(ShareWire.LIVE_UPDATE))
+                    // v56 2C-1 karşı taraf fark paketini biliyorsa (içerik sürümü 11+) yalnız değişen sayfanın farkı gider;
+                    // her 20 karede bir, sayfa ya da tuval ayarı değişince ve alan taraf isteyince tam paket
+                    val prev = liveLastSent
+                    val page = if (prev != null && codecOf(out.peerKey) >= 11 && !liveResync && liveSinceFull < com.karapp.drawguidance.data.model.LiveDiff.FULL_EVERY)
+                        com.karapp.drawguidance.data.model.LiveDiff.changedPage(prev, frame) else null
+                    when {
+                        page == -1 -> Unit
+                        page != null && prev != null -> {
+                            val d = com.karapp.drawguidance.data.model.LiveDiff.diff(prev.pages[page], frame.pages[page])
+                            val pkg = packages.liveDiffPackage(frame, page, d, id, ++liveSeqOut, liveLastSeq, liveSent, settings.deviceName.value)
+                            send(out.peerKey, pkg.encode(ShareWire.LIVE_DIFF))
+                            liveSinceFull++
+                            liveLastSent = frame; liveLastSeq = liveSeqOut
+                        }
+                        else -> {
+                            liveResync = false
+                            val pkg = packages.livePackage(frame, id, ++liveSeqOut, liveSent, settings.deviceName.value, codecOf(out.peerKey))
+                            send(out.peerKey, pkg.encode(ShareWire.LIVE_UPDATE))
+                            liveSinceFull = 0
+                            liveLastSent = frame; liveLastSeq = liveSeqOut
+                        }
+                    }
                 }.onFailure { AppLog.w("Share", "Yayın karesi gönderilemedi", it) }
                 delay(settings.liveIntervalMs)
             }

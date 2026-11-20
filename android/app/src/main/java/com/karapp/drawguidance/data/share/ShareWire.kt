@@ -43,6 +43,10 @@ object ShareWire {
      * katmanda çizer; çizgi bitince gelen LIVE_UPDATE geçici katmanı temizler. Eski sürümler bu türü tanımaz, yok sayar.
      */
     const val LIVE_INK = 15
+    /** v56 2C-1 fark paketi: yalnız değişen sayfanın değişen çizgileri (yalnız içerik sürümü 11+ olan karşı tarafa). */
+    const val LIVE_DIFF = 16
+    /** v56 alan taraf farkı uygulayamadı (sıra boşluğu): sonraki kare tam paket gönderilir. */
+    const val LIVE_RESYNC = 17
     const val BYE = 20
 
     // Teklif / paket türleri
@@ -147,6 +151,11 @@ data class SharePackageHeader(
     val imageH: Int = 0,
     /** Gönderen cihazın adı (alıcıda "paylaşılan tuval" bilgisi). */
     val from: String = "",
+    /** v56 fark paketi ([ShareWire.LIVE_DIFF]): değişen sayfa, farkın dayandığı kare, silinen kimlikler, yeni sıra. */
+    val diffPage: Int = -1,
+    val diffBase: Long = 0,
+    val removed: List<String> = emptyList(),
+    val order: List<String>? = null,
 )
 
 /**

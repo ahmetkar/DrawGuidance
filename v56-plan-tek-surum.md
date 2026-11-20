@@ -940,8 +940,9 @@ eklenme zamanıdır. 2D ve öteki v56 maddelerinin yerleri de bu haritadadır.
 
 - *Üst kipler:* serbest, tekdüze, bozma (perspektif), çarpıtma (ağ) (yeni, K2), **kaydır/eğ** (yeni, K2); taşı, döndür,
   ölçekle (var, panele taşınır)
-- *Alt panel:* yaslama (hizalama kısayolu), yatay çevir, dikey çevir, eksene göre yansıt, 90° döndür, tuvale sığdır
-  (yeni, K2); **referans noktası** (9 nokta + serbest), X / Y (var), genişlik / yükseklik / açı, orantıyı kilitle,
+- *Alt panel (ikinci satır, 2A):* **Yaslama** (snapping: mıknatıslar, kenar/merkez/ızgara/kılavuza yaslanma, mesafe,
+  hız), **yatay çevir**, **dikey çevir**, eksene göre yansıt, **45° döndür** (uzun basınca 90°), **tuvale sığdır**,
+  ara değerleme, sıfırla (yeni, K2); **referans noktası** (9 nokta + serbest), X / Y (var), genişlik / yükseklik / açı, orantıyı kilitle,
   **her birini dönüştür**, **dönüşümü tekrarla**, **dönüşümü çoğalt** (yeni, K2)
 
 **Özellikler penceresi** (seçili nesne ya da katman; sekmeli)

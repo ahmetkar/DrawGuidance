@@ -1,4 +1,5 @@
 import SwiftUI
+import Combine
 
 /// v51 paylaşım sayfası (Android `ShareScreen`): bu cihazın adı ve görünürlüğü, aynı Wi-Fi ağındaki cihazlar
 /// (tuval gönder, resim gönder, yayın başlat), aktarım durumu, yayın kartları ve paylaşım ayarları.
@@ -242,13 +243,9 @@ struct LiveSettingsSection: View {
                     Text(L("v51_share_discoverable_hint")).font(.caption).foregroundStyle(.secondary)
                 }
             }
-            Toggle(isOn: Binding(get: { settings.askBeforeLive }, set: { settings.setAskBeforeLive($0) })) {
-                VStack(alignment: .leading, spacing: 2) {
-                    Text(L("v52_live_ask"))
-                    Text(L("v52_live_ask_hint")).font(.caption).foregroundStyle(.secondary)
-                }
-            }
-            .accessibilityIdentifier("live_ask")
+            // v56 yayın her zaman önce sorulur (eski "yayından önce sor" anahtarı kalktı)
+            Label(L("v56_live_always_asks"), systemImage: "hand.raised").font(.footnote).foregroundStyle(.secondary)
+                .accessibilityIdentifier("live_always_asks")
             Toggle(isOn: Binding(get: { settings.liveAutoOpen }, set: { settings.setLiveAutoOpen($0) })) {
                 VStack(alignment: .leading, spacing: 2) {
                     Text(L("v52_live_auto_open"))
@@ -353,6 +350,14 @@ struct ShareHostModifier: ViewModifier {
                 Text(L("v54_share_pair_show", p.name) + "\n\n" + Self.spaced(p.code) + "\n\n" + L("v54_share_pair_show_note"))
             }
             .sheet(item: $share.codePrompt) { p in PairCodeEntry(prompt: p) }
+            // v56 canlı yayın isteği: şifreden önce sorulur (60 sn'de yanıt yoksa kendiliğinden geri çevrilir)
+            .alert(L("v56_live_req_title"), isPresented: Binding(get: { share.liveRequest != nil }, set: { if !$0 && share.liveRequest != nil { share.answerLiveRequest(false) } }),
+                   presenting: share.liveRequest) { _ in
+                Button(L("v51_share_accept")) { share.answerLiveRequest(true) }.accessibilityIdentifier("share_live_request_accept")
+                Button(L("v51_share_reject"), role: .cancel) { share.answerLiveRequest(false) }.accessibilityIdentifier("share_live_request_reject")
+            } message: { r in
+                Text(L("v56_live_req_body", r.name, r.title))
+            }
             .alert(L("v51_share_offer_title"), isPresented: Binding(get: { share.offer != nil }, set: { if !$0 && share.offer != nil { share.answerOffer(false) } }),
                    presenting: share.offer) { _ in
                 Button(L("v51_share_accept")) { share.answerOffer(true) }
@@ -393,17 +398,34 @@ extension View {
 struct LiveCanvasView: View {
     @ObservedObject private var share = ShareManager.shared
     @Environment(\.dismiss) private var dismiss
+    @State private var zoom: CGFloat = 1
+    @State private var pan: CGSize = .zero
+    @GestureState private var pinch: CGFloat = 1
+    @GestureState private var drag: CGSize = .zero
+    @State private var now = Date()
+    private let tick = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
 
     var body: some View {
         NavigationStack {
             ZStack {
                 Color(uiColor: .secondarySystemBackground).ignoresSafeArea()
                 if let c = share.liveCanvas {
+                    // v56 yakınlaştır/kaydır (çift dokunuş sıfırlar) ve çizilmekte olan çizginin canlı mürekkebi
                     CanvasThumbnail(canvas: c, side: 1100)
+                        .overlay { LiveInkOverlay(ink: share.liveInk, canvasW: CGFloat(max(c.width, 1)), canvasH: CGFloat(max(c.height, 1))) }
                         .aspectRatio(CGFloat(max(c.width, 1)) / CGFloat(max(c.height, 1)), contentMode: .fit)
                         .clipShape(RoundedRectangle(cornerRadius: 8))
                         .shadow(color: .black.opacity(0.1), radius: 6, y: 2)
                         .padding(16)
+                        .scaleEffect(zoom * pinch)
+                        .offset(x: pan.width + drag.width, y: pan.height + drag.height)
+                        .gesture(MagnificationGesture()
+                            .updating($pinch) { v, st, _ in st = v }
+                            .onEnded { v in zoom = min(max(zoom * v, 1), 6) })
+                        .simultaneousGesture(DragGesture()
+                            .updating($drag) { v, st, _ in if zoom > 1.01 { st = v.translation } }
+                            .onEnded { v in if zoom > 1.01 { pan.width += v.translation.width; pan.height += v.translation.height } })
+                        .onTapGesture(count: 2) { withAnimation(.easeOut(duration: 0.2)) { zoom = 1; pan = .zero } }
                         .accessibilityIdentifier("live_canvas")
                 } else {
                     VStack(spacing: 12) { ProgressView(); Text(L("v51_share_live_waiting")).foregroundStyle(.secondary) }
@@ -411,13 +433,16 @@ struct LiveCanvasView: View {
             }
             .safeAreaInset(edge: .bottom) {
                 if let inn = share.liveIn {
-                    Text(inn.ended ? L("v51_share_live_ended") : inn.paused ? L("v52_live_paused") : L("v51_share_live_in", inn.peerName, share.liveCanvas?.name ?? ""))
+                    // v56 ara 5 sn'yi geçince "Yayıncı başka bir ekranda"
+                    let elsewhere = inn.paused && !inn.ended && (inn.pausedAt.map { now.timeIntervalSince($0) >= 5 } ?? false)
+                    Text(inn.ended ? L("v51_share_live_ended") : elsewhere ? L("v56_live_elsewhere") : inn.paused ? L("v52_live_paused") : L("v51_share_live_in", inn.peerName, share.liveCanvas?.name ?? ""))
                         .font(.footnote.weight(.semibold)).foregroundStyle(.white)
                         .padding(.horizontal, 14).padding(.vertical, 8)
                         .background(Capsule().fill(inn.ended ? Color.gray : Color.red))
                         .padding(.bottom, 8)
                 }
             }
+            .onReceive(tick) { now = $0 }
             .navigationTitle(share.liveCanvas?.name ?? L("v51_share_live_title"))
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
@@ -440,6 +465,33 @@ struct LiveCanvasView: View {
                 }
             }
         }
+    }
+}
+
+/// v56 yayıncının çizmekte olduğu çizgiler (tuval koordinatlarında; kare gelince silinir).
+struct LiveInkOverlay: View {
+    let ink: [String: LiveInkStroke]
+    let canvasW: CGFloat
+    let canvasH: CGFloat
+
+    var body: some View {
+        Canvas { ctx, size in
+            let sx = size.width / canvasW, sy = size.height / canvasH
+            for s in ink.values where s.pts.count >= 3 {
+                var path = Path()
+                var i = 0
+                while i + 2 < s.pts.count {
+                    let p = CGPoint(x: CGFloat(s.pts[i]) * sx, y: CGFloat(s.pts[i + 1]) * sy)
+                    if i == 0 { path.move(to: p) } else { path.addLine(to: p) }
+                    i += 3
+                }
+                if s.pts.count == 3, let p = path.currentPoint { path.addLine(to: CGPoint(x: p.x + 0.1, y: p.y)) }
+                let color = (Color(hex: s.color) ?? .black).opacity(Double(max(0.05, min(1, s.opacity))))
+                ctx.stroke(path, with: .color(color), style: StrokeStyle(lineWidth: max(1, CGFloat(s.size) * sx), lineCap: .round, lineJoin: .round))
+            }
+        }
+        .allowsHitTesting(false)
+        .accessibilityIdentifier("share_live_ink")
     }
 }
 

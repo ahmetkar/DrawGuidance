@@ -26,7 +26,13 @@ struct ShareTransferStatus: Equatable {
 }
 
 struct ShareLiveOut: Equatable { let canvasId: String; let peerId: String; let peerName: String; var paused = false; var startedAt = Date() }
-struct ShareLiveIn: Equatable { let canvasId: String; let peerId: String; let peerName: String; var ended = false; var paused = false }
+struct ShareLiveIn: Equatable {
+    let canvasId: String; let peerId: String; let peerName: String; var ended = false; var paused = false
+    /// v56 ara verildiği an (5 sn sürerse "Yayıncı başka bir ekranda" ipucu).
+    var pausedAt: Date?
+}
+/// v56 canlı yayın isteği (kabul eden cihazda, şifreden önce sorulur).
+struct ShareLiveRequest: Identifiable, Equatable { let peerId: String; let name: String; let platform: String; let title: String; var id: String { peerId } }
 
 /// Alınan içerik bildirimi ("Tuvali aç" düğmeli pencere).
 struct ShareReceived: Identifiable, Equatable {
@@ -74,6 +80,15 @@ final class ShareManager: ObservableObject {
     /// v54 eşleşme şifresi (kabul eden: gösterilir; bağlanan: girilir).
     @Published var pairShow: SharePairShow?
     @Published var codePrompt: ShareCodePrompt?
+    /// v56 yanıt bekleyen canlı yayın isteği.
+    @Published private(set) var liveRequest: ShareLiveRequest?
+    /// v56 alan tarafta çizilmekte olan geçici çizgiler (çizgi bitip kare gelince silinir).
+    @Published private(set) var liveInk: [String: LiveInkStroke] = [:]
+    private let approval = LiveApprovalPolicy()
+    private var liveRequestTimeout: Task<Void, Never>?
+    private var inkStroke: String?
+    private var inkSent = 0
+    private var inkLastAt: Date = .distantPast
 
     private struct Outgoing { let peerId: String; let type: String; let title: String; let canvasId: String?; let image: SavedImage? }
     private var outgoing: [String: Outgoing] = [:]
@@ -142,13 +157,13 @@ final class ShareManager: ObservableObject {
 
     // MARK: Bağlantı
 
-    private func whenConnected(_ id: String, _ action: @escaping () -> Void) {
+    private func whenConnected(_ id: String, intent: String? = nil, title: String? = nil, _ action: @escaping () -> Void) {
         guard let peer = peers.first(where: { $0.id == id }) else { fail(L("v51_share_failed", "?")); return }
         if peer.state == .connected { action(); return }
         afterConnect[id, default: []].append(action)
         if peer.state != .connecting {
             setState(id, .connecting)
-            transport.connect(id)
+            transport.connect(id, intent: intent, title: title)
         }
     }
 
@@ -182,12 +197,30 @@ final class ShareManager: ObservableObject {
                  bytes: packages.canvasSize(canvas.localId), kind: canvas.kind.rawValue)
     }
 
+    /// v56 canlı yayın isteği yanıtlandı: kabulde bağlantı kabul edilir (ilk eşleşmede şifre şimdi gösterilir).
+    func answerLiveRequest(_ accept: Bool) {
+        guard let r = liveRequest else { return }
+        liveRequest = nil
+        liveRequestTimeout?.cancel(); liveRequestTimeout = nil
+        if accept {
+            approval.onApproved(r.peerId)
+            setState(r.peerId, .connecting, name: r.name, platform: r.platform)
+            transport.accept(r.peerId)
+        } else {
+            approval.onRejected(r.peerId)
+            transport.reject(r.peerId, reason: LanTransport.REJECT_REASON)
+        }
+    }
+
     private func offerOut(_ peerId: String, type: String, title: String, canvasId: String?, image: SavedImage?, bytes: Int64, kind: String?) {
         let id = UUID().uuidString.lowercased()
         outgoing[id] = Outgoing(peerId: peerId, type: type, title: title, canvasId: canvasId, image: image)
         let o = ShareOffer(id: id, type: type, title: title, bytes: bytes, canvasKind: kind)
         status = ShareTransferStatus(peerName: peerName(peerId), title: title, sending: true)
-        whenConnected(peerId) { [weak self] in self?.send(peerId, ShareWire.encode(ShareWire.OFFER, o)) }
+        // v56 yayın bağlantısı amacını bildirir: karşı cihaz önce onay sorar, şifre ondan sonra gösterilir
+        whenConnected(peerId, intent: type == ShareWire.TYPE_LIVE ? LanTransport.CONNECT_INTENT_LIVE : nil, title: title) { [weak self] in
+            self?.send(peerId, ShareWire.encode(ShareWire.OFFER, o))
+        }
     }
 
     func stopLive() {
@@ -202,11 +235,29 @@ final class ShareManager: ObservableObject {
         guard let inn = liveIn else { return }
         liveIn = nil
         liveCanvas = nil
+        liveInk = [:]
         showLive = false
         if !inn.ended { send(inn.peerId, ShareWire.encode(ShareWire.LIVE_STOP, Data("{}".utf8))) }
     }
 
     /// Düzenleyici yayın yapılan tuvalin her değişikliğini bildirir; en son hali ayarlanan sıklıkta gönderilir.
+    /// v56 düzenleyici çizilmekte olan çizginin noktalarını bildirir; yeni noktalar en çok ~60 ms'de bir küçük pakette
+    /// gider (Android `publishInk`). Çizgi bitince normal kare gider; alan taraf geçici çizgiyi o zaman siler.
+    func publishInk(_ canvasId: String, stroke: String, brush: String, color: String, size: Float, opacity: Float, points: [StrokePoint], page: Int = -1) {
+        guard let out = liveOut, out.canvasId == canvasId, !out.paused else { return }
+        let now = Date()
+        if stroke != inkStroke { inkStroke = stroke; inkSent = 0; inkLastAt = .distantPast }
+        guard now.timeIntervalSince(inkLastAt) >= 0.06, points.count > inkSent else { return }
+        let from = inkSent
+        var flat: [Float] = []
+        flat.reserveCapacity((points.count - from) * 3)
+        for p in points[from...] { flat.append(p.x); flat.append(p.y); flat.append(p.pressure) }
+        inkSent = points.count
+        inkLastAt = now
+        send(out.peerId, ShareWire.encode(ShareWire.LIVE_INK, ShareInk(stroke: stroke, brush: brush, color: color, size: size,
+                                                                        opacity: opacity, from: from, pts: flat, page: page)))
+    }
+
     func publishLive(_ canvas: CanvasUi) {
         guard liveOut?.canvasId == canvas.localId, liveOut?.paused != true else { return }
         liveFrame = canvas
@@ -305,6 +356,26 @@ final class ShareManager: ObservableObject {
 
     fileprivate func codeNeeded(_ id: String, _ name: String) { codePrompt = ShareCodePrompt(peerId: id, name: name) }
 
+    /// v56 gelen bağlantı isteği: canlı yayın her zaman önce sorulur (şifre kabulden sonra); tuval/resim bağlantısı
+    /// kendiliğinden kabul edilir (içerik ayrıca teklif onayıyla alınır).
+    fileprivate func request(_ id: String, _ name: String, _ platform: String, intent: String?, title: String?) {
+        guard intent == LanTransport.CONNECT_INTENT_LIVE else {
+            setState(id, .connecting, name: name, platform: platform)
+            transport.accept(id)
+            return
+        }
+        if approval.isBlocked(id) { transport.reject(id, reason: LanTransport.REJECT_BLOCKED); return }
+        if let old = liveRequest, old.peerId != id { transport.reject(old.peerId, reason: LanTransport.REJECT_REASON) }
+        liveRequest = ShareLiveRequest(peerId: id, name: name, platform: platform, title: title ?? "")
+        liveRequestTimeout?.cancel()
+        liveRequestTimeout = Task { @MainActor [weak self] in
+            try? await Task.sleep(nanoseconds: UInt64(LiveApprovalPolicy.ANSWER_TIMEOUT_MS) * 1_000_000)
+            guard let self, !Task.isCancelled, self.liveRequest?.peerId == id else { return }
+            self.liveRequest = nil
+            self.transport.reject(id, reason: LanTransport.REJECT_TIMEOUT)
+        }
+    }
+
     // MARK: Gelen mesajlar
 
     fileprivate func found(_ id: String, _ name: String, _ platform: String) {
@@ -330,6 +401,7 @@ final class ShareManager: ObservableObject {
         let wasConnected = peer?.state == .connected
         if pairShow?.peerId == id { pairShow = nil }
         if codePrompt?.peerId == id { codePrompt = nil }
+        if liveRequest?.peerId == id { liveRequest = nil; liveRequestTimeout?.cancel(); liveRequestTimeout = nil }
         if active {
             if let i = peers.firstIndex(where: { $0.id == id }) { peers[i].state = .found }
         } else {
@@ -356,6 +428,9 @@ final class ShareManager: ObservableObject {
         case "Eşleşme şifresi yanlış": text = L("v54_share_pair_wrong")
         case "Eşleşme yenilenmeli": text = L("v54_share_pair_renew")
         case "Karşı cihazın uygulaması güncel değil": text = L("v54_share_pair_old")
+        case "Reddedildi": text = L("v56_live_rejected"); status = nil
+        case "Yanıt yok": text = L("v56_live_no_answer"); status = nil
+        case "Geçici olarak engellendi": text = L("v56_live_blocked"); status = nil
         default: error = message; return
         }
         error = text
@@ -377,9 +452,12 @@ final class ShareManager: ObservableObject {
             setState(id, .connected, name: h.name, platform: h.platform)
         case ShareWire.OFFER:
             let o = try m.header(ShareOffer.self)
-            // v52 canlı yayın daveti kendi ayarıyla
-            let ask = o.type == ShareWire.TYPE_LIVE ? settings.askBeforeLive : settings.askBeforeReceive
-            if ask { offer = ShareIncomingOffer(peerId: id, peerName: peerName(id), offer: o) }
+            // v56 canlı yayın daveti her zaman sorulur (askBeforeLive ayarı kalktı); bağlanırken onaylandıysa yeniden
+            // sorulmaz. Tuval/resim için askBeforeReceive ayarı geçerli
+            if o.type == ShareWire.TYPE_LIVE {
+                if approval.consumeApproval(id) { reply(id, o, true) }
+                else { offer = ShareIncomingOffer(peerId: id, peerName: peerName(id), offer: o) }
+            } else if settings.askBeforeReceive { offer = ShareIncomingOffer(peerId: id, peerName: peerName(id), offer: o) }
             else { reply(id, o, true) }
         case ShareWire.ACCEPT:
             let r = try m.header(ShareReply.self)
@@ -416,8 +494,19 @@ final class ShareManager: ObservableObject {
             liveSeqIn = pkg.header.seq
             _ = try packages.install(pkg, ids: &liveIds, existingId: inn.canvasId)
             refreshLiveCanvas(inn.canvasId)
+            // v56 biten çizgiler artık tuvalde: geçici mürekkep temizlenir
+            liveInk = [:]
+        case ShareWire.LIVE_INK:
+            guard let inn = liveIn, inn.peerId == id, !inn.ended else { return }
+            let ink = try m.header(ShareInk.self)
+            liveInk[ink.stroke] = LiveInk.merge(liveInk[ink.stroke], ink)
         case ShareWire.LIVE_PAUSE, ShareWire.LIVE_RESUME:
-            if liveIn?.peerId == id, liveIn?.ended == false { liveIn?.paused = m.type == ShareWire.LIVE_PAUSE }
+            let pause = m.type == ShareWire.LIVE_PAUSE
+            if liveIn?.peerId == id, liveIn?.ended == false {
+                if pause { if liveIn?.paused != true || liveIn?.pausedAt == nil { liveIn?.pausedAt = Date() } } else { liveIn?.pausedAt = nil }
+                liveIn?.paused = pause
+            }
+            if pause { liveInk = [:] }
         case ShareWire.LIVE_STOP:
             if liveIn?.peerId == id { liveIn?.ended = true }
             if liveOut?.peerId == id { liveOut = nil; liveTask?.cancel(); liveTask = nil }
@@ -430,6 +519,7 @@ final class ShareManager: ObservableObject {
 
     private func reply(_ id: String, _ o: ShareOffer, _ accept: Bool) {
         if accept && o.type == ShareWire.TYPE_LIVE { leaveLive() }
+        if !accept && o.type == ShareWire.TYPE_LIVE { approval.onRejected(id) }
         send(id, ShareWire.encode(accept ? ShareWire.ACCEPT : ShareWire.REJECT, ShareReply(id: o.id, canvasId: nil)))
         if accept { status = ShareTransferStatus(peerName: peerName(id), title: o.title, sending: false) }
     }
@@ -577,4 +667,7 @@ extension ShareManager: LanTransportDelegate {
     nonisolated func lanError(_ message: String) { main { $0.failed(message) } }
     nonisolated func lanPairCode(_ endpoint: String, name: String, code: String?) { main { $0.pairCode(endpoint, name, code) } }
     nonisolated func lanCodeNeeded(_ endpoint: String, name: String) { main { $0.codeNeeded(endpoint, name) } }
+    nonisolated func lanRequest(_ endpoint: String, name: String, platform: String, needsCode: Bool, intent: String?, title: String?) {
+        main { $0.request(endpoint, name, platform, intent: intent, title: title) }
+    }
 }

@@ -132,3 +132,61 @@ enum ShareTrustStore {
         SecItemDelete(q as CFDictionary)
     }
 }
+
+/// v56 eşleşme şifresi kapısı (Android `PairingCodeGate`): şifre yalnız kullanıcı isteği onaylayınca üretilir, daha önce
+/// eşleşmiş cihazda hiç üretilmez (onay yine sorulur).
+final class PairingCodeGate {
+    let known: Bool
+    private let generate: () -> String
+    private(set) var code: String?
+    private(set) var approved = false
+
+    init(known: Bool, generate: @escaping () -> String = SharePairing.newCode) {
+        self.known = known
+        self.generate = generate
+    }
+
+    @discardableResult
+    func approve() -> String? {
+        if !approved { approved = true; if !known { code = generate() } }
+        return code
+    }
+}
+
+/// v56 canlı yayın onay kuralları (Android `LiveApprovalPolicy`): yayın teklifi her zaman sorulur; 60 sn'de yanıt yoksa
+/// zaman aşımı; aynı cihaz 1 dakikada 3 kez reddedilirse 5 dakika sorulmadan geri çevrilir; bağlanırken onaylanan teklif
+/// bağlantıdan sonra (3 dk içinde) yeniden sorulmaz.
+final class LiveApprovalPolicy {
+    static let ANSWER_TIMEOUT_MS: Int64 = 60_000
+    static let WINDOW_MS: Int64 = 60_000
+    static let MAX_REJECTIONS = 3
+    static let BLOCK_MS: Int64 = 5 * 60_000
+    static let APPROVAL_VALID_MS: Int64 = 3 * 60_000
+
+    private let clock: () -> Int64
+    private var rejections: [String: [Int64]] = [:]
+    private var blockedUntil: [String: Int64] = [:]
+    private var approvedAt: [String: Int64] = [:]
+    private let lock = NSLock()
+
+    init(clock: @escaping () -> Int64 = { Int64(Date().timeIntervalSince1970 * 1000) }) { self.clock = clock }
+
+    func isBlocked(_ peer: String) -> Bool { lock.lock(); defer { lock.unlock() }; return (blockedUntil[peer] ?? 0) > clock() }
+
+    func onRejected(_ peer: String) {
+        lock.lock(); defer { lock.unlock() }
+        let now = clock()
+        var q = (rejections[peer] ?? []) + [now]
+        q.removeAll { now - $0 > Self.WINDOW_MS }
+        if q.count >= Self.MAX_REJECTIONS { blockedUntil[peer] = now + Self.BLOCK_MS; q.removeAll() }
+        rejections[peer] = q
+    }
+
+    func onApproved(_ peer: String) { lock.lock(); defer { lock.unlock() }; approvedAt[peer] = clock() }
+
+    func consumeApproval(_ peer: String) -> Bool {
+        lock.lock(); defer { lock.unlock() }
+        guard let at = approvedAt.removeValue(forKey: peer) else { return false }
+        return clock() - at <= Self.APPROVAL_VALID_MS
+    }
+}

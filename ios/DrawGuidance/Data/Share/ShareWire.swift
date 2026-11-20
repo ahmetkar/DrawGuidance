@@ -22,6 +22,8 @@ enum ShareWire {
     /// v52 yayına ara verildi / sürüyor (gönderen başka tuvalde düzenliyor).
     static let LIVE_PAUSE: UInt8 = 13
     static let LIVE_RESUME: UInt8 = 14
+    /// v56 çizilmekte olan çizginin yeni noktaları (`ShareInk`); eski sürümler bilinmeyen türü yok sayar.
+    static let LIVE_INK: UInt8 = 15
     static let BYE: UInt8 = 20
 
     static let TYPE_CANVAS = "canvas"
@@ -119,6 +121,57 @@ struct ShareOffer: Codable, Equatable {
         title = try c.decodeIfPresent(String.self, forKey: .title) ?? ""
         bytes = try c.decodeIfPresent(Int64.self, forKey: .bytes) ?? 0
         canvasKind = try c.decodeIfPresent(String.self, forKey: .canvasKind)
+    }
+}
+
+/// v56 canlı mürekkep parçası (Android `ShareInk` ile aynı): `pts` düz [x, y, basınç, ...], `from` bu parçanın ilk
+/// noktasının çizgideki sırası.
+struct ShareInk: Codable, Equatable {
+    var stroke: String
+    var brush: String
+    var color: String
+    var size: Float
+    var opacity: Float = 1
+    var from: Int = 0
+    var pts: [Float] = []
+    var page: Int = -1
+
+    init(stroke: String, brush: String, color: String, size: Float, opacity: Float = 1, from: Int = 0, pts: [Float] = [], page: Int = -1) {
+        self.stroke = stroke; self.brush = brush; self.color = color; self.size = size
+        self.opacity = opacity; self.from = from; self.pts = pts; self.page = page
+    }
+
+    init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        stroke = try c.decode(String.self, forKey: .stroke)
+        brush = try c.decodeIfPresent(String.self, forKey: .brush) ?? ""
+        color = try c.decodeIfPresent(String.self, forKey: .color) ?? "#000000"
+        size = try c.decodeIfPresent(Float.self, forKey: .size) ?? 4
+        opacity = try c.decodeIfPresent(Float.self, forKey: .opacity) ?? 1
+        from = try c.decodeIfPresent(Int.self, forKey: .from) ?? 0
+        pts = try c.decodeIfPresent([Float].self, forKey: .pts) ?? []
+        page = try c.decodeIfPresent(Int.self, forKey: .page) ?? -1
+    }
+}
+
+/// v56 alan tarafta biriken geçici çizgi.
+struct LiveInkStroke: Equatable {
+    let id: String
+    let brush: String
+    let color: String
+    let size: Float
+    let opacity: Float
+    let pts: [Float]
+    let page: Int
+}
+
+/// v56 canlı mürekkep parçalarının birleştirilmesi (Android `LiveInk`).
+enum LiveInk {
+    static func merge(_ old: LiveInkStroke?, _ ink: ShareInk) -> LiveInkStroke {
+        let have = old?.pts ?? []
+        let skip = max(0, have.count / 3 - ink.from) * 3
+        let add = skip >= ink.pts.count ? [] : Array(ink.pts[skip...])
+        return LiveInkStroke(id: ink.stroke, brush: ink.brush, color: ink.color, size: ink.size, opacity: ink.opacity, pts: have + add, page: ink.page)
     }
 }
 

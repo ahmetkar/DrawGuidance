@@ -3639,6 +3639,13 @@
 "v54_template_helper_hint" = "The lines of the helper you pick become the shape template; draw near them to trace.";
 "v55_image_err_memory" = "This image is too large for this device's memory (%1$@). It wasn't added so the app doesn't crash; try a smaller copy.";
 "v55_image_err_pixels" = "The resolution is too high to process (%1$d×%2$d, over 1 gigapixel). Try a smaller copy.";
+"v56_live_always_asks" = "Live broadcasts are always asked first; the pairing code appears only after you accept.";
+"v56_live_blocked" = "Too many declined requests: try again in a few minutes";
+"v56_live_elsewhere" = "The broadcaster is on another screen";
+"v56_live_no_answer" = "No answer from the other device";
+"v56_live_rejected" = "The broadcast was declined";
+"v56_live_req_body" = "%1$@ wants to broadcast the canvas “%2$@” to you live.";
+"v56_live_req_title" = "Live broadcast request";
 "v56_practice_reward_nofill" = "No ad is available right now. The practice has been unlocked for you.";
 "vector_cut" = "Cut";
 "vector_delete" = "Delete";

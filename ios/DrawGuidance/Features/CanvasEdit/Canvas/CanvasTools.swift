@@ -349,6 +349,19 @@ final class DrawTool: CanvasTool {
         if let f = filter { emit(ctx, f.move(p, ctx.eventTime)) } else { add(ctx, p.x, p.y, p.pressure, p.tilt, p.orient) }
         ctx.setFinger(position)
         ctx.refreshLive()
+        progress(ctx)
+    }
+
+    private var progressAt: Int64 = 0
+
+    /// v56 yayın yapılan tuvalde çizilmekte olan çizgi en çok 50 ms'de bir canlı mürekkep olarak gider (silgi hariç).
+    private func progress(_ ctx: GestureContext) {
+        guard !penEraser, ctx.live.type != .ERASER, let id = ctx.live.strokeId, ctx.eventTime - progressAt >= 50 else { return }
+        let share = ShareManager.shared
+        guard share.isBroadcasting(ctx.base.localId) else { return }
+        progressAt = ctx.eventTime
+        share.publishInk(ctx.base.localId, stroke: id, brush: ctx.live.type.rawValue, color: ctx.live.colorHex,
+                         size: ctx.live.sizePx, opacity: ctx.live.opacity, points: ctx.live.points)
     }
 
     override func tick(_ ctx: GestureContext, _ time: Int64) {

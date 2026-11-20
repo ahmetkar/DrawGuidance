@@ -25,8 +25,8 @@ extension EditorViewModel {
         let a = CanvasActions()
         a.onStrokeFinished = { [unowned self] p, id in drawing.onStrokeFinished(p, strokeId: id) }
         a.onPenEraserFinished = { [unowned self] p, id in drawing.onStrokeFinished(p, strokeId: id, penEraser: true) }
-        a.onSelectAt = { [unowned self] p, t in selection.selectAt(p.x, p.y, tolerance: t) }
-        a.onDeselectAt = { [unowned self] p, t in selection.deselectAt(p.x, p.y, tolerance: t) }
+        a.onSelectAt = { [unowned self] p, t in selectAt(p.x, p.y, tolerance: t) }
+        a.onDeselectAt = { [unowned self] p, t in deselectAt(p.x, p.y, tolerance: t) }
         a.onClearSelection = { [unowned self] in selection.clear() }
         a.onEmptyTap = { [unowned self] p in
             if !store.selectedIds.isEmpty { return false }
@@ -92,6 +92,8 @@ extension EditorViewModel {
         a.onEyedrop = { [unowned self] p in _ = eyedrop(p) }
         a.onRectSelect = { [unowned self] s, e in rectSelect(s, e) }
         a.onLassoSelect = { [unowned self] pts in lassoSelect(pts) }
+        a.onMagicWand = { [unowned self] p, t in magicWand(p, tolerance: t) }
+        a.onLassoFill = { [unowned self] pts in lassoFill(pts) }
         a.eraserSize = { [unowned self] in brush.eraserSize() }
         return a
     }

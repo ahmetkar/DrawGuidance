@@ -74,7 +74,142 @@ final class SelectionController {
         return true
     }
 
-    func clear() { store.select([]) }
+    func clear() { enteredGroup = nil; store.select([]) }
+
+    // MARK: v56 seçim işlemleri
+
+    /// v56 2E grup içi seçim: çift dokunulan grubun içine girilir; içerideyken dokunuş yalnız o elemanı seçer.
+    private(set) var enteredGroup: String?
+
+    /// Çift dokunuş gruplu elemandaysa grubun içine girer ve yalnız o elemanı seçer.
+    @discardableResult
+    func enterGroupAt(_ x: Float, _ y: Float, tolerance: Float) -> Bool {
+        let index = store.currentIndex()
+        guard let element = ElementOps.hitTest(index, P(x, y), tolerance: tolerance, skip: store.lockedIds()),
+              let group = element.groupId else { return false }
+        enteredGroup = group
+        store.select(element.allIds)
+        return true
+    }
+
+    /// Grup içindeyken dokunulan eleman grubun üyesiyse yalnız o eleman seçime eklenir; değilse gruptan çıkılır (nil).
+    func selectInGroupAt(_ x: Float, _ y: Float, tolerance: Float) -> Bool? {
+        guard let group = enteredGroup else { return nil }
+        let index = store.currentIndex()
+        guard let element = ElementOps.hitTest(index, P(x, y), tolerance: tolerance, skip: store.lockedIds()),
+              element.groupId == group else { enteredGroup = nil; return nil }
+        store.select(store.selection.union(element.allIds))
+        return true
+    }
+
+    @discardableResult
+    func selectAll() -> Int {
+        let index = store.currentIndex()
+        let locked = store.lockedIds()
+        let ids = Set(index.elements.filter { e in !e.hidden && !e.strokeIds.contains(where: locked.contains) }.flatMap(\.allIds))
+        enteredGroup = nil
+        store.select(ids)
+        return ids.count
+    }
+
+    @discardableResult
+    func invert() -> Int {
+        let index = store.currentIndex()
+        let locked = store.lockedIds()
+        let selected = store.selection
+        let ids = Set(index.elements.filter { e in
+            !e.hidden && !e.strokeIds.contains(where: locked.contains) && !e.allIds.contains(where: selected.contains)
+        }.flatMap(\.allIds))
+        enteredGroup = nil
+        store.select(index.expand(ids))
+        return ids.count
+    }
+
+    /// v56 sihirli değnek: dokunulan elemana [criterion] ölçütüyle benzeyenler seçilir. Seçilen eleman sayısı.
+    @discardableResult
+    func magicWand(_ x: Float, _ y: Float, tolerance: Float, criterion: V56Selection.WandCriterion, similarity: Float) -> Int {
+        let index = store.currentIndex()
+        let locked = store.lockedIds()
+        guard let element = ElementOps.hitTest(index, P(x, y), tolerance: tolerance, skip: locked),
+              let target = index.strokes.first(where: { element.strokeIds.contains($0.id) }) else { return 0 }
+        let candidates = index.strokes.filter { !locked.contains($0.id) }
+        let found = Set(V56Selection.similar(target, candidates, criterion, similarity).map(\.id))
+        enteredGroup = nil
+        store.select(index.expand(found))
+        return found.count
+    }
+
+    /// Seçim alanı: son alan seçimi, yoksa seçili elemanların kutusu.
+    @discardableResult
+    func areaFromSelection() -> Bool {
+        var pts = store.lastArea
+        if pts == nil, let b = ElementOps.selectionBounds(store.currentIndex().strokes, store.selection) {
+            pts = V56Selection.rect(b.left, b.top, b.right, b.bottom)
+        }
+        guard let points = pts, points.count >= 3 else { return false }
+        store.area = ClipMask(points: points)
+        store.select([])
+        return true
+    }
+
+    func clearArea() { store.area = nil }
+
+    func invertArea() { store.area?.inverted.toggle() }
+
+    /// Kenar yumuşatma (px) sırayla: 0 → 6 → 16 → 32 → 0.
+    @discardableResult
+    func cycleFeather() -> Float {
+        guard let a = store.area else { return 0 }
+        let next: Float = a.feather < 3 ? 6 : a.feather < 11 ? 16 : a.feather < 24 ? 32 : 0
+        store.area?.feather = next
+        return next
+    }
+
+    /// Alanı [d] px genişletir (eksi: daraltır); çok küçülürse değişmez.
+    @discardableResult
+    func growArea(_ d: Float) -> Bool {
+        guard let a = store.area, let grown = V56Selection.offset(a.points, d) else { return false }
+        store.area?.points = grown
+        return true
+    }
+
+    /// v56 kement dolgu: [points] (yoksa seçim alanı, o da yoksa son alan seçimi) fırça rengiyle doldurulur.
+    @discardableResult
+    func lassoFill(_ points: [StrokePoint]?, colorHex: String, opacity: Float) -> Bool {
+        let area = store.area
+        guard let pts = points ?? (area.flatMap { $0.inverted ? nil : $0.points }) ?? store.lastArea, pts.count >= 3,
+              let current = store.canvas else { return false }
+        let fill = V56Selection.lassoFill(id: UUID().uuidString, pts, colorHex: colorHex, opacity: opacity, order: current.strokes.count)
+        store.commit(current.strokes + [fill])
+        return true
+    }
+
+    /// v56 2E kırpma maskesi oluşturulabilir mi.
+    func canClipMask() -> Bool {
+        let ids = store.selection
+        return !ids.isEmpty && V56Selection.canClip(store.currentIndex().strokes.filter { ids.contains($0.id) && !$0.hidden })
+    }
+
+    func hasClipMask() -> Bool {
+        let ids = store.selection
+        return store.currentIndex().strokes.contains { ids.contains($0.id) && $0.mask?.source != nil }
+    }
+
+    func clipMask() {
+        guard let current = store.canvas else { return }
+        let ids = store.selection
+        let changed = V56Selection.clip(current.strokes.filter { ids.contains($0.id) && !$0.hidden }, groupId: UUID().uuidString)
+        if changed.isEmpty { return }
+        let byId = Dictionary(changed.map { ($0.id, $0) }, uniquingKeysWith: { a, _ in a })
+        store.commit(current.strokes.map { byId[$0.id] ?? $0 })
+        store.select(Set(changed.filter { !$0.hidden }.map(\.id)))
+    }
+
+    func releaseClipMask() {
+        guard let current = store.canvas else { return }
+        let updated = V56Selection.release(current.strokes, store.selection)
+        if updated != current.strokes { store.commit(updated) }
+    }
 
     func selectForContext(_ x: Float, _ y: Float, tolerance: Float) -> Bool {
         let index = store.currentIndex()

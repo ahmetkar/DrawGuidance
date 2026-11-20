@@ -41,6 +41,8 @@ struct CanvasEditScreen: View {
                     if vm.store.canvas?.kind != .KIDS && vm.mode == .SELECT && vm.texts.draft == nil {
                         SelectionMenu(vm: vm, store: vm.store, viewport: vm.viewport)
                     }
+                    // v56 seçim alanı çubuğu ve sihirli değnek ayarları
+                    V56SelectionOverlay(vm: vm, store: vm.store)
                     if let b = vm.placingLocation {
                         LocationPlaceOverlay(background: b, panels: vm.comicPanelRects(), viewport: vm.viewport,
                                              onPlace: { vm.placeLocation($0) }, onCancel: { vm.placingLocation = nil })
@@ -225,6 +227,7 @@ private struct EditorCanvasHost: View {
         o.diagramLink = diagrams.link
         o.cropRect = frame.cropRect
         o.cropArea = frame.cropArea
+        o.area = store.area
         // Önerinin düzeltmesi tuvalde kesik çizgiyle (önce şekil, yoksa çizgi önerisi)
         let shapePreview: [[StrokePoint]] = hw.shape?.preview ?? []
         let preview: [[StrokePoint]] = shapePreview.isEmpty ? (hw.line?.preview ?? []) : shapePreview

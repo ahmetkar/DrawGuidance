@@ -365,6 +365,17 @@ struct AdvancedMenus: View {
                 vm.toggleCanvasPick(.EYEDROPPER)
             }
         }
+        // v56 sihirli değnek (2E, yalnız gelişmiş çizim) ve kement dolgu
+        if vm.v56(.ADV_SELECTION) {
+            ChromeButton(icon: "wand.and.stars", label: L("v56_magic_wand"), selected: vm.canvasPick == .MAGIC_WAND, id: "select_magic_wand") {
+                vm.toggleCanvasPick(.MAGIC_WAND)
+            }
+        }
+        if vm.v56(.LASSO_FILL) {
+            ChromeButton(icon: "drop.fill", label: L("v56_element_lasso_fill"), selected: vm.canvasPick == .LASSO_FILL, id: "select_lasso_fill") {
+                vm.toggleCanvasPick(.LASSO_FILL)
+            }
+        }
         ChromeButton(icon: "plus.square.on.square", label: L("duplicate_selection"), enabled: hasSelection, id: "duplicate") { vm.selection.duplicate() }
         ChromeButton(icon: "eye.slash", label: L("hide_elements"), enabled: hasSelection, id: "hide") { vm.hideElements() }
         ChromeButton(icon: "trash", label: L("delete_selection"), enabled: hasSelection, danger: true, id: "delete") { vm.selection.delete() }
@@ -607,7 +618,7 @@ struct ToolOptionsStrip: View {
             })
         case .PAINT: return hint(L("v53_hint_paint"))
         case .SELECT:
-            if vm.canvasPick == .RECT_SELECT || vm.canvasPick == .LASSO_SELECT { return hint(L("v53_hint_area_select")) }
+            if vm.canvasPick == .RECT_SELECT || vm.canvasPick == .LASSO_SELECT || vm.canvasPick == .LASSO_FILL { return hint(L("v53_hint_area_select")) }
             if vm.canvasPick == .EYEDROPPER { return hint(L("v53_hint_eyedropper")) }
             return nil
         case .CROP:

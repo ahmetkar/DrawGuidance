@@ -51,6 +51,10 @@ final class EditorStore: ObservableObject {
     @Published var activeLayer = Layer.BASE
     /// Kaydedilmemiş değişiklik var mı (otomatik kayıt kapalıyken).
     @Published private(set) var dirty = false
+    /// v56 seçim alanı (boyama maskesi): varken yeni fırça izleri bu alanla kırpılır.
+    @Published var area: ClipMask?
+    /// v56 son dikdörtgen / kement seçiminin çokgeni (seçim alanına çevirmek için).
+    var lastArea: [StrokePoint]?
 
     let canvasLocalId: String
     private let saveQueue: CanvasSaveQueue?
@@ -158,6 +162,8 @@ final class EditorStore: ObservableObject {
         }
         history.clear()
         dirty = false
+        area = nil
+        lastArea = nil
         if let l = loaded?.layers.last(where: { $0.visible && !$0.locked }) { activeLayer = l.id }
         else { activeLayer = loaded?.layers.last?.id ?? Layer.BASE }
         refreshHistoryFlags()
@@ -166,7 +172,8 @@ final class EditorStore: ObservableObject {
     /// Açık sayfanın çizimlerini değiştirir (geri alınabilir).
     func commit(_ updated: [Stroke], coalesce: String? = nil) {
         guard let current = canvas else { return }
-        let placed = markAlphaLocked(current.strokes, placeNewInActiveLayer(current.strokes, updated, current.layers), current.layers)
+        let known = Set(current.strokes.map(\.id))
+        let placed = markAlphaLocked(current.strokes, placeNewInActiveLayer(current.strokes, V56Selection.applyArea(known, updated, area), current.layers), current.layers)
         var pages = current.pages
         if pages.indices.contains(current.currentPage) { pages[current.currentPage] = placed } else { pages.append(placed) }
         commit(pages: pages, width: current.width, height: current.height, background: current.backgroundColorHex, coalesce: coalesce)

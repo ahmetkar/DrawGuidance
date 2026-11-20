@@ -2,7 +2,7 @@ import Combine
 import Foundation
 
 /// v43 tuval üstü seçme araçları (Android `CanvasPick`).
-enum CanvasPick { case NONE, EYEDROPPER, RECT_SELECT, LASSO_SELECT }
+enum CanvasPick { case NONE, EYEDROPPER, RECT_SELECT, LASSO_SELECT, MAGIC_WAND, LASSO_FILL }
 
 /// v51 notta açılan geçici resim tuvali (tam ekran pencere öğesi).
 struct TempEditDoc: Identifiable, Equatable { let id: String }
@@ -31,6 +31,9 @@ final class EditorViewModel: ObservableObject, EditorHost {
     @Published private(set) var mode: EditMode = .DRAW
     @Published private(set) var panel: PanelTab?
     @Published private(set) var canvasPick: CanvasPick = .NONE
+    /// v56 sihirli değnek ölçütü ve benzerlik toleransı (0..1).
+    @Published var wandCriterion: V56Selection.WandCriterion = .COLOR
+    @Published private(set) var wandTolerance: Float = 0.15
     @Published private(set) var pendingShapeTool: ShapeTool?
     @Published private(set) var pendingSceneTool: String?
     /// v41 panele bırakılmayı bekleyen mekân arka planı (yerleştirme katmanı açık)
@@ -578,7 +581,7 @@ final class EditorViewModel: ObservableObject, EditorHost {
     func toggleCanvasPick(_ pick: CanvasPick) {
         let next: CanvasPick = canvasPick == pick ? .NONE : pick
         canvasPick = next
-        if (next == .RECT_SELECT || next == .LASSO_SELECT) && mode != .SELECT { setMode(.SELECT) }
+        if [.RECT_SELECT, .LASSO_SELECT, .MAGIC_WAND, .LASSO_FILL].contains(next) && mode != .SELECT { setMode(.SELECT) }
     }
 
     @discardableResult
@@ -594,12 +597,43 @@ final class EditorViewModel: ObservableObject, EditorHost {
     func rectSelect(_ a: P, _ b: P) {
         let r = FRect(min(a.x, b.x), min(a.y, b.y), max(a.x, b.x), max(a.y, b.y))
         if r.width < 1 || r.height < 1 { return }
+        store.lastArea = V56Selection.rect(r.left, r.top, r.right, r.bottom)
         if selection.selectInArea(add: false, { $0.x >= r.left && $0.x <= r.right && $0.y >= r.top && $0.y <= r.bottom }) > 0 { startAction(.SCALE) }
     }
 
     func lassoSelect(_ points: [P]) {
         if !AreaSelect.usable(points, minSize: 4) { return }
+        store.lastArea = points.map { StrokePoint($0.x, $0.y) }
         _ = selection.selectInArea(add: false) { AreaSelect.inside(points, $0) }
+    }
+
+    // MARK: v56 seçim işlemleri ve seçim alanı
+
+    /// v56 özellik bu tuvalin modunda açık mı ([V56Flags]).
+    func v56(_ feature: V56Flags.Feature) -> Bool { V56Flags.enabled(feature, store.canvas?.kind ?? .ART) }
+
+    func selectAt(_ x: Float, _ y: Float, tolerance: Float) -> Bool {
+        // v56 2E grup içindeyken dokunuş yalnız o elemanı seçer (gruptan dışarı dokununca çıkılır)
+        if v56(.ADV_SELECTION), let r = selection.selectInGroupAt(x, y, tolerance: tolerance) { return r }
+        return selection.selectAt(x, y, tolerance: tolerance)
+    }
+
+    func deselectAt(_ x: Float, _ y: Float, tolerance: Float) -> Bool {
+        // v56 2E gruplu elemana çift dokunuş grubun içine girer
+        if v56(.ADV_SELECTION) && selection.enterGroupAt(x, y, tolerance: tolerance) { return true }
+        return selection.deselectAt(x, y, tolerance: tolerance)
+    }
+
+    func magicWand(_ point: P, tolerance: Float) {
+        selection.magicWand(point.x, point.y, tolerance: tolerance, criterion: wandCriterion, similarity: wandTolerance)
+    }
+
+    func setWandTolerance(_ t: Float) { wandTolerance = min(max(t, 0), 1) }
+
+    func paintInsideSelection() { if selection.areaFromSelection() { setMode(.DRAW) } }
+
+    func lassoFill(_ points: [P]? = nil) {
+        selection.lassoFill(points?.map { StrokePoint($0.x, $0.y) }, colorHex: brush.settings.colorHex, opacity: brush.settings.opacity)
     }
 
     // MARK: Seçim

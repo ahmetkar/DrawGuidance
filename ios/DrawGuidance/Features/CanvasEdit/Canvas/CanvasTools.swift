@@ -89,6 +89,9 @@ final class CanvasActions {
     var onEyedrop: (P) -> Void = { _ in }
     var onRectSelect: (P, P) -> Void = { _, _ in }
     var onLassoSelect: ([P]) -> Void = { _ in }
+    /// v56 sihirli değnek dokunuşu ve kement dolgu yolu.
+    var onMagicWand: (P, Float) -> Void = { _, _ in }
+    var onLassoFill: ([P]) -> Void = { _ in }
     var eraserSize: () -> Float = { 24 }
     var draw3d: () -> Depth3D? = { nil }
     var scene3d: () -> SceneCamera? = { nil }
@@ -169,6 +172,8 @@ enum CanvasTools {
         if pick == .EYEDROPPER && (mode == .DRAW || mode == .SELECT || mode == .PAINT) { return EyedropperTool() }
         if pick == .RECT_SELECT && mode == .SELECT { return RectSelectTool() }
         if pick == .LASSO_SELECT && mode == .SELECT { return LassoSelectTool() }
+        if pick == .MAGIC_WAND && mode == .SELECT { return MagicWandTool() }
+        if pick == .LASSO_FILL && mode == .SELECT { return LassoSelectTool(fill: true) }
         return create(mode)
     }
 
@@ -555,14 +560,26 @@ final class RectSelectTool: CanvasTool {
     }
 }
 
+/// v56 sihirli değnek: dokunulan elemana benzeyenler seçilir.
+final class MagicWandTool: CanvasTool {
+    override func tap(_ ctx: GestureContext, _ point: P, _ upTime: Int64) { ctx.actions.onMagicWand(point, ctx.hitTolerance) }
+}
+
+/// Kalemle alan seçimi; v56 [fill]: çizilen kapalı yol fırça rengiyle doldurulur (kement dolgu).
 final class LassoSelectTool: CanvasTool {
+    private let fill: Bool
     private var points: [P] = []
+    init(fill: Bool = false) { self.fill = fill; super.init() }
     override func begin(_ ctx: GestureContext) -> Bool { points = [ctx.startCanvas]; return true }
     override func move(_ ctx: GestureContext, _ position: P, _ point: P) {
         if let l = points.last, dist(l, point) * ctx.viewport.scale >= 3 { points.append(point) }
         ctx.show(.lasso(points))
     }
-    override func end(_ ctx: GestureContext) { ctx.show(nil); ctx.actions.onLassoSelect(points); points = [] }
+    override func end(_ ctx: GestureContext) {
+        ctx.show(nil)
+        if fill { ctx.actions.onLassoFill(points) } else { ctx.actions.onLassoSelect(points) }
+        points = []
+    }
     override func cancel(_ ctx: GestureContext) { points = []; ctx.show(nil) }
     override func tap(_ ctx: GestureContext, _ point: P, _ upTime: Int64) {
         if !ctx.actions.onSelectAt(point, ctx.hitTolerance) { ctx.actions.onClearSelection() }

@@ -8,7 +8,54 @@ enum StrokeRenderer {
         clipped(c, stroke) { drawUnclipped(c, stroke) }
     }
 
+    static func polygon(_ pts: [StrokePoint]) -> CGMutablePath {
+        let path = CGMutablePath()
+        path.move(to: CGPoint(x: CGFloat(pts[0].x), y: CGFloat(pts[0].y)))
+        for i in 1..<pts.count { path.addLine(to: CGPoint(x: CGFloat(pts[i].x), y: CGFloat(pts[i].y))) }
+        path.closeSubpath()
+        return path
+    }
+
+    private static let FAR = CGRect(x: -1e6, y: -1e6, width: 2e6, height: 2e6)
+
+    /// v56 seçim maskesi (Android `drawMasked`): sert kenarda kırpma yolu (ters seçimde çift-tek kuralıyla dışı);
+    /// yumuşatılmışta çizim saydamlık katmanında, kademeli genişletilmiş alanlardan oluşan yumuşak maske `destinationIn`
+    /// (tersinde `destinationOut`) ile uygulanır.
+    private static func masked(_ c: CGContext, _ mask: ClipMask, raster: Bool, _ body: () -> Void) {
+        let path = polygon(mask.points)
+        if mask.feather <= 0.5 || raster {
+            c.saveGState()
+            if mask.inverted { path.addRect(FAR); c.addPath(path); c.clip(using: .evenOdd) } else { c.addPath(path); c.clip() }
+            body()
+            c.restoreGState()
+            return
+        }
+        c.saveGState()
+        c.beginTransparencyLayer(auxiliaryInfo: nil)
+        body()
+        c.saveGState()
+        c.setBlendMode(mask.inverted ? .destinationOut : .destinationIn)
+        c.beginTransparencyLayer(auxiliaryInfo: nil)
+        let steps = 8
+        c.setFillColor(CGColor(gray: 0, alpha: 0.3))
+        for i in 0..<steps {
+            let d = mask.feather * (Float(i) / Float(steps - 1) - 0.5)
+            guard let ring = abs(d) < 0.01 ? mask.points : V56Selection.offset(mask.points, d) else { continue }
+            c.addPath(polygon(ring)); c.fillPath()
+        }
+        c.endTransparencyLayer()
+        c.restoreGState()
+        c.endTransparencyLayer()
+        c.restoreGState()
+    }
+
     private static func clipped(_ c: CGContext, _ stroke: Stroke, _ body: () -> Void) {
+        if let mask = stroke.mask, mask.points.count >= 3 {
+            var plain = stroke
+            plain.mask = nil
+            masked(c, mask, raster: stroke.brushType.isRaster) { clipped(c, plain, body) }
+            return
+        }
         if let clip = stroke.clip, clip.count == 4 {
             c.saveGState()
             let path = CGMutablePath()
@@ -50,6 +97,13 @@ enum StrokeRenderer {
         case .FORMULA: FormulaRenderer.draw(c, stroke, color: ArgbColor.hex(stroke.colorHex))
         case .DIAGRAM: DiagramRenderer.draw(c, stroke)
         case .IMAGE: ImageRenderer.draw(c, stroke)
+        case .LASSO_FILL:
+            // v56 kement dolgu: kapalı yolun içi (renk ve opaklık)
+            guard stroke.points.count >= 3 else { return }
+            let col = ArgbColor.hex(stroke.colorHex)
+            let a = Int((Float((col >> 24) & 0xFF) * min(max(stroke.opacity, 0), 1)).rounded())
+            c.setFillColor(ArgbColor.cgColor(col, alpha: a))
+            c.addPath(polygon(stroke.points)); c.fillPath()
         default:
             let n = stroke.points.count
             if n == 0 { return }

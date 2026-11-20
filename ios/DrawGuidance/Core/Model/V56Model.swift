@@ -37,19 +37,21 @@ struct ClipMask: Codable, Equatable {
     var points: [StrokePoint]
     var feather: Float = 0
     var inverted = false
+    /// v56 kırpma maskesi (2E 7.15): sınırı veren (gizlenen) nesnenin kimliği; nil: seçim alanından boyama maskesi.
+    var source: String? = nil
 
-    init(points: [StrokePoint], feather: Float = 0, inverted: Bool = false) {
-        self.points = points; self.feather = feather; self.inverted = inverted
+    init(points: [StrokePoint], feather: Float = 0, inverted: Bool = false, source: String? = nil) {
+        self.points = points; self.feather = feather; self.inverted = inverted; self.source = source
     }
 
     init(from decoder: Decoder) throws {
         let c = try decoder.container(keyedBy: AnyKey.self)
-        points = try c.req("points"); feather = c.v("feather", 0); inverted = c.v("inverted", false)
+        points = try c.req("points"); feather = c.v("feather", 0); inverted = c.v("inverted", false); source = c.o("source")
     }
 
     func encode(to encoder: Encoder) throws {
         var c = encoder.container(keyedBy: AnyKey.self)
-        try c.r(points, "points"); try c.e(feather, "feather", 0); try c.e(inverted, "inverted", false)
+        try c.r(points, "points"); try c.e(feather, "feather", 0); try c.e(inverted, "inverted", false); try c.o(source, "source")
     }
 }
 

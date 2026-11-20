@@ -10,6 +10,8 @@ struct CanvasOverlay {
     var formulaSlot: String?
     var vector: VectorSelection?
     var correction: [[P]]?
+    /// v56 seçim alanı (kesik çizgiyle gösterilir).
+    var area: ClipMask?
     var diagramFocus: DiagramFocus?
     var diagramLink: DiagramLink?
     var cropRect: FRect?
@@ -630,6 +632,11 @@ final class EditorCanvasView: UIView {
             }
         }
         drawPreviewShapes(g, ap, scale, accent)
+        if let a = overlay.area, a.points.count >= 3 {
+            // v56 seçim alanının sınırı (ters seçimde de aynı çizgi)
+            g.addPath(StrokeRenderer.polygon(a.points)); g.setStrokeColor(accent.cgColor); g.setLineWidth(CGFloat(1.5 / scale))
+            g.setLineDash(phase: 0, lengths: [CGFloat(8 / scale), CGFloat(6 / scale)]); g.strokePath(); g.setLineDash(phase: 0, lengths: [])
+        }
         if !moving.isEmpty { drawMoving(g, moving, ap, layers: c.layers) }
         if overlay.formulaSlots, let f = c.strokes.first(where: { selected.contains($0.id) && $0.brushType == .FORMULA }) {
             FormulaRenderer.drawSlots(g, f, activeSlot: overlay.formulaSlot, color: accent.argb)

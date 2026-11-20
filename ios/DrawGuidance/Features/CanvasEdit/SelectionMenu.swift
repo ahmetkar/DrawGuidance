@@ -63,6 +63,25 @@ struct SelectionMenu: View {
             Action(id: "sel_forward", label: L("order_forward"), icon: "square.2.layers.3d.top.filled") { vm.selection.reorder(1) },
             Action(id: "sel_backward", label: L("order_backward"), icon: "square.2.layers.3d.bottom.filled") { vm.selection.reorder(-1) },
             Action(id: "sel_hide", label: L("hide_elements"), icon: "eye.slash") { vm.hideElements() },
+        ]
+        // v56 seçim işlemleri, seçimin içine boyama, kement dolgu ve (2E) kırpma maskesi
+        if vm.v56(.SELECTION_OPS) {
+            items.append(Action(id: "sel_all", label: L("v56_select_all"), icon: "checkmark.rectangle.stack") { vm.selection.selectAll() })
+            items.append(Action(id: "sel_invert", label: L("v56_select_invert"), icon: "arrow.left.arrow.right.square") { vm.selection.invert() })
+        }
+        if vm.v56(.SELECTION_MASK) {
+            items.append(Action(id: "sel_paint_inside", label: L("v56_paint_inside"), icon: "paintbrush.pointed") { vm.paintInsideSelection() })
+        }
+        if vm.v56(.LASSO_FILL) {
+            items.append(Action(id: "sel_lasso_fill", label: L("v56_element_lasso_fill"), icon: "drop.fill") { vm.lassoFill() })
+        }
+        if vm.v56(.ADV_SELECTION) && vm.selection.canClipMask() {
+            items.append(Action(id: "sel_clip_make", label: L("v56_clip_mask_make"), icon: "scissors") { vm.selection.clipMask() })
+        }
+        if vm.v56(.ADV_SELECTION) && vm.selection.hasClipMask() {
+            items.append(Action(id: "sel_clip_release", label: L("v56_clip_mask_release"), icon: "scissors.badge.ellipsis") { vm.selection.releaseClipMask() })
+        }
+        items += [
             Action(id: "sel_clear", label: L("clear_selection"), icon: "xmark") { vm.selection.clear() },
         ]
         return items

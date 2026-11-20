@@ -80,7 +80,7 @@ struct CanvasEditScreen: View {
             .overlay(alignment: .bottom) { if vm.loaded { Draw3dHost(vm: vm, store: vm.store) } }
             .overlay(alignment: .bottom) { if vm.loaded { SuggestionLayer(vm: vm, hw: vm.handwriting, texts: vm.texts, ctl: vm.challenge) } }
             // v51 canlı yayın: bu tuval yayındaysa değişiklikler karşı cihaza gider
-            .overlay(alignment: .bottom) { if vm.loaded { LiveBroadcastBridge(store: vm.store, canvasLocalId: vm.canvasLocalId) } }
+            .overlay(alignment: .bottom) { if vm.loaded { LiveBroadcastBridge(store: vm.store, canvasLocalId: vm.canvasLocalId, owner: vm.liveOwner) } }
             // v53 Elemanlar, Katmanlar ve Özellikler sağdan açılan panelde
             .overlay { if vm.loaded && vm.store.canvas?.kind != .KIDS { EditorSidePanelHost(vm: vm, store: vm.store, brushPickerOpen: $brushPickerOpen) } }
             // v55 çizgi roman ve not almada sayfa şeridi (sayfalar arası geçiş, ekleme, çoğaltma, silme)
@@ -143,7 +143,7 @@ struct CanvasEditScreen: View {
         // v51 notta resim düzenleme: geçici basit resim tuvali tam ekran açılır; kapanınca resim nota aktarılmış olur
         .fullScreenCover(item: $vm.tempEditRequest, onDismiss: {
             // v52 nota dönüldü: ara verilen yayın sürer, son hali hemen gider
-            ShareManager.shared.resumeLive(vm.canvasLocalId)
+            ShareManager.shared.resumeLive(vm.canvasLocalId, owner: vm.liveOwner + ":temp")
             if let c = vm.store.canvas { ShareManager.shared.publishLive(c) }
         }) { doc in
             NavigationStack { CanvasEditScreen(canvasLocalId: doc.id) }

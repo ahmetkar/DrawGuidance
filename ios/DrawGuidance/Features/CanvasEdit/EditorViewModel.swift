@@ -23,6 +23,8 @@ final class EditorViewModel: ObservableObject, EditorHost {
     private static let EDITABLE_KINDS: Set<SelectionKind> = [.SHAPE, .DIAGRAM, .IMAGE, .TEXT, .FORMULA]
 
     let canvasLocalId: String
+    /// v56 canlı yayın sahip kimliği (bu düzenleyici örneği; `ShareManager.attachEditor`).
+    let liveOwner = UUID().uuidString
     let deps: EditorDependencies
     private let canvasPrefs: CanvasPrefs
 
@@ -184,8 +186,8 @@ final class EditorViewModel: ObservableObject, EditorHost {
         // v52 foto düzenleme açıkken yayına ara verilir, kapanınca sürer
         photo.$openId.map { $0 != nil }.removeDuplicates().dropFirst().sink { [weak self] open in
             guard let self else { return }
-            if open { ShareManager.shared.pauseLive(canvasLocalId) }
-            else { ShareManager.shared.resumeLive(canvasLocalId); if let c = store.canvas { ShareManager.shared.publishLive(c) } }
+            if open { ShareManager.shared.pauseLive(canvasLocalId, owner: liveOwner + ":photo") }
+            else { ShareManager.shared.resumeLive(canvasLocalId, owner: liveOwner + ":photo"); if let c = store.canvas { ShareManager.shared.publishLive(c) } }
         }.store(in: &bag)
         pen = PenController(store, self) { [unowned self] in shapes.newShapeStyle() }
         scene = ObjectSceneController(store)
@@ -304,7 +306,7 @@ final class EditorViewModel: ObservableObject, EditorHost {
         texts.commitOpenDraft()
         store.saveNow()
         if let id = TempImageEditor.start(sourceId: canvasLocalId, image: image, deps: deps) {
-            ShareManager.shared.pauseLive(canvasLocalId)
+            ShareManager.shared.pauseLive(canvasLocalId, owner: liveOwner + ":temp")
             tempEditRequest = TempEditDoc(id: id)
         } else {
             emit(.message(L("v51_temp_image_failed")))
@@ -319,7 +321,7 @@ final class EditorViewModel: ObservableObject, EditorHost {
         texts.commitOpenDraft()
         store.saveNow()
         if let id = TempImageEditor.startShape(sourceId: canvasLocalId, shape: shape, deps: deps) {
-            ShareManager.shared.pauseLive(canvasLocalId)
+            ShareManager.shared.pauseLive(canvasLocalId, owner: liveOwner + ":temp")
             tempEditRequest = TempEditDoc(id: id)
         } else {
             emit(.message(L("v52_temp_edit_failed")))

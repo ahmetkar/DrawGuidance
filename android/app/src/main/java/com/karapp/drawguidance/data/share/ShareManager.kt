@@ -251,18 +251,61 @@ class ShareManager(
         if (out.canvasId == canvas.localId && !out.paused) liveFrames.trySend(canvas)
     }
 
-    /** v52 yayına ara ver (yayın yapılan notta şekil/resim başka tuvalde düzenleniyor); izleyene bildirilir. */
-    fun pauseLive(canvasId: String) {
-        val out = _liveOut.value?.takeIf { it.canvasId == canvasId && !it.paused } ?: return
-        _liveOut.value = out.copy(paused = true)
-        send(out.peerKey, ShareWire.encode(ShareWire.LIVE_PAUSE, "{}"))
+    // ---- v56 ara ver / sürdür sahipleri ----
+    //
+    // Eskiden pauseLive/resumeLive sayaçsızdı: yayın kabul edilince açılan yeni düzenleyici yayını sürdürüyor, hemen
+    // ardından kapanan eski düzenleyicinin onDispose'u pauseLive çağırıyordu; son çağrı "ara ver" olduğu için yayın
+    // kalıcı olarak duruyordu (alan taraf ilk hali görüyordu). Artık her düzenleyici örneği bir sahip kimliğiyle
+    // kaydolur ([attachEditor]); yayın yalnız (a) tuval hiçbir düzenleyicide açık değilse ya da (b) açık bir
+    // düzenleyici kendi adına ara verdiyse durur. Bir düzenleyici yalnız kendi arasını kaldırabilir; ayrılan
+    // düzenleyicinin araları da onunla silinir.
+
+    private val editorOwners = HashMap<String, MutableSet<String>>()
+    private val pauseOwners = HashMap<String, MutableSet<String>>()
+
+    /** v56 [owner] düzenleyicisi [canvasId] tuvalini açtı. */
+    fun attachEditor(canvasId: String, owner: String) {
+        synchronized(editorOwners) { editorOwners.getOrPut(canvasId) { HashSet() } += owner }
+        recomputePause(canvasId)
     }
 
-    /** v52 ara verilen yayın sürer (düzenleyici son hali [publishLive] ile gönderir). */
-    fun resumeLive(canvasId: String) {
-        val out = _liveOut.value?.takeIf { it.canvasId == canvasId && it.paused } ?: return
-        _liveOut.value = out.copy(paused = false)
-        send(out.peerKey, ShareWire.encode(ShareWire.LIVE_RESUME, "{}"))
+    /** v56 [owner] düzenleyicisi kapandı; onun verdiği aralar da kalkar. */
+    fun detachEditor(canvasId: String, owner: String) {
+        synchronized(editorOwners) {
+            editorOwners[canvasId]?.let { it -= owner; if (it.isEmpty()) editorOwners.remove(canvasId) }
+            pauseOwners[canvasId]?.let { set -> set.removeAll { it == owner || it.startsWith("$owner:") }; if (set.isEmpty()) pauseOwners.remove(canvasId) }
+        }
+        recomputePause(canvasId)
+    }
+
+    /** v56 tuval şu an bir düzenleyicide açık mı. */
+    fun isOpenInEditor(canvasId: String): Boolean = synchronized(editorOwners) { !editorOwners[canvasId].isNullOrEmpty() }
+
+    /** v52 yayına ara ver (notta şekil/resim başka tuvalde düzenleniyor, foto düzenleyici, uygulama arka planda). */
+    fun pauseLive(canvasId: String, owner: String) {
+        synchronized(editorOwners) { pauseOwners.getOrPut(canvasId) { HashSet() } += owner }
+        recomputePause(canvasId)
+    }
+
+    /** v52 [owner]'ın verdiği ara kalkar; başka ara veren yoksa yayın sürer (düzenleyici son hali [publishLive] ile gönderir). */
+    fun resumeLive(canvasId: String, owner: String) {
+        synchronized(editorOwners) { pauseOwners[canvasId]?.let { it -= owner; if (it.isEmpty()) pauseOwners.remove(canvasId) } }
+        recomputePause(canvasId)
+    }
+
+    /** v56 yayının ara durumu sahiplere göre: düzenleyici yoksa ya da açık bir düzenleyici ara verdiyse durur. */
+    internal fun shouldPause(canvasId: String): Boolean = synchronized(editorOwners) {
+        val editors = editorOwners[canvasId].orEmpty()
+        // sahip kimliği "<düzenleyici>" ya da "<düzenleyici>:<neden>" (ör. foto düzenleyici)
+        editors.isEmpty() || pauseOwners[canvasId].orEmpty().any { it.substringBefore(':') in editors }
+    }
+
+    private fun recomputePause(canvasId: String) {
+        val out = _liveOut.value?.takeIf { it.canvasId == canvasId } ?: return
+        val pause = shouldPause(canvasId)
+        if (pause == out.paused) return
+        _liveOut.value = out.copy(paused = pause)
+        send(out.peerKey, ShareWire.encode(if (pause) ShareWire.LIVE_PAUSE else ShareWire.LIVE_RESUME, "{}"))
     }
 
     fun isBroadcasting(canvasId: String): Boolean = _liveOut.value?.canvasId == canvasId
@@ -467,10 +510,13 @@ class ShareManager(
                 val pkg = packages.canvasPackage(canvasId, ShareWire.TYPE_LIVE, id, from) ?: return fail("Tuval bulunamadı")
                 liveSent += pkg.header.assets.map { it.id }
                 send(out.key, pkg.encode(ShareWire.LIVE_START))
-                _liveOut.value = ShareLiveOut(canvasId, out.key, peerName(out.key))
+                // v56 gönderen zaten bu tuvalin düzenleyicisindeyse düzenleyici yeniden açılmaz (yeniden açılış eski
+                // düzenleyicinin kapanışıyla yarışıp yayını ara verilmiş bırakıyordu)
+                val open = isOpenInEditor(canvasId)
+                _liveOut.value = ShareLiveOut(canvasId, out.key, peerName(out.key), paused = false)
                 _status.value = null
                 startLiveLoop(id)
-                _events.tryEmit(ShareEvent.OpenBroadcast(canvasId))
+                if (!open) _events.tryEmit(ShareEvent.OpenBroadcast(canvasId))
             }
         }
     }

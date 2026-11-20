@@ -42,6 +42,9 @@ interface AdsGateway {
 
     /** v51 RewardedAd.show: [onFinished] ödül kazanıldıysa true (reklam kapatılınca). */
     fun showRewarded(activity: Activity, onFinished: (earned: Boolean) -> Unit) = onFinished(false)
+
+    /** v56 son ödüllü reklam yükleme hatasının kodu (LoadAdError.code: 0 iç, 1 geçersiz, 2 ağ, 3 envanter yok); yoksa null. */
+    val lastRewardErrorCode: Int? get() = null
 }
 
 /** v39 reklamsız uygulama (testler, kütüphanesiz derleme): hiçbir reklam yüklenmez ya da gösterilmez. */

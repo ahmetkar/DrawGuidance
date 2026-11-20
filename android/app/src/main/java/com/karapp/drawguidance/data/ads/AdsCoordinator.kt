@@ -19,7 +19,11 @@ import kotlinx.coroutines.withTimeoutOrNull
 enum class AdTrigger { APP_ENTRY, CANVAS_CLOSED }
 
 /** v51 ödüllü reklamın sonucu: ödül kazanıldı, Premium (reklamsız açılır), yarıda kapatıldı, reklam yok. */
-enum class RewardOutcome { EARNED, FREE, CANCELLED, UNAVAILABLE }
+/**
+ * v51 ödüllü reklam sonucu. v56 [NO_FILL]: reklam ağı gösterecek reklam bulamadı (kod 3) ya da süre doldu; alıştırma yine
+ * de açılır (kullanıcı reklamı izlemeye razıydı, kilit onun suçu değil).
+ */
+enum class RewardOutcome { EARNED, FREE, CANCELLED, UNAVAILABLE, NO_FILL }
 
 /** v39 reklam kararı ve nedeni (testlerde ve günlükte). */
 enum class AdDecision { SHOW, NOT_LOADED_YET, PREMIUM, KIDS_CANVAS, CHILD_USER, FIRST_LAUNCH, NO_CONSENT, FREQUENCY_CAP, UNAVAILABLE }
@@ -138,38 +142,71 @@ class AdsCoordinator(
 
     /**
      * v51 ödüllü reklam (kullanıcı kilitli alıştırmayı açmak istedi). Premium'da reklamsız [RewardOutcome.FREE]; çocuk
-     * kullanıcıda gösterilmez. Onay (UMP) yoksa önce alınır; reklam en çok 12 sn'de yüklenmezse [RewardOutcome.UNAVAILABLE].
+     * kullanıcıda gösterilmez. Onay (UMP) yoksa önce alınır. v56: reklam 25 sn'de hazır olmazsa ya da ağda reklam yoksa [RewardOutcome.NO_FILL] (alıştırma açılır).
      */
     fun requestReward(activity: Activity, onResult: (RewardOutcome) -> Unit) {
+        // v56 tek sonuç: sonuç bir kez bildirilir; toplam süre sınırı başlatma (MobileAds.initialize) dahil her adımı
+        // kapsar (eskiden süre sayacı başlatma bittikten sonra kuruluyordu, başlatma takılınca dönen simge sonsuza kalıyordu)
+        var done = false
+        val finish: (RewardOutcome) -> Unit = { o -> if (!done) { done = true; AppLog.i("Ads", "ödüllü reklam sonucu: $o"); onResult(o) } }
+        val watchdog = scope.launch {
+            kotlinx.coroutines.delay(REWARD_TIMEOUT_MS)
+            AppLog.w("Ads", "ödüllü reklam ${REWARD_TIMEOUT_MS / 1000} sn'de hazır olmadı")
+            finish(RewardOutcome.NO_FILL)
+        }
+        val end: (RewardOutcome) -> Unit = { o -> watchdog.cancel(); finish(o) }
         scope.launch {
             val e = loadedEntitlements()
-            if (e.adFree(clock())) { onResult(RewardOutcome.FREE); return@launch }
-            if (!gateway.available || rewardedUnitId.isBlank()) { onResult(RewardOutcome.UNAVAILABLE); return@launch }
-            if (AdsPolicy.isChild(user.value)) { AppLog.i("Ads", "ödüllü reklam: çocuk kullanıcı"); onResult(RewardOutcome.UNAVAILABLE); return@launch }
+            if (e.adFree(clock())) { end(RewardOutcome.FREE); return@launch }
+            if (!gateway.available || rewardedUnitId.isBlank()) { end(RewardOutcome.UNAVAILABLE); return@launch }
+            if (AdsPolicy.isChild(user.value)) { AppLog.i("Ads", "ödüllü reklam: çocuk kullanıcı"); end(RewardOutcome.UNAVAILABLE); return@launch }
             val go: (Boolean) -> Unit = { ok ->
                 consent = consent || ok
-                if (!ok) { AppLog.w("Ads", "ödüllü reklam: reklam onayı alınamadı"); onResult(RewardOutcome.UNAVAILABLE) } else {
+                if (!ok) { AppLog.w("Ads", "ödüllü reklam: reklam onayı alınamadı"); end(RewardOutcome.UNAVAILABLE) } else {
                     gateway.setRequestConfiguration(childDirected = false, underAgeOfConsent = false)
-                    gateway.initialize(app) {
-                        var done = false
-                        val timeout = scope.launch {
-                            kotlinx.coroutines.delay(20_000)
-                            if (!done) { done = true; AppLog.w("Ads", "ödüllü reklam 20 sn'de yüklenmedi"); onResult(RewardOutcome.UNAVAILABLE) }
-                        }
-                        gateway.loadRewarded(app, rewardedUnitId) { loaded ->
-                            if (done) return@loadRewarded
-                            done = true
-                            timeout.cancel()
-                            if (!loaded || activity.isFinishing) { onResult(RewardOutcome.UNAVAILABLE); return@loadRewarded }
-                            gateway.showRewarded(activity) { earned ->
-                                AppLog.i("Ads", "ödüllü reklam: kazanıldı=$earned")
-                                onResult(if (earned) RewardOutcome.EARNED else RewardOutcome.CANCELLED)
-                            }
-                        }
-                    }
+                    gateway.initialize(app) { loadAndShow(activity, attempt = 1, isDone = { done }, end = end) }
                 }
             }
             if (consent || gateway.canRequestAds(app)) go(true) else gateway.gatherConsent(activity, underAgeOfConsent = false, onDone = go)
+        }
+    }
+
+    /** v56 yükle ve göster; envanter yok (kod 3) ya da iç hata (0) olursa bir kez yeniden denenir. */
+    private fun loadAndShow(activity: Activity, attempt: Int, isDone: () -> Boolean, end: (RewardOutcome) -> Unit) {
+        gateway.loadRewarded(app, rewardedUnitId) { loaded ->
+            if (isDone()) return@loadRewarded
+            if (activity.isFinishing || activity.isDestroyed) { end(RewardOutcome.CANCELLED); return@loadRewarded }
+            if (!loaded) {
+                val code = gateway.lastRewardErrorCode
+                when {
+                    // 2 = ağ hatası: kullanıcıya bağlantı uyarısı
+                    code == 2 -> end(RewardOutcome.UNAVAILABLE)
+                    attempt < 2 && (code == 3 || code == 0 || code == null) ->
+                        scope.launch { kotlinx.coroutines.delay(1_500); loadAndShow(activity, attempt + 1, isDone, end) }
+                    // envanter yok / geçersiz istek / tekrar başarısız: reklam bizim yüzümüzden yok, alıştırma açılır
+                    else -> end(RewardOutcome.NO_FILL)
+                }
+                return@loadRewarded
+            }
+            gateway.showRewarded(activity) { earned ->
+                AppLog.i("Ads", "ödüllü reklam: kazanıldı=$earned")
+                end(if (earned) RewardOutcome.EARNED else RewardOutcome.CANCELLED)
+                preloadReward()
+            }
+        }
+    }
+
+    /**
+     * v56 ödüllü reklamı önceden yükler (alıştırma listesi ya da kilit penceresi açılınca): "Reklamı izle"ye basınca
+     * reklam hazır olur. Premium, çocuk ya da onaysız kullanıcıda bir şey yapmaz.
+     */
+    fun preloadReward() {
+        scope.launch {
+            val e = loadedEntitlements()
+            if (e.adFree(clock()) || !gateway.available || rewardedUnitId.isBlank() || AdsPolicy.isChild(user.value)) return@launch
+            if (!(consent || gateway.canRequestAds(app))) return@launch
+            gateway.setRequestConfiguration(childDirected = false, underAgeOfConsent = false)
+            gateway.initialize(app) { gateway.loadRewarded(app, rewardedUnitId) { } }
         }
     }
 
@@ -193,5 +230,6 @@ class AdsCoordinator(
     private companion object {
         const val KEY_LAST = "last_shown_at"
         const val KEY_LAUNCHED = "launched_once"
+        const val REWARD_TIMEOUT_MS = 25_000L
     }
 }

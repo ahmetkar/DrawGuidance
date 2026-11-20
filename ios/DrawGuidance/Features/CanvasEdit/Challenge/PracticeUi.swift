@@ -26,6 +26,8 @@ struct PracticeLayer: View {
     @State private var introOpen = true
     @State private var rewardBusy = false
     @State private var rewardFailed = false
+    /// v56 reklam bulunamadı, alıştırma yine açıldı bilgisi.
+    @State private var noFillNotice = false
     @Environment(\.verticalSizeClass) private var vSize
     @Environment(\.horizontalSizeClass) private var hSize
 
@@ -69,7 +71,7 @@ struct PracticeLayer: View {
                           locked: { l in !prefs.unlocked.contains(l.id) && ctl.isLocked(l) },
                           onOpen: { i in ctl.listOpen = false; ctl.open(i) }, onStop: { ctl.listOpen = false; ctl.stop() })
         }
-        .alert(L("v51_practice_reward_title"), isPresented: Binding(get: { ctl.locked != nil }, set: { if !$0 && !rewardBusy { ctl.locked = nil } })) {
+        .alert(L("v51_practice_reward_title"), isPresented: Binding(get: { ctl.locked != nil && !rewardBusy }, set: { if !$0 && !rewardBusy { rewardFailed = false; ctl.locked = nil } })) {
             Button(L("v51_practice_reward_watch")) { watchReward() }
             Button(L("v51_practice_reward_later"), role: .cancel) { rewardFailed = false; ctl.locked = nil }
         } message: {
@@ -77,20 +79,33 @@ struct PracticeLayer: View {
                 .map { I18n.tr($0.title) + " · " + L($0.kind.label) + "\n\n" } ?? ""
             Text(name + L(rewardFailed ? "v51_practice_reward_failed" : "v51_practice_reward_body"))
         }
+        .alert(L("v51_practice_reward_title"), isPresented: $noFillNotice) {
+            Button("OK", role: .cancel) {}
+        } message: { Text(L("v56_practice_reward_nofill")) }
+        // v56 liste ya da kilit penceresi açılınca ödüllü reklam önceden yüklenir
+        .onChangeCompat(of: ctl.listOpen) { _, open in if open { AdsCoordinator.shared.preloadReward() } }
+        .onChangeCompat(of: ctl.locked) { _, l in if l != nil { AdsCoordinator.shared.preloadReward() } }
         .overlay { if rewardBusy { ProgressView().padding(20).background(RoundedRectangle(cornerRadius: 14).fill(.regularMaterial)) } }
     }
 
     /// v51 ödüllü reklam: kazanılınca (ya da Premium'da) alıştırma kalıcı olarak açılır.
     private func watchReward() {
         guard let index = ctl.locked else { return }
+        // v56 pencere reklam beklerken gizli kalır (isPresented rewardBusy'de false); sonuçta yeniden açılabilir
         rewardBusy = true
         rewardFailed = false
         AdsCoordinator.shared.requestReward { outcome in
             rewardBusy = false
             switch outcome {
             case .EARNED, .FREE: ctl.unlockAndOpen(index)
+            case .NO_FILL:
+                ctl.unlockAndOpen(index)
+                noFillNotice = true
             case .CANCELLED: ctl.locked = nil
-            case .UNAVAILABLE: rewardFailed = true; ctl.locked = index
+            case .UNAVAILABLE:
+                rewardFailed = true
+                ctl.locked = nil
+                DispatchQueue.main.async { ctl.locked = index }
             }
         }
     }

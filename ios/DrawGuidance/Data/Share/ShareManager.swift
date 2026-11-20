@@ -212,20 +212,57 @@ final class ShareManager: ObservableObject {
         liveFrame = canvas
     }
 
-    /// v52 yayına ara ver (yayın yapılan notta şekil/resim başka tuvalde düzenleniyor); izleyene bildirilir.
-    func pauseLive(_ canvasId: String) {
-        guard var out = liveOut, out.canvasId == canvasId, !out.paused else { return }
-        out.paused = true
-        liveOut = out
-        send(out.peerId, ShareWire.encode(ShareWire.LIVE_PAUSE, Data("{}".utf8)))
+    // MARK: - v56 ara ver / sürdür sahipleri (Android `ShareManager.attachEditor`)
+    //
+    // Eskiden pauseLive/resumeLive sayaçsızdı; kapanan eski düzenleyicinin geç gelen pauseLive'ı yeni düzenleyicinin
+    // yayınını kalıcı olarak durduruyordu. Artık her düzenleyici bir sahip kimliğiyle kaydolur; yayın yalnız tuval hiçbir
+    // düzenleyicide açık değilse ya da açık bir düzenleyici kendi adına ara verdiyse durur.
+
+    private var editorOwners: [String: Set<String>] = [:]
+    private var pauseOwners: [String: Set<String>] = [:]
+
+    func attachEditor(_ canvasId: String, owner: String) {
+        editorOwners[canvasId, default: []].insert(owner)
+        recomputePause(canvasId)
     }
 
-    /// v52 ara verilen yayın sürer (düzenleyici son hali [publishLive] ile gönderir).
-    func resumeLive(_ canvasId: String) {
-        guard var out = liveOut, out.canvasId == canvasId, out.paused else { return }
-        out.paused = false
+    func detachEditor(_ canvasId: String, owner: String) {
+        editorOwners[canvasId]?.remove(owner)
+        if editorOwners[canvasId]?.isEmpty == true { editorOwners[canvasId] = nil }
+        pauseOwners[canvasId] = pauseOwners[canvasId]?.filter { $0 != owner && !$0.hasPrefix(owner + ":") }
+        if pauseOwners[canvasId]?.isEmpty == true { pauseOwners[canvasId] = nil }
+        recomputePause(canvasId)
+    }
+
+    func isOpenInEditor(_ canvasId: String) -> Bool { !(editorOwners[canvasId]?.isEmpty ?? true) }
+
+    /// v52 yayına ara ver (notta şekil/resim başka tuvalde düzenleniyor, foto düzenleyici, arka plan).
+    func pauseLive(_ canvasId: String, owner: String) {
+        pauseOwners[canvasId, default: []].insert(owner)
+        recomputePause(canvasId)
+    }
+
+    /// v52 [owner]'ın verdiği ara kalkar; başka ara veren yoksa yayın sürer.
+    func resumeLive(_ canvasId: String, owner: String) {
+        pauseOwners[canvasId]?.remove(owner)
+        if pauseOwners[canvasId]?.isEmpty == true { pauseOwners[canvasId] = nil }
+        recomputePause(canvasId)
+    }
+
+    /// Sahip kimliği "<düzenleyici>" ya da "<düzenleyici>:<neden>"; ara yalnız açık düzenleyicilerin araları sayılır.
+    func shouldPause(_ canvasId: String) -> Bool {
+        let editors = editorOwners[canvasId] ?? []
+        if editors.isEmpty { return true }
+        return (pauseOwners[canvasId] ?? []).contains { p in editors.contains(p.split(separator: ":").first.map(String.init) ?? p) }
+    }
+
+    private func recomputePause(_ canvasId: String) {
+        guard var out = liveOut, out.canvasId == canvasId else { return }
+        let pause = shouldPause(canvasId)
+        guard pause != out.paused else { return }
+        out.paused = pause
         liveOut = out
-        send(out.peerId, ShareWire.encode(ShareWire.LIVE_RESUME, Data("{}".utf8)))
+        send(out.peerId, ShareWire.encode(pause ? ShareWire.LIVE_PAUSE : ShareWire.LIVE_RESUME, Data("{}".utf8)))
     }
 
     func isBroadcasting(_ canvasId: String) -> Bool { liveOut?.canvasId == canvasId }
@@ -425,7 +462,8 @@ final class ShareManager: ObservableObject {
             liveOut = ShareLiveOut(canvasId: cid, peerId: out.peerId, peerName: peerName(out.peerId))
             status = nil
             startLiveLoop(id)
-            openCanvas = ShareOpenCanvas(id: cid)
+            // v56 gönderen zaten bu tuvalin düzenleyicisindeyse düzenleyici yeniden açılmaz
+            if !isOpenInEditor(cid) { openCanvas = ShareOpenCanvas(id: cid) }
         default:
             break
         }

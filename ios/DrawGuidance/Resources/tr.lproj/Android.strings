@@ -3639,6 +3639,7 @@
 "v54_template_helper_hint" = "Seçtiğin çizim yardımcısının çizgileri şekil kalıbı olur; kenarına yakın çizerek izleyebilirsin.";
 "v55_image_err_memory" = "Bu resim bu cihazın belleği için çok büyük (%1$@). Uygulamanın çökmemesi için eklenmedi; daha küçük bir kopyasını deneyin.";
 "v55_image_err_pixels" = "Çözünürlük işlenemeyecek kadar yüksek (%1$d×%2$d, 1 gigapikselin üstünde). Daha küçük bir kopyasını deneyin.";
+"v56_practice_reward_nofill" = "Şu an gösterilecek reklam bulunamadı. Alıştırma senin için açıldı.";
 "vector_cut" = "Kes";
 "vector_delete" = "Sil";
 "vector_edit_open" = "Vektör düzenle";

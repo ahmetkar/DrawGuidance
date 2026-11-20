@@ -3639,6 +3639,7 @@
 "v54_template_helper_hint" = "The lines of the helper you pick become the shape template; draw near them to trace.";
 "v55_image_err_memory" = "This image is too large for this device's memory (%1$@). It wasn't added so the app doesn't crash; try a smaller copy.";
 "v55_image_err_pixels" = "The resolution is too high to process (%1$d×%2$d, over 1 gigapixel). Try a smaller copy.";
+"v56_practice_reward_nofill" = "No ad is available right now. The practice has been unlocked for you.";
 "vector_cut" = "Cut";
 "vector_delete" = "Delete";
 "vector_edit_open" = "Edit vector";

@@ -51,13 +51,20 @@ fun CanvasEditRoute(
     // v51 notta resim düzenleme: geçici tuval açılır (açılamazsa bildirilir)
     val tempRequest by vm.tempCanvasRequest.collectAsState()
     val liveShare = koinInject<com.karapp.drawguidance.data.share.ShareManager>()
+    // v56 bu düzenleyici örneğinin yayın sahip kimliği: yayın, tuval hiçbir düzenleyicide açık değilse ya da bu örnek
+    // ara verdiyse durur; eski bir düzenleyicinin geç kapanışı yeni düzenleyicinin yayınını durduramaz
+    val editorOwner = androidx.compose.runtime.remember { java.util.UUID.randomUUID().toString() }
+    androidx.compose.runtime.DisposableEffect(canvasLocalId, editorOwner) {
+        liveShare.attachEditor(canvasLocalId, editorOwner)
+        onDispose { liveShare.detachEditor(canvasLocalId, editorOwner) }
+    }
     androidx.compose.runtime.LaunchedEffect(tempRequest) {
         val id = tempRequest ?: return@LaunchedEffect
         vm.consumeTempCanvasRequest()
         if (id.isEmpty()) vm.emit(com.karapp.drawguidance.ui.screens.canvasedit.EditEvent.Message(context.getString(com.karapp.drawguidance.R.string.v52_temp_edit_failed)))
         else {
             // v52 yayın yapılan notta resim/şekil başka tuvalde düzenlenirken yayına ara verilir; nota dönülünce sürer
-            liveShare.pauseLive(canvasLocalId)
+            liveShare.pauseLive(canvasLocalId, editorOwner)
             onOpenCanvas(id)
         }
     }
@@ -100,31 +107,28 @@ fun CanvasEditRoute(
     }
     }
     // v51 canlı yayın: bu tuval yayındaysa düzenleyicideki her değişiklik karşı cihaza gönderilir
-    LiveBroadcastBridge(canvasLocalId, vm)
+    LiveBroadcastBridge(canvasLocalId, vm, editorOwner)
     }
 }
 
 @Composable
-private fun androidx.compose.foundation.layout.BoxScope.LiveBroadcastBridge(canvasLocalId: String, vm: CanvasEditViewModel) {
+private fun androidx.compose.foundation.layout.BoxScope.LiveBroadcastBridge(canvasLocalId: String, vm: CanvasEditViewModel, owner: String) {
     val share = koinInject<com.karapp.drawguidance.data.share.ShareManager>()
     val liveOut by share.liveOut.collectAsState()
     val live = liveOut?.takeIf { it.canvasId == canvasLocalId } ?: return
     androidx.compose.runtime.LaunchedEffect(canvasLocalId, live.peerKey) {
-        // v52 düzenleyiciye dönüldü: ara verilen yayın sürer (son hali hemen gönderilir)
-        share.resumeLive(canvasLocalId)
+        // v52 düzenleyiciye dönüldü: bu örneğin verdiği ara kalkar (son hali hemen gönderilir)
+        share.resumeLive(canvasLocalId, owner)
         vm.canvas.collect { c -> if (c != null) share.publishLive(c) }
     }
-    // v52 düzenleyiciden başka bir ekrana geçilince (ya da uygulama arka plana alınınca) yayına ara verilir; geri
-    // dönülünce yukarıdaki etki yayını sürdürür
-    androidx.compose.runtime.DisposableEffect(canvasLocalId) {
-        onDispose { share.pauseLive(canvasLocalId) }
-    }
+    // v56 düzenleyiciden ayrılınca ara, sahip kaydının silinmesiyle (detachEditor) kendiliğinden verilir; uygulama
+    // arka plana alınınca bu örnek ara verir, öne gelince kaldırır
     val lifecycle = androidx.lifecycle.compose.LocalLifecycleOwner.current.lifecycle
     androidx.compose.runtime.DisposableEffect(lifecycle, canvasLocalId) {
         val observer = androidx.lifecycle.LifecycleEventObserver { _, e ->
             when (e) {
-                androidx.lifecycle.Lifecycle.Event.ON_STOP -> share.pauseLive(canvasLocalId)
-                androidx.lifecycle.Lifecycle.Event.ON_START -> { share.resumeLive(canvasLocalId); vm.canvas.value?.let(share::publishLive) }
+                androidx.lifecycle.Lifecycle.Event.ON_STOP -> share.pauseLive(canvasLocalId, owner)
+                androidx.lifecycle.Lifecycle.Event.ON_START -> { share.resumeLive(canvasLocalId, owner); vm.canvas.value?.let(share::publishLive) }
                 else -> Unit
             }
         }
@@ -134,8 +138,8 @@ private fun androidx.compose.foundation.layout.BoxScope.LiveBroadcastBridge(canv
     // v52 foto düzenleme açıkken (tam ekran ayrı düzenleyici) yayına ara verilir, kapanınca sürer
     val photoOpen by vm.photo.open.collectAsState()
     androidx.compose.runtime.LaunchedEffect(photoOpen != null) {
-        if (photoOpen != null) share.pauseLive(canvasLocalId)
-        else { share.resumeLive(canvasLocalId); vm.canvas.value?.let(share::publishLive) }
+        if (photoOpen != null) share.pauseLive(canvasLocalId, "$owner:photo")
+        else { share.resumeLive(canvasLocalId, "$owner:photo"); vm.canvas.value?.let(share::publishLive) }
     }
     val canvas by vm.canvas.collectAsState()
     com.karapp.drawguidance.ui.screens.share.LiveBroadcastBadge(

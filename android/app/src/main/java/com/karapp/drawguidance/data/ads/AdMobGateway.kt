@@ -135,6 +135,7 @@ class AdMobGateway : AdsGateway {
         RewardedAd.load(context, adUnitId, AdRequest.Builder().build(), object : RewardedAdLoadCallback() {
             override fun onAdLoaded(ad: RewardedAd) {
                 rewarded = ad
+                lastRewardError = null
                 com.karapp.drawguidance.diagnostics.AppLog.i("Ads", "ödüllü reklam yüklendi")
                 flushRewarded(true)
             }
@@ -151,6 +152,7 @@ class AdMobGateway : AdsGateway {
 
     /** v52 son ödüllü reklam yükleme hatasının kodu (yoksa null). */
     @Volatile var lastRewardError: Int? = null
+    override val lastRewardErrorCode: Int? get() = lastRewardError
 
     override fun showRewarded(activity: Activity, onFinished: (Boolean) -> Unit) {
         val ad = rewarded ?: run { onFinished(false); return }

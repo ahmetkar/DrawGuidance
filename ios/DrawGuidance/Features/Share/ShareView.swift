@@ -448,6 +448,8 @@ struct LiveBroadcastBridge: View {
     @ObservedObject private var share = ShareManager.shared
     @ObservedObject var store: EditorStore
     let canvasLocalId: String
+    /// v56 düzenleyici örneğinin yayın sahip kimliği (`EditorViewModel.liveOwner`).
+    var owner: String = UUID().uuidString
     @State private var confirmStop = false
     @Environment(\.scenePhase) private var scenePhase
 
@@ -473,14 +475,16 @@ struct LiveBroadcastBridge: View {
             if let out, out.canvasId == canvasLocalId, let c = store.canvas { share.publishLive(c) }
         }
         // v52 düzenleyiciye dönüldü: ara verilen yayın sürer; başka ekrana geçilince (ya da arka planda) ara verilir
+        // v56 düzenleyici açılınca sahip olarak kaydolur, kapanınca kaydı (ve araları) silinir; tuval başka düzenleyicide
+        // açık değilse yayın kendiliğinden ara verir. Arka planda bu örnek ara verir.
         .onAppear {
-            share.resumeLive(canvasLocalId)
+            share.attachEditor(canvasLocalId, owner: owner)
             if let c = store.canvas { share.publishLive(c) }
         }
-        .onDisappear { share.pauseLive(canvasLocalId) }
+        .onDisappear { share.detachEditor(canvasLocalId, owner: owner) }
         .onChangeCompat(of: scenePhase) { _, phase in
-            if phase == .background { share.pauseLive(canvasLocalId) }
-            else if phase == .active { share.resumeLive(canvasLocalId); if let c = store.canvas { share.publishLive(c) } }
+            if phase == .background { share.pauseLive(canvasLocalId, owner: owner + ":bg") }
+            else if phase == .active { share.resumeLive(canvasLocalId, owner: owner + ":bg"); if let c = store.canvas { share.publishLive(c) } }
         }
     }
 }

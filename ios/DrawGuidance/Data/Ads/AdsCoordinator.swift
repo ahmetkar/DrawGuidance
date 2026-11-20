@@ -112,36 +112,86 @@ final class AdsCoordinator: NSObject, GADFullScreenContentDelegate {
         (Bundle.main.object(forInfoDictionaryKey: "DGRewardedUnitId") as? String).flatMap { $0.isEmpty ? nil : $0 } ?? Self.TEST_REWARDED
     }
 
-    /// Ödüllü reklam: Premium'da reklamsız [RewardOutcome.FREE]; onay yoksa önce alınır; 12 sn'de yüklenmezse UNAVAILABLE.
+    /// Ödüllü reklam: Premium'da reklamsız [RewardOutcome.FREE]; onay yoksa önce alınır.
+    /// v56: sonuç bir kez bildirilir; 25 sn'lik süre sınırı abonelik sorgusu ve başlatma dahil her adımı kapsar (eskiden
+    /// yalnız yüklemeyi kapsıyordu, StoreKit sorgusu takılınca dönen simge kalıyordu). Ağda reklam yoksa bir kez yeniden
+    /// denenir, yine yoksa [RewardOutcome.NO_FILL] (alıştırma açılır). Reklam, kilit penceresi kapanma animasyonu
+    /// bitince gösterilir (kapanan pencerenin üstüne sunulamıyordu).
     func requestReward(_ done: @escaping (RewardOutcome) -> Void) {
+        var finished = false
+        let finish: (RewardOutcome) -> Void = { o in
+            guard !finished else { return }
+            finished = true
+            AppLog.i("Ads", "ödüllü reklam sonucu: \(o)")
+            done(o)
+        }
+        let watchdog = Task { @MainActor in
+            try? await Task.sleep(nanoseconds: 25_000_000_000)
+            if !finished { AppLog.w("Ads", "ödüllü reklam 25 sn'de hazır olmadı"); finish(.NO_FILL) }
+        }
+        let end: (RewardOutcome) -> Void = { o in watchdog.cancel(); finish(o) }
         Task { @MainActor in
-            if await premiumState() == true { done(.FREE); return }
-            if disabled { done(.UNAVAILABLE); return }
+            if await premiumState() == true { end(.FREE); return }
+            if disabled { end(.UNAVAILABLE); return }
             let go = { [weak self] in
                 guard let self else { return }
-                guard self.consent else { AppLog.w("Ads", "ödüllü reklam: reklam onayı yok"); done(.UNAVAILABLE); return }
+                guard self.consent else { AppLog.w("Ads", "ödüllü reklam: reklam onayı yok"); end(.UNAVAILABLE); return }
                 if !self.started { self.started = true; GADMobileAds.sharedInstance().start(completionHandler: nil) }
-                var finished = false
-                let timeout = Task { @MainActor in
-                    try? await Task.sleep(nanoseconds: 20_000_000_000)
-                    if !finished { finished = true; AppLog.w("Ads", "ödüllü reklam 20 sn'de yüklenmedi"); done(.UNAVAILABLE) }
-                }
-                GADRewardedAd.load(withAdUnitID: self.rewardedUnitId, request: GADRequest()) { ad, error in
-                    // v52 neden kaydı (kod 1 = envanter yok / yeni birim, 2 = ağ, 8 = uygulama kimliği hatalı)
-                    if let error { AppLog.w("Ads", "ödüllü reklam yüklenemedi: kod=\((error as NSError).code) \(error.localizedDescription)") }
-                    Task { @MainActor in
-                        guard !finished else { return }
-                        finished = true
-                        timeout.cancel()
-                        guard let ad, let vc = Self.topController() else { done(.UNAVAILABLE); return }
-                        let relay = RewardRelay(done)
-                        self.rewardRelay = relay
-                        ad.fullScreenContentDelegate = relay
-                        ad.present(fromRootViewController: vc) { relay.earned = true }
-                    }
-                }
+                self.loadAndShowReward(attempt: 1, isDone: { finished }, end: end)
             }
             if consent { go() } else { requestConsent(go) }
+        }
+    }
+
+    private func loadAndShowReward(attempt: Int, isDone: @escaping () -> Bool, end: @escaping (RewardOutcome) -> Void) {
+        let present: (GADRewardedAd) -> Void = { [weak self] ad in
+            guard let self else { return }
+            Task { @MainActor in
+                // Kilit penceresi (alert) kapanırken sunum başarısız olur: en çok 2 sn kapanmanın bitmesi beklenir
+                for _ in 0..<20 {
+                    if let vc = Self.topController(), !vc.isBeingDismissed, !vc.isBeingPresented { break }
+                    try? await Task.sleep(nanoseconds: 100_000_000)
+                }
+                guard !isDone() else { return }
+                guard let vc = Self.topController() else { end(.UNAVAILABLE); return }
+                let relay = RewardRelay(end)
+                self.rewardRelay = relay
+                ad.fullScreenContentDelegate = relay
+                ad.present(fromRootViewController: vc) { relay.earned = true }
+            }
+        }
+        if let ad = preloadedReward { preloadedReward = nil; present(ad); return }
+        GADRewardedAd.load(withAdUnitID: rewardedUnitId, request: GADRequest()) { [weak self] ad, error in
+            Task { @MainActor in
+                guard let self, !isDone() else { return }
+                if let ad { present(ad); return }
+                // v52 neden kaydı (kod 1 = envanter yok / yeni birim, 2 = ağ, 8 = uygulama kimliği hatalı)
+                let code = (error as NSError?)?.code ?? -1
+                AppLog.w("Ads", "ödüllü reklam yüklenemedi: kod=\(code) \(error?.localizedDescription ?? "")")
+                if code == GADErrorCode.networkError.rawValue { end(.UNAVAILABLE); return }
+                if attempt < 2 {
+                    try? await Task.sleep(nanoseconds: 1_500_000_000)
+                    self.loadAndShowReward(attempt: attempt + 1, isDone: isDone, end: end)
+                } else { end(.NO_FILL) }
+            }
+        }
+    }
+
+    /// v56 önceden yüklenmiş ödüllü reklam (alıştırma listesi açılınca).
+    private var preloadedReward: GADRewardedAd?
+    private var rewardPreloading = false
+
+    /// v56 ödüllü reklamı önceden yükler (Android `preloadReward`): basınca reklam hazır olur.
+    func preloadReward() {
+        guard !disabled, preloadedReward == nil, !rewardPreloading else { return }
+        Task { @MainActor in
+            if await premiumState() == true { return }
+            guard consent else { return }
+            if !started { started = true; GADMobileAds.sharedInstance().start(completionHandler: nil) }
+            rewardPreloading = true
+            GADRewardedAd.load(withAdUnitID: rewardedUnitId, request: GADRequest()) { [weak self] ad, _ in
+                Task { @MainActor in self?.rewardPreloading = false; if let ad { self?.preloadedReward = ad } }
+            }
         }
     }
 
@@ -157,7 +207,7 @@ final class AdsCoordinator: NSObject, GADFullScreenContentDelegate {
 }
 
 /// v51 ödüllü reklamın sonucu (Android `RewardOutcome`).
-enum RewardOutcome { case EARNED, FREE, CANCELLED, UNAVAILABLE }
+enum RewardOutcome { case EARNED, FREE, CANCELLED, UNAVAILABLE, NO_FILL }
 
 /// Ödüllü reklam kapanınca sonucu bildirir.
 private final class RewardRelay: NSObject, GADFullScreenContentDelegate {

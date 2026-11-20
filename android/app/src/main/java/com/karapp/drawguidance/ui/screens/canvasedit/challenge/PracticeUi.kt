@@ -197,6 +197,8 @@ fun PracticeLayer(viewModel: CanvasEditViewModel, ui: PracticeUi, viewport: View
     val activity = LocalContext.current.let { c ->
         generateSequence(c) { (it as? android.content.ContextWrapper)?.baseContext }.filterIsInstance<android.app.Activity>().firstOrNull()
     }
+    // v56 liste ya da kilit penceresi açılınca ödüllü reklam önceden yüklenir (basınca hazır olsun)
+    LaunchedEffect(ui.sheet, lockedIndex != null) { if (ui.sheet || lockedIndex != null) ads.preloadReward() }
     lockedIndex?.let { index ->
         val level = ctl.levels().getOrNull(index)
         if (level == null) { ctl.dismissLocked(); return@let }
@@ -213,6 +215,13 @@ fun PracticeLayer(viewModel: CanvasEditViewModel, ui: PracticeUi, viewport: View
                         com.karapp.drawguidance.data.ads.RewardOutcome.FREE -> ctl.unlockAndOpen(index)
                         com.karapp.drawguidance.data.ads.RewardOutcome.CANCELLED -> Unit
                         com.karapp.drawguidance.data.ads.RewardOutcome.UNAVAILABLE -> ui.rewardFailed = true
+                        // v56 ağda reklam yok ya da süre doldu: alıştırma yine açılır, kısa bilgi gösterilir
+                        com.karapp.drawguidance.data.ads.RewardOutcome.NO_FILL -> {
+                            ctl.unlockAndOpen(index)
+                            activity?.let { a ->
+                                android.widget.Toast.makeText(a, a.getString(com.karapp.drawguidance.R.string.v56_practice_reward_nofill), android.widget.Toast.LENGTH_LONG).show()
+                            }
+                        }
                     }
                 }
             },

@@ -641,7 +641,7 @@ olarak girer._
 
 | # | Özellik | Modlar | Erişim |
 |---|---|---|---|
-| 18 | Huawei AppGallery, Xiaomi GetApps, Samsung Galaxy Store uyumluluğu (abonelik ve giriş) | Hepsi (Android) | Free |
+| 18 | Huawei AppGallery ve Samsung Galaxy Store uyumluluğu (abonelik ve giriş) | Hepsi (Android) | Free |
 | 19 | E-posta ve şifreyle giriş; Google ve Apple ile giriş korunur | Hepsi (Android + iOS) | Free |
 | 20 | SVG, PSD ve DXF olarak dışa aktarma | Resim, Basit resim, Çizgi roman, Not alma; **çocuk modunda yok** | Free |
 | 21 | Özellikler penceresinde seçili katmana Ton/Doygunluk/Parlaklık (HSL) ve Renk Dengesi; katmanı çoğalt; birden çok katmanı birleştir | Resim, Basit resim, Çizgi roman | Free |
@@ -651,11 +651,13 @@ olarak girer._
 Not alma kuralı (1. bölüm) bu maddeler için şöyle: 20 (dışa aktarma) bir araç değil kaydetme seçeneği olduğu için not
 almaya da girer; 21 ve 22 not almaya girmez.
 
-### 2D-1. Alternatif mağazalar: Huawei AppGallery, Xiaomi GetApps, Samsung Galaxy Store (madde 18)
+### 2D-1. Alternatif mağazalar: Huawei AppGallery, Samsung Galaxy Store (madde 18)
+
+_Xiaomi GetApps entegrasyonu Ahmet'in kararıyla iptal edildi (2026-11-20); `xiaomi` flavor'ı yok._
 
 **Sorun:** Uygulama bugün Google Play'e bağlı: abonelik Play Billing, Google ile giriş Google Play Hizmetleri (GMS)
 ister, freeRASP (`TalsecGuard`) Play dışından kurulumu "güvensiz kaynak" sayar (`supportedAlternativeStores(emptyArray())`).
-Huawei cihazlarda GMS yok; Xiaomi ve Samsung cihazlarda GMS var ama bu mağazalar kendi ödeme sistemlerini ister.
+Huawei cihazlarda GMS yok; Samsung cihazlarda GMS var ama Galaxy Store kendi ödeme sistemini ister.
 
 **Çözüm: mağaza başına derleme türü (flavor).** Tek kod tabanı, `store` boyutu:
 
@@ -664,35 +666,28 @@ Huawei cihazlarda GMS yok; Xiaomi ve Samsung cihazlarda GMS var ama bu mağazala
 | `play` | Google Play | Play Billing (bugünkü) | E-posta/şifre, Google, Apple | AdMob |
 | `huawei` | AppGallery | **Huawei IAP** (HMS IAP Kit, abonelik) | E-posta/şifre, Apple, (HMS varsa) Huawei ID; GMS yoksa Google düğmesi gizlenir | AdMob GMS'siz cihazda reklam vermez; reklamsız çalışır (Huawei Ads Kit sonraki sürüm) |
 | `samsung` | Galaxy Store | **Samsung IAP** (IAP SDK 6.x, abonelik) | E-posta/şifre, Google, Apple | AdMob |
-| `xiaomi` | GetApps | **Play Billing** (Ahmet'in kararı, 2026-11-20); cihazda Play yoksa "Google Play gerekli" uyarısı | E-posta/şifre, Google, Apple | AdMob |
 
 - **Ortak abonelik arayüzü:** `data/billing/StoreBilling` (ürünleri getir, satın al, geri yükle, durum). Uygulamaları:
-  `PlayBilling` (bugünkü kod taşınır), `HuaweiBilling`, `SamsungBilling`, `XiaomiBilling`. Koin'de flavor'a göre seçilir.
+  `PlayBilling` (bugünkü kod taşınır), `HuaweiBilling`, `SamsungBilling`. Koin'de flavor'a göre seçilir.
   Premium hakkı yine sunucunun `/me` yanıtından gelir; mağaza yalnız satın alma kanıtını verir.
 - **Sunucu (54.0.0 → 56.0.0, tek değişiklik paketi):**
   - `POST /api/v1/subscriptions/verify-huawei` (purchaseToken + subscriptionId; Huawei Subscription API ile doğrulanır),
-    `POST /api/v1/subscriptions/verify-samsung` (purchaseId; Samsung IAP sunucu API'si ile doğrulanır),
-    Xiaomi Play Billing kullandığı için bugünkü Play doğrulamasından geçer (store alanı `XIAOMI_GETAPPS`).
+    `POST /api/v1/subscriptions/verify-samsung` (purchaseId; Samsung IAP sunucu API'si ile doğrulanır).
   - Mağaza bildirimleri: `POST /api/v1/billing/huawei-notifications` (Huawei abonelik bildirimi v2),
     Samsung için düzenli durum sorgusu (Samsung sunucuya bildirim göndermiyor).
-  - `subscriptions` belgesindeki `store` alanına `HUAWEI_APPGALLERY`, `SAMSUNG_GALAXY`, `XIAOMI_GETAPPS` eklenir.
+  - `subscriptions` belgesindeki `store` alanına `HUAWEI_APPGALLERY`, `SAMSUNG_GALAXY` eklenir.
   - Gizli anahtarlar (Huawei client secret ve abonelik genel anahtarı, Samsung service account) Swarm secret olur;
     depoya ve zip'e girmez.
-- **freeRASP:** `supportedAlternativeStores` flavor'a göre: `com.huawei.appmarket`, `com.xiaomi.mipicks` ve
-  `com.xiaomi.market`, `com.sec.android.app.samsungapps`. İmza sertifikası değişmez (her mağazaya aynı yükleme anahtarı;
-  Samsung ve Xiaomi APK'yı kendimiz imzalarız, AppGallery'de "App Signing" kapalı tutulur).
+- **freeRASP:** `supportedAlternativeStores` flavor'a göre: `com.huawei.appmarket`,
+  `com.sec.android.app.samsungapps`. İmza sertifikası değişmez (her mağazaya aynı yükleme anahtarı;
+  Samsung APK'sını kendimiz imzalarız, AppGallery'de "App Signing" kapalı tutulur).
 - **GMS'siz cihaz:** `GoogleApiAvailability` kontrolü; GMS yoksa Google ile giriş ve AdMob gizlenir, uygulama çökmeden açılır.
   Firebase Auth e-posta/şifre ve Apple (tarayıcı akışı) GMS'siz çalışır.
 - **Uygulama içi güncelleme** (`app-update-ktx`) yalnız `play` flavor'da; ötekilerinde mağaza sayfasına bağlantı.
-- **Derleme:** `bundlePlayRelease` (AAB, Play), `assembleHuaweiRelease`, `assembleSamsungRelease`, `assembleXiaomiRelease`
+- **Derleme:** `bundlePlayRelease` (AAB, Play), `assembleHuaweiRelease`, `assembleSamsungRelease`
   (APK). Huawei için `agconnect-services.json` gerekir (gizli değil ama depoya konmaz, PC'de `yayin-anahtari\`).
-- **Ahmet'ten gerekenler:** üç mağazada geliştirici hesabı ve uygulama kaydı; Huawei AppGallery Connect'te IAP açılıp
-  abonelik ürünü (`premium.monthly`); Samsung Seller Portal'da IAP ürünü ve "Item ID"; Xiaomi kararı.
-
-**Xiaomi notu:** Xiaomi'nin uygulama içi ödeme hizmeti (Mi IAP) küresel GetApps'te herkese açık değil; çoğu uygulama
-GetApps'te Google Play Billing'i (Xiaomi cihazlarda GMS var) ya da kendi web ödemesini kullanıyor. Önerim: `xiaomi`
-flavor'ı Play Billing'i kullanır (cihazda Play varsa), yoksa satın alma düğmesi "Google Play gerekli" uyarısı verir.
-**Karar (Ahmet, 2026-11-20): Play Billing.**
+- **Ahmet'ten gerekenler:** iki mağazada geliştirici hesabı ve uygulama kaydı; Huawei AppGallery Connect'te IAP açılıp
+  abonelik ürünü (`premium.monthly`); Samsung Seller Portal'da IAP ürünü ve "Item ID".
 
 **Testler:** flavor başına Koin grafiği kurulumu; `StoreBilling` sahte uygulamalarla satın alma → sunucu doğrulama →
 Premium; GMS'siz Robolectric profilinde Google düğmesi yok ve uygulama açılıyor; freeRASP mağaza listesi; sunucuda

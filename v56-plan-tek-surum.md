@@ -903,6 +903,76 @@ araçlar yok (2D maddeleri kendi mod kurallarıyla kalır). `V56Flags`'te `ADV_*
 | 9.8–9.10 | Girdap, büzüştür, şişir | Raster katmanda sıvılaştır (planda); vektörde yeni efekt | Nesne › Efektler | K2 |
 | 9.11–9.12 | Pürüzlendir, zikzak/dalga | Yeni | Nesne › Efektler | K3A |
 
+### 2E-1. Menü ve panel haritası (Resim modu)
+
+Her seçeneğin nerede duracağı, yere göre. **(var)** uygulamada zaten olan, **(yeni)** eklenecek; parantezdeki durak
+eklenme zamanıdır. 2D ve öteki v56 maddelerinin yerleri de bu haritadadır.
+
+**Üst menü** (bugünkü düğmeler aynı kalır; tek yeni düğme **Nesne**)
+
+- **Nesne ▾** (yeni açılır menü)
+  - *Hizala ve dağıt ▸* sola (var), yatay ortala (var), sağa (var), üste, dikey ortala, alta; hizalama referansı: kâğıt /
+    seçim / ana nesne; yatay dağıt, dikey dağıt, boşlukları eşitle (yeni, K2)
+  - *Yol işlemleri ▸* birleştir, önden çıkar, kesişim, dışla, böl, kırp (trim), birleştir (merge), kırp (crop), anahat,
+    şekil oluşturucu (yeni, K3A)
+  - *Tekrarla ▸* doğrusal, ızgara, dairesel, aynalı tekrar, adımla çoğalt (yeni, K3)
+  - *Efektler ▸* yolu ötele, zarf bozma, kıvırma, girdap, büzüştür, şişir, pürüzlendir, zikzak/dalga (girdap/büzüştür/şişir
+    K2, öteki yeni efektler K3A); yansıma oluştur (K2)
+  - *Yol düzenle ▸* düğümleri düzenle (var), konturu yola çevir (yeni, K3A), bıçak (yeni, K3A)
+- **Kılavuzlar** (var): simetri dikey/yatay/dörtlü/radyal (yeni, K3); aynalı bakış (var)
+- **Kaydet** penceresi (var): SVG, PSD, DXF (yeni, K3)
+- **Hızlı fırça seçici** (tuvalin sol üst köşesi; yeni, K2): fırçalar + renk düğmesi; renk düğmesi renk seçici penceresini açar
+
+**Seç modu** (alt araç çubuğundaki seçim kipleri)
+
+- dokunarak (var), dikdörtgen (var), kement (var), **sihirli değnek** (yeni, K1; ölçüt ve tolerans alt panelde)
+- grupta çift dokunuş: grubun içine gir / çık (yeni, K1)
+
+**Seçim menüsü** (seçim çubuğu ve uzun basma)
+
+- tümünü seç (yeni, K1), seçimi kaldır (var), seçimi ters çevir (yeni, K1); yumuşat, genişlet/daralt (yeni, K1)
+- grupla, grubu çöz, çoğalt (var); **bağlı kopya** (yeni, K3)
+- en öne, bir öne, bir arkaya, en arkaya (var)
+- **kırpma maskesi oluştur / kaldır** (yeni, K1), **opaklık maskesi** (yeni, K3)
+- kes, kopyala, yapıştır, sayfalar arası yapıştır (yeni, K1); gizle (var); kement dolgu (yeni, K1)
+
+**Dönüştür paneli** (Seç modunda, 2A)
+
+- *Üst kipler:* serbest, tekdüze, bozma (perspektif), çarpıtma (ağ) (yeni, K2), **kaydır/eğ** (yeni, K2); taşı, döndür,
+  ölçekle (var, panele taşınır)
+- *Alt panel:* yaslama (hizalama kısayolu), yatay çevir, dikey çevir, eksene göre yansıt, 90° döndür, tuvale sığdır
+  (yeni, K2); **referans noktası** (9 nokta + serbest), X / Y (var), genişlik / yükseklik / açı, orantıyı kilitle,
+  **her birini dönüştür**, **dönüşümü tekrarla**, **dönüşümü çoğalt** (yeni, K2)
+
+**Özellikler penceresi** (seçili nesne ya da katman; sekmeli)
+
+- *Dolgu:* düz renk (var), doğrusal/dairesel gradyan (var), serbest gradyan, desen dolgu, dolgu yok, dolgu opaklığı (yeni, K3)
+- *Kontur:* renk, kalınlık, kesikli (var); tire/boşluk uzunluğu, uç biçimi, köşe biçimi, köşe sınırı, kontur hizası, ok
+  uçları (yeni, K3)
+- *Görünüm:* opaklık (var), nesne karışım modu, çoklu dolgu, çoklu kontur (yeni, K3)
+- *Renk (katman seçiliyken):* Ton/Doygunluk/Parlaklık (HSL), Renk Dengesi, Eğriler (yeni, K3)
+
+**Katmanlar paneli**
+
+- yeni, sil, yeniden adlandır, kilitle, gizle, sırala (var)
+- katman satırında: opaklık kaydırıcısı ve karışım modu (yeni, K1), alfa kilidi, alttakine kırp (yeni, K1)
+- katman menüsünde: **çoğalt**, **birden çok katmanı birleştir** (çoklu seçimle) (yeni, K3); dokuyla doldur (yeni, K2)
+
+**Yol düzenle modu** (düğümler)
+
+- düğüm ekle, sil, taşı, bağla (birleştir), kes (makas), sadeleştir, yumuşat (var)
+- segment seçimi, yolu ayır, kapat, yönü ters çevir, yolu uzat (uç düğümden sürükle) (yeni, K3A)
+
+**Alt panel** (yalnız ilgili araç seçiliyken, çizim sırasında)
+
+- simetri: tür, kol sayısı, eksen; canlı ayna aç/kapa (K3)
+- sihirli değnek: ölçüt (renk / kontur / görünüm), tolerans (K1)
+- düğüm türü (köşe / yumuşak) ve Bezier tutamakları (K3A)
+- bıçak: kalınlık, kapalı yollar oluştur (K3A)
+- tekrar ve adımla çoğalt: adet, mesafe, açı (K3)
+- gren: doku, ölçek, güç (K2); sıvılaştır: it, döndür, büzüştür, şişir, boyut, güç (K2)
+- damlalık: kalemin çevresinde canlı renk dairesi (K2)
+
 **Veri modeli etkisi (V11 içinde, ek sürüm yok):** `Stroke.style2: VectorStyle?` (uç/köşe biçimi, köşe sınırı, kontur hizası,
 tire dizisi, ok uçları, çoklu dolgu/kontur, serbest gradyan, desen dolgu, nesne karışım modu, opaklık maskesi kaynağı);
 `Stroke.cloneOf` (bağlı kopya), `Stroke.repeat: RepeatSpec?` (canlı tekrar), `Stroke.effects: List<VectorEffect>?`

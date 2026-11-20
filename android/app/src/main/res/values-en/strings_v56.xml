@@ -11,4 +11,26 @@
     <string name="v56_live_elsewhere">The broadcaster is on another screen</string>
     <string name="v56_element_lasso_fill">Lasso fill</string>
     <string name="v56_share_flattened">%1$s uses an older version: new features such as layer modes, masks and grain were simplified</string>
+    <string name="v56_layer_opacity">Opacity %1$d%%</string>
+    <string name="v56_layer_blend">Blend mode</string>
+    <string name="v56_layer_alpha_lock">Alpha lock</string>
+    <string name="v56_layer_clip">Clip to below</string>
+    <string name="v56_layer_clip_hint">Visible only where the layer below is painted</string>
+    <string name="v56_blend_normal">Normal</string>
+    <string name="v56_blend_multiply">Multiply</string>
+    <string name="v56_blend_screen">Screen</string>
+    <string name="v56_blend_overlay">Overlay</string>
+    <string name="v56_blend_darken">Darken</string>
+    <string name="v56_blend_lighten">Lighten</string>
+    <string name="v56_blend_color_dodge">Color dodge</string>
+    <string name="v56_blend_color_burn">Color burn</string>
+    <string name="v56_blend_hard_light">Hard light</string>
+    <string name="v56_blend_soft_light">Soft light</string>
+    <string name="v56_blend_difference">Difference</string>
+    <string name="v56_blend_exclusion">Exclusion</string>
+    <string name="v56_blend_hue">Hue</string>
+    <string name="v56_blend_saturation">Saturation</string>
+    <string name="v56_blend_color">Color</string>
+    <string name="v56_blend_luminosity">Luminosity</string>
+    <string name="v56_blend_add">Add</string>
 </resources>

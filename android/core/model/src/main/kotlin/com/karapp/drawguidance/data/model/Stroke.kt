@@ -662,6 +662,11 @@ data class BrushParams(
     @EncodeDefault(EncodeDefault.Mode.NEVER) val grain: GrainSpec? = null,
     /** v56 resimden fırça: damga resminin varlık kimliği (canvas_assets); null: fırçanın kendi ucu. */
     @EncodeDefault(EncodeDefault.Mode.NEVER) val stampAssetId: String? = null,
+    /**
+     * v56 alfa kilidi: çizgi, alfa kilitli katmanda çizildi; yalnız katmanda kendisinden önce boyanmış yerlerde görünür
+     * (SrcAtop). Kilit sonradan kalksa da çizgi böyle kalır (boyanmış pikseller gibi).
+     */
+    @EncodeDefault(EncodeDefault.Mode.NEVER) val alphaLocked: Boolean = false,
 )
 
 /** v51 fırça ucu şekilleri. */

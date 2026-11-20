@@ -60,6 +60,27 @@ class LayerController(private val store: EditorStore) {
         store.select(store.selection)
     }
 
+    /** v56 katman opaklığı (0..1); kaydırırken tek geri alma adımı. */
+    fun setOpacity(id: String, opacity: Float) {
+        val v = opacity.coerceIn(0f, 1f)
+        store.commitLayers(layers().map { if (it.id == id) it.copy(opacity = v) else it }, coalesce = "layer-opacity-$id")
+    }
+
+    /** v56 katman karışım modu. */
+    fun setBlend(id: String, blend: com.karapp.drawguidance.data.model.LayerBlend) {
+        store.commitLayers(layers().map { if (it.id == id) it.copy(blend = blend) else it })
+    }
+
+    /** v56 alfa kilidi: açıkken bu katmana çizilen fırça izleri yalnız katmanın boyalı yerlerinde görünür. */
+    fun toggleAlphaLock(id: String) {
+        store.commitLayers(layers().map { if (it.id == id) it.copy(alphaLock = !it.alphaLock) else it })
+    }
+
+    /** v56 alttakine kırp (en alttaki katmanda etkisiz). */
+    fun toggleClip(id: String) {
+        store.commitLayers(layers().map { if (it.id == id) it.copy(clipToBelow = !it.clipToBelow) else it })
+    }
+
     /** Katmanı bir üste (+1) ya da alta (-1) taşır; çizimler yeni sıraya göre dizilir. */
     fun move(id: String, direction: Int) {
         val current = layers().toMutableList()

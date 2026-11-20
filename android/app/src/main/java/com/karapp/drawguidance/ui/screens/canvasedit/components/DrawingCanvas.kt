@@ -257,6 +257,8 @@ fun DrawingCanvas(
     /** Diyagramda ok ekleme sürüyorsa kaynağı ve çıkış tarafı. */
     diagramLink: com.karapp.drawguidance.ui.screens.canvasedit.state.DiagramLink? = null,
     overlay: CanvasOverlay = CanvasOverlay(),
+    /** v56 etkin katman: canlı çizgi bu katmanın opaklığı ve karışım moduyla gösterilir. */
+    activeLayerId: String? = null,
 ) {
     val colors = NeuTheme.colors
     val density = LocalDensity.current
@@ -336,7 +338,9 @@ fun DrawingCanvas(
             if (hiddenIds.isEmpty()) transforming else transforming + hiddenIds
         }
         val cacheTarget = remember(drawStrokes, excluded) { if (excluded.isEmpty()) drawStrokes else drawStrokes.filterNot { it.id in excluded } }
-        val cacheKey = CacheKey(viewW, viewH, viewport.settledScale, viewport.settledOffset, canvas.width, canvas.height, excluded, imagesVersion)
+        // v56 katman görünümü (opaklık, mod, alfa kilidi, kırpma) değişince görüntü baştan üretilir
+        val layerLook = remember(canvas.layers) { canvas.layers.map { listOf(it.id, it.opacity, it.blend, it.alphaLock, it.clipToBelow) } }
+        val cacheKey = CacheKey(viewW, viewH, viewport.settledScale, viewport.settledOffset, canvas.width, canvas.height, excluded, imagesVersion, layerLook)
         val holder = remember { StrokeCache() }
         var cacheTick by remember { mutableIntStateOf(0) }
         // Önbelleği güncel tut: görüntü değişmediyse hiçbir şey çizme, yalnızca yeni çizim eklendiyse
@@ -349,7 +353,9 @@ fun DrawingCanvas(
                     // Silgi eklendiyse görüntü baştan üretilir: silgi yalnızca kendi katmanındaki fırça izlerini silmeli
                     isAppend(holder.drawn, cacheTarget) &&
                         // v51 piksel tabanlı fırça izi alttaki çizimi okur: görüntü baştan üretilir
-                        cacheTarget.subList(holder.drawn.size, cacheTarget.size).none { it.brushType == BrushType.ERASER || it.brushType.isRaster } -> {
+                        cacheTarget.subList(holder.drawn.size, cacheTarget.size).none { it.brushType == BrushType.ERASER || it.brushType.isRaster } &&
+                        // v56 birleştirilen katmana eklenen çizim: görüntü baştan üretilir
+                        com.karapp.drawguidance.ui.drawing.LayerCompositor.appendSafe(cacheTarget.subList(holder.drawn.size, cacheTarget.size), canvas.layers) -> {
                         val added = cacheTarget.subList(holder.drawn.size, cacheTarget.size)
                         val handoff = live.finished && added.size == 1 && added[0].id == live.strokeId &&
                             live.matches(cacheKey.scale, cacheKey.offset.x, cacheKey.offset.y)
@@ -358,15 +364,15 @@ fun DrawingCanvas(
                             val clip = cacheKey.clip()
                             live.blitInto(android.graphics.Canvas(bitmap.asAndroidBitmap()), android.graphics.RectF(clip.left, clip.top, clip.right, clip.bottom))
                         } else {
-                            StrokeRenderer.drawIntoViewportCache(bitmap, added, cacheKey.scale, cacheKey.offset, cacheKey.clip())
+                            StrokeRenderer.drawIntoViewportCache(bitmap, added, cacheKey.scale, cacheKey.offset, cacheKey.clip(), canvas.layers)
                         }
                         holder.drawn = cacheTarget
                         holder.version = visualVersion
                     }
-                    else -> holder.requests.value = RenderRequest(cacheKey, cacheTarget, visualVersion)
+                    else -> holder.requests.value = RenderRequest(cacheKey, cacheTarget, visualVersion, canvas.layers)
                 }
             } else {
-                holder.requests.value = RenderRequest(cacheKey, cacheTarget, visualVersion)
+                holder.requests.value = RenderRequest(cacheKey, cacheTarget, visualVersion, canvas.layers)
             }
         }
         // Parmak kalktıktan sonra önbellek güncellendiyse canlı katman bırakılır
@@ -377,7 +383,7 @@ fun DrawingCanvas(
                 if (holder.key == request.key && holder.version == request.version) return@collectLatest
                 val key = request.key
                 val bitmap = withContext(Dispatchers.Default) {
-                    StrokeRenderer.renderViewportCache(request.target, key.width, key.height, key.scale, key.offset, key.clip()) { ensureActive() }
+                    StrokeRenderer.renderViewportCache(request.target, key.width, key.height, key.scale, key.offset, key.clip(), { ensureActive() }, request.layers)
                 }
                 holder.bitmap = bitmap
                 holder.key = key
@@ -727,6 +733,10 @@ fun DrawingCanvas(
                 )
             }
 
+            // v56 katman görünümü: taşıma önizlemesinde opaklık ve mod (kırpma tabanı önizlemede olmadığından yok)
+            fun layerOf(id: String?): com.karapp.drawguidance.data.model.Layer? =
+                canvas.layers.firstOrNull { it.id == id } ?: if (id == null) canvas.layers.firstOrNull() else null
+            val previewLayers = if (com.karapp.drawguidance.ui.drawing.LayerCompositor.needed(canvas.layers)) canvas.layers.map { it.copy(clipToBelow = false) } else emptyList()
             val pendingAppended = if (holder.drawn !== cacheTarget && isAppend(holder.drawn, cacheTarget)) {
                 // Bekleyen silgiler doğrudan çizilmez (nesneleri de silerdi); görüntü yenilenince görünür
                 cacheTarget.subList(if (holder.bitmap == null) 0 else holder.drawn.size, cacheTarget.size)
@@ -752,7 +762,11 @@ fun DrawingCanvas(
                 translate(offset.x, offset.y) {
                     scale(scale, scale, pivot = Offset.Zero) {
                         // Önbellek arka planda yenilenirken sonradan eklenen çizimler doğrudan çizilir
-                        pendingAppended.forEach { if (!(liveVisible && it.id == live.strokeId)) drawStroke(it) }
+                        pendingAppended.forEach { s ->
+                            if (!(liveVisible && s.id == live.strokeId)) with(com.karapp.drawguidance.ui.drawing.LayerCompositor) {
+                                withLayerLook(layerOf(s.layerId)) { drawStroke(s) }
+                            }
+                        }
                         if (isolate && !mode.transformsSelection) {
                             selectedStrokes.forEach { if (it.brushType != BrushType.ERASER && !it.brushType.isHelper && it.id !in hiddenIds) drawStroke(it) }
                         }
@@ -801,9 +815,9 @@ fun DrawingCanvas(
                             // Seçimdeki silgiler yalnızca seçili çizimleri silsin diye ayrı katman
                             withStrokeLayer(Rect(-1e5f, -1e5f, 1e5f, 1e5f)) {
                                 when {
-                                    move != null -> translate(move.delta.x, move.delta.y) { drawStrokeList(shown) }
-                                    turn != null -> rotate(turn.degrees, turn.pivot) { drawStrokeList(shown) }
-                                    else -> drawStrokeList(shown)
+                                    move != null -> translate(move.delta.x, move.delta.y) { drawStrokeList(shown, layers = previewLayers) }
+                                    turn != null -> rotate(turn.degrees, turn.pivot) { drawStrokeList(shown, layers = previewLayers) }
+                                    else -> drawStrokeList(shown, layers = previewLayers)
                                 }
                             }
                             // Şekil düzenleme (v16): vektör noktaları, seçili noktalar/çizgi ve çizginin tutamakları
@@ -840,7 +854,9 @@ fun DrawingCanvas(
                         }
                     }
                 }
-                if (liveVisible) drawIntoCanvas { live.drawTo(it.nativeCanvas) }
+                if (liveVisible) with(com.karapp.drawguidance.ui.drawing.LayerCompositor) {
+                    withLayerLook(if (live.isEraser) null else layerOf(activeLayerId)) { drawIntoCanvas { live.drawTo(it.nativeCanvas) } }
+                }
                 // v18 hareket tahmini: canlı çizginin ucundan tahmin edilen yere geçici kuyruk (kaydedilmez)
                 val prediction = predicted.value
                 if (liveVisible && !live.finished && !live.isEraser && prediction.isNotEmpty()) {
@@ -1032,11 +1048,15 @@ private data class CacheKey(
     val canvasHeight: Int,
     val excluded: Set<String>,
     val imagesVersion: Int,
+    val layerLook: List<List<Any>> = emptyList(),
 ) {
     fun clip() = Rect(offset, Size(canvasWidth * scale, canvasHeight * scale))
 }
 
-private class RenderRequest(val key: CacheKey, val target: List<Stroke>, val version: Long)
+private class RenderRequest(
+    val key: CacheKey, val target: List<Stroke>, val version: Long,
+    val layers: List<com.karapp.drawguidance.data.model.Layer> = emptyList(),
+)
 
 private class StrokeCache {
     var bitmap: androidx.compose.ui.graphics.ImageBitmap? = null

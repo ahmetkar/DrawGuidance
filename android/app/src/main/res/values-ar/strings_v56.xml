@@ -11,4 +11,26 @@
     <string name="v56_live_elsewhere">المُذيع في شاشة أخرى</string>
     <string name="v56_element_lasso_fill">تعبئة بالحبل</string>
     <string name="v56_share_flattened">يستخدم %1$s إصدارًا أقدم: تم تبسيط الميزات الجديدة مثل أوضاع الطبقات والأقنعة والحبيبات</string>
+    <string name="v56_layer_opacity">العتامة %1$d%%</string>
+    <string name="v56_layer_blend">وضع المزج</string>
+    <string name="v56_layer_alpha_lock">قفل الشفافية</string>
+    <string name="v56_layer_clip">قص على الطبقة السفلى</string>
+    <string name="v56_layer_clip_hint">تظهر فقط حيث رُسمت الطبقة السفلى</string>
+    <string name="v56_blend_normal">عادي</string>
+    <string name="v56_blend_multiply">ضرب</string>
+    <string name="v56_blend_screen">شاشة</string>
+    <string name="v56_blend_overlay">تراكب</string>
+    <string name="v56_blend_darken">تغميق</string>
+    <string name="v56_blend_lighten">تفتيح</string>
+    <string name="v56_blend_color_dodge">تفادي اللون</string>
+    <string name="v56_blend_color_burn">حرق اللون</string>
+    <string name="v56_blend_hard_light">ضوء قاسٍ</string>
+    <string name="v56_blend_soft_light">ضوء ناعم</string>
+    <string name="v56_blend_difference">فرق</string>
+    <string name="v56_blend_exclusion">استبعاد</string>
+    <string name="v56_blend_hue">تدرج اللون</string>
+    <string name="v56_blend_saturation">التشبع</string>
+    <string name="v56_blend_color">اللون</string>
+    <string name="v56_blend_luminosity">السطوع</string>
+    <string name="v56_blend_add">إضافة</string>
 </resources>

@@ -266,7 +266,7 @@ class ObjectSceneController(private val store: EditorStore, private val host: Ed
         CanvasDrawScope().draw(Density(1f), LayoutDirection.Ltr, Canvas(bmp.asImageBitmap()), Size(w.toFloat(), h.toFloat())) {
             scale(k, k, pivot = Offset.Zero) {
                 translate(-region.left, -region.top) {
-                    drawCanvasContent(hexToColor(c.paperOf(c.currentPage)), below, c.width.toFloat(), c.height.toFloat(), decor = c.backgroundOf(c.currentPage))
+                    drawCanvasContent(hexToColor(c.paperOf(c.currentPage)), below, c.width.toFloat(), c.height.toFloat(), decor = c.backgroundOf(c.currentPage), layers = c.layers)
                 }
             }
         }

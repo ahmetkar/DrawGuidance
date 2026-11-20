@@ -589,6 +589,8 @@ fun LayersPanelContent(
     onMove: (String, Int) -> Unit,
     onMoveSelection: (String) -> Unit,
     onDelete: (String) -> Unit,
+    /** v56 etkin katmanın opaklık, karışım modu, alfa kilidi ve kırpma ayarları; null: gösterilmez (mod kuralı). */
+    look: LayerLookActions? = null,
 ) {
     val colors = NeuTheme.colors
     var renaming by remember { mutableStateOf<Layer?>(null) }
@@ -609,6 +611,7 @@ fun LayersPanelContent(
                 inset = isActive,
                 onClick = { onSelect(layer.id) },
             ) {
+                Column {
                 Row(Modifier.padding(horizontal = 10.dp, vertical = 8.dp), verticalAlignment = Alignment.CenterVertically) {
                     Column(Modifier.weight(1f)) {
                         Text(
@@ -671,6 +674,8 @@ fun LayersPanelContent(
                             )
                         }
                     }
+                }
+                if (isActive && look != null) LayerLookRow(layer, index, look)
                 }
             }
         }
@@ -1079,4 +1084,95 @@ fun UnsavedChangesDialog(onSave: () -> Unit, onDiscard: () -> Unit, onDismiss: (
             }
         },
     )
+}
+
+
+/** v56 katman görünümü işlemleri ([blend]: opaklık ve mod; [lockClip]: alfa kilidi ve kırpma gösterilir). */
+class LayerLookActions(
+    val blend: Boolean,
+    val lockClip: Boolean,
+    val onOpacity: (String, Float) -> Unit,
+    val onBlend: (String, com.karapp.drawguidance.data.model.LayerBlend) -> Unit,
+    val onAlphaLock: (String) -> Unit,
+    val onClip: (String) -> Unit,
+)
+
+/** v56 karışım modunun adı. */
+@Composable
+fun layerBlendLabel(b: com.karapp.drawguidance.data.model.LayerBlend): String = stringResource(
+    when (b) {
+        com.karapp.drawguidance.data.model.LayerBlend.NORMAL -> R.string.v56_blend_normal
+        com.karapp.drawguidance.data.model.LayerBlend.MULTIPLY -> R.string.v56_blend_multiply
+        com.karapp.drawguidance.data.model.LayerBlend.SCREEN -> R.string.v56_blend_screen
+        com.karapp.drawguidance.data.model.LayerBlend.OVERLAY -> R.string.v56_blend_overlay
+        com.karapp.drawguidance.data.model.LayerBlend.DARKEN -> R.string.v56_blend_darken
+        com.karapp.drawguidance.data.model.LayerBlend.LIGHTEN -> R.string.v56_blend_lighten
+        com.karapp.drawguidance.data.model.LayerBlend.COLOR_DODGE -> R.string.v56_blend_color_dodge
+        com.karapp.drawguidance.data.model.LayerBlend.COLOR_BURN -> R.string.v56_blend_color_burn
+        com.karapp.drawguidance.data.model.LayerBlend.HARD_LIGHT -> R.string.v56_blend_hard_light
+        com.karapp.drawguidance.data.model.LayerBlend.SOFT_LIGHT -> R.string.v56_blend_soft_light
+        com.karapp.drawguidance.data.model.LayerBlend.DIFFERENCE -> R.string.v56_blend_difference
+        com.karapp.drawguidance.data.model.LayerBlend.EXCLUSION -> R.string.v56_blend_exclusion
+        com.karapp.drawguidance.data.model.LayerBlend.HUE -> R.string.v56_blend_hue
+        com.karapp.drawguidance.data.model.LayerBlend.SATURATION -> R.string.v56_blend_saturation
+        com.karapp.drawguidance.data.model.LayerBlend.COLOR -> R.string.v56_blend_color
+        com.karapp.drawguidance.data.model.LayerBlend.LUMINOSITY -> R.string.v56_blend_luminosity
+        com.karapp.drawguidance.data.model.LayerBlend.ADD -> R.string.v56_blend_add
+    },
+)
+
+/** v56 etkin katman satırının altında: opaklık kaydırıcısı, karışım modu, alfa kilidi, alttakine kırp. */
+@Composable
+private fun LayerLookRow(layer: Layer, index: Int, look: LayerLookActions) {
+    val colors = NeuTheme.colors
+    Column(
+        Modifier.fillMaxWidth().padding(start = 10.dp, end = 10.dp, bottom = 10.dp).testTag("layer_look"),
+        verticalArrangement = Arrangement.spacedBy(6.dp),
+    ) {
+        if (look.blend) {
+            // Kaydırırken yerel değer; bırakınca tek geri alma adımıyla (coalesce) kaydedilir
+            var opacity by remember(layer.id, layer.opacity) { mutableStateOf(layer.opacity) }
+            Text(
+                stringResource(R.string.v56_layer_opacity, (opacity * 100).roundToInt()),
+                style = MaterialTheme.typography.bodySmall, color = colors.contentMuted,
+            )
+            NeuSlider(
+                value = opacity, onValueChange = { opacity = it; look.onOpacity(layer.id, it) }, valueRange = 0f..1f,
+                modifier = Modifier.fillMaxWidth().testTag("layer_opacity"),
+            )
+            var menu by remember { mutableStateOf(false) }
+            Box {
+                NeuChip(
+                    stringResource(R.string.v56_layer_blend) + ": " + layerBlendLabel(layer.blend), selected = layer.blend != com.karapp.drawguidance.data.model.LayerBlend.NORMAL,
+                    onClick = { menu = true }, modifier = Modifier.testTag("layer_blend"),
+                )
+                DropdownMenu(expanded = menu, onDismissRequest = { menu = false }, modifier = Modifier.background(colors.background)) {
+                    com.karapp.drawguidance.data.model.LayerBlend.entries.forEach { b ->
+                        DropdownMenuItem(
+                            text = { Text(layerBlendLabel(b), color = if (b == layer.blend) colors.accent else colors.content) },
+                            onClick = { menu = false; look.onBlend(layer.id, b) },
+                            modifier = Modifier.testTag("layer_blend_${b.name.lowercase()}"),
+                        )
+                    }
+                }
+            }
+        }
+        if (look.lockClip) {
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
+                NeuChip(
+                    stringResource(R.string.v56_layer_alpha_lock), selected = layer.alphaLock, onClick = { look.onAlphaLock(layer.id) },
+                    modifier = Modifier.testTag("layer_alpha_lock"),
+                )
+                if (index > 0) {
+                    NeuChip(
+                        stringResource(R.string.v56_layer_clip), selected = layer.clipToBelow, onClick = { look.onClip(layer.id) },
+                        modifier = Modifier.testTag("layer_clip"),
+                    )
+                }
+            }
+            if (layer.clipToBelow && index > 0) {
+                Text(stringResource(R.string.v56_layer_clip_hint), style = MaterialTheme.typography.bodySmall, color = colors.contentMuted)
+            }
+        }
+    }
 }

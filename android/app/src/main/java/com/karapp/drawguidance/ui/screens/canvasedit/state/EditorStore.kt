@@ -5,6 +5,7 @@ import com.karapp.drawguidance.data.history.EditHistory
 import com.karapp.drawguidance.data.model.CanvasUi
 import com.karapp.drawguidance.data.model.Layer
 import com.karapp.drawguidance.data.model.Layers
+import com.karapp.drawguidance.data.model.isObject
 import com.karapp.drawguidance.data.model.Stroke
 import com.karapp.drawguidance.data.repository.CanvasSaveQueue
 import com.karapp.drawguidance.ui.screens.canvasedit.EditEvent
@@ -227,10 +228,27 @@ class EditorStore(
      */
     fun commit(updated: List<Stroke>, coalesce: String? = null) {
         val current = canvas.value ?: return
-        val placed = placeNewInActiveLayer(current.strokes, updated, current.layers)
+        val placed = markAlphaLocked(current.strokes, placeNewInActiveLayer(current.strokes, updated, current.layers), current.layers)
         val pages = current.pages.toMutableList()
         if (current.currentPage in pages.indices) pages[current.currentPage] = placed else pages.add(placed)
         commit(pages, current.width, current.height, current.backgroundColorHex, coalesce)
+    }
+
+    /**
+     * v56 alfa kilitli katmana yeni eklenen fırça izleri işaretlenir ([com.karapp.drawguidance.data.model.BrushParams.alphaLocked]):
+     * yalnız katmanın önceden boyalı yerlerinde görünür. Nesneler ve silgiler etkilenmez.
+     */
+    private fun markAlphaLocked(before: List<Stroke>, after: List<Stroke>, layers: List<Layer>): List<Stroke> {
+        if (layers.none { it.alphaLock }) return after
+        val locked = layers.filter { it.alphaLock }.map { it.id }.toSet()
+        val known = HashSet<String>(before.size * 2)
+        before.forEach { known += it.id }
+        return after.map { s ->
+            if (s.id in known || s.brushType.isObject || s.brushType == com.karapp.drawguidance.data.model.BrushType.ERASER ||
+                s.params?.alphaLocked == true || Layers.of(s, layers) !in locked
+            ) s
+            else s.copy(params = (s.params ?: com.karapp.drawguidance.data.model.BrushParams()).copy(alphaLocked = true))
+        }
     }
 
     private fun placeNewInActiveLayer(before: List<Stroke>, after: List<Stroke>, layers: List<Layer>): List<Stroke> {

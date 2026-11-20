@@ -1474,6 +1474,7 @@ fun CanvasEditScreen(
                     correction = (shapeSuggestion?.preview?.takeIf { it.isNotEmpty() } ?: lineSuggestion?.preview?.takeIf { it.isNotEmpty() })
                         ?.map { s -> s.map { Offset(it.x, it.y) } },
                 ),
+                activeLayerId = activeLayer,
             )
             // v52 kompozisyon kılavuzu ve kontrol önizlemesi
             if (helpersShown) {
@@ -2103,6 +2104,16 @@ fun CanvasEditScreen(
                                 onMove = viewModel::moveLayer,
                                 onMoveSelection = viewModel::moveSelectionToLayer,
                                 onDelete = viewModel::removeLayer,
+                                // v56 katman opaklığı/karışım modu ve alfa kilidi/kırpma (mod kuralı: V56Flags)
+                                look = com.karapp.drawguidance.data.model.V56Flags.let { f ->
+                                    val blend = f.enabled(com.karapp.drawguidance.data.model.V56Flags.Feature.LAYER_BLEND, kind)
+                                    val lockClip = f.enabled(com.karapp.drawguidance.data.model.V56Flags.Feature.ALPHA_LOCK_CLIP, kind)
+                                    if (!blend && !lockClip) null
+                                    else com.karapp.drawguidance.ui.screens.canvasedit.components.LayerLookActions(
+                                        blend, lockClip, viewModel::setLayerOpacity, viewModel::setLayerBlend,
+                                        viewModel::toggleLayerAlphaLock, viewModel::toggleLayerClip,
+                                    )
+                                },
                             )
                         }
                         PanelTab.ELEMENTS -> {

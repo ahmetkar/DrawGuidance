@@ -201,8 +201,23 @@ object StrokeRenderer {
      * ardışık fırça izleri ayrı bir ara katmanda çizilir ve o katmanın sonraki silgileri de o ara katmana uygulanır.
      * Silgi yoksa ara katman açılmaz (çoğu çizim).
      */
-    fun DrawScope.drawStrokeList(strokes: List<Stroke>, checkpoint: () -> Unit = {}) {
-        if (strokes.none { it.brushType == BrushType.ERASER || it.brushType.isRaster }) {
+    fun DrawScope.drawStrokeList(
+        strokes: List<Stroke>,
+        checkpoint: () -> Unit = {},
+        /** v56 katmanlar: opaklık, karışım modu ya da kırpma varsa katman katman birleştirilir ([LayerCompositor]). */
+        layers: List<com.karapp.drawguidance.data.model.Layer> = emptyList(),
+    ) {
+        if (strokes.isNotEmpty() && LayerCompositor.needed(layers)) {
+            with(LayerCompositor) { drawLayered(strokes, layers) { drawPlainList(it, checkpoint) } }
+            return
+        }
+        drawPlainList(strokes, checkpoint)
+    }
+
+    private fun isLocked(s: Stroke): Boolean = s.params?.alphaLocked == true
+
+    private fun DrawScope.drawPlainList(strokes: List<Stroke>, checkpoint: () -> Unit) {
+        if (strokes.none { it.brushType == BrushType.ERASER || it.brushType.isRaster || isLocked(it) }) {
             strokes.forEach { checkpoint(); drawStroke(it) }
             return
         }
@@ -240,7 +255,18 @@ object StrokeRenderer {
      */
     private fun DrawScope.drawInRun(strokes: List<Stroke>, m: Int, layer: String) {
         val s = strokes[m]
+        if (isLocked(s) && s.brushType != BrushType.ERASER) {
+            // v56 alfa kilidi: yalnız katmanda önceden boyanmış yerlerde (SrcAtop)
+            drawIntoCanvas { it.saveLayer(Rect(-1e6f, -1e6f, 1e6f, 1e6f), Paint().apply { blendMode = androidx.compose.ui.graphics.BlendMode.SrcAtop }) }
+            if (s.brushType.isRaster) drawRaster(strokes, m, layer, s) else drawStroke(s)
+            drawIntoCanvas { it.restore() }
+            return
+        }
         if (!s.brushType.isRaster) { drawStroke(s); return }
+        drawRaster(strokes, m, layer, s)
+    }
+
+    private fun DrawScope.drawRaster(strokes: List<Stroke>, m: Int, layer: String, s: Stroke) {
         val context = ArrayList<Stroke>(m)
         for (q in 0 until m) { val o = strokes[q]; if ((o.layerId ?: "") == layer && !o.hidden) context += o }
         drawIntoCanvas { c ->
@@ -268,6 +294,8 @@ object StrokeRenderer {
         canvasHeight: Float,
         /** v23 arka plan resmi ve deseni (rengin üstünde; vektör olarak). */
         decor: com.karapp.drawguidance.data.model.BackgroundSpec? = null,
+        /** v56 katmanlar (opaklık, karışım modu, kırpma). */
+        layers: List<com.karapp.drawguidance.data.model.Layer> = emptyList(),
         underlay: (DrawScope.() -> Unit)? = null,
     ) {
         val bounds = Rect(0f, 0f, canvasWidth, canvasHeight)
@@ -279,7 +307,7 @@ object StrokeRenderer {
         // v52 piksel fırçaları bu çizimin kağıdını okur
         val previousPaper = RasterStrokes.paperOverride.get()
         RasterStrokes.paperOverride.set(background.toArgb())
-        try { withStrokeLayer(bounds) { drawStrokeList(strokes) } } finally { RasterStrokes.paperOverride.set(previousPaper) }
+        try { withStrokeLayer(bounds) { drawStrokeList(strokes, layers = layers) } } finally { RasterStrokes.paperOverride.set(previousPaper) }
     }
 
     /** [bounds] o anki (dönüştürülmüş) koordinat sistemindeki katman sınırıdır. */
@@ -362,6 +390,7 @@ object StrokeRenderer {
         clip: Rect,
         /** Her çizimden önce çağrılır; iptal için istisna fırlatabilir (ör. yeni bir görünüm istendiğinde). */
         checkpoint: () -> Unit = {},
+        layers: List<com.karapp.drawguidance.data.model.Layer> = emptyList(),
     ): ImageBitmap {
         val bitmap = ImageBitmap(max(1, widthPx), max(1, heightPx))
         // Yalnızca görünen bölgeye değen çizimler çizilir (yakınlaştırınca ekran dışındakiler atlanır)
@@ -370,7 +399,7 @@ object StrokeRenderer {
             clipRect(clip.left, clip.top, clip.right, clip.bottom) {
                 translate(offset.x, offset.y) {
                     scale(scale, scale, pivot = Offset.Zero) {
-                        drawStrokeList(shown, checkpoint)
+                        drawStrokeList(shown, checkpoint, layers)
                     }
                 }
             }
@@ -379,7 +408,10 @@ object StrokeRenderer {
     }
 
     /** Mevcut görünüm önbelleğine yalnızca yeni eklenen çizimleri çizer (artımlı güncelleme). */
-    fun drawIntoViewportCache(bitmap: ImageBitmap, strokes: List<Stroke>, scale: Float, offset: Offset, clip: Rect) {
+    fun drawIntoViewportCache(
+        bitmap: ImageBitmap, strokes: List<Stroke>, scale: Float, offset: Offset, clip: Rect,
+        layers: List<com.karapp.drawguidance.data.model.Layer> = emptyList(),
+    ) {
         if (strokes.isEmpty()) return
         val shown = visibleIn(strokes, visibleCanvasRect(bitmap.width, bitmap.height, scale, offset, clip))
         if (shown.isEmpty()) return
@@ -387,7 +419,7 @@ object StrokeRenderer {
             clipRect(clip.left, clip.top, clip.right, clip.bottom) {
                 translate(offset.x, offset.y) {
                     scale(scale, scale, pivot = Offset.Zero) {
-                        drawStrokeList(shown)
+                        drawStrokeList(shown, layers = layers)
                     }
                 }
             }

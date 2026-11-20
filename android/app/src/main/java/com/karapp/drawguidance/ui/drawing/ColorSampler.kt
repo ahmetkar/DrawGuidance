@@ -26,7 +26,7 @@ object ColorSampler {
             translate(1f - x, 1f - y) {
                 drawCanvasContent(
                     hexToColor(canvas.paperOf(page)), strokes, canvas.width.toFloat(), canvas.height.toFloat(),
-                    decor = canvas.backgroundOf(page),
+                    decor = canvas.backgroundOf(page), layers = canvas.layers,
                 ) {}
             }
         }

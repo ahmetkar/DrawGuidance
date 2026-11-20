@@ -11,4 +11,26 @@
     <string name="v56_live_elsewhere">방송자가 다른 화면에 있습니다</string>
     <string name="v56_element_lasso_fill">올가미 채우기</string>
     <string name="v56_share_flattened">%1$s은(는) 이전 버전을 사용합니다. 레이어 모드, 마스크, 그레인 같은 새 기능은 단순화되어 전송되었습니다</string>
+    <string name="v56_layer_opacity">불투명도 %1$d%%</string>
+    <string name="v56_layer_blend">혼합 모드</string>
+    <string name="v56_layer_alpha_lock">알파 잠금</string>
+    <string name="v56_layer_clip">아래 레이어에 클리핑</string>
+    <string name="v56_layer_clip_hint">아래 레이어가 칠해진 곳에만 표시</string>
+    <string name="v56_blend_normal">표준</string>
+    <string name="v56_blend_multiply">곱하기</string>
+    <string name="v56_blend_screen">스크린</string>
+    <string name="v56_blend_overlay">오버레이</string>
+    <string name="v56_blend_darken">어둡게</string>
+    <string name="v56_blend_lighten">밝게</string>
+    <string name="v56_blend_color_dodge">색상 닷지</string>
+    <string name="v56_blend_color_burn">색상 번</string>
+    <string name="v56_blend_hard_light">하드 라이트</string>
+    <string name="v56_blend_soft_light">소프트 라이트</string>
+    <string name="v56_blend_difference">차이</string>
+    <string name="v56_blend_exclusion">제외</string>
+    <string name="v56_blend_hue">색조</string>
+    <string name="v56_blend_saturation">채도</string>
+    <string name="v56_blend_color">색상</string>
+    <string name="v56_blend_luminosity">광도</string>
+    <string name="v56_blend_add">더하기</string>
 </resources>

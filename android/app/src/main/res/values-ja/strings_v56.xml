@@ -11,4 +11,26 @@
     <string name="v56_live_elsewhere">配信者は別の画面にいます</string>
     <string name="v56_element_lasso_fill">なげなわ塗り</string>
     <string name="v56_share_flattened">%1$s は古いバージョンです。レイヤーモード、マスク、グレインなどの新機能は簡略化して送信されました</string>
+    <string name="v56_layer_opacity">不透明度 %1$d%%</string>
+    <string name="v56_layer_blend">描画モード</string>
+    <string name="v56_layer_alpha_lock">透明部分をロック</string>
+    <string name="v56_layer_clip">下のレイヤーでクリップ</string>
+    <string name="v56_layer_clip_hint">下のレイヤーの描画部分にのみ表示</string>
+    <string name="v56_blend_normal">通常</string>
+    <string name="v56_blend_multiply">乗算</string>
+    <string name="v56_blend_screen">スクリーン</string>
+    <string name="v56_blend_overlay">オーバーレイ</string>
+    <string name="v56_blend_darken">比較(暗)</string>
+    <string name="v56_blend_lighten">比較(明)</string>
+    <string name="v56_blend_color_dodge">覆い焼きカラー</string>
+    <string name="v56_blend_color_burn">焼き込みカラー</string>
+    <string name="v56_blend_hard_light">ハードライト</string>
+    <string name="v56_blend_soft_light">ソフトライト</string>
+    <string name="v56_blend_difference">差の絶対値</string>
+    <string name="v56_blend_exclusion">除外</string>
+    <string name="v56_blend_hue">色相</string>
+    <string name="v56_blend_saturation">彩度</string>
+    <string name="v56_blend_color">カラー</string>
+    <string name="v56_blend_luminosity">輝度</string>
+    <string name="v56_blend_add">加算</string>
 </resources>

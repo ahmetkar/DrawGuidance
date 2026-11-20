@@ -11,4 +11,26 @@
     <string name="v56_live_elsewhere">主播在其他界面</string>
     <string name="v56_element_lasso_fill">套索填充</string>
     <string name="v56_share_flattened">%1$s 使用的是旧版本：图层模式、蒙版和颗粒等新功能已简化后发送</string>
+    <string name="v56_layer_opacity">不透明度 %1$d%%</string>
+    <string name="v56_layer_blend">混合模式</string>
+    <string name="v56_layer_alpha_lock">锁定透明度</string>
+    <string name="v56_layer_clip">剪贴到下方图层</string>
+    <string name="v56_layer_clip_hint">仅在下方图层已绘制处显示</string>
+    <string name="v56_blend_normal">正常</string>
+    <string name="v56_blend_multiply">正片叠底</string>
+    <string name="v56_blend_screen">滤色</string>
+    <string name="v56_blend_overlay">叠加</string>
+    <string name="v56_blend_darken">变暗</string>
+    <string name="v56_blend_lighten">变亮</string>
+    <string name="v56_blend_color_dodge">颜色减淡</string>
+    <string name="v56_blend_color_burn">颜色加深</string>
+    <string name="v56_blend_hard_light">强光</string>
+    <string name="v56_blend_soft_light">柔光</string>
+    <string name="v56_blend_difference">差值</string>
+    <string name="v56_blend_exclusion">排除</string>
+    <string name="v56_blend_hue">色相</string>
+    <string name="v56_blend_saturation">饱和度</string>
+    <string name="v56_blend_color">颜色</string>
+    <string name="v56_blend_luminosity">明度</string>
+    <string name="v56_blend_add">相加</string>
 </resources>

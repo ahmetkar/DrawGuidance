@@ -108,7 +108,7 @@ class ImageExporter(
             scale(factor, factor, pivot = Offset.Zero) {
                 drawCanvasContent(
                     background ?: hexToColor(canvas.paperOf(page)), strokes, canvas.width.toFloat(), canvas.height.toFloat(),
-                    decor = canvas.backgroundOf(page).takeIf { decor },
+                    decor = canvas.backgroundOf(page).takeIf { decor }, layers = canvas.layers,
                 ) {
                     if (includeGuides && !canvas.guide.isEmpty) {
                         with(com.karapp.drawguidance.ui.drawing.GuideRenderer) {

@@ -11,4 +11,26 @@
     <string name="v56_live_elsewhere">Yayıncı başka bir ekranda</string>
     <string name="v56_element_lasso_fill">Kement dolgu</string>
     <string name="v56_share_flattened">%1$s eski sürüm kullanıyor: katman modları, maske ve gren gibi yeni özellikler sadeleştirilerek gönderildi</string>
+    <string name="v56_layer_opacity">Opaklık %1$d%%</string>
+    <string name="v56_layer_blend">Karışım modu</string>
+    <string name="v56_layer_alpha_lock">Alfa kilidi</string>
+    <string name="v56_layer_clip">Alttakine kırp</string>
+    <string name="v56_layer_clip_hint">Yalnız alttaki katmanın boyalı yerlerinde görünür</string>
+    <string name="v56_blend_normal">Normal</string>
+    <string name="v56_blend_multiply">Çarp</string>
+    <string name="v56_blend_screen">Ekran</string>
+    <string name="v56_blend_overlay">Kaplama</string>
+    <string name="v56_blend_darken">Koyulaştır</string>
+    <string name="v56_blend_lighten">Açıklaştır</string>
+    <string name="v56_blend_color_dodge">Renk soldurma</string>
+    <string name="v56_blend_color_burn">Renk yakma</string>
+    <string name="v56_blend_hard_light">Sert ışık</string>
+    <string name="v56_blend_soft_light">Yumuşak ışık</string>
+    <string name="v56_blend_difference">Fark</string>
+    <string name="v56_blend_exclusion">Dışlama</string>
+    <string name="v56_blend_hue">Ton</string>
+    <string name="v56_blend_saturation">Doygunluk</string>
+    <string name="v56_blend_color">Renk</string>
+    <string name="v56_blend_luminosity">Parlaklık</string>
+    <string name="v56_blend_add">Ekle</string>
 </resources>

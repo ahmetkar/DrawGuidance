@@ -2369,6 +2369,10 @@ class CanvasEditViewModel(
     fun renameLayer(id: String, name: String) = layerOps.rename(id, name)
     fun toggleLayerVisible(id: String) = layerOps.toggleVisible(id)
     fun toggleLayerLocked(id: String) = layerOps.toggleLocked(id)
+    fun setLayerOpacity(id: String, opacity: Float) = layerOps.setOpacity(id, opacity)
+    fun setLayerBlend(id: String, blend: com.karapp.drawguidance.data.model.LayerBlend) = layerOps.setBlend(id, blend)
+    fun toggleLayerAlphaLock(id: String) = layerOps.toggleAlphaLock(id)
+    fun toggleLayerClip(id: String) = layerOps.toggleClip(id)
     fun moveLayer(id: String, direction: Int) = layerOps.move(id, direction)
     fun moveSelectionToLayer(id: String) = layerOps.moveSelectionTo(id)
 

@@ -11,4 +11,26 @@
     <string name="v56_live_elsewhere">Ведущий на другом экране</string>
     <string name="v56_element_lasso_fill">Заливка лассо</string>
     <string name="v56_share_flattened">У %1$s старая версия: новые функции (режимы слоёв, маски, зерно) отправлены в упрощённом виде</string>
+    <string name="v56_layer_opacity">Непрозрачность %1$d%%</string>
+    <string name="v56_layer_blend">Режим наложения</string>
+    <string name="v56_layer_alpha_lock">Блокировка прозрачности</string>
+    <string name="v56_layer_clip">Обтравка по нижнему</string>
+    <string name="v56_layer_clip_hint">Видно только там, где закрашен нижний слой</string>
+    <string name="v56_blend_normal">Обычный</string>
+    <string name="v56_blend_multiply">Умножение</string>
+    <string name="v56_blend_screen">Экран</string>
+    <string name="v56_blend_overlay">Перекрытие</string>
+    <string name="v56_blend_darken">Затемнение</string>
+    <string name="v56_blend_lighten">Замена светлым</string>
+    <string name="v56_blend_color_dodge">Осветление основы</string>
+    <string name="v56_blend_color_burn">Затемнение основы</string>
+    <string name="v56_blend_hard_light">Жёсткий свет</string>
+    <string name="v56_blend_soft_light">Мягкий свет</string>
+    <string name="v56_blend_difference">Разница</string>
+    <string name="v56_blend_exclusion">Исключение</string>
+    <string name="v56_blend_hue">Цветовой тон</string>
+    <string name="v56_blend_saturation">Насыщенность</string>
+    <string name="v56_blend_color">Цветность</string>
+    <string name="v56_blend_luminosity">Яркость</string>
+    <string name="v56_blend_add">Добавление</string>
 </resources>

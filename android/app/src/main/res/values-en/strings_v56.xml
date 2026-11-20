@@ -9,4 +9,6 @@
     <string name="v56_live_blocked">Too many declined requests: try again in a few minutes</string>
     <string name="v56_live_always_asks">Live broadcasts are always asked first; the pairing code appears only after you accept.</string>
     <string name="v56_live_elsewhere">The broadcaster is on another screen</string>
+    <string name="v56_element_lasso_fill">Lasso fill</string>
+    <string name="v56_share_flattened">%1$s uses an older version: new features such as layer modes, masks and grain were simplified</string>
 </resources>

@@ -205,7 +205,7 @@ fun BrushType.style(): BrushStyle = when (this) {
     // Gerçek silme: altındaki çizimleri şeffaflaştırır (kağıt rengi görünür)
     BrushType.ERASER -> BrushStyle(widthFactor = 2f, alphaFactor = 1f, blendMode = BlendMode.Clear)
     // Resim fırça değildir; çizgi kalınlığı yoktur
-    BrushType.IMAGE, BrushType.TEXT, BrushType.SHAPE, BrushType.DIAGRAM, BrushType.FORMULA -> BrushStyle(widthFactor = 0f, alphaFactor = 1f, cap = StrokeCap.Butt, join = StrokeJoin.Miter, smooth = false, engine = BrushEngine.IMAGE)
+    BrushType.IMAGE, BrushType.TEXT, BrushType.SHAPE, BrushType.DIAGRAM, BrushType.FORMULA, BrushType.LASSO_FILL -> BrushStyle(widthFactor = 0f, alphaFactor = 1f, cap = StrokeCap.Butt, join = StrokeJoin.Miter, smooth = false, engine = BrushEngine.IMAGE)
 }
 
 private fun surface(kind: SurfaceKind) =
@@ -267,6 +267,7 @@ fun BrushType.defaultSize(): Float = when (this) {
     BrushType.FX_MIXER -> 32f
     BrushType.ERASER -> 30f
     BrushType.IMAGE -> 1f
+    BrushType.LASSO_FILL -> 1f
     BrushType.SHAPE, BrushType.DIAGRAM -> 4f
     BrushType.TEXT -> 48f
     BrushType.FORMULA -> 56f

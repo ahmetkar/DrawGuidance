@@ -89,6 +89,8 @@ enum class BrushType {
     IMAGE,
     /** Formül: noktalar kutunun 4 köşesidir (yazı gibi); kaynak ve düzenlenebilir alanlar [Stroke.formula]. */
     FORMULA,
+    /** v56 kement dolgu: noktalar kapalı yoldur; yalnız iç dolgu (renk, opaklık, isteğe bağlı gren [BrushParams.grain]). */
+    LASSO_FILL,
 }
 
 /**
@@ -557,6 +559,10 @@ data class Stroke(
      * saklanır ve çizimde uygulanır (kaldırılınca özgün görünüme döner).
      */
     val harmony: HarmonySpec? = null,
+    /** v56 seçim maskesi: eleman yalnız bu çokgenin içinde (ya da [ClipMask.inverted] ise dışında) görünür. */
+    val mask: ClipMask? = null,
+    /** v56 resim bozma/çarpıtma/yansıma dalgası ([BrushType.IMAGE]); asıl resim değişmez. */
+    val warp: ImageWarp? = null,
 )
 
 /**
@@ -652,6 +658,10 @@ data class BrushParams(
     @EncodeDefault(EncodeDefault.Mode.NEVER) val pen: PenDynamics? = null,
     /** v51 yardımcı fırça ayarları (kip, klon kaynağı). */
     @EncodeDefault(EncodeDefault.Mode.NEVER) val fx: FxParams? = null,
+    /** v56 gren (doku ile çarpılan damgalar); null: gren yok. */
+    @EncodeDefault(EncodeDefault.Mode.NEVER) val grain: GrainSpec? = null,
+    /** v56 resimden fırça: damga resminin varlık kimliği (canvas_assets); null: fırçanın kendi ucu. */
+    @EncodeDefault(EncodeDefault.Mode.NEVER) val stampAssetId: String? = null,
 )
 
 /** v51 fırça ucu şekilleri. */
@@ -806,7 +816,18 @@ data class Layer(
     val name: String,
     val visible: Boolean = true,
     val locked: Boolean = false,
+    /** v56 katman opaklığı (0..1). */
+    val opacity: Float = 1f,
+    /** v56 karışım modu. */
+    val blend: LayerBlend = LayerBlend.NORMAL,
+    /** v56 alfa kilidi: yalnız katmanın dolu piksellerine boyanır. */
+    val alphaLock: Boolean = false,
+    /** v56 alttaki katmana kırp: yalnız alttaki katmanın dolu olduğu yerde görünür. */
+    val clipToBelow: Boolean = false,
 ) {
+    /** Ekran dışı tampon gerekir mi (opaklık, mod, alfa kilidi ya da kırpma). */
+    val composited: Boolean get() = opacity < 1f || blend != LayerBlend.NORMAL || alphaLock || clipToBelow
+
     companion object {
         const val BASE = "base"
         val Default = Layer(BASE, "Katman 1")

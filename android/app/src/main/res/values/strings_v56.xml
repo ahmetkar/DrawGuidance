@@ -9,4 +9,6 @@
     <string name="v56_live_blocked">Çok sayıda reddedilen istek: birkaç dakika sonra yeniden dene</string>
     <string name="v56_live_always_asks">Canlı yayın her zaman önce sorulur; eşleşme şifresi ancak kabul edince gösterilir.</string>
     <string name="v56_live_elsewhere">Yayıncı başka bir ekranda</string>
+    <string name="v56_element_lasso_fill">Kement dolgu</string>
+    <string name="v56_share_flattened">%1$s eski sürüm kullanıyor: katman modları, maske ve gren gibi yeni özellikler sadeleştirilerek gönderildi</string>
 </resources>

@@ -9,4 +9,6 @@
     <string name="v56_live_blocked">Слишком много отклонённых запросов: повторите через несколько минут</string>
     <string name="v56_live_always_asks">Трансляция всегда требует подтверждения; код сопряжения показывается только после согласия.</string>
     <string name="v56_live_elsewhere">Ведущий на другом экране</string>
+    <string name="v56_element_lasso_fill">Заливка лассо</string>
+    <string name="v56_share_flattened">У %1$s старая версия: новые функции (режимы слоёв, маски, зерно) отправлены в упрощённом виде</string>
 </resources>

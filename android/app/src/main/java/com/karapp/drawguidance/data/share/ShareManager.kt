@@ -63,6 +63,8 @@ sealed interface ShareEvent {
     /** Yayını başlatan taraf: yayın yapılan tuval düzenleyicide açılsın. */
     data class OpenBroadcast(val canvasId: String) : ShareEvent
     data class Disconnected(val name: String) : ShareEvent
+    /** v56 karşı cihazın uygulaması eski: katman modları, maske ve gren gibi yeni özellikler düzleştirilerek gönderildi. */
+    data class Flattened(val to: String) : ShareEvent
 }
 
 /**
@@ -419,7 +421,7 @@ class ShareManager(
         val key = key(route, endpoint)
         if (_request.value?.key == key) _request.value = null
         setState(key, PeerState.CONNECTED, name, platform)
-        send(key, ShareWire.encode(ShareWire.HELLO, ShareWire.text(ShareHello(name = settings.deviceName.value, platform = "android", app = BuildConfig.VERSION_NAME))))
+        send(key, ShareWire.encode(ShareWire.HELLO, ShareWire.text(ShareHello(name = settings.deviceName.value, platform = "android", app = BuildConfig.VERSION_NAME, codec = com.karapp.drawguidance.data.local.ContentCodec.LATEST_VERSION))))
         afterConnect.remove(key)?.let { list -> synchronized(list) { list.toList() }.forEach { runCatching { it() } } }
     }
 
@@ -471,6 +473,8 @@ class ShareManager(
         when (m.type) {
             ShareWire.HELLO -> {
                 val h = ShareWire.header<ShareHello>(m)
+                // v56 karşı tarafın içerik sürümü (eski uygulamalar bildirmez: V10)
+                peerCodec[key] = if (h.codec > 0) h.codec else 10
                 setState(key, PeerState.CONNECTED, h.name, h.platform)
             }
             ShareWire.OFFER -> {
@@ -555,11 +559,16 @@ class ShareManager(
         if (accept) _status.value = ShareTransferStatus(peerName(key), o.title, sending = false)
     }
 
+    /** v56 bağlı cihazların içerik sürümleri (HELLO'dan). */
+    private val peerCodec = java.util.concurrent.ConcurrentHashMap<String, Int>()
+    private fun codecOf(key: String): Int = peerCodec[key] ?: 10
+
     private suspend fun deliver(id: String, out: Outgoing) {
         val from = settings.deviceName.value
         when (out.type) {
             ShareWire.TYPE_CANVAS -> {
-                val pkg = packages.canvasPackage(out.canvasId ?: return, ShareWire.TYPE_CANVAS, id, from) ?: return fail("Tuval bulunamadı")
+                val pkg = packages.canvasPackage(out.canvasId ?: return, ShareWire.TYPE_CANVAS, id, from, codecOf(out.key)) ?: return fail("Tuval bulunamadı")
+                if (pkg.flattened) _events.tryEmit(ShareEvent.Flattened(peerName(out.key)))
                 send(out.key, pkg.encode(ShareWire.PACKAGE))
                 _status.value = ShareTransferStatus(peerName(out.key), out.title, sending = true)
             }
@@ -578,7 +587,8 @@ class ShareManager(
                 liveSeqOut = 0
                 liveOfferId = id
                 // İlk paket kayıtlı tuvalin tamamı; gönderilen resimler yayın boyunca yeniden gönderilmez
-                val pkg = packages.canvasPackage(canvasId, ShareWire.TYPE_LIVE, id, from) ?: return fail("Tuval bulunamadı")
+                val pkg = packages.canvasPackage(canvasId, ShareWire.TYPE_LIVE, id, from, codecOf(out.key)) ?: return fail("Tuval bulunamadı")
+                if (pkg.flattened) _events.tryEmit(ShareEvent.Flattened(peerName(out.key)))
                 liveSent += pkg.header.assets.map { it.id }
                 send(out.key, pkg.encode(ShareWire.LIVE_START))
                 // v56 gönderen zaten bu tuvalin düzenleyicisindeyse düzenleyici yeniden açılmaz (yeniden açılış eski
@@ -601,7 +611,7 @@ class ShareManager(
                 val out = _liveOut.value ?: break
                 if (frame.localId != out.canvasId) continue
                 runCatching {
-                    val pkg = packages.livePackage(frame, id, ++liveSeqOut, liveSent, settings.deviceName.value)
+                    val pkg = packages.livePackage(frame, id, ++liveSeqOut, liveSent, settings.deviceName.value, codecOf(out.peerKey))
                     send(out.peerKey, pkg.encode(ShareWire.LIVE_UPDATE))
                 }.onFailure { AppLog.w("Share", "Yayın karesi gönderilemedi", it) }
                 delay(settings.liveIntervalMs)

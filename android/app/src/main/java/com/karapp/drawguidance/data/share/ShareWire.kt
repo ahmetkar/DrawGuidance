@@ -93,7 +93,14 @@ object ShareWire {
 
 /** Bağlantı kurulunca karşılıklı tanışma. [platform]: "android" | "ios". */
 @Serializable
-data class ShareHello(val v: Int = ShareWire.PROTOCOL, val name: String, val platform: String, val app: String = "")
+data class ShareHello(
+    val v: Int = ShareWire.PROTOCOL,
+    val name: String,
+    val platform: String,
+    val app: String = "",
+    /** v56 bu uygulamanın okuyabildiği en yeni içerik sürümü (eski sürümler göndermez: 10 sayılır). */
+    val codec: Int = 0,
+)
 
 /** Gönderme teklifi: alıcı kabul ederse ([ShareWire.ACCEPT]) paket gönderilir. */
 @Serializable

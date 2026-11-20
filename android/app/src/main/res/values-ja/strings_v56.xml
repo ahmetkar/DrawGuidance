@@ -9,4 +9,6 @@
     <string name="v56_live_blocked">拒否されたリクエストが多すぎます。数分後にもう一度お試しください</string>
     <string name="v56_live_always_asks">ライブ配信は必ず先に確認されます。ペアリングコードは承認後にのみ表示されます。</string>
     <string name="v56_live_elsewhere">配信者は別の画面にいます</string>
+    <string name="v56_element_lasso_fill">なげなわ塗り</string>
+    <string name="v56_share_flattened">%1$s は古いバージョンです。レイヤーモード、マスク、グレインなどの新機能は簡略化して送信されました</string>
 </resources>

@@ -2,6 +2,7 @@ package com.karapp.drawguidance.ui.components
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ShowChart
+import androidx.compose.material.icons.filled.FormatColorFill
 import androidx.compose.material.icons.filled.Air
 import androidx.compose.material.icons.filled.Cloud
 import androidx.compose.material.icons.filled.Details
@@ -159,6 +160,7 @@ object BrushIcons {
         BrushType.DOT_PEN -> Icons.Filled.MoreVert
         BrushType.BRUSH_3D -> Icons.Filled.Gradient
         BrushType.FORMULA -> Icons.Filled.Functions
+        BrushType.LASSO_FILL -> Icons.Filled.FormatColorFill
         BrushType.INK_TRAIL -> Icons.Filled.WaterDrop
         BrushType.DRIP_TRAIL -> Icons.Filled.Opacity
         BrushType.PAINT_TRAIL -> Icons.Filled.Draw
@@ -227,6 +229,7 @@ fun brushLabel(type: BrushType): String = stringResource(
         BrushType.DOT_PEN -> R.string.brush_dot_pen
         BrushType.BRUSH_3D -> R.string.brush_3d
         BrushType.FORMULA -> R.string.element_formula
+        BrushType.LASSO_FILL -> R.string.v56_element_lasso_fill
         BrushType.INK_TRAIL -> R.string.brush_ink_trail
         BrushType.DRIP_TRAIL -> R.string.brush_drip_trail
         BrushType.PAINT_TRAIL -> R.string.brush_paint_trail

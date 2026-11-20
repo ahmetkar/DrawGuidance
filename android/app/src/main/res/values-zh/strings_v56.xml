@@ -9,4 +9,6 @@
     <string name="v56_live_blocked">被拒绝的请求过多：请几分钟后再试</string>
     <string name="v56_live_always_asks">直播总会先征求你的同意；接受后才会显示配对码。</string>
     <string name="v56_live_elsewhere">主播在其他界面</string>
+    <string name="v56_element_lasso_fill">套索填充</string>
+    <string name="v56_share_flattened">%1$s 使用的是旧版本：图层模式、蒙版和颗粒等新功能已简化后发送</string>
 </resources>

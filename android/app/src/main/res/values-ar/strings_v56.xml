@@ -9,4 +9,6 @@
     <string name="v56_live_blocked">طلبات مرفوضة كثيرة: أعد المحاولة بعد بضع دقائق</string>
     <string name="v56_live_always_asks">يُسأل دائمًا عن البث المباشر أولًا؛ ولا يظهر رمز الاقتران إلا بعد القبول.</string>
     <string name="v56_live_elsewhere">المُذيع في شاشة أخرى</string>
+    <string name="v56_element_lasso_fill">تعبئة بالحبل</string>
+    <string name="v56_share_flattened">يستخدم %1$s إصدارًا أقدم: تم تبسيط الميزات الجديدة مثل أوضاع الطبقات والأقنعة والحبيبات</string>
 </resources>

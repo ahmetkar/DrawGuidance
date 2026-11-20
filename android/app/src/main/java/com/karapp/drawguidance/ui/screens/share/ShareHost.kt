@@ -87,6 +87,7 @@ fun ShareHost(onOpenCanvas: (String) -> Unit, onOpenLive: (String) -> Unit, shar
                 is ShareEvent.Rejected -> toast(context, context.getString(R.string.v51_share_rejected, e.by))
                 is ShareEvent.Failed -> toast(context, context.getString(R.string.v51_share_failed, e.message))
                 is ShareEvent.Disconnected -> toast(context, context.getString(R.string.v51_share_disconnected, e.name))
+                is ShareEvent.Flattened -> toast(context, context.getString(R.string.v56_share_flattened, e.to))
             }
         }
     }

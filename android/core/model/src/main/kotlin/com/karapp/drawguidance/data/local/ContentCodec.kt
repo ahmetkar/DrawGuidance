@@ -74,6 +74,18 @@ object ContentCodec {
      * varsa bu sürüm yazılır; eski uygulamalar bilmedikleri tür kodunu bozuk okumak yerine belgeyi açmaz.
      */
     private const val VERSION_V10: Byte = 10
+    /**
+     * v56: katman opaklığı/karışım modu/alfa kilidi/kırpma, belge ek bilgileri (simetri), seçim maskesi, resim
+     * dönüşümleri, gren ya da kement dolgu içeren belge. Katman kaydına ek alanlar, katman listesinden sonra belge ek
+     * bilgileri (JSON) ve her çizimde üçüncü ek bayrak baytı ([EXT3_MASK], [EXT3_WARP]) bulunur.
+     */
+    private const val VERSION_V11: Byte = 11
+    private const val EXT3_MASK = 1
+    private const val EXT3_WARP = 2
+    private const val LAYER_ALPHA_LOCK = 1
+    private const val LAYER_CLIP_BELOW = 2
+    /** En yeni içerik sürümü (paylaşımda karşı tarafa bildirilir). */
+    const val LATEST_VERSION: Int = 11
     /** v51 nokta başına gövde dönüşü ve gövde basıncı (her biri 1 bayt). */
     private const val EXT2_BARREL = 16
     private const val EXT_CLIP = 1
@@ -142,6 +154,8 @@ object ContentCodec {
         BrushType.ACRYLIC to 50, BrushType.OIL_PAINT to 51, BrushType.CLOUD_SMOKE to 52,
         BrushType.FX_BLUR to 53, BrushType.FX_SHARPEN to 54, BrushType.FX_DODGE to 55, BrushType.FX_BURN to 56,
         BrushType.FX_SPONGE to 57, BrushType.FX_CLONE to 58, BrushType.FX_HEAL to 59, BrushType.FX_MIXER to 60,
+        // v56
+        BrushType.LASSO_FILL to 61,
     )
     private val fontCodes = mapOf(
         TextFont.SANS to 0, TextFont.SERIF to 1, TextFont.MONO to 2, TextFont.CONDENSED to 3, TextFont.HANDWRITING to 4, TextFont.CASUAL to 5,
@@ -178,10 +192,16 @@ object ContentCodec {
         internal var layerKey: List<String> = emptyList()
         /** v23: belge v8 mi (her çizimde ikinci ek bayrak); değişince önbellek boşalır. */
         internal var v8: Boolean = false
+        /** v56: belge v11 mi (her çizimde üçüncü ek bayrak). */
+        internal var v11: Boolean = false
     }
 
-    /** Çözülen belge: sayfalar ve katmanlar. */
-    data class Document(val pages: List<List<Stroke>>, val layers: List<Layer>)
+    /** Çözülen belge: sayfalar, katmanlar ve (v56) belge ek bilgileri. */
+    data class Document(
+        val pages: List<List<Stroke>>,
+        val layers: List<Layer>,
+        val extras: com.karapp.drawguidance.data.model.DocExtras = com.karapp.drawguidance.data.model.DocExtras(),
+    )
 
     fun encode(strokes: List<Stroke>, cache: EncodeCache? = null): ByteArray = encodePages(listOf(strokes), cache)
 
@@ -190,29 +210,39 @@ object ContentCodec {
         pages: List<List<Stroke>>,
         cache: EncodeCache? = null,
         layers: List<Layer> = listOf(Layer.Default),
+        extras: com.karapp.drawguidance.data.model.DocExtras = com.karapp.drawguidance.data.model.DocExtras(),
     ): ByteArray {
         val docLayers = layers.ifEmpty { listOf(Layer.Default) }
         val layerIndex = HashMap<String, Int>(docLayers.size * 2)
         docLayers.forEachIndexed { i, l -> layerIndex[l.id] = i }
+        val v11 = !extras.isEmpty || docLayers.any { it.composited } || pages.any { page -> page.any { s -> needsV11(s) } }
         val raw = Writer()
         raw.varint(docLayers.size.toLong())
         docLayers.forEach { l ->
             raw.string(l.id); raw.string(l.name)
             raw.byte((if (l.visible) 1 else 0) or (if (l.locked) 2 else 0))
+            if (v11) {
+                raw.int32(l.opacity.toRawBits())
+                raw.byte(l.blend.code)
+                raw.byte((if (l.alphaLock) LAYER_ALPHA_LOCK else 0) or (if (l.clipToBelow) LAYER_CLIP_BELOW else 0))
+            }
         }
+        if (v11) raw.string(if (extras.isEmpty) "" else paramsJson.encodeToString(com.karapp.drawguidance.data.model.DocExtras.serializer(), extras))
         raw.varint(pages.size.coerceAtLeast(1).toLong())
         val key = docLayers.map { it.id }
-        val v8 = pages.any { page -> page.any { s -> needsV8(s) } }
-        if (cache != null && (cache.layerKey != key || cache.v8 != v8)) { cache.entries = java.util.IdentityHashMap(); cache.layerKey = key; cache.v8 = v8 }
+        val v8 = v11 || pages.any { page -> page.any { s -> needsV8(s) } }
+        if (cache != null && (cache.layerKey != key || cache.v8 != v8 || cache.v11 != v11)) {
+            cache.entries = java.util.IdentityHashMap(); cache.layerKey = key; cache.v8 = v8; cache.v11 = v11
+        }
         val previous = cache?.entries
         val next = if (cache != null) java.util.IdentityHashMap<Stroke, ByteArray>() else null
         for (page in pages.ifEmpty { listOf(emptyList()) }) {
             raw.varint(page.size.toLong())
             for (stroke in page) {
                 if (next == null) {
-                    writeStroke(raw, stroke, layerIndex, v8)
+                    writeStroke(raw, stroke, layerIndex, v8, v11)
                 } else {
-                    val bytes = previous?.get(stroke) ?: Writer().also { writeStroke(it, stroke, layerIndex, v8) }.toByteArray()
+                    val bytes = previous?.get(stroke) ?: Writer().also { writeStroke(it, stroke, layerIndex, v8, v11) }.toByteArray()
                     next[stroke] = bytes
                     raw.bytes(bytes)
                 }
@@ -230,7 +260,7 @@ object ContentCodec {
             deflater.setInput(raw.raw(), 0, raw.length())
             deflater.finish()
             val out = ByteArrayOutputStream(raw.length() / 2 + 16)
-            out.write(byteArrayOf(MAGIC_0, MAGIC_1, if (v10) VERSION_V10 else if (v9) VERSION_V9 else if (v8) VERSION_V8 else if (v7) VERSION_V7 else if (v6) VERSION_V6 else if (dynamics) VERSION_V5 else VERSION_V4))
+            out.write(byteArrayOf(MAGIC_0, MAGIC_1, if (v11) VERSION_V11 else if (v10) VERSION_V10 else if (v9) VERSION_V9 else if (v8) VERSION_V8 else if (v7) VERSION_V7 else if (v6) VERSION_V6 else if (dynamics) VERSION_V5 else VERSION_V4))
             val buffer = ByteArray(8192)
             while (!deflater.finished()) {
                 val n = deflater.deflate(buffer)
@@ -254,7 +284,7 @@ object ContentCodec {
             return Document(listOf(decodeStrokes(String(data, Charsets.UTF_8))), listOf(Layer.Default))
         }
         val version = data[2]
-        require(version == VERSION || version == VERSION_PAGES || version == VERSION_V3 || version == VERSION_V4 || version == VERSION_V5 || version == VERSION_V6 || version == VERSION_V7 || version == VERSION_V8 || version == VERSION_V9 || version == VERSION_V10) {
+        require(version == VERSION || version == VERSION_PAGES || version == VERSION_V3 || version == VERSION_V4 || version == VERSION_V5 || version == VERSION_V6 || version == VERSION_V7 || version == VERSION_V8 || version == VERSION_V9 || version == VERSION_V10 || version == VERSION_V11) {
             "Desteklenmeyen içerik sürümü: $version"
         }
         val inflater = Inflater(true)
@@ -277,15 +307,26 @@ object ContentCodec {
                 val id = reader.string()
                 val name = reader.string()
                 val flags = reader.byte()
-                Layer(id, name, visible = flags and 1 != 0, locked = flags and 2 != 0)
+                val base = Layer(id, name, visible = flags and 1 != 0, locked = flags and 2 != 0)
+                if (version >= VERSION_V11) {
+                    val opacity = Float.fromBits(reader.int32())
+                    val blend = com.karapp.drawguidance.data.model.LayerBlend.of(reader.byte())
+                    val lf = reader.byte()
+                    base.copy(opacity = opacity, blend = blend, alphaLock = lf and LAYER_ALPHA_LOCK != 0, clipToBelow = lf and LAYER_CLIP_BELOW != 0)
+                } else base
             }.ifEmpty { listOf(Layer.Default) }
         } else listOf(Layer.Default)
+        val extras = if (version >= VERSION_V11) {
+            reader.string().takeIf { it.isNotEmpty() }?.let {
+                runCatching { paramsJson.decodeFromString(com.karapp.drawguidance.data.model.DocExtras.serializer(), it) }.getOrNull()
+            } ?: com.karapp.drawguidance.data.model.DocExtras()
+        } else com.karapp.drawguidance.data.model.DocExtras()
         val pageCount = if (version == VERSION) 1 else reader.varint().toInt()
         val pages = List(pageCount) {
             val count = reader.varint().toInt()
             List(count) { readStroke(reader, version.toInt(), layers) }
         }
-        return Document(pages, layers)
+        return Document(pages, layers, extras)
     }
 
     /** v23: v8 biçimi gerektiren çizim (yazı kutusu ya da 3B şekil). */
@@ -295,9 +336,18 @@ object ContentCodec {
     /** v51 yeni fırça türü ya da gövde dinamiği. */
     private fun needsV10(s: Stroke): Boolean = typeCodes.getValue(s.brushType) >= 50 || s.points.any { it.hasBarrel }
 
+    /** v56 belge V11 biçimi gerektiriyor mu (V11 bilmeyen cihaza gönderilmeden önce [V11Flatten] uygulanır). */
+    fun requiresV11(doc: Document): Boolean =
+        !doc.extras.isEmpty || doc.layers.any { it.composited } || doc.pages.any { page -> page.any { needsV11(it) } }
+
+    /** v56 seçim maskesi, resim dönüşümü, gren, resimden fırça ya da kement dolgu. */
+    internal fun needsV11(s: Stroke): Boolean =
+        s.brushType == BrushType.LASSO_FILL || s.mask != null || (s.warp != null && !s.warp.isEmpty) ||
+            s.params?.grain != null || s.params?.stampAssetId != null
+
     private fun needsV9(s: Stroke): Boolean = s.brushType == BrushType.TEXT && s.text?.path != null
 
-    private fun writeStroke(w: Writer, s: Stroke, layerIndex: Map<String, Int>, v8: Boolean = false) {
+    private fun writeStroke(w: Writer, s: Stroke, layerIndex: Map<String, Int>, v8: Boolean = false, v11: Boolean = false) {
         writeStrokeBody(w, s)
         // Ek bayraklar: eleman kırpması (4 köşe, ham float bitleri), paragraf, katman, formül
         val clip = s.clip?.takeIf { it.size == 4 }
@@ -341,6 +391,13 @@ object ContentCodec {
                 for (p in s.points) w.byte(unitByte(p.roll))
                 for (p in s.points) w.byte(unitByte(p.barrel))
             }
+        }
+        if (v11) {
+            val mask = s.mask
+            val warp = s.warp?.takeIf { !it.isEmpty }
+            w.byte((if (mask != null) EXT3_MASK else 0) or (if (warp != null) EXT3_WARP else 0))
+            mask?.let { w.string(paramsJson.encodeToString(com.karapp.drawguidance.data.model.ClipMask.serializer(), it)) }
+            warp?.let { w.string(paramsJson.encodeToString(com.karapp.drawguidance.data.model.ImageWarp.serializer(), it)) }
         }
     }
 
@@ -496,6 +553,17 @@ object ContentCodec {
                 val roll = FloatArray(n) { r.byte() / 255f }
                 val barrel = FloatArray(n) { r.byte() / 255f }
                 out = out.copy(points = out.points.mapIndexed { i, p -> p.copy(roll = roll[i], barrel = barrel[i]) })
+            }
+        }
+        if (version >= VERSION_V11) {
+            val ext3 = r.byte()
+            if (ext3 and EXT3_MASK != 0) {
+                val m = runCatching { paramsJson.decodeFromString(com.karapp.drawguidance.data.model.ClipMask.serializer(), r.string()) }.getOrNull()
+                if (m != null) out = out.copy(mask = m)
+            }
+            if (ext3 and EXT3_WARP != 0) {
+                val wp = runCatching { paramsJson.decodeFromString(com.karapp.drawguidance.data.model.ImageWarp.serializer(), r.string()) }.getOrNull()
+                if (wp != null) out = out.copy(warp = wp)
             }
         }
         if (paragraph != null && out.text != null) out = out.copy(text = out.text!!.copy(paragraph = paragraph))

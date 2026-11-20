@@ -16,7 +16,13 @@ import com.karapp.drawguidance.data.repository.withPageSettings
 import java.util.UUID
 
 /** Kurulmaya hazır paket: başlık, içerik ve resimler (başlıktaki sırayla). */
-class SharePackage(val header: SharePackageHeader, val content: ByteArray, val assets: List<ByteArray>) {
+class SharePackage(
+    val header: SharePackageHeader,
+    val content: ByteArray,
+    val assets: List<ByteArray>,
+    /** v56 içerik karşı tarafın sürümü için düzleştirildi ([com.karapp.drawguidance.data.local.V11Flatten]). */
+    val flattened: Boolean = false,
+) {
     fun encode(messageType: Int): ByteArray =
         ShareWire.encode(messageType, ShareWire.text(header), listOf(content) + assets)
 
@@ -42,17 +48,18 @@ class SharePackages(
     private val folderName: () -> String = { "Paylaşılanlar" },
 ) {
     /** Kayıtlı tuvalin paketi (yoksa null). */
-    suspend fun canvasPackage(canvasId: String, type: String, id: String, from: String): SharePackage? {
+    suspend fun canvasPackage(canvasId: String, type: String, id: String, from: String, peerCodec: Int = ContentCodec.LATEST_VERSION): SharePackage? {
         val e = canvasDao.getByLocalId(canvasId) ?: return null
+        val (content, flat) = com.karapp.drawguidance.data.local.V11Flatten.forPeer(e.content, peerCodec)
         val assetIds = assetDao.idsForCanvas(canvasId)
         val assets = if (assetIds.isEmpty()) emptyList() else assetDao.getByIds(assetIds)
         val header = SharePackageHeader(
             id = id, type = type, name = e.name, canvasKind = e.kind, width = e.width, height = e.height,
             backgroundColorHex = e.backgroundColorHex, background = e.background, guide = e.guide,
-            currentPage = e.currentPage, aiEnabled = e.aiEnabled, contentLen = e.content.size,
+            currentPage = e.currentPage, aiEnabled = e.aiEnabled, contentLen = content.size,
             assets = assets.map { ShareAsset(it.id, it.mimeType, it.width, it.height, it.data.size) }, from = from,
         )
-        return SharePackage(header, e.content, assets.map { it.data })
+        return SharePackage(header, content, assets.map { it.data }, flat)
     }
 
     /** Toplam boyut tahmini (teklifte gösterilir). */
@@ -63,8 +70,8 @@ class SharePackages(
      * Canlı yayın güncellemesi: düzenleyicinin bellekteki tuvali; yalnız [sent] içinde olmayan resimler eklenir
      * (eklenenler [sent]'e yazılır).
      */
-    suspend fun livePackage(canvas: CanvasUi, id: String, seq: Long, sent: MutableSet<String>, from: String): SharePackage {
-        val content = ContentCodec.encodePages(canvas.pages, layers = canvas.layers)
+    suspend fun livePackage(canvas: CanvasUi, id: String, seq: Long, sent: MutableSet<String>, from: String, peerCodec: Int = ContentCodec.LATEST_VERSION): SharePackage {
+        val (content, flat) = com.karapp.drawguidance.data.local.V11Flatten.forPeer(ContentCodec.encodePages(canvas.pages, layers = canvas.layers), peerCodec)
         val ids = assetDao.idsForCanvas(canvas.localId).filterNot { it in sent }
         val assets = if (ids.isEmpty()) emptyList() else assetDao.getByIds(ids)
         sent += assets.map { it.id }
@@ -76,7 +83,7 @@ class SharePackages(
             aiEnabled = canvas.aiEnabled, contentLen = content.size,
             assets = assets.map { ShareAsset(it.id, it.mimeType, it.width, it.height, it.data.size) }, seq = seq, from = from,
         )
-        return SharePackage(header, content, assets.map { it.data })
+        return SharePackage(header, content, assets.map { it.data }, flat)
     }
 
     /**
@@ -105,7 +112,7 @@ class SharePackages(
         // İçerik çözülebilmeli (bozuk paket kaydedilmez); resim kimlikleri bu cihazdakilerle değişir
         val doc = ContentCodec.decodeDocument(pkg.content)
         val content = if (ids.isEmpty()) pkg.content
-        else ContentCodec.encodePages(doc.pages.map { page -> page.map { remap(it, ids) } }, layers = doc.layers)
+        else ContentCodec.encodePages(doc.pages.map { page -> page.map { remap(it, ids) } }, layers = doc.layers, extras = doc.extras)
         var background = h.background
         var guide = h.guide
         for ((old, new) in ids) {
@@ -145,6 +152,8 @@ class SharePackages(
         var c = s
         s.assetId?.let { a -> ids[a]?.let { c = c.copy(assetId = it) } }
         s.model?.let { link -> ids[link.dataAssetId]?.let { c = c.copy(model = link.copy(dataAssetId = it)) } }
+        // v56 resimden fırçanın damga resmi
+        s.params?.stampAssetId?.let { a -> ids[a]?.let { c = c.copy(params = c.params?.copy(stampAssetId = it)) } }
         return c
     }
 

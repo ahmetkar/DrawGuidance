@@ -9,4 +9,6 @@
     <string name="v56_live_blocked">거절된 요청이 너무 많습니다. 몇 분 후 다시 시도하세요</string>
     <string name="v56_live_always_asks">라이브 방송은 항상 먼저 묻습니다. 페어링 코드는 수락한 후에만 표시됩니다.</string>
     <string name="v56_live_elsewhere">방송자가 다른 화면에 있습니다</string>
+    <string name="v56_element_lasso_fill">올가미 채우기</string>
+    <string name="v56_share_flattened">%1$s은(는) 이전 버전을 사용합니다. 레이어 모드, 마스크, 그레인 같은 새 기능은 단순화되어 전송되었습니다</string>
 </resources>

@@ -700,8 +700,11 @@ Huawei ve Samsung doğrulamalarının imzalı örnek yanıtlarla birim testleri.
 
 ### 2D-2. E-posta ve şifreyle giriş (madde 19)
 
-- Firebase Auth e-posta/şifre sağlayıcısı (Firebase konsolunda açılır). Sunucu zaten Firebase ID belirtecini doğruluyor;
-  `signInProvider` = `password` olarak kaydedilir. Sunucu kodu değişmez (yalnız sağlayıcı listesinde `password`).
+- **Kayıt, giriş, şifre sıfırlama, doğrulama e-postası ve şifre saklama tamamen Firebase Auth'ta** (e-posta/şifre
+  sağlayıcısı Firebase konsolunda açılır). Uygulama sunucuya bugünkü gibi Firebase ID belirteci gönderir.
+- **Sunucuda hiçbir şey değişmez (Ahmet'in kararı, 2026-11-20):** sunucu belirteci bugünkü gibi doğrular, kullanıcı kaydı,
+  abonelik, paylaşım ve uçlar aynı kalır; şifre sunucuya hiç gelmez. Bugünkü kod `sign_in_provider` listesinde olmayan
+  `password` için `signInProvider` alanını boş bırakıyor; bu da değiştirilmez (alan yanıtta yok, işleyişi etkilemiyor).
 - Hesap ekranı (Android `AccountUi`, iOS `AccountView`): **Giriş yap** / **Hesap oluştur** sekmeleri, e-posta, şifre
   (en az 8 karakter, göster/gizle), **Şifremi unuttum** (Firebase sıfırlama e-postası), kayıttan sonra doğrulama
   e-postası; doğrulanmamış hesapla giriş yapılır ama abonelik satın alma ve paylaşım için doğrulama istenir.

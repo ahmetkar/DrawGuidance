@@ -965,7 +965,9 @@ eklenme zamanıdır. 2D ve öteki v56 maddelerinin yerleri de bu haritadadır.
 
 **Alt panel** (yalnız ilgili araç seçiliyken, çizim sırasında)
 
-- simetri: tür, kol sayısı, eksen; canlı ayna aç/kapa (K3)
+- simetri: tür, kol sayısı (radyalde 2–16), eksen (merkez tuvalde sürüklenir, açı), canlı ayna aç/kapa, kapat (K3). Simetri
+  Kılavuzlar › Simetri ile açılır; alt panel yalnız simetri açıkken ve Çiz modunda görünür. Ayar belgeyle kaydedilir
+  (`DocExtras.symmetry`). Nesne › Tekrarla'daki aynalı/dairesel tekrar mevcut nesneleri çoğaltır, simetri çizerken kopyalar.
 - sihirli değnek: ölçüt (renk / kontur / görünüm), tolerans (K1)
 - düğüm türü (köşe / yumuşak) ve Bezier tutamakları (K3A)
 - bıçak: kalınlık, kapalı yollar oluştur (K3A)

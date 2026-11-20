@@ -80,7 +80,138 @@ class SelectionController(private val store: EditorStore, private val host: Edit
         return true
     }
 
-    fun clear() = store.select(emptySet())
+    fun clear() { enteredGroup = null; store.select(emptySet()) }
+
+    // ------------------------------------------------------------------ v56 seçim işlemleri
+
+    /** v56 2E grup içi seçim: çift dokunulan grubun içine girilir; içerideyken dokunuş yalnız o elemanı seçer. */
+    var enteredGroup: String? = null
+        private set
+
+    /** Çift dokunuş gruplu elemandaysa grubun içine girer ve yalnız o elemanı seçer. */
+    fun enterGroupAt(x: Float, y: Float, tolerance: Float): Boolean {
+        val index = store.currentIndex()
+        val element = ElementOps.hitTest(index, Offset(x, y), tolerance, store.lockedIds()) ?: return false
+        val group = element.groupId ?: return false
+        enteredGroup = group
+        store.select(element.allIds)
+        return true
+    }
+
+    /** Grup içindeyken dokunulan eleman: grubun üyesiyse yalnız o eleman seçime eklenir; değilse gruptan çıkılır. */
+    fun selectInGroupAt(x: Float, y: Float, tolerance: Float): Boolean? {
+        val group = enteredGroup ?: return null
+        val index = store.currentIndex()
+        val element = ElementOps.hitTest(index, Offset(x, y), tolerance, store.lockedIds())
+        if (element == null || element.groupId != group) { enteredGroup = null; return null }
+        store.select(store.selection + element.allIds)
+        return true
+    }
+
+    /** Sayfadaki bütün görünür ve kilitsiz elemanları seçer. */
+    fun selectAll(): Int {
+        val index = store.currentIndex()
+        val locked = store.lockedIds()
+        val ids = index.elements.filter { e -> !e.hidden && e.strokeIds.none { it in locked } }.flatMap { it.allIds }.toSet()
+        enteredGroup = null
+        store.select(ids)
+        return ids.size
+    }
+
+    /** Seçimi ters çevirir: seçili olmayan görünür ve kilitsiz elemanlar seçilir. */
+    fun invert(): Int {
+        val index = store.currentIndex()
+        val locked = store.lockedIds()
+        val selected = store.selection
+        val ids = index.elements.filter { e -> !e.hidden && e.strokeIds.none { it in locked } && e.allIds.none { it in selected } }
+            .flatMap { it.allIds }.toSet()
+        enteredGroup = null
+        store.select(index.expand(ids))
+        return ids.size
+    }
+
+    /** v56 sihirli değnek: dokunulan elemana [criterion] ölçütüyle benzeyenler seçilir. Seçilen eleman sayısı. */
+    fun magicWand(x: Float, y: Float, tolerance: Float, criterion: com.karapp.drawguidance.data.model.V56Selection.WandCriterion, similarity: Float): Int {
+        val index = store.currentIndex()
+        val locked = store.lockedIds()
+        val element = ElementOps.hitTest(index, Offset(x, y), tolerance, locked) ?: return 0
+        val target = index.strokes.firstOrNull { it.id in element.strokeIds } ?: return 0
+        val candidates = index.strokes.filter { it.id !in locked }
+        val found = com.karapp.drawguidance.data.model.V56Selection.similar(target, candidates, criterion, similarity).map { it.id }.toSet()
+        enteredGroup = null
+        store.select(index.expand(found))
+        return found.size
+    }
+
+    /** Seçim alanı: son alan seçimi, yoksa seçili elemanların kutusu. */
+    fun areaFromSelection(): Boolean {
+        val pts = store.lastArea ?: ElementOps.selectionBounds(store.currentIndex().strokes, store.selection)?.let {
+            com.karapp.drawguidance.data.model.V56Selection.rect(it.left, it.top, it.right, it.bottom)
+        } ?: return false
+        if (pts.size < 3) return false
+        store.area.value = com.karapp.drawguidance.data.model.ClipMask(pts)
+        store.select(emptySet())
+        return true
+    }
+
+    fun clearArea() { store.area.value = null }
+
+    fun invertArea() { store.area.value = store.area.value?.let { it.copy(inverted = !it.inverted) } }
+
+    /** Kenar yumuşatma (px) sırayla: 0 → 6 → 16 → 32 → 0. */
+    fun cycleFeather(): Float {
+        val a = store.area.value ?: return 0f
+        val next = when { a.feather < 3f -> 6f; a.feather < 11f -> 16f; a.feather < 24f -> 32f; else -> 0f }
+        store.area.value = a.copy(feather = next)
+        return next
+    }
+
+    /** Alanı [d] px genişletir (eksi: daraltır); çok küçülürse değişmez. */
+    fun growArea(d: Float): Boolean {
+        val a = store.area.value ?: return false
+        val grown = com.karapp.drawguidance.data.model.V56Selection.offset(a.points, d) ?: return false
+        store.area.value = a.copy(points = grown)
+        return true
+    }
+
+    /** v56 kement dolgu: [points] (yoksa seçim alanı, o da yoksa son alan seçimi) fırça rengiyle doldurulur. */
+    fun lassoFill(points: List<com.karapp.drawguidance.data.model.StrokePoint>?, colorHex: String, opacity: Float): Boolean {
+        val area = store.area.value
+        val pts = points ?: area?.takeIf { !it.inverted }?.points ?: store.lastArea ?: return false
+        if (pts.size < 3) return false
+        val current = store.canvas.value ?: return false
+        val fill = com.karapp.drawguidance.data.model.V56Selection.lassoFill(UUID.randomUUID().toString(), pts, colorHex, opacity, current.strokes.size)
+        store.commit(current.strokes + fill)
+        return true
+    }
+
+    /** v56 2E kırpma maskesi oluşturulabilir mi (en üstteki seçili nesne sınır olabilir ve altında seçili eleman var). */
+    fun canClipMask(): Boolean {
+        val ids = store.selection
+        return ids.isNotEmpty() && com.karapp.drawguidance.data.model.V56Selection.canClip(store.currentIndex().strokes.filter { it.id in ids && !it.hidden })
+    }
+
+    fun hasClipMask(): Boolean {
+        val ids = store.selection
+        return store.currentIndex().strokes.any { it.id in ids && it.mask?.source != null }
+    }
+
+    fun clipMask() {
+        val current = store.canvas.value ?: return
+        val ids = store.selection
+        val changed = com.karapp.drawguidance.data.model.V56Selection.clip(current.strokes.filter { it.id in ids && !it.hidden }, UUID.randomUUID().toString())
+        if (changed.isEmpty()) return
+        val byId = changed.associateBy { it.id }
+        store.commit(current.strokes.map { byId[it.id] ?: it })
+        store.select(changed.filter { !it.hidden }.map { it.id }.toSet())
+    }
+
+    fun releaseClipMask() {
+        val current = store.canvas.value ?: return
+        val ids = store.selection
+        val updated = com.karapp.drawguidance.data.model.V56Selection.release(current.strokes, ids)
+        if (updated !== current.strokes) store.commit(updated)
+    }
 
     /**
      * v23 iki parmakla uzun basma: altındaki eleman seçili değilse yalnız o (grubuyla) seçilir, seçiliyse seçim

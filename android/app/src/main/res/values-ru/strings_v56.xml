@@ -33,4 +33,22 @@
     <string name="v56_blend_color">Цветность</string>
     <string name="v56_blend_luminosity">Яркость</string>
     <string name="v56_blend_add">Добавление</string>
+    <string name="v56_select_all">Выделить всё</string>
+    <string name="v56_select_invert">Инвертировать выделение</string>
+    <string name="v56_paint_inside">Рисовать внутри выделения</string>
+    <string name="v56_clip_mask_make">Создать обтравочную маску</string>
+    <string name="v56_clip_mask_release">Снять обтравочную маску</string>
+    <string name="v56_magic_wand">Волшебная палочка</string>
+    <string name="v56_wand_color">Цвет</string>
+    <string name="v56_wand_stroke">Обводка</string>
+    <string name="v56_wand_appearance">Оформление</string>
+    <string name="v56_wand_tolerance">Допуск %1$d%%</string>
+    <string name="v56_area_title">Область выделения</string>
+    <string name="v56_area_invert">Инвертировать</string>
+    <string name="v56_area_feather">Растушёвка %1$d px</string>
+    <string name="v56_area_grow">Расширить</string>
+    <string name="v56_area_shrink">Сжать</string>
+    <string name="v56_area_fill">Залить</string>
+    <string name="v56_area_clear">Убрать область</string>
+    <string name="v56_group_entered">Внутри группы: коснитесь снаружи, чтобы выйти</string>
 </resources>

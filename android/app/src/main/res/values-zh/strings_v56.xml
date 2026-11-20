@@ -33,4 +33,22 @@
     <string name="v56_blend_color">颜色</string>
     <string name="v56_blend_luminosity">明度</string>
     <string name="v56_blend_add">相加</string>
+    <string name="v56_select_all">全选</string>
+    <string name="v56_select_invert">反选</string>
+    <string name="v56_paint_inside">在选区内绘画</string>
+    <string name="v56_clip_mask_make">建立剪切蒙版</string>
+    <string name="v56_clip_mask_release">释放剪切蒙版</string>
+    <string name="v56_magic_wand">魔棒</string>
+    <string name="v56_wand_color">颜色</string>
+    <string name="v56_wand_stroke">描边</string>
+    <string name="v56_wand_appearance">外观</string>
+    <string name="v56_wand_tolerance">容差 %1$d%%</string>
+    <string name="v56_area_title">选区</string>
+    <string name="v56_area_invert">反转</string>
+    <string name="v56_area_feather">羽化 %1$d px</string>
+    <string name="v56_area_grow">扩展</string>
+    <string name="v56_area_shrink">收缩</string>
+    <string name="v56_area_fill">填充</string>
+    <string name="v56_area_clear">移除选区</string>
+    <string name="v56_group_entered">在组内：点按外部退出</string>
 </resources>

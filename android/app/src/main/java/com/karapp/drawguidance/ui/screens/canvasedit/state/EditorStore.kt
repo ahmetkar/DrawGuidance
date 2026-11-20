@@ -94,6 +94,12 @@ class EditorStore(
     /** Yeni elemanların eklendiği katman ([Layer.id]). */
     val activeLayer = MutableStateFlow(Layer.BASE)
 
+    /** v56 seçim alanı (boyama maskesi): varken eklenen fırça izleri ve silgiler bu alanla kırpılır; belgeye yazılmaz. */
+    val area = MutableStateFlow<com.karapp.drawguidance.data.model.ClipMask?>(null)
+
+    /** v56 son alan seçimi (kement ya da dikdörtgen; tuval koordinatı): "Seçimin içine boya" ve kement dolgu için. */
+    var lastArea: List<com.karapp.drawguidance.data.model.StrokePoint>? = null
+
     /**
      * Otomatik kayıt: açıkken her değişiklik kayıt kuyruğuna verilir; kapalıyken değişiklikler bellekte kalır,
      * [dirty] işaretlenir ve [saveNow] (üst menüdeki Kaydet) ile yazılır.
@@ -210,6 +216,8 @@ class EditorStore(
 
     /** Tuval yüklendi: geçmiş boş başlar. */
     fun load(loaded: CanvasUi?) {
+        area.value = null
+        lastArea = null
         // v22: kayıttaki 3B elemanlar sahnenin kaydedilmiş görünümüyle uyumlu değilse (ör. döndürme yarıda kaldıysa)
         canvas.value = loaded?.let { c ->
             com.karapp.drawguidance.ui.drawing.Scene3D.syncPages(c.pages, c.guide, c.width, c.height)?.let { c.copy(pages = it) } ?: c
@@ -228,7 +236,9 @@ class EditorStore(
      */
     fun commit(updated: List<Stroke>, coalesce: String? = null) {
         val current = canvas.value ?: return
-        val placed = markAlphaLocked(current.strokes, placeNewInActiveLayer(current.strokes, updated, current.layers), current.layers)
+        val placedInLayer = markAlphaLocked(current.strokes, placeNewInActiveLayer(current.strokes, updated, current.layers), current.layers)
+        // v56 seçim alanı varken yeni fırça izleri alanla kırpılır
+        val placed = area.value?.let { a -> com.karapp.drawguidance.data.model.V56Selection.applyArea(current.strokes.mapTo(HashSet()) { it.id }, placedInLayer, a) } ?: placedInLayer
         val pages = current.pages.toMutableList()
         if (current.currentPage in pages.indices) pages[current.currentPage] = placed else pages.add(placed)
         commit(pages, current.width, current.height, current.backgroundColorHex, coalesce)

@@ -137,7 +137,7 @@ internal abstract class CanvasTool {
 }
 
 /** v43 tuval üstü yardımcı araçlar: damlalık (Çiz ve Seç'te), dikdörtgenle ve kalemle alan seçimi (Seç'te). */
-enum class CanvasPick { NONE, EYEDROPPER, RECT_SELECT, LASSO_SELECT }
+enum class CanvasPick { NONE, EYEDROPPER, RECT_SELECT, LASSO_SELECT, /** v56 */ MAGIC_WAND, /** v56 */ LASSO_FILL }
 
 internal object CanvasTools {
     fun create(mode: EditMode, pick: CanvasPick): CanvasTool = when {
@@ -145,6 +145,8 @@ internal object CanvasTools {
         pick == CanvasPick.EYEDROPPER && (mode == EditMode.DRAW || mode == EditMode.SELECT || mode == EditMode.PAINT) -> EyedropperTool()
         pick == CanvasPick.RECT_SELECT && mode == EditMode.SELECT -> RectSelectTool()
         pick == CanvasPick.LASSO_SELECT && mode == EditMode.SELECT -> LassoSelectTool()
+        pick == CanvasPick.MAGIC_WAND && mode == EditMode.SELECT -> MagicWandTool()
+        pick == CanvasPick.LASSO_FILL && mode == EditMode.SELECT -> LassoSelectTool(fill = true)
         else -> create(mode)
     }
 
@@ -483,7 +485,13 @@ internal class RectSelectTool : CanvasTool() {
 }
 
 /** v43 kalemle alan seçimi: çizilen kapalı çizginin içindeki elemanlar seçilir (çizgi tuvale eklenmez). */
-internal class LassoSelectTool : CanvasTool() {
+/** v56 sihirli değnek: dokunulan elemana (ölçüt ve toleransa göre) benzeyen elemanlar seçilir; sürükleme kaydırır. */
+internal class MagicWandTool : CanvasTool() {
+    override fun tap(ctx: GestureContext, point: Offset, upTime: Long) = ctx.actions.onMagicWand(point, ctx.hitTolerance)
+}
+
+/** Kalemle alan seçimi; v56 [fill]: çizilen kapalı yol fırça rengiyle doldurulur (kement dolgu). */
+internal class LassoSelectTool(private val fill: Boolean = false) : CanvasTool() {
     private val points = ArrayList<Offset>()
     override fun begin(ctx: GestureContext): Boolean { points.clear(); points += ctx.startCanvas; return true }
     override fun move(ctx: GestureContext, position: Offset, point: Offset) {
@@ -492,7 +500,7 @@ internal class LassoSelectTool : CanvasTool() {
     }
     override fun end(ctx: GestureContext, preview: Preview?) {
         ctx.setPreview(null)
-        ctx.actions.onLassoSelect(points.toList())
+        if (fill) ctx.actions.onLassoFill(points.toList()) else ctx.actions.onLassoSelect(points.toList())
         points.clear()
     }
     override fun cancel(ctx: GestureContext) { points.clear(); ctx.setPreview(null) }

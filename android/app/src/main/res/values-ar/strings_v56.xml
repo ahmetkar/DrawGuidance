@@ -33,4 +33,22 @@
     <string name="v56_blend_color">اللون</string>
     <string name="v56_blend_luminosity">السطوع</string>
     <string name="v56_blend_add">إضافة</string>
+    <string name="v56_select_all">تحديد الكل</string>
+    <string name="v56_select_invert">عكس التحديد</string>
+    <string name="v56_paint_inside">الرسم داخل التحديد</string>
+    <string name="v56_clip_mask_make">إنشاء قناع قص</string>
+    <string name="v56_clip_mask_release">إزالة قناع القص</string>
+    <string name="v56_magic_wand">العصا السحرية</string>
+    <string name="v56_wand_color">اللون</string>
+    <string name="v56_wand_stroke">الحد</string>
+    <string name="v56_wand_appearance">المظهر</string>
+    <string name="v56_wand_tolerance">التسامح %1$d%%</string>
+    <string name="v56_area_title">منطقة التحديد</string>
+    <string name="v56_area_invert">عكس</string>
+    <string name="v56_area_feather">تنعيم %1$d بكسل</string>
+    <string name="v56_area_grow">توسيع</string>
+    <string name="v56_area_shrink">تقليص</string>
+    <string name="v56_area_fill">تعبئة</string>
+    <string name="v56_area_clear">إزالة المنطقة</string>
+    <string name="v56_group_entered">داخل المجموعة: انقر خارجها للخروج</string>
 </resources>

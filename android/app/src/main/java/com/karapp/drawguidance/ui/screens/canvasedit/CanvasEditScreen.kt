@@ -1,6 +1,10 @@
 package com.karapp.drawguidance.ui.screens.canvasedit
 
 import androidx.compose.material.icons.filled.Straighten
+import androidx.compose.material.icons.filled.LayersClear
+import androidx.compose.material.icons.filled.Brush
+import androidx.compose.material.icons.filled.SelectAll
+import androidx.compose.material.icons.filled.AutoFixNormal
 import androidx.compose.material.icons.filled.Functions
 import androidx.compose.material.icons.filled.ShowChart
 import androidx.compose.material.icons.filled.TableChart
@@ -307,6 +311,7 @@ fun CanvasEditScreen(
     val penAnchors by viewModel.penAnchors.collectAsState()
     val penPending by viewModel.penPending.collectAsState()
     val canvasPick by viewModel.canvasPick.collectAsState()
+    val v56Area by viewModel.area.collectAsState()
     val harmonyDraft by viewModel.harmonyDraft.collectAsState()
     val placeDraft by viewModel.placeDraft.collectAsState()
     val pendingSceneTool by viewModel.pendingSceneTool.collectAsState()
@@ -695,6 +700,8 @@ fun CanvasEditScreen(
             onEyedrop = { viewModel.eyedrop(it) },
             onRectSelect = viewModel::rectSelect,
             onLassoSelect = viewModel::lassoSelect,
+            onMagicWand = viewModel::magicWand,
+            onLassoFill = { viewModel.lassoFill(it) },
             onPenEditDrag = viewModel::penEditDrag,
             onPenEraserFinished = { points, id -> viewModel.onStrokeFinished(points, id, penEraser = true) },
             eraserSize = viewModel::eraserSize,
@@ -884,6 +891,11 @@ fun CanvasEditScreen(
             ToolItem(com.karapp.drawguidance.ui.screens.canvasedit.components.V44Icons.RectSelect, stringResource(R.string.v43_select_rect), { viewModel.toggleCanvasPick(com.karapp.drawguidance.ui.screens.canvasedit.components.CanvasPick.RECT_SELECT) }, selected = canvasPick == com.karapp.drawguidance.ui.screens.canvasedit.components.CanvasPick.RECT_SELECT),
             ToolItem(com.karapp.drawguidance.ui.screens.canvasedit.components.V44Icons.FreeSelect, stringResource(R.string.v43_select_lasso), { viewModel.toggleCanvasPick(com.karapp.drawguidance.ui.screens.canvasedit.components.CanvasPick.LASSO_SELECT) }, selected = canvasPick == com.karapp.drawguidance.ui.screens.canvasedit.components.CanvasPick.LASSO_SELECT),
             ToolItem(Icons.Filled.Colorize, stringResource(R.string.v43_eyedropper), { viewModel.toggleCanvasPick(com.karapp.drawguidance.ui.screens.canvasedit.components.CanvasPick.EYEDROPPER) }, selected = canvasPick == com.karapp.drawguidance.ui.screens.canvasedit.components.CanvasPick.EYEDROPPER),
+        ) + listOfNotNull(
+            // v56 sihirli değnek (2E, yalnız gelişmiş çizim) ve kement dolgu
+            if (viewModel.v56(com.karapp.drawguidance.data.model.V56Flags.Feature.ADV_SELECTION)) ToolItem(Icons.Filled.AutoFixNormal, stringResource(R.string.v56_magic_wand), { viewModel.toggleCanvasPick(com.karapp.drawguidance.ui.screens.canvasedit.components.CanvasPick.MAGIC_WAND) }, selected = canvasPick == com.karapp.drawguidance.ui.screens.canvasedit.components.CanvasPick.MAGIC_WAND, tag = "select_magic_wand") else null,
+            if (viewModel.v56(com.karapp.drawguidance.data.model.V56Flags.Feature.LASSO_FILL)) ToolItem(Icons.Filled.FormatColorFill, stringResource(R.string.v56_element_lasso_fill), { viewModel.toggleCanvasPick(com.karapp.drawguidance.ui.screens.canvasedit.components.CanvasPick.LASSO_FILL) }, selected = canvasPick == com.karapp.drawguidance.ui.screens.canvasedit.components.CanvasPick.LASSO_FILL, tag = "select_lasso_fill") else null,
+        ) + listOf(
             ToolItem(Icons.Filled.ContentCopy, duplicateText, viewModel::duplicateSelected, enabled = hasSelection),
             ToolItem(Icons.Filled.VisibilityOff, stringResource(R.string.hide_elements), requestHide, enabled = hasSelection || hiddenCount > 0),
             ToolItem(Icons.Filled.Delete, deleteText, viewModel::deleteSelected, enabled = hasSelection, danger = true),
@@ -1475,6 +1487,7 @@ fun CanvasEditScreen(
                         ?.map { s -> s.map { Offset(it.x, it.y) } },
                 ),
                 activeLayerId = activeLayer,
+                area = v56Area,
             )
             // v52 kompozisyon kılavuzu ve kontrol önizlemesi
             if (helpersShown) {
@@ -1492,6 +1505,8 @@ fun CanvasEditScreen(
             if (tutorialUi != null) com.karapp.drawguidance.ui.screens.canvasedit.tutorial.TutorialLiveLayer(tutorialLive, viewport)
             // v37 çocuk boyamasında kova imleci ve boyanmaya hazır alan
             if (kids && mode == EditMode.PAINT) com.karapp.drawguidance.ui.screens.canvasedit.components.KidsPaintOverlay(viewModel, viewport)
+            // v56 seçim alanı çubuğu ve sihirli değnek ayarları
+            com.karapp.drawguidance.ui.screens.canvasedit.components.V56SelectionOverlay(viewModel, mode, canvasPick)
             // v45 parametreli şeklin tutamakları
             if (mode == EditMode.SHAPE_EDIT && shapeTool == ShapeTool.PARAMS) com.karapp.drawguidance.ui.screens.canvasedit.components.ParamHandlesLayer(viewModel, selectedShape, viewport)
             com.karapp.drawguidance.ui.screens.canvasedit.ruler.RulerLayer(viewModel, viewport, rulerActions, kind)
@@ -1618,7 +1633,15 @@ fun CanvasEditScreen(
                         action(R.string.fill_gaps, Icons.Filled.Link) { viewModel.fillGaps() },
                         action(R.string.mode_rotate, Icons.AutoMirrored.Filled.RotateRight) { viewModel.chooseMode(EditMode.ROTATE) },
                     )
-                } + orderItems + action(R.string.clear_selection, Icons.Filled.Close) { viewModel.clearSelection() }
+                } + orderItems + listOfNotNull(
+                    // v56 seçim işlemleri, seçimin içine boyama, kement dolgu ve (2E) kırpma maskesi
+                    if (viewModel.v56(com.karapp.drawguidance.data.model.V56Flags.Feature.SELECTION_OPS)) action(R.string.v56_select_all, Icons.Filled.SelectAll) { viewModel.selectAll() } else null,
+                    if (viewModel.v56(com.karapp.drawguidance.data.model.V56Flags.Feature.SELECTION_OPS)) action(R.string.v56_select_invert, Icons.Filled.FlipToFront) { viewModel.invertSelection() } else null,
+                    if (viewModel.v56(com.karapp.drawguidance.data.model.V56Flags.Feature.SELECTION_MASK)) action(R.string.v56_paint_inside, Icons.Filled.Brush) { viewModel.paintInsideSelection() } else null,
+                    if (viewModel.v56(com.karapp.drawguidance.data.model.V56Flags.Feature.LASSO_FILL)) action(R.string.v56_element_lasso_fill, Icons.Filled.FormatColorFill) { viewModel.lassoFill() } else null,
+                    if (viewModel.v56(com.karapp.drawguidance.data.model.V56Flags.Feature.ADV_SELECTION) && viewModel.canClipMask()) action(R.string.v56_clip_mask_make, Icons.Filled.ContentCut) { viewModel.clipMask() } else null,
+                    if (viewModel.v56(com.karapp.drawguidance.data.model.V56Flags.Feature.ADV_SELECTION) && viewModel.hasClipMask()) action(R.string.v56_clip_mask_release, Icons.Filled.LayersClear) { viewModel.releaseClipMask() } else null,
+                ) + action(R.string.clear_selection, Icons.Filled.Close) { viewModel.clearSelection() }
                 val selectionBox = remember(current.strokes, selectedIds) {
                     com.karapp.drawguidance.ui.screens.canvasedit.editor.ElementOps.selectionBounds(current.strokes, selectedIds)
                 }

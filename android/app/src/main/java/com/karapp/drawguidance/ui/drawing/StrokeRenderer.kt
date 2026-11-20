@@ -11,6 +11,7 @@ import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.PointMode
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.asAndroidBitmap
+import androidx.compose.ui.graphics.asAndroidPath
 import androidx.compose.ui.graphics.drawscope.CanvasDrawScope
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.graphics.drawscope.DrawScope
@@ -47,6 +48,51 @@ object StrokeRenderer {
      * Elemana kırpma uygulanmışsa yalnızca kırpma dörtgeninin içi çizilir.
      */
     fun DrawScope.drawStroke(stroke: Stroke, offset: Offset = Offset.Zero) {
+        val mask = stroke.mask
+        if (mask != null && mask.points.size >= 3) { drawMasked(stroke, offset, mask); return }
+        drawClipped(stroke, offset)
+    }
+
+    /**
+     * v56 seçim maskesi: sert kenarda `clipPath` (ters seçimde çift-tek kuralıyla dışı); yumuşatılmışta çizim ara
+     * katmanda, bulanık maske `DstIn` ile uygulanır.
+     */
+    private fun DrawScope.drawMasked(stroke: Stroke, offset: Offset, mask: com.karapp.drawguidance.data.model.ClipMask) {
+        val path = Path().apply {
+            moveTo(mask.points[0].x + offset.x, mask.points[0].y + offset.y)
+            for (i in 1 until mask.points.size) lineTo(mask.points[i].x + offset.x, mask.points[i].y + offset.y)
+            close()
+        }
+        if (mask.feather <= 0.5f) {
+            if (mask.inverted) {
+                path.fillType = androidx.compose.ui.graphics.PathFillType.EvenOdd
+                path.addRect(Rect(-1e6f, -1e6f, 1e6f, 1e6f))
+            }
+            clipPath(path) { drawClipped(stroke, offset) }
+            return
+        }
+        val bounds = Rect(-1e6f, -1e6f, 1e6f, 1e6f)
+        drawIntoCanvas { it.saveLayer(bounds, Paint()) }
+        drawClipped(stroke, offset)
+        // Maske ayrı ara katmanda (dışı saydam) ve DstIn ile birleşir: maskenin dışı tamamen silinir
+        drawIntoCanvas { c ->
+            c.saveLayer(bounds, Paint().apply { blendMode = androidx.compose.ui.graphics.BlendMode.DstIn })
+            val blur = android.graphics.BlurMaskFilter(mask.feather, android.graphics.BlurMaskFilter.Blur.NORMAL)
+            if (mask.inverted) {
+                c.nativeCanvas.drawColor(android.graphics.Color.BLACK)
+                val cut = android.graphics.Paint(android.graphics.Paint.ANTI_ALIAS_FLAG).apply {
+                    xfermode = android.graphics.PorterDuffXfermode(android.graphics.PorterDuff.Mode.DST_OUT); maskFilter = blur
+                }
+                c.nativeCanvas.drawPath(path.asAndroidPath(), cut)
+            } else {
+                c.nativeCanvas.drawPath(path.asAndroidPath(), android.graphics.Paint(android.graphics.Paint.ANTI_ALIAS_FLAG).apply { maskFilter = blur })
+            }
+            c.restore()
+            c.restore()
+        }
+    }
+
+    private fun DrawScope.drawClipped(stroke: Stroke, offset: Offset) {
         val clip = stroke.clip
         if (clip != null && clip.size == 4) {
             val path = Path().apply {
@@ -61,6 +107,19 @@ object StrokeRenderer {
     }
 
     private fun DrawScope.drawUnclipped(stroke: Stroke, offset: Offset) {
+        if (stroke.brushType == BrushType.LASSO_FILL) {
+            // v56 kement dolgu: kapalı yolun içi (renk ve opaklık)
+            val pts = stroke.points
+            if (pts.size >= 3) {
+                val path = Path().apply {
+                    moveTo(pts[0].x + offset.x, pts[0].y + offset.y)
+                    for (i in 1 until pts.size) lineTo(pts[i].x + offset.x, pts[i].y + offset.y)
+                    close()
+                }
+                drawPath(path, hexToColor(stroke.colorHex).let { it.copy(alpha = it.alpha * stroke.opacity.coerceIn(0f, 1f)) })
+            }
+            return
+        }
         if (stroke.brushType == BrushType.IMAGE) {
             drawImageStroke(stroke, offset)
             return
@@ -277,6 +336,14 @@ object StrokeRenderer {
                     moveTo(clip[0].x, clip[0].y); for (i in 1 until 4) lineTo(clip[i].x, clip[i].y); close()
                 }
                 c.nativeCanvas.clipPath(path)
+            }
+            // v56 seçim maskesi (piksel fırçasında sert kenar)
+            s.mask?.takeIf { it.points.size >= 3 }?.let { m ->
+                val mp = android.graphics.Path().apply {
+                    moveTo(m.points[0].x, m.points[0].y); for (i in 1 until m.points.size) lineTo(m.points[i].x, m.points[i].y); close()
+                    if (m.inverted) { fillType = android.graphics.Path.FillType.EVEN_ODD; addRect(-1e6f, -1e6f, 1e6f, 1e6f, android.graphics.Path.Direction.CW) }
+                }
+                c.nativeCanvas.clipPath(mp)
             }
             RasterStrokes.draw(c.nativeCanvas, s, context)
             c.nativeCanvas.restoreToCount(save)

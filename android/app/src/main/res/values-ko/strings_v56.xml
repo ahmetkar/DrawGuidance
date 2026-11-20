@@ -33,4 +33,22 @@
     <string name="v56_blend_color">색상</string>
     <string name="v56_blend_luminosity">광도</string>
     <string name="v56_blend_add">더하기</string>
+    <string name="v56_select_all">모두 선택</string>
+    <string name="v56_select_invert">선택 반전</string>
+    <string name="v56_paint_inside">선택 영역 안에 그리기</string>
+    <string name="v56_clip_mask_make">클리핑 마스크 만들기</string>
+    <string name="v56_clip_mask_release">클리핑 마스크 해제</string>
+    <string name="v56_magic_wand">자동 선택 도구</string>
+    <string name="v56_wand_color">색상</string>
+    <string name="v56_wand_stroke">선</string>
+    <string name="v56_wand_appearance">모양</string>
+    <string name="v56_wand_tolerance">허용치 %1$d%%</string>
+    <string name="v56_area_title">선택 영역</string>
+    <string name="v56_area_invert">반전</string>
+    <string name="v56_area_feather">페더 %1$d px</string>
+    <string name="v56_area_grow">확장</string>
+    <string name="v56_area_shrink">축소</string>
+    <string name="v56_area_fill">채우기</string>
+    <string name="v56_area_clear">영역 제거</string>
+    <string name="v56_group_entered">그룹 안: 바깥을 탭하면 나갑니다</string>
 </resources>

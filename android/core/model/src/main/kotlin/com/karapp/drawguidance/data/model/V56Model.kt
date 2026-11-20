@@ -26,6 +26,8 @@ data class ClipMask(
     val points: List<StrokePoint>,
     @EncodeDefault(EncodeDefault.Mode.NEVER) val feather: Float = 0f,
     @EncodeDefault(EncodeDefault.Mode.NEVER) val inverted: Boolean = false,
+    /** v56 kırpma maskesi (2E 7.15): sınırı veren (gizlenen) nesnenin kimliği; null: seçim alanından boyama maskesi. */
+    @EncodeDefault(EncodeDefault.Mode.NEVER) val source: String? = null,
 )
 
 /** v56 gren: doku kimliği (hazır doku ya da varlık), ölçek, güç (0..1); [moving] true: doku tuvale sabit (kayar). */

@@ -997,7 +997,9 @@ class CanvasEditViewModel(
         val next = if (_canvasPick.value == pick) com.karapp.drawguidance.ui.screens.canvasedit.components.CanvasPick.NONE else pick
         _canvasPick.value = next
         if ((next == com.karapp.drawguidance.ui.screens.canvasedit.components.CanvasPick.RECT_SELECT ||
-                next == com.karapp.drawguidance.ui.screens.canvasedit.components.CanvasPick.LASSO_SELECT) && _mode.value != EditMode.SELECT) {
+                next == com.karapp.drawguidance.ui.screens.canvasedit.components.CanvasPick.LASSO_SELECT ||
+                next == com.karapp.drawguidance.ui.screens.canvasedit.components.CanvasPick.MAGIC_WAND ||
+                next == com.karapp.drawguidance.ui.screens.canvasedit.components.CanvasPick.LASSO_FILL) && _mode.value != EditMode.SELECT) {
             setMode(EditMode.SELECT)
         }
     }
@@ -1017,12 +1019,14 @@ class CanvasEditViewModel(
     fun rectSelect(a: Offset, b: Offset) {
         val r = com.karapp.drawguidance.ui.screens.canvasedit.editor.AreaSelect.rect(a, b)
         if (r.width < 1f || r.height < 1f) return
+        store.lastArea = com.karapp.drawguidance.data.model.V56Selection.rect(r.left, r.top, r.right, r.bottom)
         if (selection.selectInArea(add = false) { r.contains(it) } > 0) startAction(EditMode.SCALE)
     }
 
     /** Kalemle çizilen kapalı çizginin içindekiler seçilir. */
     fun lassoSelect(points: List<Offset>) {
         if (!com.karapp.drawguidance.ui.screens.canvasedit.editor.AreaSelect.usable(points, 4f)) return
+        store.lastArea = points.map { com.karapp.drawguidance.data.model.StrokePoint(it.x, it.y) }
         selection.selectInArea(add = false) { com.karapp.drawguidance.ui.screens.canvasedit.editor.AreaSelect.inside(points, it) }
     }
 
@@ -1067,8 +1071,45 @@ class CanvasEditViewModel(
         selection.holdMoveAt(x, y, tolerance).also { moved -> if (moved) kidsPaint.hover(null, -1) }
     fun toggleElement(elementId: String) = selection.toggleElement(elementId)
     fun toggleGroup(groupId: String) = selection.toggleGroup(groupId)
-    fun selectAt(x: Float, y: Float, tolerance: Float): Boolean = selection.selectAt(x, y, tolerance)
-    fun deselectAt(x: Float, y: Float, tolerance: Float): Boolean = selection.deselectAt(x, y, tolerance)
+    fun selectAt(x: Float, y: Float, tolerance: Float): Boolean {
+        // v56 2E grup içindeyken dokunuş yalnız o elemanı seçer (gruptan dışarı dokununca çıkılır)
+        if (v56(com.karapp.drawguidance.data.model.V56Flags.Feature.ADV_SELECTION)) selection.selectInGroupAt(x, y, tolerance)?.let { return it }
+        return selection.selectAt(x, y, tolerance)
+    }
+    fun deselectAt(x: Float, y: Float, tolerance: Float): Boolean {
+        // v56 2E gruplu elemana çift dokunuş grubun içine girer
+        if (v56(com.karapp.drawguidance.data.model.V56Flags.Feature.ADV_SELECTION) && selection.enterGroupAt(x, y, tolerance)) return true
+        return selection.deselectAt(x, y, tolerance)
+    }
+
+    /** v56 özellik bu tuvalin modunda açık mı ([com.karapp.drawguidance.data.model.V56Flags]). */
+    fun v56(feature: com.karapp.drawguidance.data.model.V56Flags.Feature): Boolean =
+        com.karapp.drawguidance.data.model.V56Flags.enabled(feature, store.canvas.value?.kind ?: com.karapp.drawguidance.data.model.CanvasKind.ART)
+
+    // v56 seçim işlemleri ve seçim alanı
+    val area: kotlinx.coroutines.flow.StateFlow<com.karapp.drawguidance.data.model.ClipMask?> get() = store.area
+    private val _wandCriterion = kotlinx.coroutines.flow.MutableStateFlow(com.karapp.drawguidance.data.model.V56Selection.WandCriterion.COLOR)
+    val wandCriterion: kotlinx.coroutines.flow.StateFlow<com.karapp.drawguidance.data.model.V56Selection.WandCriterion> = _wandCriterion
+    private val _wandTolerance = kotlinx.coroutines.flow.MutableStateFlow(0.15f)
+    val wandTolerance: kotlinx.coroutines.flow.StateFlow<Float> = _wandTolerance
+    fun setWandCriterion(c: com.karapp.drawguidance.data.model.V56Selection.WandCriterion) { _wandCriterion.value = c }
+    fun setWandTolerance(t: Float) { _wandTolerance.value = t.coerceIn(0f, 1f) }
+    fun magicWand(point: Offset, tolerance: Float) { selection.magicWand(point.x, point.y, tolerance, _wandCriterion.value, _wandTolerance.value) }
+    fun selectAll() { selection.selectAll() }
+    fun invertSelection() { selection.invert() }
+    fun paintInsideSelection() { if (selection.areaFromSelection()) setMode(EditMode.DRAW) }
+    fun clearArea() = selection.clearArea()
+    fun invertArea() = selection.invertArea()
+    fun cycleAreaFeather(): Float = selection.cycleFeather()
+    fun growArea(d: Float) = selection.growArea(d)
+    fun lassoFill(points: List<Offset>? = null) {
+        val b = brushSettings.value
+        selection.lassoFill(points?.map { com.karapp.drawguidance.data.model.StrokePoint(it.x, it.y) }, b.colorHex, b.opacity)
+    }
+    fun canClipMask(): Boolean = selection.canClipMask()
+    fun hasClipMask(): Boolean = selection.hasClipMask()
+    fun clipMask() = selection.clipMask()
+    fun releaseClipMask() = selection.releaseClipMask()
     fun clearSelection() = selection.clear()
 
     /** v23 iki parmakla uzun basma: altındaki eleman seçilir (boş yerde seçim kalkar). */

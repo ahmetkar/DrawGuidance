@@ -33,4 +33,22 @@
     <string name="v56_blend_color">カラー</string>
     <string name="v56_blend_luminosity">輝度</string>
     <string name="v56_blend_add">加算</string>
+    <string name="v56_select_all">すべて選択</string>
+    <string name="v56_select_invert">選択範囲を反転</string>
+    <string name="v56_paint_inside">選択範囲内に描画</string>
+    <string name="v56_clip_mask_make">クリッピングマスクを作成</string>
+    <string name="v56_clip_mask_release">クリッピングマスクを解除</string>
+    <string name="v56_magic_wand">自動選択</string>
+    <string name="v56_wand_color">色</string>
+    <string name="v56_wand_stroke">線</string>
+    <string name="v56_wand_appearance">アピアランス</string>
+    <string name="v56_wand_tolerance">許容値 %1$d%%</string>
+    <string name="v56_area_title">選択範囲</string>
+    <string name="v56_area_invert">反転</string>
+    <string name="v56_area_feather">ぼかし %1$d px</string>
+    <string name="v56_area_grow">拡張</string>
+    <string name="v56_area_shrink">縮小</string>
+    <string name="v56_area_fill">塗りつぶし</string>
+    <string name="v56_area_clear">範囲を解除</string>
+    <string name="v56_group_entered">グループ内: 外側をタップで終了</string>
 </resources>

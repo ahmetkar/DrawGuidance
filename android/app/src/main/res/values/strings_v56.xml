@@ -33,4 +33,22 @@
     <string name="v56_blend_color">Renk</string>
     <string name="v56_blend_luminosity">Parlaklık</string>
     <string name="v56_blend_add">Ekle</string>
+    <string name="v56_select_all">Tümünü seç</string>
+    <string name="v56_select_invert">Seçimi ters çevir</string>
+    <string name="v56_paint_inside">Seçimin içine boya</string>
+    <string name="v56_clip_mask_make">Kırpma maskesi oluştur</string>
+    <string name="v56_clip_mask_release">Kırpma maskesini kaldır</string>
+    <string name="v56_magic_wand">Sihirli değnek</string>
+    <string name="v56_wand_color">Renk</string>
+    <string name="v56_wand_stroke">Kontur</string>
+    <string name="v56_wand_appearance">Görünüm</string>
+    <string name="v56_wand_tolerance">Tolerans %1$d%%</string>
+    <string name="v56_area_title">Seçim alanı</string>
+    <string name="v56_area_invert">Ters çevir</string>
+    <string name="v56_area_feather">Yumuşat %1$d px</string>
+    <string name="v56_area_grow">Genişlet</string>
+    <string name="v56_area_shrink">Daralt</string>
+    <string name="v56_area_fill">Doldur</string>
+    <string name="v56_area_clear">Alanı kaldır</string>
+    <string name="v56_group_entered">Grubun içindesiniz: dışarı dokununca çıkılır</string>
 </resources>

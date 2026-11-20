@@ -185,6 +185,10 @@ class CanvasActions(
     val onEyedrop: (Offset) -> Unit = {},
     val onRectSelect: (Offset, Offset) -> Unit = { _, _ -> },
     val onLassoSelect: (List<Offset>) -> Unit = {},
+    /** v56 sihirli değnek: dokunulan elemana benzeyenler seçilir. */
+    val onMagicWand: (Offset, Float) -> Unit = { _, _ -> },
+    /** v56 kement dolgu: çizilen kapalı yol fırça rengiyle doldurulur. */
+    val onLassoFill: (List<Offset>) -> Unit = {},
     val onPenEditDrag: (point: Offset, done: Boolean) -> Unit = { _, _ -> },
     /** v18 kalemin silgi ucuyla (ya da yan tuşla) çizilen çizgi: silgi olarak kaydedilir. */
     val onPenEraserFinished: (List<StrokePoint>, String) -> Unit = { p, id -> onStrokeFinished(p, id) },
@@ -259,6 +263,8 @@ fun DrawingCanvas(
     overlay: CanvasOverlay = CanvasOverlay(),
     /** v56 etkin katman: canlı çizgi bu katmanın opaklığı ve karışım moduyla gösterilir. */
     activeLayerId: String? = null,
+    /** v56 seçim alanı (boyama maskesi): kesik çizgiyle gösterilir. */
+    area: com.karapp.drawguidance.data.model.ClipMask? = null,
 ) {
     val colors = NeuTheme.colors
     val density = LocalDensity.current
@@ -799,6 +805,20 @@ fun DrawingCanvas(
                                     style = DrawStroke(width = 2f / scale, pathEffect = androidx.compose.ui.graphics.PathEffect.dashPathEffect(floatArrayOf(10f / scale, 8f / scale), 0f)),
                                 )
                             }
+                        }
+                        // v56 seçim alanı: kesik çizgi (ters seçimde dışı hafif gölgeli)
+                        area?.takeIf { it.points.size >= 3 }?.let { a ->
+                            val path = androidx.compose.ui.graphics.Path().apply {
+                                moveTo(a.points[0].x, a.points[0].y)
+                                for (i in 1 until a.points.size) lineTo(a.points[i].x, a.points[i].y)
+                                close()
+                            }
+                            if (a.inverted) drawPath(path, colors.accent.copy(alpha = 0.06f))
+                            drawPath(path, androidx.compose.ui.graphics.Color.White, style = DrawStroke(width = 2.5f / scale))
+                            drawPath(
+                                path, colors.accent,
+                                style = DrawStroke(width = 1.5f / scale, pathEffect = androidx.compose.ui.graphics.PathEffect.dashPathEffect(floatArrayOf(8f / scale, 6f / scale), 0f)),
+                            )
                         }
                         (activePreview as? Preview.Guideline)?.let { line ->
                             drawLine(

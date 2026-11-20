@@ -51,4 +51,9 @@
     <string name="v56_area_fill">填充</string>
     <string name="v56_area_clear">移除选区</string>
     <string name="v56_group_entered">在组内：点按外部退出</string>
+    <string name="v56_clip_cut">剪切</string>
+    <string name="v56_clip_copy">复制</string>
+    <string name="v56_clip_paste">粘贴</string>
+    <string name="v56_clip_copied">已复制到剪贴板</string>
+    <string name="v56_clip_pasted">已粘贴</string>
 </resources>

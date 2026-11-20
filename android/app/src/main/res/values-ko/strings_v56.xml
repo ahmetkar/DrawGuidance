@@ -51,4 +51,9 @@
     <string name="v56_area_fill">채우기</string>
     <string name="v56_area_clear">영역 제거</string>
     <string name="v56_group_entered">그룹 안: 바깥을 탭하면 나갑니다</string>
+    <string name="v56_clip_cut">잘라내기</string>
+    <string name="v56_clip_copy">복사</string>
+    <string name="v56_clip_paste">붙여넣기</string>
+    <string name="v56_clip_copied">클립보드에 복사됨</string>
+    <string name="v56_clip_pasted">붙여넣었습니다</string>
 </resources>

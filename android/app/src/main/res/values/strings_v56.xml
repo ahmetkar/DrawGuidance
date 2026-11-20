@@ -51,4 +51,9 @@
     <string name="v56_area_fill">Doldur</string>
     <string name="v56_area_clear">Alanı kaldır</string>
     <string name="v56_group_entered">Grubun içindesiniz: dışarı dokununca çıkılır</string>
+    <string name="v56_clip_cut">Kes</string>
+    <string name="v56_clip_copy">Kopyala</string>
+    <string name="v56_clip_paste">Yapıştır</string>
+    <string name="v56_clip_copied">Panoya alındı</string>
+    <string name="v56_clip_pasted">Yapıştırıldı</string>
 </resources>

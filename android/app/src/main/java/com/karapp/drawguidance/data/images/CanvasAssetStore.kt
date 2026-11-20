@@ -147,6 +147,17 @@ class CanvasAssetStore(private val dao: CanvasAssetDao) {
         return newId
     }
 
+    /** v56 pano: varlık kayıtları (bayt, tür, boyut). */
+    suspend fun entities(ids: Collection<String>): List<CanvasAssetEntity> = if (ids.isEmpty()) emptyList() else dao.getByIds(ids.toList())
+
+    /** v56 pano: başka tuvalden alınmış varlığı bu tuvale yeni kimlikle yazar. */
+    suspend fun insertCopy(asset: CanvasAssetEntity, canvasLocalId: String): String {
+        val newId = UUID.randomUUID().toString()
+        dao.insert(CanvasAssetEntity(newId, canvasLocalId, asset.mimeType, asset.width, asset.height, asset.data, System.currentTimeMillis()))
+        CanvasImageCache.get(asset.id)?.let { CanvasImageCache.put(newId, it) }
+        return newId
+    }
+
     /** Kayıtlı verinin baytları (yoksa null). */
     suspend fun bytes(id: String): ByteArray? = dao.getByIds(listOf(id)).firstOrNull()?.data
 
@@ -189,6 +200,8 @@ class CanvasAssetStore(private val dao: CanvasAssetDao) {
         strokes.forEach { s ->
             s.assetId?.let(used::add)
             s.model?.dataAssetId?.let(used::add)
+            // v56 resimden fırçanın damga resmi
+            s.params?.stampAssetId?.let(used::add)
             s.text?.box?.imageId?.takeIf { it.startsWith(com.karapp.drawguidance.data.model.BackgroundSpec.ASSET) }
                 ?.let { used += it.removePrefix(com.karapp.drawguidance.data.model.BackgroundSpec.ASSET) }
         }

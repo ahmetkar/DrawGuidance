@@ -63,6 +63,8 @@ import androidx.compose.material.icons.filled.FormatColorFill
 import androidx.compose.material.icons.filled.TextFields
 import androidx.compose.material.icons.filled.AccountTree
 import androidx.compose.material.icons.filled.ContentCut
+import androidx.compose.material.icons.filled.ContentPaste
+import androidx.compose.material.icons.filled.CopyAll
 import androidx.compose.material.icons.filled.Category
 import androidx.compose.material.icons.filled.FilterVintage
 import androidx.compose.material.icons.filled.Flare
@@ -652,6 +654,9 @@ fun CanvasEditScreen(
                     if (viewModel.mode.value != EditMode.SELECT) viewModel.setMode(EditMode.SELECT)
                     // Seçimin türüne özel işlemler (eski bağlam menüsündekiler) Düzenle listesinde açılır
                     contextEdit = viewModel.canvas.value?.kind != com.karapp.drawguidance.data.model.CanvasKind.KIDS
+                } else if (viewModel.canUseClipboard() && viewModel.clipboardContent.value != null) {
+                    // v56 2C-3 boş yerde uzun basma: panodakiler buraya yapıştırılır
+                    viewModel.paste(anchor = p)
                 }
             },
             onThreeFingerSwipe = viewModel::swipeUndo,
@@ -788,6 +793,13 @@ fun CanvasEditScreen(
     // v18: üst menü moda göre değişir (Çiz: çizim araçları; Seç: kopyala/sil; Taşı: konum ve kaydırma; Ekle:
     // eklenecekler; Düzenle: döndür/ölçekle/kırp ve düzenlenen elemanın araçları; Genişlet: boyut ve kenarlar)
     val hasSelection = selectedIds.isNotEmpty()
+    // v56 2C-3 pano: yapıştır pano doluyken her sayfada görünür
+    val clipboardNow by viewModel.clipboardContent.collectAsState()
+    val clipboardOn = viewModel.canUseClipboard()
+    val visibleRect: () -> FloatArray = {
+        val sc = viewport.scale.coerceAtLeast(0.01f)
+        floatArrayOf(-viewport.offset.x / sc, -viewport.offset.y / sc, (viewport.viewSize.width - viewport.offset.x) / sc, (viewport.viewSize.height - viewport.offset.y) / sc)
+    }
     // v30 gizleme: tek eleman doğrudan gizlenir; birden çok eleman seçiliyse hangilerinin gizleneceği sorulur
     val hiddenCount = remember(elements) { elements.elements.count { it.hidden } }
     val requestHide: () -> Unit = {
@@ -897,6 +909,11 @@ fun CanvasEditScreen(
             if (viewModel.v56(com.karapp.drawguidance.data.model.V56Flags.Feature.LASSO_FILL)) ToolItem(Icons.Filled.FormatColorFill, stringResource(R.string.v56_element_lasso_fill), { viewModel.toggleCanvasPick(com.karapp.drawguidance.ui.screens.canvasedit.components.CanvasPick.LASSO_FILL) }, selected = canvasPick == com.karapp.drawguidance.ui.screens.canvasedit.components.CanvasPick.LASSO_FILL, tag = "select_lasso_fill") else null,
         ) + listOf(
             ToolItem(Icons.Filled.ContentCopy, duplicateText, viewModel::duplicateSelected, enabled = hasSelection),
+        ) + (if (clipboardOn) listOf(
+            ToolItem(Icons.Filled.ContentCut, stringResource(R.string.v56_clip_cut), { viewModel.cutSelected() }, enabled = hasSelection, tag = "clip_cut"),
+            ToolItem(Icons.Filled.CopyAll, stringResource(R.string.v56_clip_copy), { viewModel.copySelected() }, enabled = hasSelection, tag = "clip_copy"),
+            ToolItem(Icons.Filled.ContentPaste, stringResource(R.string.v56_clip_paste), { viewModel.paste(visible = visibleRect()) }, enabled = clipboardNow != null, tag = "clip_paste"),
+        ) else emptyList()) + listOf(
             ToolItem(Icons.Filled.VisibilityOff, stringResource(R.string.hide_elements), requestHide, enabled = hasSelection || hiddenCount > 0),
             ToolItem(Icons.Filled.Delete, deleteText, viewModel::deleteSelected, enabled = hasSelection, danger = true),
         )
@@ -1570,7 +1587,10 @@ fun CanvasEditScreen(
                 }
             }
             if (!kids && mode == EditMode.SELECT && selectedIds.isNotEmpty() && textDraft == null && formulaEditing == null) {
-                val orderItems = listOf(
+                val orderItems = (if (clipboardOn) listOf(
+                    action(R.string.v56_clip_cut, Icons.Filled.ContentCut) { viewModel.cutSelected() },
+                    action(R.string.v56_clip_copy, Icons.Filled.CopyAll) { viewModel.copySelected() },
+                ) else emptyList()) + listOf(
                     action(R.string.order_forward, Icons.Filled.FlipToFront) { viewModel.reorderSelected(com.karapp.drawguidance.ui.screens.canvasedit.editor.ZOrder.FORWARD) },
                     action(R.string.order_backward, Icons.Filled.FlipToBack) { viewModel.reorderSelected(com.karapp.drawguidance.ui.screens.canvasedit.editor.ZOrder.BACKWARD) },
                     action(R.string.hide_elements, Icons.Filled.VisibilityOff) { requestHide() },

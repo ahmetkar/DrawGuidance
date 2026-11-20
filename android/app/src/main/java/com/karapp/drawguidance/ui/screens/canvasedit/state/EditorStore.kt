@@ -234,11 +234,11 @@ class EditorStore(
      * Açık sayfanın çizimlerini değiştirir (geri alınabilir). Yeni eklenen ve katmanı belirtilmemiş elemanlar etkin
      * katmana konur; çizimler katman sırasına dizilir (her denetleyici bunu ayrıca düşünmez).
      */
-    fun commit(updated: List<Stroke>, coalesce: String? = null) {
+    fun commit(updated: List<Stroke>, coalesce: String? = null, useArea: Boolean = true) {
         val current = canvas.value ?: return
         val placedInLayer = markAlphaLocked(current.strokes, placeNewInActiveLayer(current.strokes, updated, current.layers), current.layers)
-        // v56 seçim alanı varken yeni fırça izleri alanla kırpılır
-        val placed = area.value?.let { a -> com.karapp.drawguidance.data.model.V56Selection.applyArea(current.strokes.mapTo(HashSet()) { it.id }, placedInLayer, a) } ?: placedInLayer
+        // v56 seçim alanı varken yeni fırça izleri alanla kırpılır (yapıştırılanlar hariç)
+        val placed = area.value?.takeIf { useArea }?.let { a -> com.karapp.drawguidance.data.model.V56Selection.applyArea(current.strokes.mapTo(HashSet()) { it.id }, placedInLayer, a) } ?: placedInLayer
         val pages = current.pages.toMutableList()
         if (current.currentPage in pages.indices) pages[current.currentPage] = placed else pages.add(placed)
         commit(pages, current.width, current.height, current.backgroundColorHex, coalesce)

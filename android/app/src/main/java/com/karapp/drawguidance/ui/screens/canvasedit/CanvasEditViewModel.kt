@@ -424,6 +424,8 @@ class CanvasEditViewModel(
         if (store.canvas.value?.kind?.isNotes == true) inserted(setOf(id))
     }
     private val selection = SelectionController(store, this)
+    /** v56 2C-3 sayfalar arası kes, kopyala, yapıştır. */
+    private val clipboard = com.karapp.drawguidance.ui.screens.canvasedit.state.ClipboardController(store, this, assetStore)
     // v27 çizgi roman (balon, panel, efekt yazısı, hız çizgileri)
     private val comic by lazy { ComicController(store, this, texts) { brush } }
     private val drawing = DrawingController(store, this) { brush }
@@ -1111,6 +1113,12 @@ class CanvasEditViewModel(
     fun clipMask() = selection.clipMask()
     fun releaseClipMask() = selection.releaseClipMask()
     fun clearSelection() = selection.clear()
+    // v56 2C-3 pano (çocuk modunda yok)
+    val clipboardContent get() = clipboard.content
+    fun canUseClipboard(): Boolean = v56(com.karapp.drawguidance.data.model.V56Flags.Feature.CROSS_PAGE_PASTE)
+    fun cutSelected() { clipboard.cut() }
+    fun copySelected() { clipboard.copy() }
+    fun paste(anchor: Offset? = null, visible: FloatArray? = null) = clipboard.paste(anchor, visible)
 
     /** v23 iki parmakla uzun basma: altındaki eleman seçilir (boş yerde seçim kalkar). */
     fun selectForContext(x: Float, y: Float, tolerance: Float): Boolean = selection.selectForContext(x, y, tolerance)

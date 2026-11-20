@@ -51,4 +51,9 @@
     <string name="v56_area_fill">塗りつぶし</string>
     <string name="v56_area_clear">範囲を解除</string>
     <string name="v56_group_entered">グループ内: 外側をタップで終了</string>
+    <string name="v56_clip_cut">切り取り</string>
+    <string name="v56_clip_copy">コピー</string>
+    <string name="v56_clip_paste">貼り付け</string>
+    <string name="v56_clip_copied">クリップボードにコピーしました</string>
+    <string name="v56_clip_pasted">貼り付けました</string>
 </resources>

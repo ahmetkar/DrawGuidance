@@ -51,4 +51,9 @@
     <string name="v56_area_fill">Залить</string>
     <string name="v56_area_clear">Убрать область</string>
     <string name="v56_group_entered">Внутри группы: коснитесь снаружи, чтобы выйти</string>
+    <string name="v56_clip_cut">Вырезать</string>
+    <string name="v56_clip_copy">Копировать</string>
+    <string name="v56_clip_paste">Вставить</string>
+    <string name="v56_clip_copied">Скопировано в буфер</string>
+    <string name="v56_clip_pasted">Вставлено</string>
 </resources>

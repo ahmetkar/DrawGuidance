@@ -51,4 +51,9 @@
     <string name="v56_area_fill">Fill</string>
     <string name="v56_area_clear">Remove area</string>
     <string name="v56_group_entered">Inside group: tap outside to exit</string>
+    <string name="v56_clip_cut">Cut</string>
+    <string name="v56_clip_copy">Copy</string>
+    <string name="v56_clip_paste">Paste</string>
+    <string name="v56_clip_copied">Copied to clipboard</string>
+    <string name="v56_clip_pasted">Pasted</string>
 </resources>

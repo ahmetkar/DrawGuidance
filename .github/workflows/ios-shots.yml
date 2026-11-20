@@ -42,8 +42,8 @@ jobs:
       fail-fast: false
       max-parallel: 5
       matrix:
-        dev: [phone, pad]
-        lang: [tr, en, ar, ja, ko, ru, zh]
+        dev: [phone]
+        lang: [en]
     steps:
       - uses: actions/download-artifact@v4
         with: { name: app }

@@ -121,7 +121,9 @@ struct CanvasEditScreen: View {
                 try? await Task.sleep(nanoseconds: 3_000_000_000)
                 vm.challenge.start()
             }
-            guard let i = a.firstIndex(of: "-dgTutorial"), i + 1 < a.count, let kind = vm.store.canvas?.kind,
+            guard let i = a.firstIndex(of: "-dgTutorial"), i + 1 < a.count else { return }
+            for _ in 0..<20 where vm.store.canvas == nil { try? await Task.sleep(nanoseconds: 500_000_000) }
+            guard let kind = vm.store.canvas?.kind,
                   let g = vm.tutorial.groups(kind).first(where: { $0.id == a[i + 1] }) else { return }
             let steps = a.firstIndex(of: "-dgSteps").flatMap { $0 + 1 < a.count ? Int(a[$0 + 1]) : nil } ?? 0
             try? await Task.sleep(nanoseconds: 3_000_000_000)

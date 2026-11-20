@@ -128,6 +128,8 @@ private struct HomeTab: View {
             let c = CanvasCreator.create(CanvasFormResult(name: CanvasTemplates.name(e), width: e.width > 0 ? e.width : k.defaultSize.width,
                                                           height: e.height > 0 ? e.height : k.defaultSize.height, paperHex: "#FFFFFF",
                                                           aiEnabled: true, kind: k, templateId: e.id), store: store)
+            // şablon resimleri diske yazılırken bekle; aksi halde düzenleyici boş sayfa yükleyebilir
+            try? await Task.sleep(nanoseconds: 3_000_000_000)
             if a.contains("-dgLive") {
                 let peer = a.firstIndex(of: "-dgPeer").flatMap { $0 + 1 < a.count ? a[$0 + 1] : nil } ?? "iPad"
                 ShareManager.shared.debugShowLive(c, peer: peer)

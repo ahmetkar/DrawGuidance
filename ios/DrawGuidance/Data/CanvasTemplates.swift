@@ -31,6 +31,14 @@ struct TemplateAsset: Codable, Equatable {
     var mime = "image/webp"
     var w = 0
     var h = 0
+
+    /// catalog/meta.json'da "mime" yok: eksik alanlar varsayılanla okunur (yoksa çizgi roman şablonları boş açılıyordu).
+    init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        id = try c.decode(String.self, forKey: .id); file = try c.decode(String.self, forKey: .file)
+        mime = try c.decodeIfPresent(String.self, forKey: .mime) ?? "image/webp"
+        w = try c.decodeIfPresent(Int.self, forKey: .w) ?? 0; h = try c.decodeIfPresent(Int.self, forKey: .h) ?? 0
+    }
 }
 
 struct CanvasTemplateMeta: Codable, Equatable {

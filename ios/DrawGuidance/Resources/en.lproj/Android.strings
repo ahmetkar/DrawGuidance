@@ -3663,8 +3663,13 @@
 "v56_blend_saturation" = "Saturation";
 "v56_blend_screen" = "Screen";
 "v56_blend_soft_light" = "Soft light";
+"v56_clip_copied" = "Copied to clipboard";
+"v56_clip_copy" = "Copy";
+"v56_clip_cut" = "Cut";
 "v56_clip_mask_make" = "Make clipping mask";
 "v56_clip_mask_release" = "Release clipping mask";
+"v56_clip_paste" = "Paste";
+"v56_clip_pasted" = "Pasted";
 "v56_element_lasso_fill" = "Lasso fill";
 "v56_group_entered" = "Inside group: tap outside to exit";
 "v56_layer_alpha_lock" = "Alpha lock";

@@ -170,10 +170,12 @@ final class EditorStore: ObservableObject {
     }
 
     /// Açık sayfanın çizimlerini değiştirir (geri alınabilir).
-    func commit(_ updated: [Stroke], coalesce: String? = nil) {
+    func commit(_ updated: [Stroke], coalesce: String? = nil, useArea: Bool = true) {
         guard let current = canvas else { return }
         let known = Set(current.strokes.map(\.id))
-        let placed = markAlphaLocked(current.strokes, placeNewInActiveLayer(current.strokes, V56Selection.applyArea(known, updated, area), current.layers), current.layers)
+        // v56 seçim alanı varken yeni fırça izleri alanla kırpılır (yapıştırılanlar hariç)
+        let masked = useArea ? V56Selection.applyArea(known, updated, area) : updated
+        let placed = markAlphaLocked(current.strokes, placeNewInActiveLayer(current.strokes, masked, current.layers), current.layers)
         var pages = current.pages
         if pages.indices.contains(current.currentPage) { pages[current.currentPage] = placed } else { pages.append(placed) }
         commit(pages: pages, width: current.width, height: current.height, background: current.backgroundColorHex, coalesce: coalesce)

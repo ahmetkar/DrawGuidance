@@ -71,6 +71,8 @@ final class EditorViewModel: ObservableObject, EditorHost {
     private(set) var diagrams: DiagramController!
     private(set) var texts: TextController!
     private(set) var selection: SelectionController!
+    /// v56 2C-3 sayfalar arası kes, kopyala, yapıştır.
+    private(set) var clipboard: ClipboardController!
     private(set) var comic: ComicController!
     private(set) var drawing: DrawingController!
     private(set) var pages: PageController!
@@ -176,6 +178,7 @@ final class EditorViewModel: ObservableObject, EditorHost {
             if store.canvas?.kind.isNotes == true { inserted([id]) }
         }
         selection = SelectionController(store, self)
+        clipboard = ClipboardController(store, self)
         comic = ComicController(store, self, texts: texts) { [unowned self] in brush }
         drawing = DrawingController(store, self) { [unowned self] in brush }
         pages = PageController(store, beforeChange: { [unowned self] in beforePageChange() }, onLimit: { [unowned self] in emit(.pageLimit($0)) })
@@ -631,6 +634,18 @@ final class EditorViewModel: ObservableObject, EditorHost {
     func setWandTolerance(_ t: Float) { wandTolerance = min(max(t, 0), 1) }
 
     func paintInsideSelection() { if selection.areaFromSelection() { setMode(.DRAW) } }
+
+    // MARK: v56 2C-3 pano (çocuk modunda yok)
+
+    func canUseClipboard() -> Bool { v56(.CROSS_PAGE_PASTE) }
+
+    /// Görünür alan, tuval biriminde [sol, üst, sağ, alt].
+    func visibleCanvasRect() -> [Float] {
+        let sc = max(viewport.scale, 0.01), o = viewport.offset, v = viewport.viewSize
+        return [-o.x / sc, -o.y / sc, (v.w - o.x) / sc, (v.h - o.y) / sc]
+    }
+
+    func paste(anchor: P? = nil) { clipboard.paste(anchor: anchor, visible: anchor == nil ? visibleCanvasRect() : nil) }
 
     func lassoFill(_ points: [P]? = nil) {
         selection.lassoFill(points?.map { StrokePoint($0.x, $0.y) }, colorHex: brush.settings.colorHex, opacity: brush.settings.opacity)

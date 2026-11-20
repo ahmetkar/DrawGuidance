@@ -59,6 +59,10 @@ struct SelectionMenu: View {
         if store.selectedIds.count > 1 {
             items.append(Action(id: "sel_group", label: L("group_selection"), icon: "square.stack.3d.up") { vm.selection.group() })
         }
+        if vm.canUseClipboard() {
+            items.append(Action(id: "sel_cut", label: L("v56_clip_cut"), icon: "scissors") { vm.clipboard.cut() })
+            items.append(Action(id: "sel_copy", label: L("v56_clip_copy"), icon: "doc.on.doc") { vm.clipboard.copy() })
+        }
         items += [
             Action(id: "sel_forward", label: L("order_forward"), icon: "square.2.layers.3d.top.filled") { vm.selection.reorder(1) },
             Action(id: "sel_backward", label: L("order_backward"), icon: "square.2.layers.3d.bottom.filled") { vm.selection.reorder(-1) },

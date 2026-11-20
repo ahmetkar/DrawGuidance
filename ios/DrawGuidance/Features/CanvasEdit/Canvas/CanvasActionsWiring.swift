@@ -40,6 +40,9 @@ extension EditorViewModel {
             if selection.selectForContext(p.x, p.y, tolerance: tol) || !store.selectedIds.isEmpty {
                 if mode != .SELECT { setMode(.SELECT) }
                 ui.contextEdit = store.canvas?.kind != .KIDS
+            } else if canUseClipboard() && ElementClipboard.shared.content != nil {
+                // v56 2C-3 boş yerde uzun basma: panodakiler buraya yapıştırılır
+                paste(anchor: p)
             }
         }
         a.onThreeFingerSwipe = { [unowned self] d in swipeUndo(d) }

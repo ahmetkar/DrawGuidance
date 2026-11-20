@@ -3663,8 +3663,13 @@
 "v56_blend_saturation" = "Насыщенность";
 "v56_blend_screen" = "Экран";
 "v56_blend_soft_light" = "Мягкий свет";
+"v56_clip_copied" = "Скопировано в буфер";
+"v56_clip_copy" = "Копировать";
+"v56_clip_cut" = "Вырезать";
 "v56_clip_mask_make" = "Создать обтравочную маску";
 "v56_clip_mask_release" = "Снять обтравочную маску";
+"v56_clip_paste" = "Вставить";
+"v56_clip_pasted" = "Вставлено";
 "v56_element_lasso_fill" = "Заливка лассо";
 "v56_group_entered" = "Внутри группы: коснитесь снаружи, чтобы выйти";
 "v56_layer_alpha_lock" = "Блокировка прозрачности";

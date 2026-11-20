@@ -219,6 +219,8 @@ struct AdvancedMenus: View {
     @Binding var sheet: EditorSheet?
     @Binding var brushPickerOpen: Bool
     @ObservedObject var addUi: AddWindows
+    /// v56 2C-3 uygulama içi pano (Yapıştır düğmesi).
+    @ObservedObject var clipboard = ElementClipboard.shared
 
     private var kind: CanvasKind { store.canvas?.kind ?? .ART }
     private var notes: Bool { kind.isNotes }
@@ -377,6 +379,12 @@ struct AdvancedMenus: View {
             }
         }
         ChromeButton(icon: "plus.square.on.square", label: L("duplicate_selection"), enabled: hasSelection, id: "duplicate") { vm.selection.duplicate() }
+        if vm.canUseClipboard() {
+            // v56 2C-3 kes, kopyala, yapıştır (yapıştır pano doluyken her sayfada)
+            ChromeButton(icon: "scissors", label: L("v56_clip_cut"), enabled: hasSelection, id: "clip_cut") { vm.clipboard.cut() }
+            ChromeButton(icon: "doc.on.doc", label: L("v56_clip_copy"), enabled: hasSelection, id: "clip_copy") { vm.clipboard.copy() }
+            ChromeButton(icon: "doc.on.clipboard", label: L("v56_clip_paste"), enabled: clipboard.content != nil, id: "clip_paste") { vm.paste() }
+        }
         ChromeButton(icon: "eye.slash", label: L("hide_elements"), enabled: hasSelection, id: "hide") { vm.hideElements() }
         ChromeButton(icon: "trash", label: L("delete_selection"), enabled: hasSelection, danger: true, id: "delete") { vm.selection.delete() }
         ChromeButton(icon: "square.stack.3d.up", label: L("group_selection"), enabled: hasSelection, id: "group") { vm.selection.group() }

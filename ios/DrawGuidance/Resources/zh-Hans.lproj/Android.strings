@@ -3663,8 +3663,13 @@
 "v56_blend_saturation" = "饱和度";
 "v56_blend_screen" = "滤色";
 "v56_blend_soft_light" = "柔光";
+"v56_clip_copied" = "已复制到剪贴板";
+"v56_clip_copy" = "复制";
+"v56_clip_cut" = "剪切";
 "v56_clip_mask_make" = "建立剪切蒙版";
 "v56_clip_mask_release" = "释放剪切蒙版";
+"v56_clip_paste" = "粘贴";
+"v56_clip_pasted" = "已粘贴";
 "v56_element_lasso_fill" = "套索填充";
 "v56_group_entered" = "在组内：点按外部退出";
 "v56_layer_alpha_lock" = "锁定透明度";

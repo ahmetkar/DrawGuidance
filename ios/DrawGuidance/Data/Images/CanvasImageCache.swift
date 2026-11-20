@@ -137,6 +137,21 @@ final class CanvasAssetStore {
 
     func mimeType(_ id: String) -> String? { meta(id)?.mimeType }
 
+    /// v56 pano: varlığın kaydı ve baytları.
+    func record(_ id: String) -> (Meta, Data)? {
+        guard let m = meta(id), let data = try? Data(contentsOf: file(m)) else { return nil }
+        return (m, data)
+    }
+
+    /// v56 pano: başka tuvalden alınmış varlığı bu tuvale yeni kimlikle yazar.
+    func insertCopy(_ m: Meta, _ data: Data, _ canvasLocalId: String) -> String {
+        let newId = saveData(canvasLocalId, data, m.mimeType, width: m.width, height: m.height)
+        if let img = CanvasImageCache.get(m.id) { CanvasImageCache.put(newId, img) }
+        return newId
+    }
+
+    func canvasOf(_ id: String) -> String? { meta(id)?.canvasLocalId }
+
     /// Bir resmi başka tuvale kopyalar (yeni kimlik).
     func copyTo(_ id: String, _ canvasLocalId: String) -> String? {
         guard let m = meta(id), let data = bytes(id) else { return nil }
@@ -176,6 +191,8 @@ final class CanvasAssetStore {
         for s in strokes {
             if let a = s.assetId { used.insert(a) }
             if let d = s.model?.dataAssetId { used.insert(d) }
+            // v56 resimden fırçanın damga resmi
+            if let d = s.params?.stampAssetId { used.insert(d) }
             if let b = s.text?.box?.imageId, b.hasPrefix(BackgroundSpec.ASSET) { used.insert(String(b.dropFirst(BackgroundSpec.ASSET.count))) }
         }
         lock.lock()

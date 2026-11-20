@@ -3663,8 +3663,13 @@
 "v56_blend_saturation" = "채도";
 "v56_blend_screen" = "스크린";
 "v56_blend_soft_light" = "소프트 라이트";
+"v56_clip_copied" = "클립보드에 복사됨";
+"v56_clip_copy" = "복사";
+"v56_clip_cut" = "잘라내기";
 "v56_clip_mask_make" = "클리핑 마스크 만들기";
 "v56_clip_mask_release" = "클리핑 마스크 해제";
+"v56_clip_paste" = "붙여넣기";
+"v56_clip_pasted" = "붙여넣었습니다";
 "v56_element_lasso_fill" = "올가미 채우기";
 "v56_group_entered" = "그룹 안: 바깥을 탭하면 나갑니다";
 "v56_layer_alpha_lock" = "알파 잠금";

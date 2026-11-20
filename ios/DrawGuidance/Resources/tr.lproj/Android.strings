@@ -3663,8 +3663,13 @@
 "v56_blend_saturation" = "Doygunluk";
 "v56_blend_screen" = "Ekran";
 "v56_blend_soft_light" = "Yumuşak ışık";
+"v56_clip_copied" = "Panoya alındı";
+"v56_clip_copy" = "Kopyala";
+"v56_clip_cut" = "Kes";
 "v56_clip_mask_make" = "Kırpma maskesi oluştur";
 "v56_clip_mask_release" = "Kırpma maskesini kaldır";
+"v56_clip_paste" = "Yapıştır";
+"v56_clip_pasted" = "Yapıştırıldı";
 "v56_element_lasso_fill" = "Kement dolgu";
 "v56_group_entered" = "Grubun içindesiniz: dışarı dokununca çıkılır";
 "v56_layer_alpha_lock" = "Alfa kilidi";

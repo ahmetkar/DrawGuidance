@@ -3639,6 +3639,7 @@
 "v54_template_helper_hint" = "Seçtiğin çizim yardımcısının çizgileri şekil kalıbı olur; kenarına yakın çizerek izleyebilirsin.";
 "v55_image_err_memory" = "Bu resim bu cihazın belleği için çok büyük (%1$@). Uygulamanın çökmemesi için eklenmedi; daha küçük bir kopyasını deneyin.";
 "v55_image_err_pixels" = "Çözünürlük işlenemeyecek kadar yüksek (%1$d×%2$d, 1 gigapikselin üstünde). Daha küçük bir kopyasını deneyin.";
+"v56_element_lasso_fill" = "Kement dolgu";
 "v56_live_always_asks" = "Canlı yayın her zaman önce sorulur; eşleşme şifresi ancak kabul edince gösterilir.";
 "v56_live_blocked" = "Çok sayıda reddedilen istek: birkaç dakika sonra yeniden dene";
 "v56_live_elsewhere" = "Yayıncı başka bir ekranda";
@@ -3647,6 +3648,7 @@
 "v56_live_req_body" = "%1$@, «%2$@» tuvalini size canlı yayınlamak istiyor.";
 "v56_live_req_title" = "Canlı yayın isteği";
 "v56_practice_reward_nofill" = "Şu an gösterilecek reklam bulunamadı. Alıştırma senin için açıldı.";
+"v56_share_flattened" = "%1$@ eski sürüm kullanıyor: katman modları, maske ve gren gibi yeni özellikler sadeleştirilerek gönderildi";
 "vector_cut" = "Kes";
 "vector_delete" = "Sil";
 "vector_edit_open" = "Vektör düzenle";

@@ -46,6 +46,8 @@ enum BrushType: String, KotlinEnum {
     case IMAGE
     /// Formül: noktalar kutunun 4 köşesidir.
     case FORMULA
+    /// v56 kement dolgu: noktalar kapalı yoldur; yalnız iç dolgu (renk, opaklık, isteğe bağlı gren).
+    case LASSO_FILL
 
     static var fallback: BrushType { .PENCIL }
 
@@ -565,17 +567,20 @@ struct Stroke: Codable, Equatable, Identifiable {
     var model: Model3DLink? = nil
     var hidden = false
     var harmony: HarmonySpec? = nil
+    /// v56 seçim maskesi ve resim dönüşümleri (JSON'a yazılmaz; içerik biçiminde V11 ek bayrağıyla).
+    var mask: ClipMask? = nil
+    var warp: ImageWarp? = nil
 
     init(id: String, points: [StrokePoint], colorHex: String, brushType: BrushType, sizePx: Float, opacity: Float,
          order: Int, groupId: String? = nil, assetId: String? = nil, flow: Float = 1, strength: Float = 1,
          text: TextSpec? = nil, shape: ShapeSpec? = nil, diagram: DiagramSpec? = nil, clip: [StrokePoint]? = nil,
          layerId: String? = nil, formula: FormulaSpec? = nil, params: BrushParams? = nil, space: Space3D? = nil,
-         model: Model3DLink? = nil, hidden: Bool = false, harmony: HarmonySpec? = nil) {
+         model: Model3DLink? = nil, hidden: Bool = false, harmony: HarmonySpec? = nil, mask: ClipMask? = nil, warp: ImageWarp? = nil) {
         self.id = id; self.points = points; self.colorHex = colorHex; self.brushType = brushType; self.sizePx = sizePx
         self.opacity = opacity; self.order = order; self.groupId = groupId; self.assetId = assetId; self.flow = flow
         self.strength = strength; self.text = text; self.shape = shape; self.diagram = diagram; self.clip = clip
         self.layerId = layerId; self.formula = formula; self.params = params; self.space = space; self.model = model
-        self.hidden = hidden; self.harmony = harmony
+        self.hidden = hidden; self.harmony = harmony; self.mask = mask; self.warp = warp
     }
 
     init(from decoder: Decoder) throws {
@@ -688,13 +693,16 @@ struct BrushParams: Codable, Equatable {
     var tip: TipParams? = nil
     var pen: PenDynamics? = nil
     var fx: FxParams? = nil
+    /// v56 gren ve resimden fırça (fırça ucu bir resim varlığı).
+    var grain: GrainSpec? = nil
+    var stampAssetId: String? = nil
 
     init(spacing: Float? = nil, tiltWidth: Float? = nil, tiltLight: Float? = nil, tiltThreshold: Float = 0,
          nibFollow: Bool = false, tube: TubeParams? = nil, depth3d: Depth3D? = nil, comicLines: ComicLinesParams? = nil,
-         tip: TipParams? = nil, pen: PenDynamics? = nil, fx: FxParams? = nil) {
+         tip: TipParams? = nil, pen: PenDynamics? = nil, fx: FxParams? = nil, grain: GrainSpec? = nil, stampAssetId: String? = nil) {
         self.spacing = spacing; self.tiltWidth = tiltWidth; self.tiltLight = tiltLight; self.tiltThreshold = tiltThreshold
         self.nibFollow = nibFollow; self.tube = tube; self.depth3d = depth3d; self.comicLines = comicLines
-        self.tip = tip; self.pen = pen; self.fx = fx
+        self.tip = tip; self.pen = pen; self.fx = fx; self.grain = grain; self.stampAssetId = stampAssetId
     }
 
     init(from decoder: Decoder) throws {
@@ -702,7 +710,7 @@ struct BrushParams: Codable, Equatable {
         spacing = c.o("spacing"); tiltWidth = c.o("tiltWidth"); tiltLight = c.o("tiltLight")
         tiltThreshold = c.v("tiltThreshold", 0); nibFollow = c.v("nibFollow", false); tube = c.o("tube")
         depth3d = c.o("depth3d"); comicLines = c.o("comicLines")
-        tip = c.o("tip"); pen = c.o("pen"); fx = c.o("fx")
+        tip = c.o("tip"); pen = c.o("pen"); fx = c.o("fx"); grain = c.o("grain"); stampAssetId = c.o("stampAssetId")
     }
 
     func encode(to encoder: Encoder) throws {
@@ -710,7 +718,7 @@ struct BrushParams: Codable, Equatable {
         try c.o(spacing, "spacing"); try c.o(tiltWidth, "tiltWidth"); try c.o(tiltLight, "tiltLight")
         try c.e(tiltThreshold, "tiltThreshold", 0); try c.e(nibFollow, "nibFollow", false); try c.o(tube, "tube")
         try c.o(depth3d, "depth3d"); try c.o(comicLines, "comicLines")
-        try c.o(tip, "tip"); try c.o(pen, "pen"); try c.o(fx, "fx")
+        try c.o(tip, "tip"); try c.o(pen, "pen"); try c.o(fx, "fx"); try c.o(grain, "grain"); try c.o(stampAssetId, "stampAssetId")
     }
 }
 
@@ -900,19 +908,33 @@ struct Layer: Codable, Equatable, Identifiable {
     var name: String
     var visible = true
     var locked = false
+    /// v56 katman opaklığı, karışım modu, alfa kilidi ve alttaki katmana kırpma.
+    var opacity: Float = 1
+    var blend: LayerBlend = .NORMAL
+    var alphaLock = false
+    var clipToBelow = false
 
-    init(id: String, name: String, visible: Bool = true, locked: Bool = false) {
+    /// Katman ayrı bir ara yüzeyde birleştirilmeli mi (V11 içerik gerektirir).
+    var composited: Bool { opacity < 1 || blend != .NORMAL || alphaLock || clipToBelow }
+
+    init(id: String, name: String, visible: Bool = true, locked: Bool = false, opacity: Float = 1,
+         blend: LayerBlend = .NORMAL, alphaLock: Bool = false, clipToBelow: Bool = false) {
         self.id = id; self.name = name; self.visible = visible; self.locked = locked
+        self.opacity = opacity; self.blend = blend; self.alphaLock = alphaLock; self.clipToBelow = clipToBelow
     }
 
     init(from decoder: Decoder) throws {
         let c = try decoder.container(keyedBy: AnyKey.self)
         id = try c.req("id"); name = try c.req("name"); visible = c.v("visible", true); locked = c.v("locked", false)
+        opacity = c.v("opacity", 1); blend = c.v("blend", LayerBlend.NORMAL); alphaLock = c.v("alphaLock", false)
+        clipToBelow = c.v("clipToBelow", false)
     }
 
     func encode(to encoder: Encoder) throws {
         var c = encoder.container(keyedBy: AnyKey.self)
         try c.r(id, "id"); try c.r(name, "name"); try c.e(visible, "visible", true); try c.e(locked, "locked", false)
+        try c.e(opacity, "opacity", 1); try c.e(blend, "blend", LayerBlend.NORMAL); try c.e(alphaLock, "alphaLock", false)
+        try c.e(clipToBelow, "clipToBelow", false)
     }
 }
 

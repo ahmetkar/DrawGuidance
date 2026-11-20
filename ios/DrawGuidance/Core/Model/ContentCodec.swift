@@ -19,6 +19,16 @@ enum ContentCodec {
     private static let VERSION_V9: UInt8 = 9
     /// v51 yeni fırça türleri ya da gövde dinamiği (Android `VERSION_V10`).
     private static let VERSION_V10: UInt8 = 10
+    /// v56 katman opaklığı/karışım/alfa kilidi/kırpma, belge ek bilgileri, seçim maskesi, resim dönüşümleri, gren ya da
+    /// kement dolgu (Android `VERSION_V11`): katman kaydına ek alanlar, katmanlardan sonra belge ek bilgileri (JSON) ve
+    /// her çizimde üçüncü ek bayrak baytı.
+    private static let VERSION_V11: UInt8 = 11
+    private static let EXT3_MASK = 1
+    private static let EXT3_WARP = 2
+    private static let LAYER_ALPHA_LOCK = 1
+    private static let LAYER_CLIP_BELOW = 2
+    /// En yeni içerik sürümü (paylaşımda karşı tarafa bildirilir).
+    static let LATEST_VERSION = 11
     private static let EXT2_BARREL = 16
     private static let EXT2_TEXTBOX = 1
     private static let EXT2_MODEL = 2
@@ -65,6 +75,8 @@ enum ContentCodec {
         .ACRYLIC: 50, .OIL_PAINT: 51, .CLOUD_SMOKE: 52,
         .FX_BLUR: 53, .FX_SHARPEN: 54, .FX_DODGE: 55, .FX_BURN: 56,
         .FX_SPONGE: 57, .FX_CLONE: 58, .FX_HEAL: 59, .FX_MIXER: 60,
+        // v56
+        .LASSO_FILL: 61,
     ]
     private static let fontCodes: [TextFont: Int] = [
         .SANS: 0, .SERIF: 1, .MONO: 2, .CONDENSED: 3, .HANDWRITING: 4, .CASUAL: 5,
@@ -91,6 +103,8 @@ enum ContentCodec {
     struct Document: Equatable {
         var pages: [[Stroke]]
         var layers: [Layer]
+        /// v56 belge ek bilgileri (simetri).
+        var extras = DocExtras()
     }
 
     struct CodecError: Error, CustomStringConvertible {
@@ -114,29 +128,36 @@ enum ContentCodec {
 
     static func encode(_ strokes: [Stroke]) -> Data { encodePages([strokes]) }
 
-    static func encodePages(_ pages: [[Stroke]], layers: [Layer] = [Layer.Default]) -> Data {
+    static func encodePages(_ pages: [[Stroke]], layers: [Layer] = [Layer.Default], extras: DocExtras = DocExtras()) -> Data {
         let docLayers = layers.isEmpty ? [Layer.Default] : layers
         var layerIndex: [String: Int] = [:]
         for (i, l) in docLayers.enumerated() { layerIndex[l.id] = i }
+        let v11 = !extras.isEmpty || docLayers.contains { $0.composited } || pages.contains { $0.contains(where: needsV11) }
         var raw = Writer()
         raw.varint(Int64(docLayers.count))
         for l in docLayers {
             raw.string(l.id); raw.string(l.name)
             raw.byte((l.visible ? 1 : 0) | (l.locked ? 2 : 0))
+            if v11 {
+                raw.float(l.opacity)
+                raw.byte(l.blend.code)
+                raw.byte((l.alphaLock ? LAYER_ALPHA_LOCK : 0) | (l.clipToBelow ? LAYER_CLIP_BELOW : 0))
+            }
         }
+        if v11 { raw.string(extras.isEmpty ? "" : json(extras)) }
         let pageList = pages.isEmpty ? [[]] : pages
         raw.varint(Int64(max(pages.count, 1)))
-        let v8 = pages.contains { $0.contains(where: needsV8) }
+        let v8 = v11 || pages.contains { $0.contains(where: needsV8) }
         for page in pageList {
             raw.varint(Int64(page.count))
-            for s in page { writeStroke(&raw, s, layerIndex, v8: v8) }
+            for s in page { writeStroke(&raw, s, layerIndex, v8: v8, v11: v11) }
         }
         let dynamics = pages.contains { $0.contains(where: hasDynamics) }
         let v6 = pages.contains { $0.contains { $0.params != nil || hasOrient($0) } }
         let v7 = pages.contains { $0.contains { $0.space != nil } }
         let v9 = pages.contains { $0.contains(where: needsV9) }
         let v10 = pages.contains { $0.contains(where: needsV10) }
-        let version: UInt8 = v10 ? VERSION_V10 : v9 ? VERSION_V9 : v8 ? VERSION_V8 : v7 ? VERSION_V7 : v6 ? VERSION_V6 : dynamics ? VERSION_V5 : VERSION_V4
+        let version: UInt8 = v11 ? VERSION_V11 : v10 ? VERSION_V10 : v9 ? VERSION_V9 : v8 ? VERSION_V8 : v7 ? VERSION_V7 : v6 ? VERSION_V6 : dynamics ? VERSION_V5 : VERSION_V4
         var out = Data([MAGIC_0, MAGIC_1, version])
         out.append(deflate(raw.data))
         return out
@@ -155,7 +176,7 @@ enum ContentCodec {
             return Document(pages: [LegacyJson.decodeStrokes(String(decoding: bytes, as: UTF8.self))], layers: [Layer.Default])
         }
         let version = bytes[2]
-        guard (VERSION...VERSION_V10).contains(version) else {
+        guard (VERSION...VERSION_V11).contains(version) else {
             throw CodecError(description: "Desteklenmeyen içerik sürümü: \(version)")
         }
         let body = try inflate(Data(bytes[3...]))
@@ -166,9 +187,21 @@ enum ContentCodec {
             var ls: [Layer] = []
             for _ in 0..<n {
                 let id = try r.string(), name = try r.string(), flags = try r.byte()
-                ls.append(Layer(id: id, name: name, visible: flags & 1 != 0, locked: flags & 2 != 0))
+                var l = Layer(id: id, name: name, visible: flags & 1 != 0, locked: flags & 2 != 0)
+                if version >= VERSION_V11 {
+                    l.opacity = try r.float()
+                    l.blend = LayerBlend.of(try r.byte())
+                    let lf = try r.byte()
+                    l.alphaLock = lf & LAYER_ALPHA_LOCK != 0; l.clipToBelow = lf & LAYER_CLIP_BELOW != 0
+                }
+                ls.append(l)
             }
             if !ls.isEmpty { layers = ls }
+        }
+        var extras = DocExtras()
+        if version >= VERSION_V11 {
+            let js = try r.string()
+            if !js.isEmpty, let e = fromJson(DocExtras.self, js) { extras = e }
         }
         let pageCount = version == VERSION ? 1 : Int(try r.varint())
         var pages: [[Stroke]] = []
@@ -179,7 +212,7 @@ enum ContentCodec {
             for _ in 0..<count { page.append(try readStroke(&r, Int(version), layers)) }
             pages.append(page)
         }
-        return Document(pages: pages, layers: layers)
+        return Document(pages: pages, layers: layers, extras: extras)
     }
 
     // MARK: Çizim
@@ -192,9 +225,20 @@ enum ContentCodec {
         needsV10(s) || s.hidden || s.model != nil || (s.brushType == .TEXT && (s.text?.box != nil || s.text?.path != nil))
     }
 
+    /// v56 belge V11 biçimi gerektiriyor mu (V11 bilmeyen cihaza gönderilmeden önce `V11Flatten` uygulanır).
+    static func requiresV11(_ doc: Document) -> Bool {
+        !doc.extras.isEmpty || doc.layers.contains { $0.composited } || doc.pages.contains { $0.contains(where: needsV11) }
+    }
+
+    /// v56 seçim maskesi, resim dönüşümü, gren, resimden fırça ya da kement dolgu.
+    static func needsV11(_ s: Stroke) -> Bool {
+        s.brushType == .LASSO_FILL || s.mask != nil || (s.warp.map { !$0.isEmpty } ?? false) ||
+            s.params?.grain != nil || s.params?.stampAssetId != nil
+    }
+
     private static func needsV9(_ s: Stroke) -> Bool { s.brushType == .TEXT && s.text?.path != nil }
 
-    private static func writeStroke(_ w: inout Writer, _ s: Stroke, _ layerIndex: [String: Int], v8: Bool) {
+    private static func writeStroke(_ w: inout Writer, _ s: Stroke, _ layerIndex: [String: Int], v8: Bool, v11: Bool = false) {
         writeStrokeBody(&w, s)
         let clip = (s.clip?.count == 4) ? s.clip : nil
         let paragraph: TextParagraph? = (s.brushType == .TEXT && s.text != nil && s.text!.paragraph != .NORMAL) ? s.text!.paragraph : nil
@@ -241,6 +285,13 @@ enum ContentCodec {
                 for p in s.points { w.byte(unitByte(p.roll)) }
                 for p in s.points { w.byte(unitByte(p.barrel)) }
             }
+        }
+        if v11 {
+            let mask = s.mask
+            let warp = s.warp.flatMap { $0.isEmpty ? nil : $0 }
+            w.byte((mask != nil ? EXT3_MASK : 0) | (warp != nil ? EXT3_WARP : 0))
+            if let mask { w.string(json(mask)) }
+            if let warp { w.string(json(warp)) }
         }
     }
 
@@ -395,6 +446,11 @@ enum ContentCodec {
                 for _ in 0..<n { barrel.append(Float(try r.byte()) / 255) }
                 for i in 0..<n { out.points[i].roll = roll[i]; out.points[i].barrel = barrel[i] }
             }
+        }
+        if version >= Int(VERSION_V11) {
+            let ext3 = try r.byte()
+            if ext3 & EXT3_MASK != 0, let m = fromJson(ClipMask.self, try r.string()) { out.mask = m }
+            if ext3 & EXT3_WARP != 0, let wp = fromJson(ImageWarp.self, try r.string()) { out.warp = wp }
         }
         if let paragraph, out.text != nil { out.text!.paragraph = paragraph }
         if let layer { out.layerId = layer }

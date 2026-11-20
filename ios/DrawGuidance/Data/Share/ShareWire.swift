@@ -91,8 +91,12 @@ struct ShareHello: Codable {
     var name: String
     var platform: String
     var app = ""
+    /// v56 en yeni içerik sürümü (eski uygulamalar göndermez: 0, V10 sayılır).
+    var codec = 0
 
-    init(name: String, platform: String, app: String) { self.name = name; self.platform = platform; self.app = app }
+    init(name: String, platform: String, app: String, codec: Int = 0) {
+        self.name = name; self.platform = platform; self.app = app; self.codec = codec
+    }
 
     init(from decoder: Decoder) throws {
         let c = try decoder.container(keyedBy: CodingKeys.self)
@@ -100,6 +104,7 @@ struct ShareHello: Codable {
         name = try c.decodeIfPresent(String.self, forKey: .name) ?? "?"
         platform = try c.decodeIfPresent(String.self, forKey: .platform) ?? ""
         app = try c.decodeIfPresent(String.self, forKey: .app) ?? ""
+        codec = (try? c.decodeIfPresent(Int.self, forKey: .codec)) ?? 0
     }
 }
 
@@ -251,6 +256,8 @@ struct SharePackage {
     let header: SharePackageHeader
     let content: Data
     let assets: [Data]
+    /// v56 içerik karşı tarafın sürümü için düzleştirildi (`V11Flatten`).
+    var flattened = false
 
     func encode(_ type: UInt8) -> Data { ShareWire.encode(type, header, [content] + assets) }
 

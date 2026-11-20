@@ -12,7 +12,7 @@ final class SharePackages {
     }
 
     /// Kayıtlı tuvalin paketi (yoksa nil).
-    func canvasPackage(_ canvasId: String, type: String, id: String, from: String) -> SharePackage? {
+    func canvasPackage(_ canvasId: String, type: String, id: String, from: String, peerCodec: Int = ContentCodec.LATEST_VERSION) -> SharePackage? {
         guard let c = store.getCanvas(canvasId) else { return nil }
         let metas = assets.metas(forCanvas: canvasId)
         var datas: [Data] = []
@@ -22,7 +22,7 @@ final class SharePackages {
             datas.append(d)
             list.append(ShareAsset(id: m.id, mime: m.mimeType, w: m.width, h: m.height, len: d.count))
         }
-        return package(c, type: type, id: id, seq: 0, assets: list, datas: datas, from: from)
+        return package(c, type: type, id: id, seq: 0, assets: list, datas: datas, from: from, peerCodec: peerCodec)
     }
 
     func canvasSize(_ canvasId: String) -> Int64 {
@@ -30,7 +30,7 @@ final class SharePackages {
     }
 
     /// Yayın güncellemesi: düzenleyicideki tuval; yalnız `sent` içinde olmayan resimler eklenir (arka planda çağrılabilir).
-    nonisolated func livePackage(_ c: CanvasUi, id: String, seq: Int64, sent: inout Set<String>, from: String) -> SharePackage {
+    nonisolated func livePackage(_ c: CanvasUi, id: String, seq: Int64, sent: inout Set<String>, from: String, peerCodec: Int = ContentCodec.LATEST_VERSION) -> SharePackage {
         var datas: [Data] = []
         var list: [ShareAsset] = []
         for m in assets.metas(forCanvas: c.localId) where !sent.contains(m.id) {
@@ -39,11 +39,13 @@ final class SharePackages {
             list.append(ShareAsset(id: m.id, mime: m.mimeType, w: m.width, h: m.height, len: d.count))
             sent.insert(m.id)
         }
-        return package(c, type: ShareWire.TYPE_LIVE, id: id, seq: seq, assets: list, datas: datas, from: from)
+        return package(c, type: ShareWire.TYPE_LIVE, id: id, seq: seq, assets: list, datas: datas, from: from, peerCodec: peerCodec)
     }
 
-    nonisolated private func package(_ c: CanvasUi, type: String, id: String, seq: Int64, assets list: [ShareAsset], datas: [Data], from: String) -> SharePackage {
-        let content = ContentCodec.encodePages(c.pages, layers: c.layers)
+    nonisolated private func package(_ c: CanvasUi, type: String, id: String, seq: Int64, assets list: [ShareAsset], datas: [Data], from: String,
+                                     peerCodec: Int = ContentCodec.LATEST_VERSION) -> SharePackage {
+        // v56 V11 bilmeyen cihaza düzleştirilmiş içerik
+        let (content, flat) = V11Flatten.forPeer(ContentCodec.encodePages(c.pages, layers: c.layers), peerCodec)
         var h = SharePackageHeader(id: id, type: type, name: c.name)
         h.canvasKind = c.kind.rawValue
         h.width = c.width; h.height = c.height
@@ -56,7 +58,7 @@ final class SharePackages {
         h.assets = list
         h.seq = seq
         h.from = from
-        return SharePackage(header: h, content: content, assets: datas)
+        return SharePackage(header: h, content: content, assets: datas, flattened: flat)
     }
 
     /// Alınan tuvali kaydeder ya da (`existingId`) yayında günceller. `ids`: gönderenin resim kimliği → buradaki kimlik.
@@ -113,6 +115,8 @@ final class SharePackages {
         var c = s
         if let a = s.assetId, let n = ids[a] { c.assetId = n }
         if let m = s.model, let n = ids[m.dataAssetId] { c.model = Model3DLink(modelId: m.modelId, dataAssetId: n) }
+        // v56 resimden fırçanın damga resmi
+        if let a = s.params?.stampAssetId, let n = ids[a] { c.params?.stampAssetId = n }
         return c
     }
 

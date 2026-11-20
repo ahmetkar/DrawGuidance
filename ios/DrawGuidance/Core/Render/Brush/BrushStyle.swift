@@ -108,7 +108,7 @@ extension BrushType {
         case .FX_BLUR, .FX_SHARPEN, .FX_DODGE, .FX_BURN, .FX_SPONGE, .FX_CLONE, .FX_HEAL, .FX_MIXER:
             return BrushStyle(widthFactor: 1.6, alphaFactor: 1, textured: true, engine: .RASTER, spacing: 0.1, hardness: 0.3)
         case .ERASER: return BrushStyle(widthFactor: 2, alphaFactor: 1, blendMode: .clear)
-        case .IMAGE, .TEXT, .SHAPE, .DIAGRAM, .FORMULA:
+        case .IMAGE, .TEXT, .SHAPE, .DIAGRAM, .FORMULA, .LASSO_FILL:
             return BrushStyle(widthFactor: 0, alphaFactor: 1, cap: .butt, join: .miter, smooth: false, engine: .IMAGE)
         }
     }
@@ -158,7 +158,7 @@ extension BrushType {
         case .FX_CLONE, .FX_HEAL: return 30
         case .FX_MIXER: return 32
         case .ERASER: return 30
-        case .IMAGE: return 1
+        case .IMAGE, .LASSO_FILL: return 1
         case .SHAPE, .DIAGRAM: return 4
         case .TEXT: return 48
         case .FORMULA: return 56
@@ -413,6 +413,7 @@ extension BrushType {
         case .FX_CLONE: return "v51_brush_clone"
         case .FX_HEAL: return "v51_brush_heal"
         case .FX_MIXER: return "v51_brush_mixer"
+        case .LASSO_FILL: return "v56_element_lasso_fill"
         default: return "brush_" + rawValue.lowercased()
         }
     }

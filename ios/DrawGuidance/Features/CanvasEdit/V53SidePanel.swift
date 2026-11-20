@@ -151,6 +151,7 @@ struct ElementsList: View {
         case .SHAPE: return "square.on.circle"
         case .DIAGRAM: return "point.3.connected.trianglepath.dotted"
         case .FORMULA: return "function"
+        case .LASSO_FILL: return "drop.fill"
         default: return BrushSymbols.of(t)
         }
     }

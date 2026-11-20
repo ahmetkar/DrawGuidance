@@ -392,7 +392,7 @@ final class ShareManager: ObservableObject {
         if pairShow?.peerId == id { pairShow = nil }
         setState(id, .connected, name: name, platform: platform)
         let version = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? ""
-        send(id, ShareWire.encode(ShareWire.HELLO, ShareHello(name: settings.deviceName, platform: "ios", app: version)))
+        send(id, ShareWire.encode(ShareWire.HELLO, ShareHello(name: settings.deviceName, platform: "ios", app: version, codec: ContentCodec.LATEST_VERSION)))
         afterConnect.removeValue(forKey: id)?.forEach { $0() }
     }
 
@@ -449,6 +449,8 @@ final class ShareManager: ObservableObject {
         switch m.type {
         case ShareWire.HELLO:
             let h = try m.header(ShareHello.self)
+            // v56 karşı tarafın içerik sürümü (eski uygulamalar bildirmez: V10)
+            peerCodec[id] = h.codec > 0 ? h.codec : 10
             setState(id, .connected, name: h.name, platform: h.platform)
         case ShareWire.OFFER:
             let o = try m.header(ShareOffer.self)
@@ -524,13 +526,22 @@ final class ShareManager: ObservableObject {
         if accept { status = ShareTransferStatus(peerName: peerName(id), title: o.title, sending: false) }
     }
 
+    /// v56 bağlı cihazların içerik sürümleri (HELLO'dan).
+    private var peerCodec: [String: Int] = [:]
+    private func codecOf(_ id: String) -> Int { peerCodec[id] ?? 10 }
+
+    private func noteFlattened(_ pkg: SharePackage, _ peerId: String) {
+        if pkg.flattened { toast = L("v56_share_flattened", peerName(peerId)) }
+    }
+
     private func deliver(_ id: String, _ out: Outgoing) {
         let from = settings.deviceName
         switch out.type {
         case ShareWire.TYPE_CANVAS:
-            guard let cid = out.canvasId, let pkg = packages.canvasPackage(cid, type: ShareWire.TYPE_CANVAS, id: id, from: from) else {
+            guard let cid = out.canvasId, let pkg = packages.canvasPackage(cid, type: ShareWire.TYPE_CANVAS, id: id, from: from, peerCodec: codecOf(out.peerId)) else {
                 fail(L("v51_share_failed", out.title)); return
             }
+            noteFlattened(pkg, out.peerId)
             send(out.peerId, pkg.encode(ShareWire.PACKAGE))
         case ShareWire.TYPE_IMAGE:
             guard let img = out.image, let repo = EditorDependencies.shared.images,
@@ -542,9 +553,10 @@ final class ShareManager: ObservableObject {
             h.from = from
             send(out.peerId, SharePackage(header: h, content: bytes, assets: []).encode(ShareWire.PACKAGE))
         case ShareWire.TYPE_LIVE:
-            guard let cid = out.canvasId, let pkg = packages.canvasPackage(cid, type: ShareWire.TYPE_LIVE, id: id, from: from) else {
+            guard let cid = out.canvasId, let pkg = packages.canvasPackage(cid, type: ShareWire.TYPE_LIVE, id: id, from: from, peerCodec: codecOf(out.peerId)) else {
                 fail(L("v51_share_failed", out.title)); return
             }
+            noteFlattened(pkg, out.peerId)
             liveSent = Set(pkg.header.assets.map(\.id))
             liveSeqOut = 0
             liveOfferId = id
@@ -572,10 +584,11 @@ final class ShareManager: ObservableObject {
                     let seq = self.liveSeqOut
                     let before = self.liveSent
                     let from = self.settings.deviceName
+                    let codec = self.codecOf(out.peerId)
                     // Paket arka planda hazırlanır (içerik kodlama ve resim okuma)
                     let (pkg, newSent) = await Task.detached(priority: .userInitiated) { () -> (SharePackage, Set<String>) in
                         var sent = before
-                        let p = packages.livePackage(frame, id: id, seq: seq, sent: &sent, from: from)
+                        let p = packages.livePackage(frame, id: id, seq: seq, sent: &sent, from: from, peerCodec: codec)
                         return (p, sent)
                     }.value
                     guard !Task.isCancelled, self.liveOut == out else { return }

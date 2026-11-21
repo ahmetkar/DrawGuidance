@@ -387,6 +387,9 @@ struct AdvancedMenus: View {
             ChromeButton(icon: "arrow.up.and.down.righttriangle.up.righttriangle.down", label: L("v56_reflection"), enabled: hasSelection, id: "v56_reflection") { vm.reflectSelection() }
             ChromeButton(icon: "water.waves", label: L("v56_liquify"), id: "v56_liquify") { vm.startLiquify() }
         }
+        if vm.v56(.ADV_ALIGN) || vm.v56(.ADV_EFFECTS) {
+            ChromeButton(icon: "square.on.circle", label: L("v56_object_menu"), enabled: hasSelection, id: "v56_object_menu_open") { vm.objectMenuOpen = true }
+        }
         if vm.canUseClipboard() {
             // v56 2C-3 kes, kopyala, yapıştır (yapıştır pano doluyken her sayfada)
             ChromeButton(icon: "scissors", label: L("v56_clip_cut"), enabled: hasSelection, id: "clip_cut") { vm.clipboard.cut() }

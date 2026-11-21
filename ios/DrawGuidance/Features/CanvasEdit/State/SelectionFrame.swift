@@ -9,11 +9,15 @@ final class SelectionController {
 
     init(_ store: EditorStore, _ host: EditorHost) { self.store = store; self.host = host }
 
+    /// v56 2E hizalamada ana nesne: seçimde en son dokunulan eleman.
+    private(set) var lastPicked: String?
+
     @discardableResult
     func pickAt(_ x: Float, _ y: Float, tolerance: Float) -> Bool {
         let index = store.currentIndex()
         guard let element = ElementOps.hitTest(index, P(x, y), tolerance: tolerance, skip: store.lockedIds()) else { return false }
         store.select(index.expand(element.allIds))
+        lastPicked = element.strokeIds.first ?? element.allIds.first
         return true
     }
 
@@ -63,6 +67,7 @@ final class SelectionController {
         let index = store.currentIndex()
         guard let element = ElementOps.hitTest(index, P(x, y), tolerance: tolerance, skip: store.lockedIds()) else { return false }
         store.select(index.expand(store.selection.union(element.allIds)))
+        lastPicked = element.strokeIds.first ?? element.allIds.first
         return true
     }
 

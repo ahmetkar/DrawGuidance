@@ -11,8 +11,8 @@ struct V56TransformLayer: View {
     var body: some View {
         if transform.state != nil {
             ZStack(alignment: .bottom) {
-                TransformOverlay(transform: transform, viewport: viewport)
-                TransformPanel(transform: transform)
+                TransformOverlay(transform: transform, viewport: viewport, advanced: vm.v56(.ADV_TRANSFORM))
+                TransformPanel(transform: transform, advanced: vm.v56(.ADV_TRANSFORM))
             }
         } else if liquify.target != nil {
             ZStack(alignment: .bottom) {
@@ -23,7 +23,7 @@ struct V56TransformLayer: View {
     }
 }
 
-private enum Grip: Equatable { case corner(Int), edge(Int), rotate, mesh(Int), move, meshInside }
+private enum Grip: Equatable { case corner(Int), edge(Int), rotate, mesh(Int), move, meshInside, pivot }
 
 private func pt(_ p: P) -> CGPoint { CGPoint(x: CGFloat(p.x), y: CGFloat(p.y)) }
 private func dist(_ a: CGPoint, _ b: CGPoint) -> CGFloat { hypot(a.x - b.x, a.y - b.y) }
@@ -51,6 +51,7 @@ private func outward(_ a: CGPoint, _ b: CGPoint, _ d: CGPoint) -> CGPoint {
 private struct TransformOverlay: View {
     @ObservedObject var transform: TransformController
     @ObservedObject var viewport: ViewportState
+    var advanced = false
     @State private var grip: Grip?
     @State private var last: CGPoint = .zero
     @State private var lastTime = Date()
@@ -94,6 +95,15 @@ private struct TransformOverlay: View {
                 q.forEach { handle(ctx, $0, 7, accent) }
                 for e in 0..<4 { handle(ctx, CGPoint(x: (q[e].x + q[(e + 1) % 4].x) / 2, y: (q[e].y + q[(e + 1) % 4].y) / 2), 4.5, accent) }
             }
+            // 2E referans noktası (nişan)
+            if advanced && s.mesh == nil {
+                let pv = pivotScreen(s)
+                ctx.stroke(Path(ellipseIn: CGRect(x: pv.x - 5, y: pv.y - 5, width: 10, height: 10)), with: .color(accent), lineWidth: 1.5)
+                var cross = Path()
+                cross.move(to: CGPoint(x: pv.x - 9, y: pv.y)); cross.addLine(to: CGPoint(x: pv.x + 9, y: pv.y))
+                cross.move(to: CGPoint(x: pv.x, y: pv.y - 9)); cross.addLine(to: CGPoint(x: pv.x, y: pv.y + 9))
+                ctx.stroke(cross, with: .color(accent), lineWidth: 1.5)
+            }
             let blue = Color(red: 0.18, green: 0.5, blue: 0.93)
             if let gx = transform.guides.0 {
                 let x = CGFloat(viewport.toScreen(P(gx, 0)).x)
@@ -117,7 +127,14 @@ private struct TransformOverlay: View {
         ctx.stroke(Path(ellipseIn: rect), with: .color(accent), lineWidth: 1.5)
     }
 
+    private func pivotScreen(_ s: TransformState) -> CGPoint {
+        if let p = transform.pivotPoint(s) { return pt(viewport.toScreen(P(p.0, p.1))) }
+        let q = s.quad.map(screen)
+        return CGPoint(x: q.reduce(0) { $0 + $1.x } / 4, y: q.reduce(0) { $0 + $1.y } / 4)
+    }
+
     private func pick(_ p: CGPoint, _ s: TransformState) -> Grip? {
+        if advanced && s.mesh == nil && dist(pivotScreen(s), p) < hit * 0.8 { return .pivot }
         if s.kind == .WARP, let mesh = s.mesh {
             if let i = mesh.firstIndex(where: { dist(screen($0), p) < hit }) { return .mesh(i) }
             return insideQuad(p, WarpMesh.corners(mesh).map(screen)) ? .meshInside : nil
@@ -154,6 +171,7 @@ private struct TransformOverlay: View {
             transform.rotateTo(Float(atan2(Double(c.y - cy), Double(c.x - cx)) * 180 / .pi) + 90)
         case .mesh(let i): transform.dragMesh(i, c.x, c.y)
         case .meshInside: transform.dragMeshInside(c.x, c.y, dx, dy)
+        case .pivot: transform.setFreePivot(c.x, c.y)
         case .move:
             // Mıknatıs: toplam sürüklemenin baskın eksenine kilitli
             total.width += CGFloat(dx); total.height += CGFloat(dy)
@@ -195,6 +213,8 @@ private struct PanelBox<C: View>: View {
 
 private struct TransformPanel: View {
     @ObservedObject var transform: TransformController
+    var advanced = false
+    @State private var pivotOpen = false
     @State private var snapOpen = false
     @State private var numericOpen = false
 
@@ -203,7 +223,7 @@ private struct TransformPanel: View {
             PanelBox {
                 ScrollView(.horizontal, showsIndicators: false) {
                     HStack(spacing: 6) {
-                        ForEach([(TransformKind.FREE, "v56_tf_free"), (.UNIFORM, "v56_tf_uniform"), (.DISTORT, "v56_tf_distort"), (.WARP, "v56_tf_warp")], id: \.0) { k, key in
+                        ForEach(kinds, id: \.0) { k, key in
                             V56Chip(label: L(key), on: s.kind == k, id: "v56_tf_\(k.rawValue.lowercased())") { transform.setKind(k) }
                         }
                         if s.kind == .WARP {
@@ -223,6 +243,13 @@ private struct TransformPanel: View {
                             transform.setFilter(TransformFilter.of((s.filter.code + 1) % TransformFilter.allCases.count))
                         }
                         V56Chip(label: L("v56_tf_numeric"), id: "v56_tf_numeric") { numericOpen = true }
+                        if advanced {
+                            let affine = s.kind != .DISTORT && s.kind != .WARP
+                            V56Chip(label: L("v56_tf_pivot"), on: transform.pivot != 4, id: "v56_tf_pivot") { pivotOpen = true }
+                            if affine { V56Chip(label: L("v56_tf_each"), on: transform.each, id: "v56_tf_each") { transform.setEach(!transform.each) } }
+                            if affine && transform.last != nil { V56Chip(label: L("v56_tf_repeat"), id: "v56_tf_repeat") { transform.repeatLast() } }
+                            V56Chip(label: L("v56_tf_duplicate"), id: "v56_tf_duplicate") { transform.doneDuplicate() }
+                        }
                         V56Chip(label: L("v56_tf_reset"), id: "v56_tf_reset") { transform.reset() }
                         V56Chip(label: L("cancel_button"), id: "v56_tf_cancel") { transform.cancel() }
                         V56Chip(label: L("v56_tf_done"), on: true, id: "v56_tf_done") { transform.done() }
@@ -233,8 +260,15 @@ private struct TransformPanel: View {
                 }
             }
             .sheet(isPresented: $snapOpen) { SnapSheet(transform: transform) }
+            .sheet(isPresented: $pivotOpen) { PivotSheet(transform: transform) }
             .sheet(isPresented: $numericOpen) { NumericSheet(transform: transform) }
         }
+    }
+
+    private var kinds: [(TransformKind, String)] {
+        var k: [(TransformKind, String)] = [(.FREE, "v56_tf_free"), (.UNIFORM, "v56_tf_uniform"), (.DISTORT, "v56_tf_distort"), (.WARP, "v56_tf_warp")]
+        if advanced { k.append((.SHEAR, "v56_tf_shear")) }
+        return k
     }
 
     private func filterKey(_ f: TransformFilter) -> String {
@@ -278,6 +312,8 @@ private struct NumericSheet: View {
     @ObservedObject var transform: TransformController
     @Environment(\.dismiss) private var dismiss
     @State private var values: [String] = []
+    @State private var lock = false
+    @State private var ratio: Float = 1
 
     private let keys = ["v56_tf_x", "v56_tf_y", "v56_tf_w", "v56_tf_h", "v56_tf_angle"]
 
@@ -286,9 +322,15 @@ private struct NumericSheet: View {
             Form {
                 if values.count == 5 {
                     ForEach(0..<5, id: \.self) { i in
-                        TextField(L(keys[i]), text: $values[i]).keyboardType(.numbersAndPunctuation)
+                        TextField(L(keys[i]), text: Binding(get: { values[i] }, set: { v in
+                            values[i] = v
+                            if lock, let f = Float(v.replacingOccurrences(of: ",", with: ".")) {
+                                if i == 2 { values[3] = String(Int((f / ratio).rounded())) } else if i == 3 { values[2] = String(Int((f * ratio).rounded())) }
+                            }
+                        })).keyboardType(.numbersAndPunctuation)
                             .accessibilityIdentifier("v56_tf_num_\(["x", "y", "w", "h", "angle"][i])")
                     }
+                    Toggle(L("v56_tf_lock_ratio"), isOn: $lock).accessibilityIdentifier("v56_tf_lock_ratio")
                 }
             }
             .navigationTitle(L("v56_tf_numeric"))
@@ -305,8 +347,39 @@ private struct NumericSheet: View {
                 }
             }
         }
-        .onAppear { values = (transform.metrics() ?? [0, 0, 0, 0, 0]).map { String(Int($0.rounded())) } }
+        .onAppear {
+            let m = transform.metrics() ?? [0, 0, 1, 1, 0]
+            values = m.map { String(Int($0.rounded())) }
+            ratio = m[3] > 0 ? m[2] / m[3] : 1
+        }
         .presentationDetents([.medium])
+    }
+}
+
+/// 2E referans noktası: 3×3 nokta; serbest için tuvaldeki nişan sürüklenir.
+private struct PivotSheet: View {
+    @ObservedObject var transform: TransformController
+    @Environment(\.dismiss) private var dismiss
+
+    var body: some View {
+        VStack(spacing: 12) {
+            Text(L("v56_tf_pivot")).font(.headline)
+            ForEach(0..<3, id: \.self) { r in
+                HStack(spacing: 18) {
+                    ForEach(0..<3, id: \.self) { c in
+                        let i = r * 3 + c
+                        Button { transform.setPivot(i); dismiss() } label: {
+                            Image(systemName: transform.pivot == i ? "circle.inset.filled" : "circle").font(.title2)
+                        }
+                        .buttonStyle(.plain)
+                        .accessibilityIdentifier("v56_tf_pivot_\(i)")
+                    }
+                }
+            }
+            Text(L("v56_tf_pivot_hint")).font(.caption).foregroundStyle(.secondary).multilineTextAlignment(.center)
+        }
+        .padding()
+        .presentationDetents([.height(260)])
     }
 }
 

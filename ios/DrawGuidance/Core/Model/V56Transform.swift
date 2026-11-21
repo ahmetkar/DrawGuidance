@@ -2,7 +2,8 @@ import Foundation
 
 /// v56 aşama 6 Dönüştür paneli geometrisi (planın 2A bölümü; saf, Android `V56Transform.kt` ile aynı):
 /// homografi (Bozma), ağ enterpolasyonu (Çarpıtma), yaslama, çevirme/döndürme/sığdırma ve dönüşüm durumu.
-enum TransformKind: String, CaseIterable { case FREE, UNIFORM, DISTORT, WARP }
+/// SHEAR (2E, yalnız Resim): kenar paralel kayar, köşe paralelkenarı kendi eksenlerinde ölçekler.
+enum TransformKind: String, CaseIterable { case FREE, UNIFORM, DISTORT, WARP, SHEAR }
 
 /// Resim ara değerlemesi: ImageWarp.filter kodları.
 enum TransformFilter: Int, CaseIterable {
@@ -241,20 +242,20 @@ enum TransformOps {
 
     static func translate(_ s: TransformState, _ dx: Float, _ dy: Float) -> TransformState { mapAll(s) { ($0 + dx, $1 + dy) } }
 
-    static func rotate(_ s: TransformState, _ degrees: Float) -> TransformState {
-        let (cx, cy) = center(s.quad)
+    static func rotate(_ s: TransformState, _ degrees: Float, pivot: (Float, Float)? = nil) -> TransformState {
+        let (cx, cy) = pivot ?? center(s.quad)
         let a = Double(degrees) * .pi / 180
         let c = Float(cos(a)), sn = Float(sin(a))
         return mapAll(s) { x, y in (cx + (x - cx) * c - (y - cy) * sn, cy + (x - cx) * sn + (y - cy) * c) }
     }
 
-    static func rotateTo(_ s: TransformState, _ degrees: Float, magnet: Bool) -> TransformState {
+    static func rotateTo(_ s: TransformState, _ degrees: Float, magnet: Bool, pivot: (Float, Float)? = nil) -> TransformState {
         let target = magnet ? Snapping.angle(degrees) : degrees
-        return rotate(s, target - angleOf(s.quad))
+        return rotate(s, target - angleOf(s.quad), pivot: pivot)
     }
 
-    static func flip(_ s: TransformState, horizontal: Bool) -> TransformState {
-        let (cx, cy) = center(s.quad)
+    static func flip(_ s: TransformState, horizontal: Bool, pivot: (Float, Float)? = nil) -> TransformState {
+        let (cx, cy) = pivot ?? center(s.quad)
         let a = Double(angleOf(s.quad)) * .pi / 180
         let ux = Float(cos(a)), uy = Float(sin(a))
         return mapAll(s) { x, y in
@@ -266,6 +267,22 @@ enum TransformOps {
     }
 
     static func dragCorner(_ s: TransformState, _ i: Int, _ x: Float, _ y: Float) -> TransformState {
+        if s.kind == .SHEAR {
+            let q = s.quad
+            let o = q[(i + 2) % 4], na = q[(i + 1) % 4], nb = q[(i + 3) % 4]
+            let ax = na.x - o.x, ay = na.y - o.y, bx = nb.x - o.x, by = nb.y - o.y
+            let det = ax * by - ay * bx
+            if abs(det) < 1e-6 { return s }
+            let px = x - o.x, py = y - o.y
+            let a = (px * by - py * bx) / det, b = (ax * py - ay * px) / det
+            if a * hypot(ax, ay) < 1 || b * hypot(bx, by) < 1 { return s }
+            var nq = q
+            nq[(i + 1) % 4] = StrokePoint(o.x + a * ax, o.y + a * ay)
+            nq[(i + 3) % 4] = StrokePoint(o.x + b * bx, o.y + b * by)
+            nq[i] = StrokePoint(o.x + a * ax + b * bx, o.y + a * ay + b * by)
+            var out = s; out.quad = nq
+            return out
+        }
         if s.kind == .DISTORT {
             var q = s.quad; q[i] = StrokePoint(x, y)
             if Homography.convex(q) { var o = s; o.quad = q; return o }
@@ -296,7 +313,7 @@ enum TransformOps {
     static func dragEdge(_ s: TransformState, _ e: Int, _ dx: Float, _ dy: Float) -> TransformState {
         let q = s.quad
         let i0 = e, i1 = (e + 1) % 4
-        if s.kind == .DISTORT {
+        if s.kind == .DISTORT || s.kind == .SHEAR {
             let ex = q[i1].x - q[i0].x, ey = q[i1].y - q[i0].y, len = max(1e-3, hypot(ex, ey))
             let along = (dx * ex + dy * ey) / len
             let mx = ex / len * along, my = ey / len * along
@@ -419,6 +436,76 @@ enum TransformOps {
             return o
         }
         return Applied(strokes: out, skipped: skipped)
+    }
+}
+
+/// 2E göreli afin dönüşüm: p' = c + (dx, dy) + L·(p − c); L = [[a, b], [c, d]].
+struct RelativeTransform: Equatable {
+    var a: Float, b: Float, c: Float, d: Float, dx: Float, dy: Float
+    var isIdentity: Bool { abs(a - 1) < 1e-5 && abs(b) < 1e-5 && abs(c) < 1e-5 && abs(d - 1) < 1e-5 && abs(dx) < 1e-3 && abs(dy) < 1e-3 }
+    func map(_ cx: Float, _ cy: Float, _ x: Float, _ y: Float) -> (Float, Float) {
+        (cx + dx + a * (x - cx) + b * (y - cy), cy + dy + c * (x - cx) + d * (y - cy))
+    }
+}
+
+extension TransformOps {
+    /// Durumun göreli afin karşılığı; ağ ya da perspektif ise nil.
+    static func relative(_ s: TransformState) -> RelativeTransform? {
+        if s.mesh != nil { return nil }
+        let q = s.quad
+        let w = s.r - s.l, h = s.b - s.t
+        if w <= 0 || h <= 0 { return nil }
+        let ex = q[1].x + q[3].x - q[0].x, ey = q[1].y + q[3].y - q[0].y
+        if hypot(q[2].x - ex, q[2].y - ey) > max(0.5, max(widthOf(q), heightOf(q)) * 0.002) { return nil }
+        let a = (q[1].x - q[0].x) / w, c = (q[1].y - q[0].y) / w
+        let b = (q[3].x - q[0].x) / h, d = (q[3].y - q[0].y) / h
+        let cx = (s.l + s.r) / 2, cy = (s.t + s.b) / 2
+        let mx = q[0].x + a * (cx - s.l) + b * (cy - s.t), my = q[0].y + c * (cx - s.l) + d * (cy - s.t)
+        return RelativeTransform(a: a, b: b, c: c, d: d, dx: mx - cx, dy: my - cy)
+    }
+
+    static func pointsBounds(_ strokes: [Stroke]) -> [Float]? {
+        var l = Float.greatestFiniteMagnitude, t = Float.greatestFiniteMagnitude, r = -Float.greatestFiniteMagnitude, b = -Float.greatestFiniteMagnitude
+        for s in strokes { for p in s.points { l = min(l, p.x); t = min(t, p.y); r = max(r, p.x); b = max(b, p.y) } }
+        return l > r ? nil : [l, t, r, b]
+    }
+
+    /// Seçimin birimleri: aynı gruptakiler birlikte (belge sırasıyla).
+    static func units(_ strokes: [Stroke], _ ids: Set<String>) -> [Set<String>] {
+        var order: [String] = []
+        var groups: [String: Set<String>] = [:]
+        for s in strokes where ids.contains(s.id) {
+            let k = s.groupId ?? ("#" + s.id)
+            if groups[k] == nil { order.append(k); groups[k] = [] }
+            groups[k]!.insert(s.id)
+        }
+        return order.map { groups[$0]! }
+    }
+
+    static func applyRelative(_ strokes: [Stroke], _ ids: Set<String>, _ rel: RelativeTransform, each: Bool) -> [Stroke] {
+        let groups = each ? units(strokes, ids) : [ids]
+        var out = strokes
+        for g in groups {
+            guard let bb = pointsBounds(out.filter { g.contains($0.id) }) else { continue }
+            var st = TransformState.start(bb[0], bb[1], bb[2], bb[3], kind: .FREE)
+            let cx = (st.l + st.r) / 2, cy = (st.t + st.b) / 2
+            st.quad = st.box.map { let m = rel.map(cx, cy, $0.x, $0.y); return StrokePoint(m.0, m.1) }
+            out = apply(out, g, st).strokes
+        }
+        return out
+    }
+
+    static func applyEach(_ strokes: [Stroke], _ ids: Set<String>, _ s: TransformState) -> Applied {
+        guard let rel = relative(s) else { return apply(strokes, ids, s) }
+        return Applied(strokes: applyRelative(strokes, ids, rel, each: true), skipped: [])
+    }
+
+    /// Referans noktası: 9 noktadan biri (0 sol-üst … 4 merkez … 8 sağ-alt).
+    static func anchorPoint(_ q: [StrokePoint], _ index: Int) -> (Float, Float) {
+        let u = Float(index % 3) / 2, v = Float(index / 3) / 2
+        let tx = q[0].x + (q[1].x - q[0].x) * u, ty = q[0].y + (q[1].y - q[0].y) * u
+        let bx = q[3].x + (q[2].x - q[3].x) * u, by = q[3].y + (q[2].y - q[3].y) * u
+        return (tx + (bx - tx) * v, ty + (by - ty) * v)
     }
 }
 

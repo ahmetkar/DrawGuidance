@@ -35,6 +35,13 @@ final class TransformController: ObservableObject {
     @Published private(set) var guides: (Float?, Float?) = (nil, nil)
     @Published private(set) var skipped = 0
     @Published private(set) var advancedMesh = false
+    /// 2E referans noktası: 0..8 (4 merkez); -1 serbest.
+    @Published private(set) var pivot = 4
+    private var freePivot: (Float, Float)?
+    /// 2E her birini dönüştür.
+    @Published private(set) var each = false
+    /// 2E son afin dönüşüm (tekrarla / çoğalt) ve her biri kipinde mi.
+    @Published private(set) var last: (RelativeTransform, Bool)?
 
     private var ids = Set<String>()
     private var original: [Stroke] = []
@@ -68,15 +75,20 @@ final class TransformController: ObservableObject {
         }
         targetsX = xs; targetsY = ys
         skipped = 0
+        pivot = 4; freePivot = nil
         state = TransformOps.setKind(TransformState.start(b.left, b.top, b.right, b.bottom), kind, meshSize: meshSize)
         return true
     }
 
     private var meshSize: Int { advancedMesh ? WarpMesh.ADVANCED : WarpMesh.BASIC }
 
+    private func applied(_ s: TransformState) -> TransformOps.Applied {
+        each && s.kind != .DISTORT && s.kind != .WARP ? TransformOps.applyEach(original, ids, s) : TransformOps.apply(original, ids, s)
+    }
+
     private func preview(_ s: TransformState) {
         state = s
-        let applied = TransformOps.apply(original, ids, s)
+        let applied = applied(s)
         skipped = applied.skipped.count
         store.previewStrokes(applied.strokes)
     }
@@ -137,11 +149,34 @@ final class TransformController: ObservableObject {
     }
 
     func dragEdge(_ e: Int, _ dx: Float, _ dy: Float) { change { TransformOps.dragEdge($0, e, dx, dy) } }
-    func rotateTo(_ degrees: Float) { let m = snap.magnets; change { TransformOps.rotateTo($0, degrees, magnet: m) } }
+    func rotateTo(_ degrees: Float) { let m = snap.magnets; change { TransformOps.rotateTo($0, degrees, magnet: m, pivot: pivotPoint($0)) } }
     func dragMesh(_ index: Int, _ x: Float, _ y: Float) { change { TransformOps.dragMesh($0, index, x, y) } }
     func dragMeshInside(_ px: Float, _ py: Float, _ dx: Float, _ dy: Float) { change { TransformOps.dragMeshInside($0, px, py, dx, dy) } }
-    func flip(horizontal: Bool) { change { TransformOps.flip($0, horizontal: horizontal) } }
-    func rotateStep(_ degrees: Float = 45) { change { TransformOps.rotate($0, degrees) } }
+    func flip(horizontal: Bool) { change { TransformOps.flip($0, horizontal: horizontal, pivot: pivotPoint($0)) } }
+    func rotateStep(_ degrees: Float = 45) { change { TransformOps.rotate($0, degrees, pivot: pivotPoint($0)) } }
+
+    /// Referans noktasının tuvaldeki yeri (merkezde nil).
+    func pivotPoint(_ s: TransformState? = nil) -> (Float, Float)? {
+        guard let st = s ?? state else { return nil }
+        if pivot == -1 { return freePivot }
+        if pivot == 4 { return nil }
+        return TransformOps.anchorPoint(st.mesh.map { WarpMesh.corners($0) } ?? st.quad, pivot)
+    }
+
+    func setPivot(_ index: Int) { pivot = index.coerceIn(0, 8); freePivot = nil }
+    func setFreePivot(_ x: Float, _ y: Float) { pivot = -1; freePivot = (x, y) }
+    func setEach(_ on: Bool) { each = on; change { $0 } }
+
+    /// Panelde: son dönüşüm geçerli duruma bir kez daha eklenir.
+    func repeatLast() {
+        guard let rel = last?.0 else { return }
+        change { s in
+            var o = s
+            let cx = s.quad.reduce(0) { $0 + $1.x } / 4, cy = s.quad.reduce(0) { $0 + $1.y } / 4
+            o.quad = s.quad.map { let m = rel.map(cx, cy, $0.x, $0.y); return StrokePoint(m.0, m.1) }
+            return o
+        }
+    }
 
     func fitToCanvas() {
         guard let c = store.canvas else { return }
@@ -161,10 +196,50 @@ final class TransformController: ObservableObject {
         guard let s = state else { return }
         store.endPreview()
         if !s.isIdentity {
-            store.commit(TransformOps.apply(original, ids, s).strokes, useArea: false)
+            store.commit(applied(s).strokes, useArea: false)
             store.select(ids)
+            if let rel = TransformOps.relative(s), !rel.isIdentity { last = (rel, each) }
         }
         close()
+    }
+
+    /// Dönüştür ve çoğalt: özgünler yerinde, dönüşmüş kopyalar eklenir ve seçilir (tek geri alma adımı).
+    func doneDuplicate() {
+        guard let s = state else { return }
+        store.endPreview()
+        let (copies, copyIds) = duplicates(original, ids)
+        let all = original + copies
+        let out = each && s.kind != .DISTORT && s.kind != .WARP ? TransformOps.applyEach(all, copyIds, s) : TransformOps.apply(all, copyIds, s)
+        store.commit(out.strokes, useArea: false)
+        store.select(copyIds)
+        if let rel = TransformOps.relative(s), !rel.isIdentity { last = (rel, each) }
+        close()
+    }
+
+    /// Panel kapalıyken son dönüşüm seçime (ya da [duplicate] ise kopyalarına) uygulanır.
+    @discardableResult
+    func applyLast(duplicate: Bool) -> Bool {
+        guard let l = last, let c = store.canvas, !isOpen else { return false }
+        let rel = l.0, eachLast = l.1
+        let sel = store.selection
+        if sel.isEmpty { return false }
+        var strokes = c.strokes
+        var target = sel
+        if duplicate { let d = duplicates(strokes, sel); strokes += d.0; target = d.1 }
+        store.commit(TransformOps.applyRelative(strokes, target, rel, each: eachLast), useArea: false)
+        store.select(target)
+        return true
+    }
+
+    private func duplicates(_ strokes: [Stroke], _ sel: Set<String>) -> ([Stroke], Set<String>) {
+        var groups: [String: String] = [:]
+        let copies = strokes.filter { sel.contains($0.id) }.enumerated().map { i, st -> Stroke in
+            var c = st
+            c.id = UUID().uuidString.lowercased(); c.order = strokes.count + i
+            if let g = st.groupId { if groups[g] == nil { groups[g] = UUID().uuidString.lowercased() }; c.groupId = groups[g] }
+            return c
+        }
+        return (copies, Set(copies.map(\.id)))
     }
 
     func cancel() {

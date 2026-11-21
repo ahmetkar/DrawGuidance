@@ -44,6 +44,8 @@ final class EditorViewModel: ObservableObject, EditorHost {
     @Published var reopenColorSheet = false
     /// v56 aşama 5 doku seçicisinin hedefi: "area", "page" ya da "layer:<kimlik>"; nil: kapalı.
     @Published var textureFillTarget: String?
+    /// v56 aşama 6A Nesne menüsü açık mı.
+    @Published var objectMenuOpen = false
     /// v56 sihirli değnek ölçütü ve benzerlik toleransı (0..1).
     @Published var wandCriterion: V56Selection.WandCriterion = .COLOR
     @Published private(set) var wandTolerance: Float = 0.15
@@ -719,6 +721,64 @@ final class EditorViewModel: ObservableObject, EditorHost {
         if sel.count == 1, sel[0].brushType == .IMAGE { liquify.begin(sel[0].id); return }
         Task { if let id = await images.rasterize(ids) { liquify.begin(id) } }
     }
+
+    // MARK: v56 aşama 6A (2E): hizala ve dağıt, vektör efektleri, dönüşümü tekrarla
+
+    private func unitBounds(_ s: Stroke) -> [Float]? { ElementOps.bounds(s).map { [$0.left, $0.top, $0.right, $0.bottom] } }
+
+    /// Ana nesne: seçimde en son dokunulan eleman (yoksa en büyük birim).
+    func keyObjectId() -> String? {
+        guard let c = store.canvas else { return nil }
+        let sel = store.selection
+        if let p = selection.lastPicked, sel.contains(p) { return p }
+        return V56Arrange.units(c.strokes, sel, boundsOf: unitBounds).max { ($0.r - $0.l) * ($0.b - $0.t) < ($1.r - $1.l) * ($1.b - $1.t) }?.ids.first
+    }
+
+    @discardableResult
+    func alignObjects(_ align: V56Arrange.Align, _ ref: V56Arrange.Ref) -> Bool {
+        guard let c = store.canvas else { return false }
+        let units = V56Arrange.units(c.strokes, store.selection, boundsOf: unitBounds)
+        if units.isEmpty { return false }
+        let off = V56Arrange.align(units, align, ref, paperW: Float(c.width), paperH: Float(c.height), keyId: keyObjectId())
+        if off.allSatisfy({ $0.0 == 0 && $0.1 == 0 }) { return false }
+        store.commit(V56Arrange.applyOffsets(c.strokes, units, off), useArea: false)
+        return true
+    }
+
+    @discardableResult
+    func distributeObjects(_ mode: V56Arrange.Distribute) -> Bool {
+        guard let c = store.canvas else { return false }
+        let units = V56Arrange.units(c.strokes, store.selection, boundsOf: unitBounds)
+        let off = V56Arrange.distribute(units, mode)
+        if off.allSatisfy({ $0.0 == 0 && $0.1 == 0 }) { return false }
+        store.commit(V56Arrange.applyOffsets(c.strokes, units, off), useArea: false)
+        return true
+    }
+
+    private var effectBase: [Stroke]?
+
+    func previewEffect(_ effect: V56Arrange.Effect, _ amount: Float) {
+        if effectBase == nil { effectBase = store.canvas?.strokes }
+        guard let base = effectBase else { return }
+        store.previewStrokes(V56Arrange.effect(base, store.selection, effect, amount))
+    }
+
+    @discardableResult
+    func applyEffect(_ effect: V56Arrange.Effect, _ amount: Float) -> Bool {
+        guard let base = effectBase ?? store.canvas?.strokes else { return false }
+        store.endPreview(); effectBase = nil
+        let out = V56Arrange.effect(base, store.selection, effect, amount)
+        if out == base { return false }
+        store.commit(out, useArea: false)
+        return true
+    }
+
+    func cancelEffect() { if effectBase != nil { store.endPreview(); effectBase = nil } }
+
+    func canEffect() -> Bool { store.canvas?.strokes.contains { store.selection.contains($0.id) && V56Arrange.canEffect($0) } == true }
+
+    @discardableResult
+    func repeatTransform(duplicate: Bool) -> Bool { transform.applyLast(duplicate: duplicate) }
 
     /// Katman menüsünden: o katman etkin yapılıp bütün sayfası dokuyla doldurulur.
     func textureFillLayer(_ layerId: String, _ textureId: String) {

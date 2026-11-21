@@ -52,6 +52,8 @@ struct CanvasEditScreen: View {
                         .sheet(isPresented: Binding(get: { vm.textureFillTarget != nil }, set: { if !$0 { vm.textureFillTarget = nil } })) {
                             TexturePickerSheet(vm: vm, target: vm.textureFillTarget ?? "page")
                         }
+                        // v56 aşama 6A Nesne menüsü
+                        .sheet(isPresented: $vm.objectMenuOpen) { V56ObjectMenu(vm: vm) }
                     if let b = vm.placingLocation {
                         LocationPlaceOverlay(background: b, panels: vm.comicPanelRects(), viewport: vm.viewport,
                                              onPlace: { vm.placeLocation($0) }, onCancel: { vm.placingLocation = nil })

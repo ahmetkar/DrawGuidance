@@ -37,7 +37,7 @@ import kotlin.math.roundToInt
  * sihirli değnek açıkken (altta) ölçüt ve tolerans.
  */
 @Composable
-fun V56SelectionOverlay(viewModel: CanvasEditViewModel, mode: EditMode, pick: CanvasPick) {
+fun V56SelectionOverlay(viewModel: CanvasEditViewModel, mode: EditMode, pick: CanvasPick, onTextureFill: () -> Unit = {}) {
     val area by viewModel.area.collectAsState()
     val criterion by viewModel.wandCriterion.collectAsState()
     val tolerance by viewModel.wandTolerance.collectAsState()
@@ -53,6 +53,9 @@ fun V56SelectionOverlay(viewModel: CanvasEditViewModel, mode: EditMode, pick: Ca
                 NeuChip(stringResource(R.string.v56_area_shrink), false, { viewModel.growArea(-8f) }, Modifier.testTag("v56_area_shrink"))
                 if (!a.inverted && viewModel.v56(com.karapp.drawguidance.data.model.V56Flags.Feature.LASSO_FILL)) {
                     NeuChip(stringResource(R.string.v56_area_fill), false, { viewModel.lassoFill() }, Modifier.testTag("v56_area_fill"))
+                }
+                if (!a.inverted && viewModel.v56(com.karapp.drawguidance.data.model.V56Flags.Feature.GRAIN)) {
+                    NeuChip(stringResource(R.string.v56_texture_fill), false, onTextureFill, Modifier.testTag("v56_area_texture_fill"))
                 }
                 NeuChip(stringResource(R.string.v56_area_clear), false, { viewModel.clearArea() }, Modifier.testTag("v56_area_clear"))
             }

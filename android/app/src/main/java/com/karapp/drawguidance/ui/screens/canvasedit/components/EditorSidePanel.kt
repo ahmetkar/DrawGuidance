@@ -164,6 +164,8 @@ fun BrushPanelContent(
     onEyedropper: (() -> Unit)? = null,
     /** v33 çocuklar için sade panel: fırça, kalınlık ve büyük renk paleti. */
     kids: Boolean = false,
+    /** v56 gren ve resimden fırça (mod kuralı: V56Flags GRAIN). */
+    grain: GrainActions? = null,
 ) {
     val colors = NeuTheme.colors
     if (kids) {
@@ -245,7 +247,7 @@ fun BrushPanelContent(
             NeuSlider(value = settings.strength, onValueChange = onStrengthChange, valueRange = 0.1f..1f)
         }
 
-        BrushTuningSection(settings.brushType, settings.tuning, onTuning, onResetTuning, cloneSourcePicking, cloneSourcePending, onPickCloneSource)
+        BrushTuningSection(settings.brushType, settings.tuning, onTuning, onResetTuning, cloneSourcePicking, cloneSourcePending, onPickCloneSource, grain)
 
         Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {

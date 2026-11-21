@@ -62,6 +62,12 @@ class LiveStrokeLayer {
      */
     private var front: ((StrokeChunk) -> Unit)? = null
 
+    /** v56 gren ve resimden fırça (canlı izde de bitmiş izdeki gibi görünsün). */
+    private var params: com.karapp.drawguidance.data.model.BrushParams? = null
+    private var color: Int = 0
+    private var liveSize: Float = 1f
+    private var liveFlow: Float = 1f
+
     internal fun start(
         id: String, type: BrushType, color: Int, sizePx: Float, opacity: Float, flow: Float, strength: Float,
         scale: Float, offsetX: Float, offsetY: Float, viewWidth: Int, viewHeight: Int,
@@ -69,11 +75,15 @@ class LiveStrokeLayer {
         params: com.karapp.drawguidance.data.model.BrushParams? = null,
     ) {
         release()
+        this.params = params
+        this.color = color
+        this.liveSize = sizePx
+        this.liveFlow = flow
         this.viewWidth = viewWidth
         this.viewHeight = viewHeight
         stream = StrokeStream.create(type, color, sizePx, opacity, id.hashCode(), flow, strength, eraserMask = true, params = params)
         this.front = front?.takeIf {
-            stream?.let { s -> !s.isEraser && s.compositeAlpha >= 0.999f && s.blend == BlendMode.SrcOver && s.shadowAlpha <= 0f && !s.needsOwnLayer } == true
+            params?.grain == null && params?.stampAssetId == null && stream?.let { s -> !s.isEraser && s.compositeAlpha >= 0.999f && s.blend == BlendMode.SrcOver && s.shadowAlpha <= 0f && !s.needsOwnLayer } == true
         }
         strokeId = id
         this.scale = scale
@@ -218,16 +228,55 @@ class LiveStrokeLayer {
         drawShadow(canvas, s, area, tail)
         // v20 3B fırçanın kuyruğu altındaki karolardan (birleşim yerini) siler: gölgeyi silmesin diye iz ayrı katmanda
         val body = if (s.needsOwnLayer && s.shadowAlpha > 0f && tail != null) canvas.saveLayer(area, null) else -1
-        drawTiles(canvas)
-        if (tail != null) {
-            canvas.save()
-            canvas.translate(offsetX, offsetY)
-            canvas.scale(scale, scale)
-            tail.draw(canvas)
-            canvas.restore()
+        val grained = grainLayer(canvas, s)
+        if (!drawStampsLive(canvas, s)) {
+            drawTiles(canvas)
+            if (tail != null) {
+                canvas.save()
+                canvas.translate(offsetX, offsetY)
+                canvas.scale(scale, scale)
+                tail.draw(canvas)
+                canvas.restore()
+            }
         }
+        if (grained >= 0) applyGrain(canvas, s, grained)
         if (body >= 0) canvas.restoreToCount(body)
         canvas.restoreToCount(restore)
+    }
+
+    /** v56 resimden fırça: canlı izde de uç resmi damgalanır (uç yüklü değilse fırçanın kendi ucu). */
+    private fun drawStampsLive(canvas: Canvas, s: StrokeStream): Boolean {
+        if (params?.stampAssetId == null || s.isEraser) return false
+        val pts = points()
+        if (pts.isEmpty()) return false
+        val stroke = com.karapp.drawguidance.data.model.Stroke(
+            strokeId ?: "", pts, "#000000", s.type, liveSize, s.opacity, 0, params = params, flow = liveFlow,
+        )
+        canvas.save()
+        canvas.translate(offsetX, offsetY)
+        canvas.scale(scale, scale)
+        val ok = GrainRenderer.drawStamps(canvas, stroke, 0f, 0f, color)
+        canvas.restore()
+        return ok
+    }
+
+    private fun grainLayer(canvas: Canvas, s: StrokeStream): Int {
+        if (params?.grain == null || s.isEraser || s.count == 0) return -1
+        return canvas.saveLayer(null, null)
+    }
+
+    /** v56 gren: canlı izin ara katmanı doku karosuyla çarpılır (bitmiş izdeki yerleşimle aynı). */
+    private fun applyGrain(canvas: Canvas, s: StrokeStream, layer: Int) {
+        val g = params?.grain
+        if (g != null && s.count > 0) {
+            val shader = android.graphics.BitmapShader(GrainRenderer.tile(g.textureId, g.strength), android.graphics.Shader.TileMode.REPEAT, android.graphics.Shader.TileMode.REPEAT)
+            val m = GrainRenderer.shaderMatrix(g, s.pointsX()[0], s.pointsY()[0])
+            m.postScale(scale, scale)
+            m.postTranslate(offsetX, offsetY)
+            shader.setLocalMatrix(m)
+            canvas.drawPaint(Paint(Paint.FILTER_BITMAP_FLAG).apply { this.shader = shader; xfermode = PorterDuffXfermode(PorterDuff.Mode.DST_IN) })
+        }
+        canvas.restoreToCount(layer)
     }
 
     private fun drawTiles(canvas: Canvas) {
@@ -252,7 +301,9 @@ class LiveStrokeLayer {
         val composite = compositePaint(s)
         val restore = if (composite != null) target.saveLayer(area, composite) else target.save()
         drawShadow(target, s, area, null)
-        drawTiles(target)
+        val grained = grainLayer(target, s)
+        if (!drawStampsLive(target, s)) drawTiles(target)
+        if (grained >= 0) applyGrain(target, s, grained)
         target.restoreToCount(restore)
         target.restore()
     }

@@ -41,6 +41,7 @@ import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.automirrored.filled.DriveFileMove
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.Texture
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material.icons.filled.Lock
@@ -591,6 +592,8 @@ fun LayersPanelContent(
     onDelete: (String) -> Unit,
     /** v56 etkin katmanın opaklık, karışım modu, alfa kilidi ve kırpma ayarları; null: gösterilmez (mod kuralı). */
     look: LayerLookActions? = null,
+    /** v56 katmanı dokuyla doldur (katman kimliği); null: menüde yok. */
+    onTextureFill: ((String) -> Unit)? = null,
 ) {
     val colors = NeuTheme.colors
     var renaming by remember { mutableStateOf<Layer?>(null) }
@@ -666,6 +669,11 @@ fun LayersPanelContent(
                                 leadingIcon = { Icon(Icons.AutoMirrored.Filled.DriveFileMove, null) },
                                 enabled = selectionCount > 0 && !layer.locked && layer.visible,
                                 onClick = { menu = false; onMoveSelection(layer.id) },
+                            )
+                            if (onTextureFill != null) DropdownMenuItem(
+                                text = { Text(stringResource(R.string.v56_texture_fill_layer)) }, leadingIcon = { Icon(Icons.Filled.Texture, null) },
+                                enabled = !layer.locked && layer.visible, onClick = { menu = false; onTextureFill(layer.id) },
+                                modifier = Modifier.testTag("v56_layer_texture_fill"),
                             )
                             DropdownMenuItem(
                                 text = { Text(stringResource(R.string.layer_delete), color = colors.danger) },

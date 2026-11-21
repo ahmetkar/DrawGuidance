@@ -303,6 +303,34 @@ class ImageController(
         }
     }
 
+    /**
+     * v56 aşama 5 "Resimden fırça oluştur": resim güvenlik ve boyut denetiminden geçer, koyu yerleri boya olan en çok
+     * 256 px'lik uç resmine çevrilip bu tuvale varlık olarak yazılır; kimliği [onReady]'e verilir.
+     */
+    fun createImageBrush(uri: Uri, onReady: (String) -> Unit) {
+        if (_import.value == ImageImportState.Checking) return
+        _import.value = ImageImportState.Checking
+        host.scope.launch {
+            val result = runCatching { imageImporter.check(uri) }.getOrElse { ImageCheckResult(listOf(ImageIssue.Unreadable), emptyList(), null) }
+            val image = result.image
+            if (!result.accepted || image == null) {
+                _import.value = ImageImportState.Rejected(result.errors.ifEmpty { listOf(ImageIssue.Unreadable) }, result.warnings)
+                return@launch
+            }
+            val id = runCatching {
+                val tip = kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.Default) {
+                    com.karapp.drawguidance.ui.drawing.GrainRenderer.tipFrom(image.bitmap)
+                }
+                val bytes = java.io.ByteArrayOutputStream().use { out ->
+                    tip.compress(android.graphics.Bitmap.CompressFormat.PNG, 100, out); out.toByteArray()
+                }
+                assetStore.save(store.canvasLocalId, PreparedImage(bytes, "image/png", tip.width, tip.height, tip, bytes.size, 0f))
+            }.getOrNull()
+            _import.value = null
+            if (id != null) onReady(id)
+        }
+    }
+
     /** v29 Resimlerim'den (uygulamanın kaydettiği) resim: sınır kontrolü olmadan, küçültülerek eklenir. */
     fun importSaved(uri: Uri, center: Offset) {
         if (_import.value == ImageImportState.Checking) return

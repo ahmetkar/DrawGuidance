@@ -79,4 +79,25 @@
     <string name="v56_help_quick_color">Renk seçici penceresini açar; penceredeki damlalıkla tuvalden renk alabilirsin.</string>
     <string name="v56_help_quick_pin">Fırçayı hızlı şeritte sabitler (en çok 6). Dokununca fırça seçilir.</string>
     <string name="v56_help_quick_unpin">Fırçayı sabitlenenlerden kaldırır. Dokununca fırça seçilir.</string>
+    <string name="v56_grain_title">Gren</string>
+    <string name="v56_grain_hint">Fırça izi seçilen dokuyla çarpılır; kağıt dişi gibi boşluklar kalır.</string>
+    <string name="v56_grain_none">Yok</string>
+    <string name="v56_grain_scale">Doku ölçeği</string>
+    <string name="v56_grain_strength">Gren gücü</string>
+    <string name="v56_grain_moving">Kayar</string>
+    <string name="v56_grain_moving_hint">Açık: doku tuvale sabit, fırça üstünden kayar. Kapalı: doku her çizgiyle birlikte başlar.</string>
+    <string name="v56_tex_paper">Kağıt</string>
+    <string name="v56_tex_canvas">Tuval bezi</string>
+    <string name="v56_tex_charcoal">Kömür</string>
+    <string name="v56_tex_noise">Kum</string>
+    <string name="v56_tex_dots">Noktalar</string>
+    <string name="v56_tex_hatch">Tarama</string>
+    <string name="v56_image_brush">Resimden fırça oluştur</string>
+    <string name="v56_image_brush_remove">Resim ucunu kaldır</string>
+    <string name="v56_image_brush_active">Bu fırça seçtiğin resmi damga olarak kullanıyor (koyu yerler boya olur).</string>
+    <string name="v56_texture_fill">Dokuyla doldur</string>
+    <string name="v56_texture_fill_layer">Katmanı dokuyla doldur</string>
+    <string name="v56_add_texture">Doku</string>
+    <string name="v56_help_add_texture">Etkin katmanın bütün sayfasını seçilen hazır dokuyla, fırça renginde doldurur.</string>
+    <string name="v56_help_texture_fill">Seçim alanının içini seçilen hazır dokuyla, fırça renginde doldurur.</string>
 </resources>

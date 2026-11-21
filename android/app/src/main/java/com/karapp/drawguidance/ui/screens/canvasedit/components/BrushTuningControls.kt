@@ -5,6 +5,8 @@ import androidx.compose.material.icons.filled.ExpandMore
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
@@ -29,6 +31,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.graphics.drawscope.clipRect
+import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
@@ -198,6 +202,8 @@ internal fun BrushTuningSection(
     cloneSourcePicking: Boolean = false,
     cloneSourcePending: Boolean = false,
     onPickCloneSource: () -> Unit = {},
+    /** v56 gren ve resimden fırça; null: gösterilmez (mod kuralı). */
+    grain: GrainActions? = null,
 ) {
     val colors = NeuTheme.colors
     Column(Modifier.testTag("brush_tuning_section"), verticalArrangement = Arrangement.spacedBy(16.dp)) {
@@ -293,6 +299,8 @@ internal fun BrushTuningSection(
                 )
             }
         }
+
+        if (grain != null && BrushTuning.supportsGrain(type)) GrainSection(type, tuning, grain)
 
         if (tuning != BrushTuning()) {
             TextButton(onClick = onReset, modifier = Modifier.testTag("brush_tuning_reset")) {
@@ -513,4 +521,115 @@ internal fun BrushAdvancedSections(
         LabeledSlider(stringResource(R.string.v51_pen_barrel), signedPct(ba), ba, -1f..1f, { v -> setPen { it.copy(barrel = r2(v).takeIf { x -> x != 0f }) } }, "brush_v51_pen_barrel",
             hint = stringResource(R.string.v51_pen_barrel_hint))
     }
+}
+
+// ---------------------------------------------------------------------------------------------
+// v56 aşama 5: gren ve resimden fırça
+// ---------------------------------------------------------------------------------------------
+
+/** v56 Fırça Özellikleri › Gren bölümünün eylemleri. */
+class GrainActions(
+    val onTexture: (String?) -> Unit,
+    val onGrain: ((com.karapp.drawguidance.data.model.GrainSpec) -> com.karapp.drawguidance.data.model.GrainSpec) -> Unit,
+    val onPickImage: () -> Unit,
+    val onRemoveImage: () -> Unit,
+)
+
+/** Hazır dokunun adı (7 dilde). */
+@Composable
+fun textureLabel(id: String): String = stringResource(
+    when (id.removePrefix(com.karapp.drawguidance.data.model.V56Textures.PREFIX)) {
+        "paper" -> R.string.v56_tex_paper
+        "canvas" -> R.string.v56_tex_canvas
+        "charcoal" -> R.string.v56_tex_charcoal
+        "noise" -> R.string.v56_tex_noise
+        "dots" -> R.string.v56_tex_dots
+        else -> R.string.v56_tex_hatch
+    },
+)
+
+/** Doku örneği (karo, koyu = boya tutan yer). */
+@Composable
+fun TextureSwatch(id: String, selected: Boolean, onClick: () -> Unit, modifier: Modifier = Modifier) {
+    val colors = NeuTheme.colors
+    val bitmap = remember(id) { com.karapp.drawguidance.ui.drawing.GrainRenderer.preview(id).asImageBitmap() }
+    val label = textureLabel(id)
+    Column(
+        modifier.clickable(onClick = onClick).padding(2.dp).semantics { contentDescription = label },
+        horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(2.dp),
+    ) {
+        Canvas(
+            Modifier.size(48.dp)
+                .background(colors.background, androidx.compose.foundation.shape.RoundedCornerShape(10.dp))
+                .border(if (selected) 3.dp else 1.dp, if (selected) colors.accent else colors.contentMuted.copy(alpha = 0.4f), androidx.compose.foundation.shape.RoundedCornerShape(10.dp)),
+        ) {
+            val inset = 3.dp.toPx()
+            clipRect(inset, inset, size.width - inset, size.height - inset) {
+                drawImage(
+                    bitmap, dstSize = androidx.compose.ui.unit.IntSize(size.width.toInt(), size.height.toInt()),
+                    colorFilter = androidx.compose.ui.graphics.ColorFilter.tint(colors.content, androidx.compose.ui.graphics.BlendMode.SrcIn),
+                )
+            }
+        }
+        Text(label, style = MaterialTheme.typography.labelSmall, maxLines = 1)
+    }
+}
+
+@OptIn(ExperimentalLayoutApi::class)
+@Composable
+private fun GrainSection(type: BrushType, tuning: BrushTuning, actions: GrainActions) {
+    val colors = NeuTheme.colors
+    Column(Modifier.testTag("v56_grain_section"), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+        SectionTitle(stringResource(R.string.v56_grain_title), stringResource(R.string.v56_grain_hint))
+        FlowRow(horizontalArrangement = Arrangement.spacedBy(6.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+            NeuChip(stringResource(R.string.v56_grain_none), tuning.grain == null, { actions.onTexture(null) }, Modifier.testTag("v56_grain_none"))
+            com.karapp.drawguidance.data.model.V56Textures.BUILTIN.forEach { id ->
+                TextureSwatch(id, tuning.grain?.textureId == id, { actions.onTexture(id) }, Modifier.testTag("v56_grain_${id.removePrefix("builtin:")}"))
+            }
+        }
+        tuning.grain?.let { g ->
+            LabeledSlider(
+                stringResource(R.string.v56_grain_scale), pct(g.scale), g.scale,
+                com.karapp.drawguidance.data.model.V56Textures.MIN_SCALE..com.karapp.drawguidance.data.model.V56Textures.MAX_SCALE,
+                { v -> actions.onGrain { it.copy(scale = r2(v)) } }, "v56_grain_scale",
+            )
+            LabeledSlider(stringResource(R.string.v56_grain_strength), pct(g.strength), g.strength, 0f..1f, { v -> actions.onGrain { it.copy(strength = r2(v)) } }, "v56_grain_strength")
+            SwitchRow(stringResource(R.string.v56_grain_moving), stringResource(R.string.v56_grain_moving_hint), g.moving, "v56_grain_moving") { on ->
+                actions.onGrain { it.copy(moving = on) }
+            }
+        }
+        if (BrushTuning.supportsImageTip(type)) {
+            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                NeuButton(stringResource(R.string.v56_image_brush), actions.onPickImage, Modifier.weight(1f).testTag("v56_image_brush"))
+                if (tuning.stampAssetId != null) {
+                    TextButton(onClick = actions.onRemoveImage, modifier = Modifier.testTag("v56_image_brush_remove")) {
+                        Text(stringResource(R.string.v56_image_brush_remove), color = colors.accent)
+                    }
+                }
+            }
+            if (tuning.stampAssetId != null) {
+                Text(stringResource(R.string.v56_image_brush_active), style = MaterialTheme.typography.bodySmall, color = colors.contentMuted, modifier = Modifier.testTag("v56_image_brush_active"))
+            }
+        }
+    }
+}
+
+/** v56 doku seçici (Dokuyla doldur, katmanı dokuyla doldur, Ekle › Doku). */
+@OptIn(ExperimentalLayoutApi::class)
+@Composable
+fun TexturePickerDialog(title: String, onPick: (String) -> Unit, onDismiss: () -> Unit) {
+    androidx.compose.material3.AlertDialog(
+        onDismissRequest = onDismiss,
+        containerColor = NeuTheme.colors.background,
+        title = { Text(title) },
+        text = {
+            FlowRow(Modifier.testTag("v56_texture_picker"), horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                com.karapp.drawguidance.data.model.V56Textures.BUILTIN.forEach { id ->
+                    TextureSwatch(id, false, { onPick(id) }, Modifier.testTag("v56_texture_${id.removePrefix("builtin:")}"))
+                }
+            }
+        },
+        confirmButton = {},
+        dismissButton = { TextButton(onClick = onDismiss) { Text(stringResource(R.string.cancel_button)) } },
+    )
 }

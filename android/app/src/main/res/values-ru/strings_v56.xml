@@ -79,4 +79,25 @@
     <string name="v56_help_quick_color">Открывает выбор цвета; пипеткой в нём можно взять цвет с холста.</string>
     <string name="v56_help_quick_pin">Закрепляет кисть в быстрой полосе (до 6). Коснитесь, чтобы выбрать.</string>
     <string name="v56_help_quick_unpin">Убирает кисть из закреплённых. Коснитесь, чтобы выбрать.</string>
+    <string name="v56_grain_title">Зерно</string>
+    <string name="v56_grain_hint">Мазок умножается на выбранную текстуру, остаются просветы, как зерно бумаги.</string>
+    <string name="v56_grain_none">Нет</string>
+    <string name="v56_grain_scale">Масштаб текстуры</string>
+    <string name="v56_grain_strength">Сила зерна</string>
+    <string name="v56_grain_moving">Скользящая</string>
+    <string name="v56_grain_moving_hint">Вкл.: текстура закреплена на холсте, кисть скользит по ней. Выкл.: текстура начинается с каждым мазком.</string>
+    <string name="v56_tex_paper">Бумага</string>
+    <string name="v56_tex_canvas">Холст</string>
+    <string name="v56_tex_charcoal">Уголь</string>
+    <string name="v56_tex_noise">Песок</string>
+    <string name="v56_tex_dots">Точки</string>
+    <string name="v56_tex_hatch">Штриховка</string>
+    <string name="v56_image_brush">Кисть из изображения</string>
+    <string name="v56_image_brush_remove">Убрать кончик-изображение</string>
+    <string name="v56_image_brush_active">Эта кисть ставит выбранное изображение как штамп (тёмные места становятся краской).</string>
+    <string name="v56_texture_fill">Залить текстурой</string>
+    <string name="v56_texture_fill_layer">Залить слой текстурой</string>
+    <string name="v56_add_texture">Текстура</string>
+    <string name="v56_help_add_texture">Заливает всю страницу активного слоя выбранной текстурой цветом кисти.</string>
+    <string name="v56_help_texture_fill">Заливает выделенную область выбранной текстурой цветом кисти.</string>
 </resources>

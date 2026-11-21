@@ -176,7 +176,9 @@ class CanvasAssetStore(private val dao: CanvasAssetDao) {
     suspend fun ensureLoaded(strokes: List<Stroke>, extra: Collection<String> = emptyList()) {
         val missing = (strokes.asSequence()
             .filter { it.brushType == BrushType.IMAGE }
-            .mapNotNull { it.assetId } + extra.asSequence())
+            .mapNotNull { it.assetId } +
+            // v56 resimden fırçanın uç resimleri
+            strokes.asSequence().mapNotNull { it.params?.stampAssetId } + extra.asSequence())
             .filterNot { CanvasImageCache.contains(it) }
             .distinct()
             .toList()

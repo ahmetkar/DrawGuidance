@@ -7,6 +7,7 @@ import com.karapp.drawguidance.data.model.TipParams
 import com.karapp.drawguidance.data.model.PenDynamics
 import com.karapp.drawguidance.data.model.FxParams
 import com.karapp.drawguidance.data.model.isHelper
+import com.karapp.drawguidance.data.model.isObject
 import com.karapp.drawguidance.data.model.isRaster
 import com.karapp.drawguidance.ui.drawing.defaultSpacing
 import com.karapp.drawguidance.ui.drawing.defaultTiltLight
@@ -44,6 +45,10 @@ data class BrushTuning(
     val pen: PenDynamics = PenDynamics(),
     /** v51 yardımcı fırça ayarları (kip, klon kaynağı). */
     val fx: FxParams = FxParams(),
+    /** v56 gren (doku, ölçek, güç, kayar); null: gren yok. */
+    val grain: com.karapp.drawguidance.data.model.GrainSpec? = null,
+    /** v56 resimden fırça: damga ucunun varlık kimliği (tuvale bağlı); null: fırçanın kendi ucu. */
+    val stampAssetId: String? = null,
 ) {
     /** Etkin sabitleme gücü (kapalıysa 0). */
     val stabilizeAmount: Float get() = if (stabilizer) stabilizerStrength.coerceIn(0.05f, 1f) else 0f
@@ -60,11 +65,23 @@ data class BrushTuning(
         val tp = (if (type.isRaster) tip else TipParams(minSize = tip.minSize, maxSize = tip.maxSize)).orNull()
         val pd = pen.orNull()
         val fp = fx.takeIf { type.isHelper && it != FxParams() }
-        if (sp == null && tw == null && tl == null && th <= 0f && !nib && t == null && tp == null && pd == null && fp == null) return null
-        return BrushParams(spacing = sp, tiltWidth = tw, tiltLight = tl, tiltThreshold = th, nibFollow = nib, tube = t, tip = tp, pen = pd, fx = fp)
+        val gr = grain?.takeIf { supportsGrain(type) }
+        val st = stampAssetId?.takeIf { supportsImageTip(type) }
+        if (sp == null && tw == null && tl == null && th <= 0f && !nib && t == null && tp == null && pd == null && fp == null && gr == null && st == null) return null
+        return BrushParams(
+            spacing = sp, tiltWidth = tw, tiltLight = tl, tiltThreshold = th, nibFollow = nib, tube = t, tip = tp, pen = pd, fx = fp,
+            grain = gr, stampAssetId = st,
+        )
     }
 
     companion object {
+        /** v56 gren uygulanabilen fırçalar: boya bırakan bütün fırçalar (silgi, yardımcılar ve nesneler hariç). */
+        fun supportsGrain(type: BrushType): Boolean =
+            type != BrushType.ERASER && !type.isObject && !type.isHelper && type != BrushType.BRUSH_3D
+
+        /** v56 resimden fırça: damgalarla çizilebilen vektör fırçalar (piksel motorlu ve 3B hariç). */
+        fun supportsImageTip(type: BrushType): Boolean = supportsGrain(type) && !type.isRaster && type != BrushType.LASSO_FILL
+
         /** Fırça boyutu sınırları (px). */
         const val MIN_SIZE = 1f
         const val MAX_SIZE = 380f

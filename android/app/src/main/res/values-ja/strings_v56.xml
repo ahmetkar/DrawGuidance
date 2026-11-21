@@ -79,4 +79,25 @@
     <string name="v56_help_quick_color">カラーピッカーを開きます。スポイトでキャンバスから色を取れます。</string>
     <string name="v56_help_quick_pin">ブラシをクイック列にピン留めします(最大6本)。タップで選択。</string>
     <string name="v56_help_quick_unpin">ピン留めを解除します。タップで選択。</string>
+    <string name="v56_grain_title">グレイン</string>
+    <string name="v56_grain_hint">ストロークが選んだテクスチャで乗算され、紙目のような隙間が残ります。</string>
+    <string name="v56_grain_none">なし</string>
+    <string name="v56_grain_scale">テクスチャの大きさ</string>
+    <string name="v56_grain_strength">グレインの強さ</string>
+    <string name="v56_grain_moving">スライド</string>
+    <string name="v56_grain_moving_hint">オン: テクスチャはキャンバスに固定され、ブラシがその上を滑ります。オフ: 線ごとにテクスチャが始まります。</string>
+    <string name="v56_tex_paper">紙</string>
+    <string name="v56_tex_canvas">キャンバス布</string>
+    <string name="v56_tex_charcoal">木炭</string>
+    <string name="v56_tex_noise">砂</string>
+    <string name="v56_tex_dots">ドット</string>
+    <string name="v56_tex_hatch">ハッチング</string>
+    <string name="v56_image_brush">画像からブラシを作成</string>
+    <string name="v56_image_brush_remove">画像の先端を外す</string>
+    <string name="v56_image_brush_active">このブラシは選んだ画像をスタンプとして使います（暗い部分が絵の具になります）。</string>
+    <string name="v56_texture_fill">テクスチャで塗りつぶす</string>
+    <string name="v56_texture_fill_layer">レイヤーをテクスチャで塗りつぶす</string>
+    <string name="v56_add_texture">テクスチャ</string>
+    <string name="v56_help_add_texture">アクティブなレイヤーのページ全体を、選んだテクスチャでブラシの色に塗りつぶします。</string>
+    <string name="v56_help_texture_fill">選択範囲の内側を、選んだテクスチャでブラシの色に塗りつぶします。</string>
 </resources>

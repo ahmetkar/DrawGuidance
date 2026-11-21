@@ -79,4 +79,25 @@
     <string name="v56_help_quick_color">색 선택 창을 엽니다. 스포이트로 캔버스에서 색을 가져올 수 있습니다.</string>
     <string name="v56_help_quick_pin">브러시를 빠른 줄에 고정합니다(최대 6개). 탭하면 선택됩니다.</string>
     <string name="v56_help_quick_unpin">고정을 해제합니다. 탭하면 선택됩니다.</string>
+    <string name="v56_grain_title">그레인</string>
+    <string name="v56_grain_hint">붓 자국에 선택한 질감이 곱해져 종이 결 같은 빈틈이 남습니다.</string>
+    <string name="v56_grain_none">없음</string>
+    <string name="v56_grain_scale">질감 크기</string>
+    <string name="v56_grain_strength">그레인 강도</string>
+    <string name="v56_grain_moving">미끄러짐</string>
+    <string name="v56_grain_moving_hint">켜기: 질감이 캔버스에 고정되고 붓이 그 위를 미끄러집니다. 끄기: 선마다 질감이 새로 시작됩니다.</string>
+    <string name="v56_tex_paper">종이</string>
+    <string name="v56_tex_canvas">캔버스 천</string>
+    <string name="v56_tex_charcoal">목탄</string>
+    <string name="v56_tex_noise">모래</string>
+    <string name="v56_tex_dots">점</string>
+    <string name="v56_tex_hatch">해칭</string>
+    <string name="v56_image_brush">이미지로 붓 만들기</string>
+    <string name="v56_image_brush_remove">이미지 팁 제거</string>
+    <string name="v56_image_brush_active">이 붓은 고른 이미지를 도장처럼 찍습니다(어두운 부분이 물감이 됩니다).</string>
+    <string name="v56_texture_fill">질감으로 채우기</string>
+    <string name="v56_texture_fill_layer">레이어를 질감으로 채우기</string>
+    <string name="v56_add_texture">질감</string>
+    <string name="v56_help_add_texture">활성 레이어의 페이지 전체를 고른 질감과 붓 색으로 채웁니다.</string>
+    <string name="v56_help_texture_fill">선택 영역 안을 고른 질감과 붓 색으로 채웁니다.</string>
 </resources>

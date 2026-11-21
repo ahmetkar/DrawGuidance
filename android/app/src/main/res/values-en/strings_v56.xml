@@ -79,4 +79,25 @@
     <string name="v56_help_quick_color">Opens the color picker; use its eyedropper to pick a color from the canvas.</string>
     <string name="v56_help_quick_pin">Pins the brush to the quick strip (up to 6). Tap to select the brush.</string>
     <string name="v56_help_quick_unpin">Removes the brush from the pinned ones. Tap to select the brush.</string>
+    <string name="v56_grain_title">Grain</string>
+    <string name="v56_grain_hint">The stroke is multiplied by the chosen texture, leaving gaps like paper tooth.</string>
+    <string name="v56_grain_none">None</string>
+    <string name="v56_grain_scale">Texture scale</string>
+    <string name="v56_grain_strength">Grain strength</string>
+    <string name="v56_grain_moving">Sliding</string>
+    <string name="v56_grain_moving_hint">On: texture is fixed to the canvas and the brush slides over it. Off: texture starts with each stroke.</string>
+    <string name="v56_tex_paper">Paper</string>
+    <string name="v56_tex_canvas">Canvas cloth</string>
+    <string name="v56_tex_charcoal">Charcoal</string>
+    <string name="v56_tex_noise">Sand</string>
+    <string name="v56_tex_dots">Dots</string>
+    <string name="v56_tex_hatch">Hatching</string>
+    <string name="v56_image_brush">Create brush from image</string>
+    <string name="v56_image_brush_remove">Remove image tip</string>
+    <string name="v56_image_brush_active">This brush stamps your chosen image (dark areas become paint).</string>
+    <string name="v56_texture_fill">Fill with texture</string>
+    <string name="v56_texture_fill_layer">Fill layer with texture</string>
+    <string name="v56_add_texture">Texture</string>
+    <string name="v56_help_add_texture">Fills the whole page of the active layer with the chosen texture in the brush colour.</string>
+    <string name="v56_help_texture_fill">Fills the selected area with the chosen texture in the brush colour.</string>
 </resources>

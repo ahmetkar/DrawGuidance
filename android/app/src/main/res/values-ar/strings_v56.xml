@@ -79,4 +79,25 @@
     <string name="v56_help_quick_color">يفتح منتقي الألوان؛ استخدم القطارة فيه لأخذ لون من اللوحة.</string>
     <string name="v56_help_quick_pin">يثبّت الفرشاة في الشريط السريع (6 كحد أقصى). المس لاختيارها.</string>
     <string name="v56_help_quick_unpin">يزيل الفرشاة من المثبتة. المس لاختيارها.</string>
+    <string name="v56_grain_title">الحبيبات</string>
+    <string name="v56_grain_hint">يُضرب أثر الفرشاة بالملمس المختار فتظهر فراغات مثل حبيبات الورق.</string>
+    <string name="v56_grain_none">بلا</string>
+    <string name="v56_grain_scale">حجم الملمس</string>
+    <string name="v56_grain_strength">قوة الحبيبات</string>
+    <string name="v56_grain_moving">منزلق</string>
+    <string name="v56_grain_moving_hint">تشغيل: الملمس ثابت على اللوحة والفرشاة تنزلق فوقه. إيقاف: يبدأ الملمس مع كل خط.</string>
+    <string name="v56_tex_paper">ورق</string>
+    <string name="v56_tex_canvas">قماش</string>
+    <string name="v56_tex_charcoal">فحم</string>
+    <string name="v56_tex_noise">رمل</string>
+    <string name="v56_tex_dots">نقاط</string>
+    <string name="v56_tex_hatch">تظليل خطي</string>
+    <string name="v56_image_brush">إنشاء فرشاة من صورة</string>
+    <string name="v56_image_brush_remove">إزالة رأس الصورة</string>
+    <string name="v56_image_brush_active">تستخدم هذه الفرشاة صورتك كختم (تصبح المناطق الداكنة طلاءً).</string>
+    <string name="v56_texture_fill">تعبئة بملمس</string>
+    <string name="v56_texture_fill_layer">تعبئة الطبقة بملمس</string>
+    <string name="v56_add_texture">ملمس</string>
+    <string name="v56_help_add_texture">يملأ صفحة الطبقة النشطة كاملة بالملمس المختار بلون الفرشاة.</string>
+    <string name="v56_help_texture_fill">يملأ منطقة التحديد بالملمس المختار بلون الفرشاة.</string>
 </resources>

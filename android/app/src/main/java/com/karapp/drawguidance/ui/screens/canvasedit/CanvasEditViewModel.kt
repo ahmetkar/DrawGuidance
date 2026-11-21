@@ -553,7 +553,9 @@ class CanvasEditViewModel(
                 assetStore.prune(
                     canvasLocalId, loaded.pages.flatten(),
                     listOfNotNull(loaded.background.assetId) + loaded.pageBackgrounds.mapNotNull { it?.spec?.assetId } +
-                        com.karapp.drawguidance.data.notes.TempCanvases.pendingAssetIds(canvasLocalId),
+                        com.karapp.drawguidance.data.notes.TempCanvases.pendingAssetIds(canvasLocalId) +
+                        // v56 fırça ayarlarındaki resim uçları (henüz çizilmemiş olsa da)
+                        brush.stampAssetIds(),
                 )
                 brush.adaptTo(loaded.kind)
                 // v29 bu tuvalin modunun tahmin modeli arka planda hazırlanır
@@ -563,6 +565,8 @@ class CanvasEditViewModel(
                 brush.restore(loaded.kind, last, canvasPrefs.lastColor)
                 // v56 hızlı fırça seçici: bu modun son kullanılanları ve favorileri
                 quickBrush.bind(loaded.kind)
+                // v56 resim uçları bu tuvalde de bulunsun (başka tuvalde oluşturulduysa kopyalanır)
+                ensureStampAssets(canvasLocalId)
                 if (com.karapp.drawguidance.data.model.V56Flags.enabled(com.karapp.drawguidance.data.model.V56Flags.Feature.QUICK_BRUSH, loaded.kind)) quickBrush.used(brush.settings.value.brushType)
                 texts.adaptTo(loaded.width, loaded.height)
                 canvasPrefs.lastText?.let { (spec, size) -> texts.restore(spec, size.takeIf { it > 0f }) }
@@ -1045,6 +1049,66 @@ class CanvasEditViewModel(
     }
 
     fun colorSheetReopened() { _reopenColorSheet.value = false }
+
+    // --- v56 aşama 5: gren, resimden fırça, doku dolgusu ---
+
+    /** Resim uçları bu tuvalin varlıklarında yoksa kopyalanır; hiçbir yerde yoksa fırça kendi ucuna döner. */
+    private fun ensureStampAssets(canvasLocalId: String) {
+        val ids = brush.stampAssetIds()
+        if (ids.isEmpty()) return
+        viewModelScope.launch {
+            val found = runCatching { assetStore.entities(ids) }.getOrDefault(emptyList()).associateBy { it.id }
+            for (id in ids) {
+                val e = found[id]
+                when {
+                    e == null -> brush.replaceStamp(id, null)
+                    e.canvasLocalId != canvasLocalId -> runCatching { assetStore.insertCopy(e, canvasLocalId) }.getOrNull()
+                        ?.let { brush.replaceStamp(id, it); assetStore.ensureLoaded(emptyList(), listOf(it)) }
+                    else -> assetStore.ensureLoaded(emptyList(), listOf(id))
+                }
+            }
+        }
+    }
+
+    /** Seçilen resimden fırça ucu: seçili fırça damgayla çizilemiyorsa keçeli kaleme geçilir. */
+    fun createImageBrush(uri: android.net.Uri) {
+        images.createImageBrush(uri) { id ->
+            if (!com.karapp.drawguidance.data.settings.BrushTuning.supportsImageTip(brush.settings.value.brushType)) selectBrush(BrushType.MARKER)
+            brush.updateTuning { it.copy(stampAssetId = id) }
+        }
+    }
+
+    fun removeImageBrush() = brush.updateTuning { it.copy(stampAssetId = null) }
+
+    /** Gren: doku seç (null: kapalı), ölçek, güç, kayar. */
+    fun setGrainTexture(id: String?) = brush.updateTuning { t ->
+        t.copy(grain = id?.let { (t.grain ?: com.karapp.drawguidance.data.model.GrainSpec(it)).copy(textureId = it) })
+    }
+    fun setGrain(change: (com.karapp.drawguidance.data.model.GrainSpec) -> com.karapp.drawguidance.data.model.GrainSpec) =
+        brush.updateTuning { t -> t.copy(grain = t.grain?.let(change)) }
+
+    /**
+     * Dokuyla doldur: seçim alanı varsa alanın içi, yoksa ([wholePage] ya da alan yokken) etkin katmanın bütün sayfası
+     * fırça rengi ve opaklığıyla, seçilen hazır dokuyla doldurulur. Tek geri alma adımı.
+     */
+    fun textureFill(textureId: String, wholePage: Boolean = false): Boolean {
+        val c = store.canvas.value ?: return false
+        val b = brushSettings.value
+        val grain = com.karapp.drawguidance.data.model.GrainSpec(textureId)
+        val area = store.area.value?.takeIf { !wholePage && !it.inverted }?.points
+        val pts = area ?: com.karapp.drawguidance.data.model.V56Textures.pageRect(c.width.toFloat(), c.height.toFloat())
+        val fill = com.karapp.drawguidance.data.model.V56Selection.lassoFill(
+            java.util.UUID.randomUUID().toString(), pts, b.colorHex, b.opacity, c.strokes.size, grain = grain,
+        )
+        store.commit(c.strokes + fill, useArea = false)
+        return true
+    }
+
+    /** Katman menüsünden: o katman etkin yapılıp bütün sayfası dokuyla doldurulur. */
+    fun textureFillLayer(layerId: String, textureId: String) {
+        setActiveLayer(layerId)
+        textureFill(textureId, wholePage = true)
+    }
     fun toggleEraser() = brush.toggleEraser()
     fun updateBrushSize(sizePx: Float) = brush.updateSize(sizePx)
     fun updateBrushColor(colorHex: String) {

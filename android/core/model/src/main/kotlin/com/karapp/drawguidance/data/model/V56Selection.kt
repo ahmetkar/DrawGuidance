@@ -167,8 +167,12 @@ object V56Selection {
     }
 
     /** Kement dolgu elemanı: [points] kapalı yol, renk ve opaklık. */
-    fun lassoFill(id: String, points: List<StrokePoint>, colorHex: String, opacity: Float, order: Int, layerId: String? = null): Stroke =
-        Stroke(id, points, colorHex, BrushType.LASSO_FILL, 1f, opacity.coerceIn(0f, 1f), order, layerId = layerId)
+    fun lassoFill(
+        id: String, points: List<StrokePoint>, colorHex: String, opacity: Float, order: Int, layerId: String? = null,
+        /** v56 aşama 5 doku dolgusu: dolgu dokuyla çarpılır (hazır doku paketi). */
+        grain: GrainSpec? = null,
+    ): Stroke =
+        Stroke(id, points, colorHex, BrushType.LASSO_FILL, 1f, opacity.coerceIn(0f, 1f), order, layerId = layerId, params = grain?.let { BrushParams(grain = it) })
 
     /** Seçim alanı varken eklenen elemanlar: fırça izleri ve silgiler alanla kırpılır (nesneler etkilenmez). */
     fun applyArea(before: Set<String>, after: List<Stroke>, area: ClipMask?): List<Stroke> {

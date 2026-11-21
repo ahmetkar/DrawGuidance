@@ -93,6 +93,19 @@ object StrokeRenderer {
     }
 
     private fun DrawScope.drawClipped(stroke: Stroke, offset: Offset) {
+        // v56 gren: iz ara katmanda çizilip dokuyla çarpılır
+        val grain = GrainRenderer.grainOf(stroke)
+        if (grain != null && !stroke.brushType.isObject) {
+            val first = stroke.points[0]
+            drawIntoCanvas { c ->
+                GrainRenderer.withGrain(c.nativeCanvas, grain, first.x + offset.x, first.y + offset.y) { drawClippedInner(stroke, offset) }
+            }
+            return
+        }
+        drawClippedInner(stroke, offset)
+    }
+
+    private fun DrawScope.drawClippedInner(stroke: Stroke, offset: Offset) {
         val clip = stroke.clip
         if (clip != null && clip.size == 4) {
             val path = Path().apply {
@@ -142,6 +155,12 @@ object StrokeRenderer {
         }
         val n = stroke.points.size
         if (n == 0) return
+        // v56 resimden fırça: uç resmi iz boyunca damgalanır (uç yüklenmediyse fırçanın kendi ucu)
+        if (stroke.params?.stampAssetId != null && !stroke.brushType.isRaster) {
+            var drawn = false
+            drawIntoCanvas { drawn = GrainRenderer.drawStamps(it.nativeCanvas, stroke, offset.x, offset.y, hexToColor(stroke.colorHex).toArgb()) }
+            if (drawn) return
+        }
         // v51 piksel tabanlı fırça: bağlamsız çizim (önizleme, bekleyen çizim); listede bağlamıyla çizilir
         if (stroke.brushType.isRaster) {
             drawIntoCanvas { c ->
@@ -345,7 +364,12 @@ object StrokeRenderer {
                 }
                 c.nativeCanvas.clipPath(mp)
             }
-            RasterStrokes.draw(c.nativeCanvas, s, context)
+            val grain = GrainRenderer.grainOf(s)
+            if (grain != null) {
+                GrainRenderer.withGrain(c.nativeCanvas, grain, s.points[0].x, s.points[0].y) { RasterStrokes.draw(c.nativeCanvas, s, context) }
+            } else {
+                RasterStrokes.draw(c.nativeCanvas, s, context)
+            }
             c.nativeCanvas.restoreToCount(save)
         }
     }

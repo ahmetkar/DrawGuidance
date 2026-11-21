@@ -79,4 +79,25 @@
     <string name="v56_help_quick_color">打开颜色选择器;可用其中的吸管从画布取色。</string>
     <string name="v56_help_quick_pin">将画笔固定到快速栏(最多 6 支)。点按即可选用。</string>
     <string name="v56_help_quick_unpin">取消固定该画笔。点按即可选用。</string>
+    <string name="v56_grain_title">颗粒</string>
+    <string name="v56_grain_hint">笔迹与所选纹理相乘，留下类似纸纹的空隙。</string>
+    <string name="v56_grain_none">无</string>
+    <string name="v56_grain_scale">纹理比例</string>
+    <string name="v56_grain_strength">颗粒强度</string>
+    <string name="v56_grain_moving">滑动</string>
+    <string name="v56_grain_moving_hint">开：纹理固定在画布上，画笔在其上滑过。关：纹理随每一笔重新开始。</string>
+    <string name="v56_tex_paper">纸张</string>
+    <string name="v56_tex_canvas">画布</string>
+    <string name="v56_tex_charcoal">炭笔</string>
+    <string name="v56_tex_noise">沙粒</string>
+    <string name="v56_tex_dots">圆点</string>
+    <string name="v56_tex_hatch">排线</string>
+    <string name="v56_image_brush">从图片创建画笔</string>
+    <string name="v56_image_brush_remove">移除图片笔尖</string>
+    <string name="v56_image_brush_active">此画笔将所选图片作为印章（深色部分成为颜料）。</string>
+    <string name="v56_texture_fill">用纹理填充</string>
+    <string name="v56_texture_fill_layer">用纹理填充图层</string>
+    <string name="v56_add_texture">纹理</string>
+    <string name="v56_help_add_texture">用所选纹理以画笔颜色填满当前图层的整页。</string>
+    <string name="v56_help_texture_fill">用所选纹理以画笔颜色填充选区。</string>
 </resources>

@@ -518,6 +518,12 @@ fun CanvasEditScreen(
         }
     }
 
+    // v56 aşama 5: resimden fırça ve doku seçici ("area": seçim alanı, "page": etkin katmanın sayfası, "layer:<id>")
+    val pickImageBrush = rememberLauncherForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri ->
+        if (uri != null) viewModel.createImageBrush(uri)
+    }
+    var textureFillTarget by remember { mutableStateOf<String?>(null) }
+
     val imageAddedText = stringResource(R.string.image_added)
     val erasedRemovedText = stringResource(R.string.erased_removed)
     val gapsFilledText = stringResource(R.string.command_gaps_filled)
@@ -782,6 +788,8 @@ fun CanvasEditScreen(
             com.karapp.drawguidance.ui.screens.canvasedit.components.AddMenuItem("packs", stringResource(R.string.v43_add_packs), Icons.Filled.Inventory2) { packsOpen = true }
         } else null,
         com.karapp.drawguidance.ui.screens.canvasedit.components.AddMenuItem("guide", stringResource(R.string.add_guide), Icons.Filled.GridOn) { guideOpen = true },
+        // v56 Ekle › Doku: etkin katmanın sayfası hazır dokuyla doldurulur
+        if (viewModel.v56(com.karapp.drawguidance.data.model.V56Flags.Feature.GRAIN)) com.karapp.drawguidance.ui.screens.canvasedit.components.AddMenuItem("texture", stringResource(R.string.v56_add_texture), Icons.Filled.Texture) { textureFillTarget = "page" } else null,
         // v25 "3B şekil ekle" ayrı seçenek (kendi simgesiyle); pencerede şekil seçilip "3B şekil ekle" düğmesiyle eklenir
         com.karapp.drawguidance.ui.screens.canvasedit.components.AddMenuItem("model3d", stringResource(R.string.add_model3d), Icons.Filled.ViewInAr) { models3dOpen = true },
         // v27 not tuvalinde perspektif çizgisi eklenmez, yalnız kılavuz çizgileri
@@ -1529,7 +1537,21 @@ fun CanvasEditScreen(
             // v37 çocuk boyamasında kova imleci ve boyanmaya hazır alan
             if (kids && mode == EditMode.PAINT) com.karapp.drawguidance.ui.screens.canvasedit.components.KidsPaintOverlay(viewModel, viewport)
             // v56 seçim alanı çubuğu ve sihirli değnek ayarları
-            com.karapp.drawguidance.ui.screens.canvasedit.components.V56SelectionOverlay(viewModel, mode, canvasPick)
+            com.karapp.drawguidance.ui.screens.canvasedit.components.V56SelectionOverlay(viewModel, mode, canvasPick) { textureFillTarget = "area" }
+            textureFillTarget?.let { target ->
+                com.karapp.drawguidance.ui.screens.canvasedit.components.TexturePickerDialog(
+                    stringResource(if (target == "area") R.string.v56_texture_fill else R.string.v56_texture_fill_layer),
+                    onPick = { id ->
+                        textureFillTarget = null
+                        when {
+                            target == "area" -> viewModel.textureFill(id)
+                            target.startsWith("layer:") -> viewModel.textureFillLayer(target.removePrefix("layer:"), id)
+                            else -> viewModel.textureFill(id, wholePage = true)
+                        }
+                    },
+                    onDismiss = { textureFillTarget = null },
+                )
+            }
             // v56 damlalığın canlı renk dairesi
             val loupe by viewModel.loupe.collectAsState()
             com.karapp.drawguidance.ui.screens.canvasedit.components.EyedropperLoupe(
@@ -2167,6 +2189,12 @@ fun CanvasEditScreen(
                             // v33 çocuklar için sade fırça paneli
                             kids = kids,
                             textSection = textSection,
+                            // v56 gren ve resimden fırça
+                            grain = if (viewModel.v56(com.karapp.drawguidance.data.model.V56Flags.Feature.GRAIN)) com.karapp.drawguidance.ui.screens.canvasedit.components.GrainActions(
+                                viewModel::setGrainTexture, viewModel::setGrain,
+                                { pickImageBrush.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)) },
+                                viewModel::removeImageBrush,
+                            ) else null,
                             )
                             }
                         }
@@ -2198,6 +2226,7 @@ fun CanvasEditScreen(
                                         viewModel::toggleLayerAlphaLock, viewModel::toggleLayerClip,
                                     )
                                 },
+                                onTextureFill = if (viewModel.v56(com.karapp.drawguidance.data.model.V56Flags.Feature.GRAIN)) ({ id -> textureFillTarget = "layer:$id" }) else null,
                             )
                         }
                         PanelTab.ELEMENTS -> {

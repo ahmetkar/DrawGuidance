@@ -192,10 +192,31 @@ class BrushController(
                 tiltWidth = it.tiltWidth?.coerceIn(0f, 2f),
                 tiltLight = it.tiltLight?.coerceIn(0f, 1f),
                 tiltThreshold = it.tiltThreshold.coerceIn(0f, 60f),
+                grain = it.grain?.let { g ->
+                    g.copy(
+                        scale = g.scale.coerceIn(com.karapp.drawguidance.data.model.V56Textures.MIN_SCALE, com.karapp.drawguidance.data.model.V56Textures.MAX_SCALE),
+                        strength = g.strength.coerceIn(0f, 1f),
+                    )
+                },
             )
         }
         tunings[s.brushType] = next
         _settings.value = s.copy(tuning = next)
+        persist()
+    }
+
+    /** v56 fırça ayarlarında kayıtlı resim uçlarının varlık kimlikleri. */
+    fun stampAssetIds(): Set<String> {
+        load()
+        return (tunings.values.mapNotNull { it.stampAssetId } + listOfNotNull(_settings.value.tuning.stampAssetId)).toSet()
+    }
+
+    /** v56 resim ucu başka tuvale kopyalandı ([new]) ya da artık yok (null): bütün fırça ayarlarında değişir. */
+    fun replaceStamp(old: String, new: String?) {
+        load()
+        tunings.entries.filter { it.value.stampAssetId == old }.forEach { it.setValue(it.value.copy(stampAssetId = new)) }
+        val s = _settings.value
+        if (s.tuning.stampAssetId == old) _settings.value = s.copy(tuning = s.tuning.copy(stampAssetId = new))
         persist()
     }
 

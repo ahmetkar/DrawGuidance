@@ -149,19 +149,23 @@ struct SymmetrySpec: Codable, Equatable {
     var cx: Float
     var cy: Float
     var angle: Float = 0
+    /// Canlı ayna (çizerken kopyalar görünür).
+    var live = true
 
-    init(kind: SymmetryKind, arms: Int = 2, cx: Float, cy: Float, angle: Float = 0) {
-        self.kind = kind; self.arms = arms; self.cx = cx; self.cy = cy; self.angle = angle
+    init(kind: SymmetryKind, arms: Int = 2, cx: Float, cy: Float, angle: Float = 0, live: Bool = true) {
+        self.kind = kind; self.arms = arms; self.cx = cx; self.cy = cy; self.angle = angle; self.live = live
     }
 
     init(from decoder: Decoder) throws {
         let c = try decoder.container(keyedBy: AnyKey.self)
         kind = try c.req("kind"); arms = c.v("arms", 2); cx = try c.req("cx"); cy = try c.req("cy"); angle = c.v("angle", 0)
+        live = c.v("live", true)
     }
 
     func encode(to encoder: Encoder) throws {
         var c = encoder.container(keyedBy: AnyKey.self)
         try c.r(kind, "kind"); try c.e(arms, "arms", 2); try c.r(cx, "cx"); try c.r(cy, "cy"); try c.e(angle, "angle", 0)
+        try c.e(live, "live", true)
     }
 }
 

@@ -3729,6 +3729,7 @@
 "v56_help_object_menu" = "選択したオブジェクトを整列・分布し、渦巻き/収縮/膨張を適用し、最後の変形を繰り返します。";
 "v56_help_paint_inside" = "選択範囲を描画エリアにします。新しい線はその内側だけに描かれます。";
 "v56_help_paste" = "切り取り・コピーした要素をこのページに貼り付けます。ページやキャンバスをまたいで使えます。";
+"v56_help_pattern" = "選択した要素をキャンバス全体に格子状に並べます。";
 "v56_help_quick_all" = "すべてのブラシがあるブラシ画面を開きます。";
 "v56_help_quick_color" = "カラーピッカーを開きます。スポイトでキャンバスから色を取れます。";
 "v56_help_quick_pin" = "ブラシをクイック列にピン留めします(最大6本)。タップで選択。";
@@ -3773,6 +3774,9 @@
 "v56_magic_wand" = "自動選択";
 "v56_object_menu" = "オブジェクト";
 "v56_paint_inside" = "選択範囲内に描画";
+"v56_pattern" = "パターン作成";
+"v56_pattern_count" = "%1$d 個のコピー";
+"v56_pattern_gap" = "間隔: %1$d";
 "v56_practice_reward_nofill" = "現在表示できる広告がありません。練習をロック解除しました。";
 "v56_quick_all_brushes" = "すべてのブラシ";
 "v56_quick_brush_a11y" = "クイックブラシ、使用中: %1$@";
@@ -3791,6 +3795,19 @@
 "v56_share_flattened" = "%1$@ は古いバージョンです。レイヤーモード、マスク、グレインなどの新機能は簡略化して送信されました";
 "v56_space_h" = "水平間隔を均等";
 "v56_space_v" = "垂直間隔を均等";
+"v56_sym_angle" = "角度: %1$d°";
+"v56_sym_arms" = "分割数: %1$d";
+"v56_sym_center" = "中央へ";
+"v56_sym_close" = "対称をオフ";
+"v56_sym_cx" = "中心 X";
+"v56_sym_cy" = "中心 Y";
+"v56_sym_horizontal" = "横";
+"v56_sym_live" = "ライブミラー";
+"v56_sym_off" = "オフ";
+"v56_sym_quad" = "4方向";
+"v56_sym_radial" = "放射";
+"v56_sym_vertical" = "縦";
+"v56_symmetry" = "対称";
 "v56_tex_canvas" = "キャンバス布";
 "v56_tex_charcoal" = "木炭";
 "v56_tex_dots" = "ドット";

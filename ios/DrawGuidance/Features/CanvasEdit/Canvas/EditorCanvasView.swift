@@ -674,6 +674,30 @@ final class EditorCanvasView: UIView {
         if liveVisible, let s = live.stroke() {
             LayerCompositor.withLayerLook(g, live.isEraser ? nil : layerOf(c, vm.store.activeLayer)) { StrokeRenderer.drawLive(g, s) }
         }
+        // v56 aşama 8 simetri: canlı ayna ve eksenler
+        if let sym = c.guide.symmetry, V56Flags.enabled(.SYMMETRY, c.kind) {
+            if sym.live, liveVisible, let s = live.stroke() {
+                for t in V56Symmetry.transforms(sym) {
+                    let m = CGAffineTransform(a: CGFloat(t.a), b: CGFloat(t.c), c: CGFloat(t.b), d: CGFloat(t.d),
+                                              tx: CGFloat(sym.cx - t.a * sym.cx - t.b * sym.cy), ty: CGFloat(sym.cy - t.c * sym.cx - t.d * sym.cy))
+                    g.saveGState(); g.concatenate(m)
+                    LayerCompositor.withLayerLook(g, live.isEraser ? nil : layerOf(c, vm.store.activeLayer)) { StrokeRenderer.drawLive(g, s) }
+                    g.restoreGState()
+                }
+            }
+            if mode == .DRAW || mode == .PEN || mode == .PAINT {
+                let len = Float(max(c.width, c.height)) * 1.5
+                g.setStrokeColor(accent.withAlphaComponent(0.7).cgColor); g.setLineWidth(CGFloat(1.5 / scale))
+                g.setLineDash(phase: 0, lengths: [CGFloat(10 / scale), CGFloat(6 / scale)])
+                for ax in V56Symmetry.axes(sym, len) {
+                    g.move(to: CGPoint(x: CGFloat(ax[0]), y: CGFloat(ax[1]))); g.addLine(to: CGPoint(x: CGFloat(ax[2]), y: CGFloat(ax[3])))
+                }
+                g.strokePath(); g.setLineDash(phase: 0, lengths: [])
+                let r = CGFloat(5 / scale)
+                g.setFillColor(accent.cgColor)
+                g.fillEllipse(in: CGRect(x: CGFloat(sym.cx) - r, y: CGFloat(sym.cy) - r, width: r * 2, height: r * 2))
+            }
+        }
         // Silgi nesneleri silmez: silerken nesneler canlı silginin üstünde gösterilir
         if liveVisible && live.isEraser {
             for s in visible where s.brushType.isObject && !s.hidden { StrokeRenderer.drawStroke(g, s) }

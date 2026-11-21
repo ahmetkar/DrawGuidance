@@ -785,6 +785,7 @@ final class EditorViewModel: ObservableObject, EditorHost {
     @Published private(set) var merging = false
     @Published private(set) var colorApplying = false
     @Published var colorAdjustOpen = false
+    @Published var patternOpen = false
 
     func layersNeedRaster(_ ids: Set<String>) -> Bool { LayerOps.needsRaster(store.canvas?.layers ?? [Layer.Default], ids) }
 
@@ -869,6 +870,42 @@ final class EditorViewModel: ObservableObject, EditorHost {
     }
 
     func useGlitterBrush() { usePresetBrush(V56Presets.glitter) }
+
+    // MARK: v56 aşama 8 simetri ve Desen yap
+
+    func setSymmetry(_ kind: SymmetryKind?) { guides.setSymmetry(kind) }
+    func updateSymmetry(_ spec: SymmetrySpec, persist: Bool = true) { guides.updateSymmetry(spec, persist: persist) }
+
+    private func patternSelection() -> (CanvasUi, [Stroke], [Float])? {
+        guard let c = store.canvas else { return nil }
+        let sel = c.strokes.filter { store.selection.contains($0.id) && !$0.hidden }
+        let rects = sel.compactMap { StrokeRenderer.paintBounds($0) }
+        guard let first = rects.first else { return nil }
+        let r = rects.dropFirst().reduce(first) { $0.union($1) }
+        return (c, sel, [Float(r.minX), Float(r.minY), Float(r.maxX), Float(r.maxY)])
+    }
+
+    /// Seçili elemanlar [gap] aralıkla tuval boyunca döşenir (tek geri alma adımı).
+    @discardableResult
+    func makePattern(_ gap: Float) -> Int {
+        guard let p = patternSelection() else { return 0 }
+        let (c, sel, b) = p
+        let out = V56Symmetry.pattern(sel, b, c.width, c.height, gap) { UUID().uuidString.lowercased() }
+        guard let group = out.first?.groupId else { return 0 }
+        let strokes = c.strokes.map { s -> Stroke in
+            var n = s
+            if store.selection.contains(s.id) && s.groupId == nil { n.groupId = group }
+            return n
+        } + out
+        store.commit(strokes, useArea: false)
+        return out.count
+    }
+
+    func patternCount(_ gap: Float) -> Int {
+        guard let p = patternSelection() else { return 0 }
+        let (c, b) = (p.0, p.2)
+        return V56Symmetry.patternCount(b, c.width, c.height, gap)
+    }
 
     private func usePresetBrush(_ p: V56Presets.LayerPreset) {
         brush.select(p.brush)

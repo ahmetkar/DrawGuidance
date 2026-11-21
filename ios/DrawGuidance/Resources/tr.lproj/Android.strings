@@ -3729,6 +3729,7 @@
 "v56_help_object_menu" = "Seçili nesneleri hizalar ve dağıtır, girdap/büzüştür/şişir efekti uygular, son dönüşümü tekrarlar.";
 "v56_help_paint_inside" = "Seçili öğelerin alanını seçim alanı yapar; yeni çizgiler yalnız içine boyanır.";
 "v56_help_paste" = "Kesilen ya da kopyalanan öğeleri bu sayfaya yapıştırır; başka sayfa ve tuvallerde de çalışır.";
+"v56_help_pattern" = "Seçili elemanları tuval boyunca ızgara halinde döşer.";
 "v56_help_quick_all" = "Bütün fırçaların olduğu fırça penceresini açar.";
 "v56_help_quick_color" = "Renk seçici penceresini açar; penceredeki damlalıkla tuvalden renk alabilirsin.";
 "v56_help_quick_pin" = "Fırçayı hızlı şeritte sabitler (en çok 6). Dokununca fırça seçilir.";
@@ -3773,6 +3774,9 @@
 "v56_magic_wand" = "Sihirli değnek";
 "v56_object_menu" = "Nesne";
 "v56_paint_inside" = "Seçimin içine boya";
+"v56_pattern" = "Desen yap";
+"v56_pattern_count" = "%1$d kopya";
+"v56_pattern_gap" = "Aralık: %1$d";
 "v56_practice_reward_nofill" = "Şu an gösterilecek reklam bulunamadı. Alıştırma senin için açıldı.";
 "v56_quick_all_brushes" = "Tüm fırçalar";
 "v56_quick_brush_a11y" = "Hızlı fırça seçici, etkin: %1$@";
@@ -3791,6 +3795,19 @@
 "v56_share_flattened" = "%1$@ eski sürüm kullanıyor: katman modları, maske ve gren gibi yeni özellikler sadeleştirilerek gönderildi";
 "v56_space_h" = "Yatay boşlukları eşitle";
 "v56_space_v" = "Dikey boşlukları eşitle";
+"v56_sym_angle" = "Açı: %1$d°";
+"v56_sym_arms" = "Kol: %1$d";
+"v56_sym_center" = "Ortala";
+"v56_sym_close" = "Simetriyi kapat";
+"v56_sym_cx" = "Merkez X";
+"v56_sym_cy" = "Merkez Y";
+"v56_sym_horizontal" = "Yatay";
+"v56_sym_live" = "Canlı ayna";
+"v56_sym_off" = "Kapalı";
+"v56_sym_quad" = "Dörtlü";
+"v56_sym_radial" = "Radyal";
+"v56_sym_vertical" = "Dikey";
+"v56_symmetry" = "Simetri";
 "v56_tex_canvas" = "Tuval bezi";
 "v56_tex_charcoal" = "Kömür";
 "v56_tex_dots" = "Noktalar";

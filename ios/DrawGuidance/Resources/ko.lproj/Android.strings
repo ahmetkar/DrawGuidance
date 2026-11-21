@@ -3729,6 +3729,7 @@
 "v56_help_object_menu" = "선택한 개체를 정렬·분배하고 소용돌이/오목/볼록 효과를 적용하며 마지막 변형을 반복합니다.";
 "v56_help_paint_inside" = "선택한 요소를 선택 영역으로 만듭니다. 새 선은 그 안에만 그려집니다.";
 "v56_help_paste" = "잘라내거나 복사한 요소를 이 페이지에 붙여넣습니다. 다른 페이지와 캔버스에서도 됩니다.";
+"v56_help_pattern" = "선택한 요소를 캔버스 전체에 격자로 배치합니다.";
 "v56_help_quick_all" = "모든 브러시가 있는 브러시 창을 엽니다.";
 "v56_help_quick_color" = "색 선택 창을 엽니다. 스포이트로 캔버스에서 색을 가져올 수 있습니다.";
 "v56_help_quick_pin" = "브러시를 빠른 줄에 고정합니다(최대 6개). 탭하면 선택됩니다.";
@@ -3773,6 +3774,9 @@
 "v56_magic_wand" = "자동 선택 도구";
 "v56_object_menu" = "개체";
 "v56_paint_inside" = "선택 영역 안에 그리기";
+"v56_pattern" = "패턴 만들기";
+"v56_pattern_count" = "복사본 %1$d개";
+"v56_pattern_gap" = "간격: %1$d";
 "v56_practice_reward_nofill" = "지금 표시할 광고가 없습니다. 연습이 열렸습니다.";
 "v56_quick_all_brushes" = "모든 브러시";
 "v56_quick_brush_a11y" = "빠른 브러시 선택, 사용 중: %1$@";
@@ -3791,6 +3795,19 @@
 "v56_share_flattened" = "%1$@은(는) 이전 버전을 사용합니다. 레이어 모드, 마스크, 그레인 같은 새 기능은 단순화되어 전송되었습니다";
 "v56_space_h" = "가로 간격 균등";
 "v56_space_v" = "세로 간격 균등";
+"v56_sym_angle" = "각도: %1$d°";
+"v56_sym_arms" = "팔: %1$d";
+"v56_sym_center" = "가운데로";
+"v56_sym_close" = "대칭 끄기";
+"v56_sym_cx" = "중심 X";
+"v56_sym_cy" = "중심 Y";
+"v56_sym_horizontal" = "가로";
+"v56_sym_live" = "실시간 미러";
+"v56_sym_off" = "끄기";
+"v56_sym_quad" = "4분할";
+"v56_sym_radial" = "방사형";
+"v56_sym_vertical" = "세로";
+"v56_symmetry" = "대칭";
 "v56_tex_canvas" = "캔버스 천";
 "v56_tex_charcoal" = "목탄";
 "v56_tex_dots" = "점";

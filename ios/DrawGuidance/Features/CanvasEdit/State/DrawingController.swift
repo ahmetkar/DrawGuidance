@@ -34,8 +34,11 @@ final class DrawingController {
         let stroke = Stroke(id: strokeId ?? UUID().uuidString.lowercased(), points: compactPoints(points), colorHex: settings.colorHex,
                             brushType: settings.brushType, sizePx: settings.sizePx, opacity: settings.opacity, order: current.strokes.count,
                             flow: settings.flow, strength: settings.strength, params: params)
-        store.commit(current.strokes + [stroke])
-        if settings.brushType == .ERASER { pruneAfterEraser(stroke) } else { host.onInk(stroke) }
+        // v56 aşama 8 simetri: kopyalar ayrı elemanlar olarak aynı adımda eklenir
+        let sym = V56Flags.enabled(.SYMMETRY, current.kind) ? current.guide.symmetry : nil
+        let copies = sym.map { V56Symmetry.copies(stroke, $0) { UUID().uuidString.lowercased() } } ?? []
+        store.commit(current.strokes + [stroke] + copies)
+        if settings.brushType == .ERASER { copies.forEach { pruneAfterEraser($0) }; pruneAfterEraser(stroke) } else { host.onInk(stroke) }
     }
 
     /// v32 eğitim modu: hazır çizgi tuvale eklenir.

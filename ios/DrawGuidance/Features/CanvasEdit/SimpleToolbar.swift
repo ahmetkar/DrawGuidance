@@ -72,6 +72,13 @@ struct SimpleToolbar: View {
                       selected: ruler.session == .TEMPLATE || ruler.session == .TEMPLATE_PICK) {
             RulerOpen.template(vm, ruler)
         })
+        // v56 aşama 8 simetri aç/kapa (ayarlar alttaki çubukta)
+        if let c = store.canvas, !notes, vm.v56(.SYMMETRY) {
+            let on = c.guide.symmetry != nil
+            t.append(Tool(id: "symmetry", icon: "arrow.left.and.right.righttriangle.left.righttriangle.right", label: L("v56_symmetry"), selected: on) {
+                vm.setSymmetry(on ? nil : .VERTICAL)
+            })
+        }
         if store.canvas?.kind == .SIMPLE_ART {
             // v50 yetişkin çizim alıştırmaları
             t.append(Tool(id: "practice", icon: "figure.strengthtraining.traditional", label: L("v50_practice"), selected: vm.practice.active) { vm.practice.listOpen = true })

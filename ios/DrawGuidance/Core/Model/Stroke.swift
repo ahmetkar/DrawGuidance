@@ -1381,6 +1381,8 @@ struct GuideSpec: Codable, Equatable {
     var yaw3d: Float = GuideSpec.DEFAULT_YAW
     var pitch3d: Float = GuideSpec.DEFAULT_PITCH
     var persp3d: Float = 0
+    /// v56 aşama 8 simetri kılavuzu (tuvalle kaydedilir, geri almanın dışında).
+    var symmetry: SymmetrySpec? = nil
 
     init() {}
 
@@ -1395,7 +1397,7 @@ struct GuideSpec: Codable, Equatable {
         return c
     }
 
-    var isEmpty: Bool { kind == .NONE && perspective == 0 && !draw3d }
+    var isEmpty: Bool { kind == .NONE && perspective == 0 && !draw3d && symmetry == nil }
 
     var draw3dSpec: Depth3D? { draw3d ? Depth3D(plane: plane3d, depth: min(max(depth3d, 0), 1)) : nil }
 
@@ -1409,6 +1411,7 @@ struct GuideSpec: Codable, Equatable {
         perspectiveOpacity = c.v("perspectiveOpacity", d.perspectiveOpacity); draw3d = c.v("draw3d", d.draw3d)
         plane3d = c.v("plane3d", d.plane3d); depth3d = c.v("depth3d", d.depth3d); yaw3d = c.v("yaw3d", d.yaw3d)
         pitch3d = c.v("pitch3d", d.pitch3d); persp3d = c.v("persp3d", d.persp3d)
+        symmetry = c.o("symmetry")
     }
 
     func encode(to encoder: Encoder) throws {
@@ -1421,5 +1424,6 @@ struct GuideSpec: Codable, Equatable {
         try c.e(perspectiveOpacity, "perspectiveOpacity", d.perspectiveOpacity); try c.e(draw3d, "draw3d", d.draw3d)
         try c.e(plane3d, "plane3d", d.plane3d); try c.e(depth3d, "depth3d", d.depth3d); try c.e(yaw3d, "yaw3d", d.yaw3d)
         try c.e(pitch3d, "pitch3d", d.pitch3d); try c.e(persp3d, "persp3d", d.persp3d)
+        try c.o(symmetry, "symmetry")
     }
 }

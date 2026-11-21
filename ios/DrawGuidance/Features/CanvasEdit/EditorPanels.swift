@@ -150,6 +150,17 @@ struct GuideSheet: View {
                         }
                     }
                 }
+                // v56 aşama 8 simetri kılavuzu
+                if vm.v56(.SYMMETRY) {
+                    Section(L("v56_symmetry")) {
+                        Picker(L("v56_symmetry"), selection: Binding(get: { spec.symmetry?.kind }, set: { vm.setSymmetry($0) })) {
+                            Text(L("v56_sym_off")).tag(SymmetryKind?.none)
+                            ForEach(SymmetryKind.allCases, id: \.self) { k in Text(V56SymmetryLabel.text(k)).tag(SymmetryKind?.some(k)) }
+                        }
+                        .pickerStyle(.segmented)
+                        .accessibilityIdentifier("v56_sym_picker")
+                    }
+                }
                 Section { Button(L("guide_clear_all"), role: .destructive) { vm.guides.clearGuides() } }
             }
             .navigationTitle(L("add_guide"))

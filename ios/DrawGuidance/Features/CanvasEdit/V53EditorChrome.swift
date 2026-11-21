@@ -391,6 +391,10 @@ struct AdvancedMenus: View {
         if vm.v56(.COLOR_ADJUST) {
             ChromeButton(icon: "paintpalette", label: L("v56_color_adjust"), enabled: hasSelection, id: "v56_color_adjust_open") { vm.colorAdjustOpen = true }
         }
+        // v56 aşama 8 Desen yap
+        if vm.v56(.SYMMETRY) {
+            ChromeButton(icon: "square.grid.3x3.fill", label: L("v56_pattern"), enabled: hasSelection, id: "v56_pattern_open") { vm.patternOpen = true }
+        }
         if vm.v56(.ADV_ALIGN) || vm.v56(.ADV_EFFECTS) {
             ChromeButton(icon: "square.on.circle", label: L("v56_object_menu"), enabled: hasSelection, id: "v56_object_menu_open") { vm.objectMenuOpen = true }
         }

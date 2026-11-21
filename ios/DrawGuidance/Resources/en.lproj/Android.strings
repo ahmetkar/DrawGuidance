@@ -3729,6 +3729,7 @@
 "v56_help_object_menu" = "Aligns and distributes the selected objects, applies twirl/pucker/bloat and repeats the last transform.";
 "v56_help_paint_inside" = "Turns the selection into a selection area; new strokes paint only inside it.";
 "v56_help_paste" = "Pastes cut or copied elements onto this page; works across pages and canvases.";
+"v56_help_pattern" = "Tiles the selected elements across the canvas in a grid.";
 "v56_help_quick_all" = "Opens the brush window with every brush.";
 "v56_help_quick_color" = "Opens the color picker; use its eyedropper to pick a color from the canvas.";
 "v56_help_quick_pin" = "Pins the brush to the quick strip (up to 6). Tap to select the brush.";
@@ -3773,6 +3774,9 @@
 "v56_magic_wand" = "Magic wand";
 "v56_object_menu" = "Object";
 "v56_paint_inside" = "Paint inside selection";
+"v56_pattern" = "Make pattern";
+"v56_pattern_count" = "%1$d copies";
+"v56_pattern_gap" = "Spacing: %1$d";
 "v56_practice_reward_nofill" = "No ad is available right now. The practice has been unlocked for you.";
 "v56_quick_all_brushes" = "All brushes";
 "v56_quick_brush_a11y" = "Quick brush picker, active: %1$@";
@@ -3791,6 +3795,19 @@
 "v56_share_flattened" = "%1$@ uses an older version: new features such as layer modes, masks and grain were simplified";
 "v56_space_h" = "Equal horizontal spacing";
 "v56_space_v" = "Equal vertical spacing";
+"v56_sym_angle" = "Angle: %1$d°";
+"v56_sym_arms" = "Arms: %1$d";
+"v56_sym_center" = "Center";
+"v56_sym_close" = "Turn off symmetry";
+"v56_sym_cx" = "Center X";
+"v56_sym_cy" = "Center Y";
+"v56_sym_horizontal" = "Horizontal";
+"v56_sym_live" = "Live mirror";
+"v56_sym_off" = "Off";
+"v56_sym_quad" = "Quad";
+"v56_sym_radial" = "Radial";
+"v56_sym_vertical" = "Vertical";
+"v56_symmetry" = "Symmetry";
 "v56_tex_canvas" = "Canvas cloth";
 "v56_tex_charcoal" = "Charcoal";
 "v56_tex_dots" = "Dots";

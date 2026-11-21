@@ -333,4 +333,29 @@ final class GuideController {
         }
         setGuide(g, persist: persist)
     }
+
+    /// v56 aşama 8 simetri: tür seçilir (nil: kapalı); merkez ve açı önceki ayardan korunur.
+    func setSymmetry(_ kind: SymmetryKind?) {
+        guard let current = store.canvas else { return }
+        var g = current.guide
+        if let kind {
+            if var old = g.symmetry {
+                old.arms = kind != .RADIAL ? 2 : (old.kind == kind ? old.arms : 6)
+                old.kind = kind
+                g.symmetry = old
+            } else {
+                g.symmetry = V56Symmetry.start(kind, current.width, current.height)
+            }
+        } else {
+            g.symmetry = nil
+        }
+        setGuide(g)
+    }
+
+    /// Simetri ayarı (kol sayısı, eksen, açı, canlı ayna); persist false: sürüklenirken.
+    func updateSymmetry(_ spec: SymmetrySpec, persist: Bool = true) {
+        guard var g = store.canvas?.guide else { return }
+        g.symmetry = spec
+        setGuide(g, persist: persist)
+    }
 }

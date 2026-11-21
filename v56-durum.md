@@ -1,6 +1,6 @@
 # v56 durum
 
-Son güncelleme: 2026-11-21, K3A durağı (otomatik geçiş: K7 sonuna kadar duraklarda beklenmiyor).
+Son güncelleme: 2026-11-21, K4 durağı (otomatik geçiş: K7 sonuna kadar duraklarda beklenmiyor).
 
 | Durak | Durum | Not |
 |---|---|---|
@@ -9,11 +9,39 @@ Son güncelleme: 2026-11-21, K3A durağı (otomatik geçiş: K7 sonuna kadar dur
 | K1 (V11 model, katman motoru, seçim maskesi, kes/kopyala/yapıştır, fark paketi) | Bitti | Android + iOS |
 | K2 (hızlı fırça seçici, gren ve doku, Dönüştür paneli, yansıma, sıvılaştır, 2E dönüştürme/hizalama/efektler) | Bitti | Android + iOS |
 | K3 (aşama 7, 8, 8A, 9: renk ayarları, katman çoğalt/birleştir, hazır ayarlar, simetri, desen, gelişmiş görünüm, bağlı kopya, opaklık maskesi, canlı Tekrarla, SVG/PSD/DXF) | Bitti | Android + iOS |
-| **K3A** (aşama 9C: yol işlemleri, şekil oluşturucu, Bezier düğümleri, bıçak, efektler, zarf) | **Bitti** | Android + iOS |
-| K4 (aşama 10: 3B temizlik, tuvale 3B ekleme) | Sırada | |
-| K5–K6 (3B Çizim) | Başlamadı | |
+| K3A (aşama 9C: yol işlemleri, şekil oluşturucu, Bezier düğümleri, bıçak, efektler, zarf) | Bitti | Android + iOS |
+| **K4** (aşama 10: 3B temizlik, tuvale 3B ekleme) | **Bitti** | Android + iOS |
+| K5–K6 (3B Çizim) | Sırada (K5) | |
 | K7 (aşama 14) | Başlamadı | |
 | K8 (9A e-posta girişi, 9B mağaza flavor'ları, aşama 15) | Başlamadı, Ahmet'in onayı gerekir | Ahmet: "9a ve 9b yi en sona al" |
+
+## K4'te yapılanlar
+
+- **Tuvale 3B şekil ekleme:** pencerede iki kaynak var: **Kütüphane** (kategoriler, arama) ve **GLB dosyası** (dosya
+  seç, ayrıntı düzeyi; basit çizimde yok). Seçince "İleri" açı adımını açar: önizleme parmakla döndürülür, Ön / Yan /
+  Üst / İzometrik hazır açıları ve dönüş/eğim kaydırıcıları var. "3B şekil ekle" şekli o açıdan resim olarak koyar.
+- **Açıyı değiştir:** seçili 3B şeklin menüsünde (iOS'ta Seç çubuğunda). Model aynı kalır, resim yeni açıdan
+  yeniden çizilir; yer ve yükseklik korunur, tek geri alma adımı. Açı, tuvaldeki model verisinin kamerasında saklanır.
+- **Kaldırılanlar:** tuvalden 3B düzenleyiciye geçiş ("Düzenle", GLB içe aktarma sorusu), tuvaldeki eski 3B çizim
+  çubuğu (düzlem/derinlik/kamera), 3B düzenleyicide GLB dışa aktarma/paylaşma ve GLB içe aktarma, listede hazır şekiller
+  sekmesi ve GLB içe aktarma. 3B öneri artık herkese açık; `model3d.suggest` ve `model3d.export` emekli (Premium
+  listesinde yok, sunucudan gelse de sayılmaz).
+- **3B Çizimlerim:** liste başlığı ve boş metni yenilendi, "Yeni 3B çizim" düğmesi, arama.
+- Bozma ve Çarpıtma 3B şekle uygulanmaz (atlanır, bildirilir); afin dönüşümler uygulanır.
+
+### Plandan sapmalar (K4)
+
+- Ana sekmenin adı ("3B Şekiller") K5'e kadar korundu; testler bu adla geziyor. K5'te "3B Çizim" olacak.
+- 3B düzenleyici (ve içindeki katalog/ilkel şekil paneli) K5'te 3B Çizim moduyla değişeceği için yerinde bırakıldı.
+  `Model3DResults` yalnız bu düzenleyici için duruyor; tuvalle bağı kesildi.
+- ShapePickerModal'daki 3B bölümüne artık hiçbir yerden gelinmiyor; dokunulmadı (K5'te temizlenecek).
+- iOS tuvalinde 3B şekil için "Düzenle" hiç yoktu; yalnız "Açıyı değiştir" eklendi.
+
+## Testler (K4)
+
+- Android: V56Model3DTest 3/3, V23Model3DCanvas 1/1, V25CanvasAdd3D 1/1, V40DesignUi 4/4, V44Rules 9/9,
+  V23No3dBar 1/1, V23SuggestShots 1/1, V39* (eski GatingUi hatası dışında) geçti. Derleme hatasız.
+- iOS: `V56Model3DTests` (3 test) yazıldı (Swift derleyicisi yok, duraklarda CI yok).
 
 ## K3A'da yapılanlar
 

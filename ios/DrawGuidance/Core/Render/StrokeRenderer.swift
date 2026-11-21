@@ -5,7 +5,16 @@ import Foundation
 enum StrokeRenderer {
     /// Tek çizim: kırpma dörtgeni varsa içinde.
     static func drawStroke(_ c: CGContext, _ stroke: Stroke) {
-        clipped(c, stroke) { drawUnclipped(c, stroke) }
+        clipped(c, stroke) { grained(c, stroke) { drawUnclipped(c, stroke) } }
+    }
+
+    /// v56 gren: iz saydamlık katmanında çizilip dokuyla çarpılır.
+    private static func grained(_ c: CGContext, _ stroke: Stroke, _ body: () -> Void) {
+        if let g = GrainRenderer.grainOf(stroke), !stroke.brushType.isObject {
+            GrainRenderer.withGrain(c, g, firstX: stroke.points[0].x, firstY: stroke.points[0].y, body)
+        } else {
+            body()
+        }
     }
 
     static func polygon(_ pts: [StrokePoint]) -> CGMutablePath {
@@ -78,7 +87,7 @@ enum StrokeRenderer {
     /// damgalarla önizlenir (yardımcı fırçalar işlenecek alanı yarı saydam gri gösterir). Diğer fırçalar `drawStroke` gibi.
     static func drawLive(_ c: CGContext, _ stroke: Stroke) {
         guard stroke.brushType.isRaster, !stroke.points.isEmpty else { drawStroke(c, stroke); return }
-        clipped(c, stroke) {
+        clipped(c, stroke) { grained(c, stroke) {
             let helper = stroke.brushType.isHelper
             let xs = stroke.points.map(\.x), ys = stroke.points.map(\.y)
             let d = BrushPainter.dynamicsOf(stroke.points)
@@ -87,7 +96,7 @@ enum StrokeRenderer {
                                seed: stroke.id.javaHashCode, flow: stroke.flow, strength: stroke.strength,
                                pressures: d.pressures, tilts: d.tilts, params: stroke.params, orients: d.orients,
                                rolls: d.rolls, barrels: d.barrels)
-        }
+        } }
     }
 
     private static func drawUnclipped(_ c: CGContext, _ stroke: Stroke) {
@@ -109,6 +118,8 @@ enum StrokeRenderer {
             if n == 0 { return }
             // v51 piksel tabanlı fırça: bağlamsız çizim (önizleme, bekleyen çizim); listede bağlamıyla çizilir
             if stroke.brushType.isRaster { RasterStrokes.draw(c, stroke, context: nil); return }
+            // v56 resimden fırça: uç resmi iz boyunca damgalanır (uç yüklenmediyse fırçanın kendi ucu)
+            if stroke.params?.stampAssetId != nil, GrainRenderer.drawStamps(c, stroke, color: ArgbColor.hex(stroke.colorHex)) { return }
             if let r = paintBounds(stroke) {
                 let clip = c.boundingBoxOfClipPath
                 if !clip.isNull && !clip.isInfinite && !clip.intersects(r) { return }
@@ -189,7 +200,7 @@ enum StrokeRenderer {
             let o = strokes[q]
             if (o.layerId ?? "") == layer && !o.hidden { context.append(o) }
         }
-        clipped(c, s) { RasterStrokes.draw(c, s, context: context) }
+        clipped(c, s) { grained(c, s) { RasterStrokes.draw(c, s, context: context) } }
     }
 
     /// Kağıt rengi + arka plan (gradyan, resim, desen) + çizimler (silgi kâğıdı silmesin diye çizimler ayrı katmanda).

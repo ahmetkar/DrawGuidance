@@ -42,6 +42,8 @@ final class EditorViewModel: ObservableObject, EditorHost {
     @Published var penPoint: P?
     /// v56 renk penceresindeki damlalıktan sonra pencere yeniden açılacak mı.
     @Published var reopenColorSheet = false
+    /// v56 aşama 5 doku seçicisinin hedefi: "area", "page" ya da "layer:<kimlik>"; nil: kapalı.
+    @Published var textureFillTarget: String?
     /// v56 sihirli değnek ölçütü ve benzerlik toleransı (0..1).
     @Published var wandCriterion: V56Selection.WandCriterion = .COLOR
     @Published private(set) var wandTolerance: Float = 0.15
@@ -265,13 +267,15 @@ final class EditorViewModel: ObservableObject, EditorHost {
         // v51 geçici tuvalden gelip henüz nota aktarılmamış resimler de korunur
         deps.assets.prune(canvasLocalId, c.pages.flatMap { $0 },
                           keep: Set([c.background.assetId].compactMap { $0 } + c.pageBackgrounds.compactMap { $0?.spec?.assetId }
-                                    + TempCanvases.pendingAssetIds(canvasLocalId)))
+                                    + TempCanvases.pendingAssetIds(canvasLocalId)).union(brush.stampAssetIds()))
         brush.adaptTo(c.kind)
         modeTemplates?.warm()
         brush.restore(c.kind, canvasPrefs.lastBrush.flatMap(BrushType.init(rawValue:)), canvasPrefs.lastColor)
         // v56 hızlı fırça seçici: bu modun son kullanılanları ve favorileri
         quickBrush.bind(c.kind)
         if V56Flags.enabled(.QUICK_BRUSH, c.kind) { quickBrush.used(brush.settings.brushType) }
+        // v56 resim uçları bu tuvalde de bulunsun (başka tuvalde oluşturulduysa kopyalanır)
+        ensureStampAssets()
         texts.adaptTo(c.width, c.height)
         if let (spec, size) = canvasPrefs.lastText { texts.restore(spec, sizePx: size > 0 ? size : nil) }
         formulas.adaptTo(c.width, c.height)
@@ -618,6 +622,62 @@ final class EditorViewModel: ObservableObject, EditorHost {
     func eyedropFromColorSheet() {
         reopenColorSheet = true
         if canvasPick != .EYEDROPPER { toggleCanvasPick(.EYEDROPPER) }
+    }
+
+    // MARK: v56 aşama 5: gren, resimden fırça, doku dolgusu
+
+    /// Resim uçları bu tuvalin varlıklarında yoksa kopyalanır; hiçbir yerde yoksa fırça kendi ucuna döner.
+    private func ensureStampAssets() {
+        for id in brush.stampAssetIds() {
+            switch deps.assets.canvasOf(id) {
+            case nil: brush.replaceStamp(id, nil)
+            case canvasLocalId?: deps.assets.ensureLoaded(id: id)
+            default:
+                if let n = deps.assets.copyTo(id, canvasLocalId) { brush.replaceStamp(id, n); deps.assets.ensureLoaded(id: n) }
+            }
+        }
+    }
+
+    /// Seçilen resimden fırça ucu: seçili fırça damgayla çizilemiyorsa keçeli kaleme geçilir.
+    func createImageBrush(_ data: Data) {
+        images.createImageBrush(data) { [weak self] id in
+            guard let self else { return }
+            if !BrushTuning.supportsImageTip(self.brush.settings.brushType) { self.selectBrush(.MARKER) }
+            self.brush.updateTuning { t in var n = t; n.stampAssetId = id; return n }
+        }
+    }
+
+    func removeImageBrush() { brush.updateTuning { t in var n = t; n.stampAssetId = nil; return n } }
+
+    /// Gren: doku seç (nil: kapalı), ölçek, güç, kayar.
+    func setGrainTexture(_ id: String?) {
+        brush.updateTuning { t in
+            var n = t
+            if let id { var g = t.grain ?? GrainSpec(textureId: id); g.textureId = id; n.grain = g } else { n.grain = nil }
+            return n
+        }
+    }
+
+    func setGrain(_ change: (GrainSpec) -> GrainSpec) {
+        brush.updateTuning { t in var n = t; n.grain = t.grain.map(change); return n }
+    }
+
+    /// Dokuyla doldur: seçim alanı varsa alanın içi, yoksa (ya da `wholePage`) etkin katmanın bütün sayfası; tek geri alma adımı.
+    @discardableResult
+    func textureFill(_ textureId: String, wholePage: Bool = false) -> Bool {
+        guard let c = store.canvas else { return false }
+        let area = wholePage ? nil : store.area.flatMap { $0.inverted ? nil : $0.points }
+        let pts = area ?? V56Textures.pageRect(Float(c.width), Float(c.height))
+        let fill = V56Selection.lassoFill(id: UUID().uuidString, pts, colorHex: brush.settings.colorHex, opacity: brush.settings.opacity,
+                                          order: c.strokes.count, grain: GrainSpec(textureId: textureId))
+        store.commit(c.strokes + [fill], useArea: false)
+        return true
+    }
+
+    /// Katman menüsünden: o katman etkin yapılıp bütün sayfası dokuyla doldurulur.
+    func textureFillLayer(_ layerId: String, _ textureId: String) {
+        layers.setActive(layerId)
+        textureFill(textureId, wholePage: true)
     }
 
     func updateBrushColor(_ hex: String) {

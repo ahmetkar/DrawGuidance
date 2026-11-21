@@ -273,12 +273,31 @@ final class BrushController: ObservableObject {
         next.tiltWidth = next.tiltWidth?.coerceIn(0, 2)
         next.tiltLight = next.tiltLight?.coerceIn(0, 1)
         next.tiltThreshold = next.tiltThreshold.coerceIn(0, 60)
+        if var g = next.grain {
+            g.scale = g.scale.coerceIn(V56Textures.MIN_SCALE, V56Textures.MAX_SCALE)
+            g.strength = g.strength.coerceIn(0, 1)
+            next.grain = g
+        }
         tunings[settings.brushType] = next
         settings.tuning = next
         persist()
     }
 
     func resetTuning() { updateTuning { _ in BrushTuning() } }
+
+    /// v56 fırça ayarlarında kayıtlı resim uçlarının varlık kimlikleri.
+    func stampAssetIds() -> Set<String> {
+        load()
+        return Set(tunings.values.compactMap(\.stampAssetId) + [settings.tuning.stampAssetId].compactMap { $0 })
+    }
+
+    /// v56 resim ucu başka tuvale kopyalandı (`new`) ya da artık yok (nil).
+    func replaceStamp(_ old: String, _ new: String?) {
+        load()
+        for (k, v) in tunings where v.stampAssetId == old { var t = v; t.stampAssetId = new; tunings[k] = t }
+        if settings.tuning.stampAssetId == old { settings.tuning.stampAssetId = new }
+        persist()
+    }
 
     func startPickCloneSource() { cloneSourcePicking.toggle() }
 

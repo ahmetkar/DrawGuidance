@@ -15,11 +15,14 @@ struct BrushTuning: Codable, Equatable {
     var tip = TipParams()
     var pen = PenDynamics()
     var fx = FxParams()
+    /// v56 gren (doku, ölçek, güç, kayar) ve resimden fırçanın uç resmi (tuvale bağlı varlık).
+    var grain: GrainSpec? = nil
+    var stampAssetId: String? = nil
 
     init() {}
 
     private enum CodingKeys: String, CodingKey {
-        case spacing, speed, stabilizer, stabilizerStrength, tiltWidth, tiltLight, tiltThreshold, nibFollow, tube, tip, pen, fx
+        case spacing, speed, stabilizer, stabilizerStrength, tiltWidth, tiltLight, tiltThreshold, nibFollow, tube, tip, pen, fx, grain, stampAssetId
     }
 
     /// Eski kayıtlarda olmayan alanlar varsayılanla okunur (kayıtlı ayarlar kaybolmasın).
@@ -37,7 +40,15 @@ struct BrushTuning: Codable, Equatable {
         tip = (try? c.decodeIfPresent(TipParams.self, forKey: .tip)) ?? TipParams()
         pen = (try? c.decodeIfPresent(PenDynamics.self, forKey: .pen)) ?? PenDynamics()
         fx = (try? c.decodeIfPresent(FxParams.self, forKey: .fx)) ?? FxParams()
+        grain = try? c.decodeIfPresent(GrainSpec.self, forKey: .grain)
+        stampAssetId = try? c.decodeIfPresent(String.self, forKey: .stampAssetId)
     }
+
+    /// v56 gren uygulanabilen fırçalar (silgi, yardımcılar, 3B ve nesneler hariç).
+    static func supportsGrain(_ type: BrushType) -> Bool { type != .ERASER && !type.isObject && !type.isHelper && type != .BRUSH_3D }
+
+    /// v56 resimden fırça: damgalarla çizilebilen vektör fırçalar.
+    static func supportsImageTip(_ type: BrushType) -> Bool { supportsGrain(type) && !type.isRaster && type != .LASSO_FILL }
 
     static let MIN_SIZE: Float = 1
     static let MAX_SIZE: Float = 380
@@ -56,8 +67,11 @@ struct BrushTuning: Codable, Equatable {
         let tp = (type.isRaster ? tip : sizeOnly).orNil
         let pd = pen.orNil
         let fp: FxParams? = (type.isHelper && fx != FxParams()) ? fx : nil
-        if sp == nil && tw == nil && tl == nil && th <= 0 && !nib && t == nil && tp == nil && pd == nil && fp == nil { return nil }
-        return BrushParams(spacing: sp, tiltWidth: tw, tiltLight: tl, tiltThreshold: th, nibFollow: nib, tube: t, tip: tp, pen: pd, fx: fp)
+        let gr = BrushTuning.supportsGrain(type) ? grain : nil
+        let st = BrushTuning.supportsImageTip(type) ? stampAssetId : nil
+        if sp == nil && tw == nil && tl == nil && th <= 0 && !nib && t == nil && tp == nil && pd == nil && fp == nil && gr == nil && st == nil { return nil }
+        return BrushParams(spacing: sp, tiltWidth: tw, tiltLight: tl, tiltThreshold: th, nibFollow: nib, tube: t, tip: tp, pen: pd, fx: fp,
+                           grain: gr, stampAssetId: st)
     }
 }
 

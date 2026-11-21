@@ -233,6 +233,10 @@ struct LayersList: View {
                 if !store.selectedIds.isEmpty {
                     Button { vm.layers.moveSelectionTo(layer.id) } label: { Label(L("v53_layer_move_here"), systemImage: "square.and.arrow.down.on.square") }
                 }
+                if vm.v56(.GRAIN) && !layer.locked && layer.visible {
+                    Button { vm.textureFillTarget = "layer:\(layer.id)" } label: { Label(L("v56_texture_fill_layer"), systemImage: "square.grid.3x3.topleft.filled") }
+                        .accessibilityIdentifier("v56_layer_texture_fill")
+                }
                 if layer.id != Layer.BASE {
                     Button(role: .destructive) { vm.layers.remove(layer.id) } label: { Label(L("delete_selection"), systemImage: "trash") }
                 }
@@ -395,6 +399,8 @@ struct BrushSettingsEditor: View {
                     .scrollDisabled(true)
                     .frame(minHeight: 420)
             }
+            // v56 gren ve resimden fırça
+            GrainSectionView(vm: vm, brush: brush)
         }
     }
 }

@@ -544,6 +544,8 @@ struct AddRowItems: View {
             item("tones", "circle.grid.3x3.fill", L("v53_tones")) { addUi.open = .tones }
         }
         if !kind.simple { item("guide", "grid", L("add_guide")) { sheet = .guide } }
+        // v56 Ekle › Doku: etkin katmanın sayfası hazır dokuyla doldurulur
+        if vm.v56(.GRAIN) { item("texture", "square.grid.3x3.topleft.filled", L("v56_add_texture")) { vm.textureFillTarget = "page" } }
         item("model3d", "cube.transparent", L("add_model3d")) { addUi.open = .model3d }
         PhotosPicker(selection: $photo, matching: .images) {
             HStack(spacing: 6) {

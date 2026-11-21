@@ -21,6 +21,9 @@ struct V56SelectionOverlay: View {
                         if !a.inverted && vm.v56(.LASSO_FILL) {
                             chip(L("v56_area_fill"), id: "v56_area_fill") { vm.lassoFill() }
                         }
+                        if !a.inverted && vm.v56(.GRAIN) {
+                            chip(L("v56_texture_fill"), id: "v56_area_texture_fill") { vm.textureFillTarget = "area" }
+                        }
                         chip(L("v56_area_clear"), id: "v56_area_clear") { vm.selection.clearArea() }
                     }
                     .padding(.top, 8)

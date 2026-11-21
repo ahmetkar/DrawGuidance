@@ -225,6 +225,28 @@ final class ImageController: ObservableObject {
         }
     }
 
+    /// v56 aşama 5 "Resimden fırça oluştur": resim güvenlik ve boyut denetiminden geçer, koyu yerleri boya olan en çok
+    /// 256 px'lik uç resmine çevrilip bu tuvale varlık olarak yazılır; kimliği `onReady`'e verilir.
+    func createImageBrush(_ data: Data, onReady: @escaping (String) -> Void) {
+        if isChecking { return }
+        importState = .checking
+        let canvasId = store.canvasLocalId
+        Task {
+            let result = await Task.detached(priority: .userInitiated) { ImageImportValidator.check(data) }.value
+            guard result.accepted, let image = result.image else {
+                importState = .rejected(errors: result.errors.isEmpty ? [.unreadable] : result.errors, warnings: result.warnings)
+                return
+            }
+            let tip = await Task.detached(priority: .userInitiated) { GrainRenderer.tipFrom(image.image) }.value
+            importState = nil
+            guard let png = PixelCodec.encode(tip) else { return }
+            let id = assets.save(canvasId, PreparedImage(bytes: png, mimeType: "image/png", width: tip.width, height: tip.height, image: tip,
+                                                         originalBytes: png.count, detailScore: 0))
+            CanvasImageCache.put(id, tip)
+            onReady(id)
+        }
+    }
+
     /// v23 arka plan resmi: kontrol edilir, tuvalin resim verisine eklenir; kimliği [onAdded]'a verilir.
     func importBackground(_ data: Data, onAdded: @escaping (String) -> Void) {
         let canvasId = store.canvasLocalId

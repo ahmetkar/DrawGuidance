@@ -137,9 +137,13 @@ enum V56Selection {
         }
     }
 
-    static func lassoFill(id: String, _ points: [StrokePoint], colorHex: String, opacity: Float, order: Int, layerId: String? = nil) -> Stroke {
-        Stroke(id: id, points: points, colorHex: colorHex, brushType: .LASSO_FILL, sizePx: 1, opacity: min(max(opacity, 0), 1),
-               order: order, layerId: layerId)
+    /// `grain`: v56 aşama 5 doku dolgusu (dolgu hazır dokuyla çarpılır).
+    static func lassoFill(id: String, _ points: [StrokePoint], colorHex: String, opacity: Float, order: Int, layerId: String? = nil,
+                          grain: GrainSpec? = nil) -> Stroke {
+        var s = Stroke(id: id, points: points, colorHex: colorHex, brushType: .LASSO_FILL, sizePx: 1, opacity: min(max(opacity, 0), 1),
+                       order: order, layerId: layerId)
+        if let grain { s.params = BrushParams(grain: grain) }
+        return s
     }
 
     static func applyArea(_ before: Set<String>, _ after: [Stroke], _ area: ClipMask?) -> [Stroke] {

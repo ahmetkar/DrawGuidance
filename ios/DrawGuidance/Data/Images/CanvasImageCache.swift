@@ -160,6 +160,9 @@ final class CanvasAssetStore {
         return newId
     }
 
+    /// v56 tek varlığı belleğe alır (resim ucu).
+    func ensureLoaded(id: String) { decodeIntoCache(id) }
+
     private func decodeIntoCache(_ id: String) {
         guard !CanvasImageCache.contains(id), let data = bytes(id), let img = CanvasImageCache.decode(data) else { return }
         CanvasImageCache.put(id, img)
@@ -177,6 +180,8 @@ final class CanvasAssetStore {
         for page in canvas.pages {
             for s in page {
                 if let a = s.assetId { ids.insert(a) }
+                // v56 resimden fırçanın uç resmi
+                if let a = s.params?.stampAssetId { ids.insert(a) }
                 if let box = s.text?.box?.imageId {
                     if box.hasPrefix(BackgroundSpec.ASSET) { ids.insert(String(box.dropFirst(BackgroundSpec.ASSET.count))) } else { _ = PaperLibrary.image(box) }
                 }

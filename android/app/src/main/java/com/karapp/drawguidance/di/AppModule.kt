@@ -54,7 +54,6 @@ fun appModule(apiBaseUrl: String) = module {
     single { com.karapp.drawguidance.data.library.PaperRepository(get()) }
     single { com.karapp.drawguidance.data.library.TextureRepository(get()) }
     single { com.karapp.drawguidance.data.library.Model3DRepository(androidContext(), get(), get()) }
-    single { com.karapp.drawguidance.data.library.Model3DResults() }
     single { com.karapp.drawguidance.data.local.FolderRepository(get(), get(), get()) }
     single { com.karapp.drawguidance.data.settings.EditorPrefsStore(androidContext()) }
     // v24 3B düzenleyicinin çizim tercihleri (ekran kartı, kalite)
@@ -307,17 +306,12 @@ fun appModule(apiBaseUrl: String) = module {
     viewModel { (canvasLocalId: String) ->
         CanvasEditViewModel(get(), get(), get(), get(), get(), get(), get(), get(), canvasLocalId, get(), transfer = get(), shapeModels = get(), recent = get(), tutorialPrefs = get(), tempImages = get())
     }
-    // Boş kimlik: yok (yeni model / tuvalsiz açılış)
-    viewModel { (modelId: String, canvasId: String, strokeId: String, name: String) ->
-        com.karapp.drawguidance.ui.screens.model3d.Model3DEditorViewModel(
-            get(), get(), get(), modelId.ifEmpty { null }, canvasId.ifEmpty { null }, strokeId.ifEmpty { null }, get(),
-            // v25 resim olarak dışa aktarma Resimlerim'e yazar
+    // v56 3B Çizim (boş kimlik: yeni çizim)
+    viewModel { (modelId: String, name: String) ->
+        com.karapp.drawguidance.ui.screens.sketch3d.Sketch3DViewModel(
+            get(), get(), modelId.ifEmpty { null }, get(),
+            // Resim olarak kaydetme Resimlerim'e yazar
             images = get(),
-            // v29 tuvale / çizgi romana aktarma
-            transfer = get(),
-            // v30 tuvalin yapay zekâ ayarı
-            canvasAi = { id -> get<com.karapp.drawguidance.data.repository.CanvasRepository>().isAiEnabled(id) ?: true },
-            // v33 ana sayfadaki 3B tuvalde verilen ad
             initialName = name.ifEmpty { null },
         )
     }

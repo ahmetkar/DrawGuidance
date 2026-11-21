@@ -123,10 +123,8 @@ fun DrawGuidanceNavGraph(
             // v34 çizim alanı koordinatları soldan sağa: Arapçada da düzenleyici soldan sağa dizilir (yazılar sağdan sola)
             EditorDirection {
                 com.karapp.drawguidance.ui.premium.PremiumScope(null, { navController.navigate(Routes.SUBSCRIPTION) }) {
-                com.karapp.drawguidance.ui.screens.model3d.Model3DEditorScreen(
+                com.karapp.drawguidance.ui.screens.sketch3d.Sketch3DScreen(
                     modelId = arg("modelId"),
-                    canvasId = null,
-                    strokeId = null,
                     initialName = arg("name"),
                     onBack = { navController.popBackStack() },
                 )
@@ -193,6 +191,8 @@ fun DrawGuidanceNavGraph(
                     // v52 çizim ekranının Diğer menüsünden paylaşım ve canlı yayın
                     onOpenShare = { navController.navigate(Routes.SHARE) },
                     onOpenLiveShare = { navController.navigate(Routes.SHARE_LIVE) },
+                    // v56 aşama 11 Diğer menüsünden "3B çiz": yeni 3B Çizim modu
+                    onOpenSketch3D = { navController.navigate(Routes.modelEdit(null)) },
                     // v51 notta resim düzenleme: geçici basit resim tuvali (kaydedince ya da çıkınca nota dönülür)
                     onOpenCanvas = { id -> navController.navigate(Routes.canvasEdit(id)) },
                     // v51 yeni alıştırma yeni tuvalde: eski düzenleyici yığından çıkar

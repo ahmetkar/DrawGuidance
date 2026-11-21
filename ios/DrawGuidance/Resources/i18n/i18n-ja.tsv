@@ -3355,3 +3355,11 @@ ZAMAN KAYBI	時間の無駄
 Yardımcı şekiller	補助図形
 Işık katmanı	光レイヤー
 Gölge katmanı	影レイヤー
+Katman %d	レイヤー %d
+Düzlem noktaya taşındı	平面を点に移動しました
+Düzlem yüze yapıştı	平面を面に合わせました
+Yüze, çizgi ucuna ya da kesişime dokunun	面・線の端・交点をタップしてください
+Katman kilitli	レイヤーはロックされています
+Katman gizli	レイヤーは非表示です
+Ekran kartı çizimi açılamadı; yazılımla çiziliyor	GPU描画を開始できませんでした。ソフトウェアで描画します
+Yeni 3B çizim	新しい3D描画

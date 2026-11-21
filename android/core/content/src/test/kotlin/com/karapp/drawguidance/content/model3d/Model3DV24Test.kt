@@ -144,9 +144,9 @@ class Model3DV24Test {
 
     private fun sampleModel(): Model3D {
         val cube = ModelEdit.newPart(PrimitiveKind.CUBE, "c", 0).copy(rotation = V3(10f, 20f, 30f), scale = V3(1f, 2f, 0.5f))
-        val painted = ModelEdit.paintFace(cube, 2, Material(0xFF00FF00.toInt(), texture = "wood.oak", textureScale = 0.5f, kind = MaterialKind.METAL, shine = 0.8f))
+        val painted = cube.copy(faceMaterials = mapOf(2 to Material(0xFF00FF00.toInt(), texture = "wood.oak", textureScale = 0.5f, kind = MaterialKind.METAL, shine = 0.8f)))
         val sphere = ModelEdit.newPart(PrimitiveKind.SPHERE, "s", 1, V3(2f, 0f, 0f)).copy(material = Material(0x80FF0000.toInt(), opacity = 0.5f, kind = MaterialKind.GLASS))
-        val edited = ModelEdit.extrudeFace(ModelEdit.newPart(PrimitiveKind.CYLINDER, "e", 2, V3(-2f, 0f, 0f)), 0, 0.3f).copy(visible = false)
+        val edited = ModelEdit.newPart(PrimitiveKind.CYLINDER, "e", 2, V3(-2f, 0f, 0f)).copy(primitive = null, visible = false)
         val tri = Mesh(floatArrayOf(0f, 0f, 0f, 1f, 0f, 0f, 0f, 1f, 0f), arrayOf(intArrayOf(0, 1, 2)), arrayOf(floatArrayOf(0f, 0f, 1f, 0f, 0f, 1f)))
         val withUv = Part("u", "Üçgen", tri, null, uv = UvMode.MESH, material = Material(texture = "imp.x"))
         return Model3D(

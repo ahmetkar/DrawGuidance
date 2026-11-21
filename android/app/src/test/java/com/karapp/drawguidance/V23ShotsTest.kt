@@ -97,7 +97,7 @@ class V23EditorToolsShotsTest : V23EditorBase() {
     @Test
     fun editorTools() {
         waitForText("Henüz bir tuvaliniz yok", substring = true)
-        compose.onNodeWithText("3B Şekiller").performSemanticsAction(SemanticsActions.OnClick)
+        compose.onNodeWithText("3B Çizim").performSemanticsAction(SemanticsActions.OnClick)
         waitFor { exists("models3d_screen") }
         compose.onNodeWithText("Yeni 3B şekil").performClick()
         waitFor { exists("model3d_editor") }

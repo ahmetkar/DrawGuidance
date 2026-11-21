@@ -1079,7 +1079,7 @@
     <string name="model3d_picker_hint">المس: للإضافة إلى اللوحة · القلم: للفتح في المحرّر ثلاثي الأبعاد</string>
     <string name="model3d_inserting">جارٍ تجهيز الشكل ثلاثي الأبعاد…</string>
     <string name="add_model3d">إضافة شكل ثلاثي الأبعاد</string>
-    <string name="drawer_models3d">الأشكال ثلاثية الأبعاد</string>
+    <string name="drawer_models3d">رسم ثلاثي الأبعاد</string>
     <string name="text_suggest_title">اقتراح نص:</string>
     <string name="text_suggest_setting">اقتراح النص</string>
     <string name="shape_suggest_setting">اقتراح الشكل</string>

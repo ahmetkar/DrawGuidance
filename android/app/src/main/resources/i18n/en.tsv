@@ -3310,3 +3310,11 @@ ZAMAN KAYBI	TIME SINK
 Yardımcı şekiller	Helper shapes
 Işık katmanı	Light layer
 Gölge katmanı	Shadow layer
+Katman %d	Layer %d
+Düzlem noktaya taşındı	Plane moved to the point
+Düzlem yüze yapıştı	Plane snapped to the face
+Yüze, çizgi ucuna ya da kesişime dokunun	Tap a face, a line end or a crossing
+Katman kilitli	The layer is locked
+Katman gizli	The layer is hidden
+Ekran kartı çizimi açılamadı; yazılımla çiziliyor	GPU drawing could not start; using software drawing
+Yeni 3B çizim	New 3D drawing

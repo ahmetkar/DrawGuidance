@@ -3343,3 +3343,11 @@ ZAMAN KAYBI	ПОТЕРЯ ВРЕМЕНИ
 Yardımcı şekiller	Вспомогательные фигуры
 Işık katmanı	Слой света
 Gölge katmanı	Слой тени
+Katman %d	Слой %d
+Düzlem noktaya taşındı	Плоскость перенесена в точку
+Düzlem yüze yapıştı	Плоскость привязана к грани
+Yüze, çizgi ucuna ya da kesişime dokunun	Коснитесь грани, конца линии или пересечения
+Katman kilitli	Слой заблокирован
+Katman gizli	Слой скрыт
+Ekran kartı çizimi açılamadı; yazılımla çiziliyor	Не удалось запустить отрисовку на GPU; используется программная
+Yeni 3B çizim	Новый 3D-рисунок

@@ -5,7 +5,6 @@ import android.graphics.Bitmap
 import com.karapp.drawguidance.content.model3d.Catalog3D
 import com.karapp.drawguidance.content.model3d.Gltf3
 import com.karapp.drawguidance.content.model3d.GltfImport
-import com.karapp.drawguidance.content.model3d.GltfWriteOptions
 import com.karapp.drawguidance.content.model3d.Model3D
 import com.karapp.drawguidance.content.model3d.Model3DStore
 import com.karapp.drawguidance.content.model3d.RenderOptions
@@ -26,6 +25,9 @@ import kotlinx.coroutines.withContext
 import java.util.UUID
 
 /**
+ * v56 3B Çizim: kayıtlar D3 v2 ([Model3DStore.encode]); eski GLB kayıtları bir kez çevrilir ([migrateToSketch]:
+ * modelleme parçaları kilitli cisim olur), asıl GLB bir sürüm boyunca `models3d-backup/` altında saklanır.
+ *
  * v23 "3B Şekillerim" deposu (`models3d`). v24: modeller GLB biçiminde ([Model3DStore]; glTF 2.0, düzenleme bilgileri
  * "extras"ta) ve küçük resimleriyle saklanır; eski (v23 "D3") kayıtlar ilk açılışta bir kez GLB'ye çevrilir. Dışa
  * aktarma dokuları gömülü GLB üretir; içe aktarma başka programların glTF/GLB dosyalarını ayrıntısını düşürerek alır
@@ -38,12 +40,13 @@ class Model3DRepository(
     private val scope: CoroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.Default),
 ) {
     private val prefs = context.applicationContext.getSharedPreferences("models3d", Context.MODE_PRIVATE)
+    private val backupDir = java.io.File(context.applicationContext.filesDir, "models3d-backup")
 
     fun observe(): Flow<List<Model3DInfo>> = dao.observeInfo()
 
     fun warmUp() {
         scope.launch {
-            runCatching { migrateToGlb() }.onFailure { AppLog.e("Model3D", "3B modeller GLB'ye çevrilemedi", it) }
+            runCatching { migrateToSketch() }.onFailure { AppLog.e("Model3D", "3B modeller 3B Çizim biçimine çevrilemedi", it) }
             runCatching {
                 if (prefs.getInt(SAMPLES_KEY, 0) >= Samples3D.VERSION) return@runCatching
                 val existing = dao.idsBySource(Model3DEntity.SAMPLE).toSet()
@@ -58,26 +61,34 @@ class Model3DRepository(
         }
     }
 
-    /** v24: eski biçimdeki kayıtları GLB'ye çevirir (bir kez; zaman ve küçük resim korunur). */
-    suspend fun migrateToGlb() {
-        if (prefs.getInt(FORMAT_KEY, 0) >= FORMAT_GLB) return
+    /**
+     * v56: eski (GLB ya da D3 v1) kayıtları bir kez D3 v2'ye çevirir; parçalar kilitli cisim olur. Asıl veri
+     * `models3d-backup/<kimlik>.glb` olarak saklanır (zaman ve küçük resim korunur).
+     */
+    suspend fun migrateToSketch() {
+        if (prefs.getInt(FORMAT_KEY, 0) >= FORMAT_SKETCH) return
         var converted = 0
         for (id in dao.allIds()) {
             val row = dao.get(id) ?: continue
             if (!Model3DStore.isLegacy(row.data)) continue
             val model = runCatching { Model3DStore.decode(row.data) }.getOrNull() ?: continue
-            dao.updateData(id, Model3DStore.encode(model.copy(id = row.id, name = row.name)))
+            runCatching { backupDir.mkdirs(); java.io.File(backupDir, "${row.id.replace(Regex("[^A-Za-z0-9._-]"), "_")}.glb").writeBytes(row.data) }
+            dao.updateData(id, Model3DStore.encode(Model3DStore.fromLegacy(model).copy(id = row.id, name = row.name)))
             converted++
         }
-        prefs.edit().putInt(FORMAT_KEY, FORMAT_GLB).apply()
-        if (converted > 0) AppLog.i("Model3D", "$converted 3B model GLB biçimine çevrildi")
+        prefs.edit().putInt(FORMAT_KEY, FORMAT_SKETCH).apply()
+        if (converted > 0) AppLog.i("Model3D", "$converted 3B model 3B Çizim biçimine çevrildi")
     }
 
     suspend fun load(id: String): Model3D? = withContext(Dispatchers.IO) {
-        dao.get(id)?.let { row -> runCatching { Model3DStore.decode(row.data) }.getOrNull()?.copy(id = row.id, name = row.name) }
+        dao.get(id)?.let { row ->
+            runCatching { Model3DStore.decode(row.data) }.getOrNull()
+                ?.let { if (Model3DStore.isLegacy(row.data)) Model3DStore.fromLegacy(it) else it }
+                ?.copy(id = row.id, name = row.name)
+        }
     }
 
-    /** Modelin kayıtlı verisi (GLB). */
+    /** Modelin kayıtlı verisi (D3 v2). */
     suspend fun bytes(id: String): ByteArray? = withContext(Dispatchers.IO) { dao.get(id)?.data }
 
     /** Modeli kaydeder (yoksa ekler); kimliği döner. */
@@ -123,15 +134,6 @@ class Model3DRepository(
         result
     }
 
-    /** Dışa aktarma: dokular gömülü GLB (başka programlarda açılır; uygulamaya geri alınınca kayıpsız). */
-    suspend fun exportGlb(model: Model3D): ByteArray {
-        val ids = model.parts.flatMap { p -> listOfNotNull(p.material.texture) + p.faceMaterials.values.mapNotNull { it.texture } }.toSet()
-        textures.preload(ids)
-        return withContext(Dispatchers.Default) {
-            Gltf3.write(model, GltfWriteOptions(embedTextures = true, textures = textures::cached))
-        }
-    }
-
     private fun decodeImage(bytes: ByteArray, mime: String?): Texture? =
         BitmapCodec.pixels(bytes)?.let { (w, h, px) -> Texture(w, h, px) }
 
@@ -164,7 +166,7 @@ class Model3DRepository(
         const val THUMB = 192
         private const val SAMPLES_KEY = "samples_version"
         private const val FORMAT_KEY = "format_version"
-        private const val FORMAT_GLB = 2
+        private const val FORMAT_SKETCH = 3
 
         /** İçe aktarmada ayrıntı seçenekleri (üçgen sayısı): az, orta, çok. */
         val DETAIL_LEVELS = intArrayOf(2_000, 5_000, 12_000)

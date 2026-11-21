@@ -545,9 +545,10 @@ object Renderer {
                 for (i in 0 until s.count) {
                     view.project(s.points[3 * i], s.points[3 * i + 1], s.points[3 * i + 2], b)
                     if (i == 0) {
-                        if (b[3] > 0f) disc(b[0], b[1], b[2], s.width * 0.5f * view.scale * b[3], s.color, id)
+                        if (b[3] > 0f) disc(b[0], b[1], b[2], s.widthAt(0) * 0.5f * view.scale * b[3], s.color, id)
                     } else if (a[3] > 0f && b[3] > 0f) {
-                        val ra = s.width * 0.5f * view.scale * a[3]; val rb = s.width * 0.5f * view.scale * b[3]
+                        // v56 nokta başına kalınlık (kalem basıncı)
+                        val ra = s.widthAt(i - 1) * 0.5f * view.scale * a[3]; val rb = s.widthAt(i) * 0.5f * view.scale * b[3]
                         val len = sqrt((b[0] - a[0]) * (b[0] - a[0]) + (b[1] - a[1]) * (b[1] - a[1]))
                         val step = max(0.75f, min(ra, rb) * 0.5f)
                         val n = max(1, ceil(len / step).toInt())

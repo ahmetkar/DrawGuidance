@@ -60,6 +60,30 @@ import kotlinx.coroutines.launch
 import com.karapp.drawguidance.ui.components.NeuSheet
 
 /**
+ * v25 resim olarak dışa aktarma ayarları: en uzun kenar, oran (1 kare, 0,75 dikey, 1,333 yatay), arka plan (0 saydam),
+ * zemin ızgarası, gölge, kenar çizgileri, açı (şu anki görünüm ya da modele sığdır), biçim ve kenar yumuşatma (1–3).
+ */
+data class ImageExport(
+    val size: Int = 1080,
+    val aspect: Float = 1f,
+    val background: Int = 0,
+    val ground: Boolean = false,
+    val shadow: Boolean = true,
+    val edges: Boolean = true,
+    val fit: Boolean = true,
+    val jpeg: Boolean = false,
+    val smoothness: Int = 2,
+)
+
+/** v56 resim olarak kaydetmeyi sağlayan (3B Çizim ekranının ViewModel'i). */
+interface Image3DExporter {
+    val imageLocationLabel: String
+    suspend fun renderImage(e: ImageExport, previewSide: Int? = null): android.graphics.Bitmap?
+    suspend fun saveImage(e: ImageExport, target: com.karapp.drawguidance.data.images.SaveTarget = com.karapp.drawguidance.data.images.SaveTarget.Default): String?
+    fun message(text: String)
+}
+
+/**
  * v25 3B şekli resim olarak dışa aktarma penceresi: boyut (cihazın sınırına kadar), oran, arka plan (saydam ya da renk),
  * zemin ızgarası, gölge, kenar çizgileri, açı (modele sığdır ya da şu anki görünüm), biçim (PNG/JPEG) ve kenar
  * yumuşatma; ayarlar değiştikçe küçük önizleme yenilenir. "Resimlerime kaydet" Resimlerim'e (ve ayarlardaki kayıt
@@ -67,7 +91,7 @@ import com.karapp.drawguidance.ui.components.NeuSheet
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ImageExportSheet(vm: Model3DEditorViewModel, onDismiss: () -> Unit) {
+fun ImageExportSheet(vm: Image3DExporter, onDismiss: () -> Unit) {
     val colors = NeuTheme.colors
     val context = LocalContext.current
     val scope = rememberCoroutineScope()

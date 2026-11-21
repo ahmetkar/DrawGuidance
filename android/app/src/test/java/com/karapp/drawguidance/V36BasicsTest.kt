@@ -24,14 +24,10 @@ import com.karapp.drawguidance.data.images.CanvasAssetStore
 import com.karapp.drawguidance.data.images.ImageExporter
 import com.karapp.drawguidance.data.images.ImagesRepository
 import com.karapp.drawguidance.data.library.Model3DRepository
-import com.karapp.drawguidance.data.library.Model3DResults
 import com.karapp.drawguidance.data.library.TextureRepository
 import com.karapp.drawguidance.data.local.AppDatabase
 import com.karapp.drawguidance.data.local.CatalogVectorEntity
 import com.karapp.drawguidance.ui.screens.account.LegalTexts
-import com.karapp.drawguidance.ui.screens.model3d.Mode3
-import com.karapp.drawguidance.ui.screens.model3d.Model3DEditorViewModel
-import com.karapp.drawguidance.ui.screens.model3d.PaintScope
 import com.karapp.drawguidance.ui.screens.settings.SettingsTab
 import com.karapp.drawguidance.ui.theme.ThemePalette
 import com.karapp.drawguidance.ui.theme.ThemePrefs
@@ -166,42 +162,6 @@ class V36DataTest {
     }
 
     private fun idle() = repeat(5) { shadowOf(Looper.getMainLooper()).idle() }
-
-    @Test
-    fun paintColorOnlyChangesTheBrush() {
-        val tex = TextureRepository(db.texture3DDao())
-        val repo = Model3DRepository(context, db.model3DDao(), tex)
-        val images = ImagesRepository(db.savedImageDao(), ImageExporter(context, useGallery = false), CanvasAssetStore(db.canvasAssetDao()))
-        val vm = Model3DEditorViewModel(repo, tex, Model3DResults(), null, null, null, images = images)
-        idle()
-        vm.setViewport(900, 900)
-        val cube = vm.model.value!!.parts[0]
-        val base = cube.material
-        vm.setMode(Mode3.PAINT)
-        vm.setPaintScope(PaintScope.FACE)
-        val red = Material(color = 0xFFE53935.toInt())
-        vm.setPaint(red)
-        vm.paintAt(0, 0)
-        idle()
-        // Boyanan yüz kırmızı, parça seçili; yeni renk seçilince parçanın öteki yüzleri değişmez
-        assertEquals(red, vm.model.value!!.parts[0].materialOf(0))
-        assertEquals(listOf(cube.id), vm.selection.value.parts)
-        val blue = Material(color = 0xFF1E88E5.toInt())
-        vm.setMaterial(blue)
-        idle()
-        assertEquals(blue, vm.paint.value)
-        val part = vm.model.value!!.parts[0]
-        assertEquals(base, part.material)
-        assertEquals(setOf(0), part.faceMaterials.keys)
-        assertEquals(red, part.materialOf(0))
-        // Sonraki dokunuş yeni renkle yalnız o yüzü boyar
-        vm.paintAt(0, 1)
-        idle()
-        val after = vm.model.value!!.parts[0]
-        assertEquals(blue, after.materialOf(1))
-        assertEquals(red, after.materialOf(0))
-        assertEquals(setOf(0, 1), after.faceMaterials.keys)
-    }
 
     @Test
     fun libraryShapesAreStoredCompressedAndReadBack() = runBlocking {

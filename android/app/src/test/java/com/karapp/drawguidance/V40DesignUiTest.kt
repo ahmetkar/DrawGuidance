@@ -56,7 +56,7 @@ class V40DesignUiTest : V33EditorBase() {
     fun drawingsListHasNoGlbImport() {
         // v56 aşama 10: 3B Çizimlerim'de GLB içe aktarma yok (GLB yalnız tuvale eklemede)
         waitForText("Henüz bir tuvaliniz yok", substring = true)
-        compose.onNodeWithText("3B Şekiller").performSemanticsAction(SemanticsActions.OnClick)
+        compose.onNodeWithText("3B Çizim").performSemanticsAction(SemanticsActions.OnClick)
         waitFor { exists("models3d_screen") }
         assertTrue(!exists("models3d_import_glb"))
         assertTrue(exists("models3d_new"))

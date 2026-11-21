@@ -1079,7 +1079,7 @@
     <string name="model3d_picker_hint">タップ：キャンバスに追加 · 鉛筆：3Dエディターで開く</string>
     <string name="model3d_inserting">3D図形を準備しています…</string>
     <string name="add_model3d">3D図形を追加</string>
-    <string name="drawer_models3d">3D図形</string>
+    <string name="drawer_models3d">3D描画</string>
     <string name="text_suggest_title">文字の提案：</string>
     <string name="text_suggest_setting">文字の提案</string>
     <string name="shape_suggest_setting">図形の提案</string>

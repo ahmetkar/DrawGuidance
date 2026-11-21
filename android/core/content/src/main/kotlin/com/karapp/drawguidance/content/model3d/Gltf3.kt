@@ -260,7 +260,6 @@ object Gltf3 {
             }
             m["smooth"] = JsonPrimitive(p.smooth); m["uv"] = JsonPrimitive(p.uv.name); m["visible"] = JsonPrimitive(p.visible)
             p.group?.let { m["group"] = JsonPrimitive(it) }
-            p.brush?.let { m["brush"] = brushJson(it) }
             m["poly"] = JsonPrimitive(polyView)
             return JsonObject(m)
         }
@@ -382,41 +381,6 @@ object Gltf3 {
     }
 
     /** v26 fırça kaynağı (parçanın yerel uzayında iz ve ayarlar). */
-    private fun brushJson(b: BrushSource): JsonElement {
-        val m = LinkedHashMap<String, JsonElement>()
-        val sp = b.spec
-        m["kind"] = JsonPrimitive(sp.kind.name); m["w"] = JsonPrimitive(sp.width); m["h"] = JsonPrimitive(sp.height)
-        m["bulge"] = JsonPrimitive(sp.bulge); m["taper"] = JsonPrimitive(sp.taper); m["smooth"] = JsonPrimitive(sp.smoothing)
-        m["pressure"] = JsonPrimitive(sp.pressure); m["sides"] = JsonPrimitive(sp.sides); m["max"] = JsonPrimitive(sp.maxSamples)
-        m["pts"] = JsonArray(b.points.map { JsonPrimitive(it) })
-        b.pressures?.let { pr -> m["prs"] = JsonArray(pr.map { JsonPrimitive(it) }) }
-        m["n"] = v3(b.normal); m["up"] = v3(b.up)
-        b.closed?.let { m["closed"] = JsonPrimitive(it) }
-        b.axis?.let { m["axis"] = v3(it) }
-        m["t"] = JsonPrimitive(b.time)
-        b.sig?.let { g -> m["sig"] = JsonArray(listOf(JsonPrimitive(g.vertices), JsonPrimitive(g.faces), JsonPrimitive(g.sum))) }
-        return JsonObject(m)
-    }
-
-    private fun brushFrom(o: JsonObject): BrushSource? {
-        val kind = Brush3Kind.entries.firstOrNull { it.name == o.str("kind") } ?: return null
-        val pts = o["pts"].floats()?.takeIf { it.size >= 6 && it.size % 3 == 0 } ?: return null
-        fun vec(key: String) = o[key].floats()?.takeIf { it.size == 3 }?.let { V3(it[0], it[1], it[2]) }
-        val spec = BrushShapeSpec(
-            kind, o.float("w") ?: 0.05f, o.float("h") ?: 0.5f, o.float("bulge") ?: 0.8f, o.float("taper") ?: 0.3f,
-            o.float("smooth") ?: 0.4f, (o["pressure"] as? JsonPrimitive)?.booleanOrNull ?: true, o.int("sides") ?: 10, o.int("max") ?: 160,
-        )
-        val sig = (o["sig"] as? JsonArray)?.takeIf { it.size == 3 }?.let { a ->
-            val v = (a[0] as? JsonPrimitive)?.intOrNull; val f = (a[1] as? JsonPrimitive)?.intOrNull; val sum = (a[2] as? JsonPrimitive)?.doubleOrNull
-            if (v != null && f != null && sum != null) MeshSig(v, f, sum) else null
-        }
-        return BrushSource(
-            spec, pts, o["prs"].floats()?.takeIf { it.size == pts.size / 3 }, vec("n") ?: V3.UP, vec("up") ?: V3(0f, 0f, -1f),
-            (o["closed"] as? JsonPrimitive)?.booleanOrNull, vec("axis"), (o["t"] as? JsonPrimitive)?.longOrNull ?: 0L, sig,
-        )
-    }
-
-    /** Euler (derece; önce X, sonra Y, sonra Z) → dördey (x, y, z, w). */
     fun quaternion(deg: V3): List<Float> {
         fun q(axis: Int, d: Float): DoubleArray {
             val h = Math.toRadians(d.toDouble()) / 2
@@ -602,7 +566,6 @@ object Gltf3 {
                 uv = UvMode.entries.firstOrNull { it.name == ex.str("uv") } ?: UvMode.BOX,
                 visible = ex["visible"]?.jsonPrimitive?.booleanOrNull ?: true,
                 group = ex.str("group"),
-                brush = ex["brush"].obj()?.let { brushFrom(it) },
             )
         }
         val sc = dg["scene"].obj()

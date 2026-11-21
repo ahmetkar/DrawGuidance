@@ -48,52 +48,6 @@ class Model3DTest {
     }
 
     @Test
-    fun extrudeInsetMergeAndDelete() {
-        val cube = ModelEdit.newPart(PrimitiveKind.CUBE, "c", 0)
-        val top = (0 until cube.mesh.faceCount).first { cube.mesh.faceNormal(it).y > 0.9f }
-        val ex = ModelEdit.extrudeFace(cube, top, 0.5f)
-        assertEquals(10, ex.mesh.faceCount)
-        assertTrue(ex.mesh.closed)
-        assertEquals(1.5f, ModelEdit.worldBounds(ex).size.y, 1e-4f)
-        assertEquals(null, ex.primitive)
-        // Ölçekli parçada uzatma dünya biriminde
-        val tall = cube.copy(scale = V3(1f, 2f, 1f))
-        assertEquals(2.5f, ModelEdit.worldBounds(ModelEdit.extrudeFace(tall, top, 0.5f)).size.y, 1e-4f)
-        // İçe kaydırma: 4 yeni halka yüzü, iç yüz aynı sırada
-        val inset = ModelEdit.insetFace(cube, top, 0.3f)
-        assertEquals(10, inset.mesh.faceCount)
-        assertTrue(inset.mesh.faceNormal(top).y > 0.99f)
-        // Yüz boyama uzatmada yan yüzlere geçer
-        val painted = ModelEdit.paintFace(cube, top, Material(0xFFFF0000.toInt()))
-        val ex2 = ModelEdit.extrudeFace(painted, top, 0.2f)
-        assertEquals(5, ex2.faceMaterials.size)
-        // Yüz silme sıraları kaydırır
-        val del = ModelEdit.deleteFace(painted, 0)
-        assertEquals(5, del.mesh.faceCount)
-        assertEquals(1, del.faceMaterials.size)
-        assertTrue(del.faceMaterials.keys.single() == top - 1 || top == 0)
-        // Birleştirme dönüşümleri işler
-        val s = ModelEdit.newPart(PrimitiveKind.SPHERE, "s", 1, V3(2f, 0f, 0f))
-        val merged = ModelEdit.merge(listOf(cube, s), "m", "Birleşik")!!
-        val mb = ModelEdit.worldBounds(merged)
-        assertEquals(-0.5f, mb.min.x, 1e-3f); assertEquals(2.5f, mb.max.x, 1e-3f); assertEquals(0f, mb.min.y, 1e-3f)
-        assertTrue(merged.faceMaterials.isNotEmpty())
-    }
-
-    @Test
-    fun moveVerticesUsesWorldSpace() {
-        val p = ModelEdit.newPart(PrimitiveKind.CUBE, "c", 0).copy(rotation = V3(0f, 90f, 0f), scale = V3(2f, 1f, 1f))
-        val v = 0
-        val t = Transform3.of(p)
-        val before = t.apply(p.mesh.vertex(v))
-        val moved = ModelEdit.moveVertices(p, listOf(v), V3(0.3f, 0.1f, -0.2f))
-        val after = Transform3.of(moved).apply(moved.mesh.vertex(v))
-        assertEquals(0.3f, after.x - before.x, 1e-4f)
-        assertEquals(0.1f, after.y - before.y, 1e-4f)
-        assertEquals(-0.2f, after.z - before.z, 1e-4f)
-    }
-
-    @Test
     fun codecRoundTrip() {
         Samples3D.all.forEach { m ->
             val withStroke = m.copy(strokes = listOf(Stroke3("s1", floatArrayOf(0f, 0f, 0f, 1f, 1f, 0.5f), 0xFF112233.toInt(), 0.03f)))
@@ -136,12 +90,6 @@ class Model3DTest {
         // Sığdırma: model ekranı doldurur
         val fit = Renderer.render(model, View3.fit(model, model.camera, 200, 200, 0.05f), RenderOptions(supersample = 1))
         assertTrue(fit.part.count { it == 1 } > covered)
-        // Köşe seçimi: ekrandaki en yakın görünür köşe
-        val sv = ModelEdit.screenVertices(cube, frame, 0)
-        val visible = (0 until cube.mesh.vertexCount).filter { sv[3 * it + 2] > 0f }
-        assertTrue("görünür köşe ${visible.size}", visible.size >= 6)
-        val v0 = visible.first()
-        assertEquals(v0, ModelEdit.pickVertex(cube, frame, sv[3 * v0] + 2f, sv[3 * v0 + 1] - 1f, 12f, 0))
     }
 
     @Test
@@ -172,11 +120,11 @@ class Model3DTest {
     fun planeHitAndAxisDrag() {
         val cam = Camera3(yaw = 0f, pitch = 0f, persp = 0f, zoom = 1f, target = V3.ZERO)
         val view = View3.editor(cam, 400, 400)
-        // Önden bakışta ekran merkezinin ön düzlemle kesişimi hedef
-        val hit = ModelEdit.hitPlane(view, 200f, 200f, V3.ZERO, V3(0f, 0f, 1f))!!
+        // v56 önden bakışta ekran merkezinin ön düzlemle kesişimi hedef
+        val hit = PlaneSnap.project(PlaneSnap.preset(PlaneSnap.Preset.FRONT), view, 200f, 200f)!!
         assertEquals(0f, hit.x, 1e-3f); assertEquals(0f, hit.y, 1e-3f)
         // Üst düzlem önden kenar üstü görünür: kesişim yok
-        assertEquals(null, ModelEdit.hitPlane(view, 200f, 200f, V3.ZERO, V3(0f, 1f, 0f)))
+        assertEquals(null, PlaneSnap.project(PlaneSnap.preset(PlaneSnap.Preset.TOP), view, 200f, 200f))
         // Sağa sürükleme X ekseninde artı
         val d = ModelEdit.dragDelta(view, 50f, 0f, 0)
         assertTrue(d.x > 0f && d.y == 0f && d.z == 0f)

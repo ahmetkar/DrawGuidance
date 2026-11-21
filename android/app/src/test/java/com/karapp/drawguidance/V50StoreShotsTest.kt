@@ -187,19 +187,18 @@ abstract class V50StoreShotsBase : V32EditorBase() {
         assumeTrue(System.getenv("DG_SHOTS") != null)
         settleFor(800)
         val k = GlobalContext.get()
-        val vm = com.karapp.drawguidance.ui.screens.model3d.Model3DEditorViewModel(k.get(), k.get(), k.get(), null, null, null, k.get(), images = k.get())
+        val vm = com.karapp.drawguidance.ui.screens.sketch3d.Sketch3DViewModel(k.get(), k.get(), null, k.get(), images = k.get())
         compose.runOnUiThread {
             compose.activity.setContent {
                 com.karapp.drawguidance.ui.theme.DrawGuidanceTheme(darkTheme = false) {
-                    com.karapp.drawguidance.ui.screens.model3d.Model3DEditorScreen(null, null, null, onBack = {}, vm = vm)
+                    com.karapp.drawguidance.ui.screens.sketch3d.Sketch3DScreen(null, onBack = {}, vm = vm)
                 }
             }
         }
-        waitFor { exists("model3d_editor") && vm.currentView() != null }
-        compose.runOnIdle { vm.addPart(com.karapp.drawguidance.content.model3d.PrimitiveKind.SPHERE) }
+        waitFor { exists("sketch3d_screen") && vm.currentView() != null }
+        compose.runOnIdle { vm.addPrimitive(com.karapp.drawguidance.content.model3d.PrimitiveKind.SPHERE) }
         settleFor(600)
-        compose.runOnIdle { vm.addPart(com.karapp.drawguidance.content.model3d.PrimitiveKind.CYLINDER) }
-        waitFor(90_000) { vm.busy.value == null }
+        compose.runOnIdle { vm.addPrimitive(com.karapp.drawguidance.content.model3d.PrimitiveKind.CYLINDER) }
         settleFor(1200)
         shot(shotName("06-3b"))
     }

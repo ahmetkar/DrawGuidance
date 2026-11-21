@@ -3356,3 +3356,11 @@ ZAMAN KAYBI	시간 낭비
 Yardımcı şekiller	보조 도형
 Işık katmanı	빛 레이어
 Gölge katmanı	그림자 레이어
+Katman %d	레이어 %d
+Düzlem noktaya taşındı	평면을 점으로 옮겼습니다
+Düzlem yüze yapıştı	평면이 면에 붙었습니다
+Yüze, çizgi ucuna ya da kesişime dokunun	면, 선 끝 또는 교차점을 누르세요
+Katman kilitli	레이어가 잠겨 있습니다
+Katman gizli	레이어가 숨겨져 있습니다
+Ekran kartı çizimi açılamadı; yazılımla çiziliyor	GPU 그리기를 시작할 수 없어 소프트웨어로 그립니다
+Yeni 3B çizim	새 3D 그림

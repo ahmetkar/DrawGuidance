@@ -101,7 +101,7 @@ class V33SearchTest : V33EditorBase() {
             repo.save(Model3D("m1", "Kırmızı küp", listOf(ModelEdit.newPart(PrimitiveKind.CUBE, "p1", 0))))
             repo.save(Model3D("m2", "Gezegen", listOf(ModelEdit.newPart(PrimitiveKind.SPHERE, "p2", 0))))
         }
-        compose.onNodeWithText("3B Şekiller").performSemanticsAction(SemanticsActions.OnClick)
+        compose.onNodeWithText("3B Çizim").performSemanticsAction(SemanticsActions.OnClick)
         waitFor { exists("models3d_screen") && visibleCard("Gezegen") && visibleCard("Kırmızı küp") }
         type("models3d_search", "KUP")
         waitFor { visibleCard("Kırmızı küp") && !visibleCard("Gezegen") }

@@ -143,7 +143,10 @@ void main() {
     vec2 nrm = vec2(-dir.y, dir.x);
     vec4 c = aInfo.x < 0.5 ? c0 : c1;
     float hw = 0.5 * uWidth;
-    if (uWorldWidth > 0.0) hw = max(0.6, 0.5 * uWorldWidth / (uPersp > 0.5 ? c.w : 1.0));
+    if (uWorldWidth > 0.0) {
+        float wm = (aInfo.z < 0.5 && aN1.y > 0.5) ? (aInfo.x < 0.5 ? aN1.x : aN2.x) : 1.0;
+        hw = max(0.6, 0.5 * uWorldWidth * wm / (uPersp > 0.5 ? c.w : 1.0));
+    }
     float along = aInfo.x < 0.5 ? -1.0 : 1.0;
     vec2 off = (nrm * aInfo.y + dir * along) * hw;
     c.xy += off / uHalf * c.w;

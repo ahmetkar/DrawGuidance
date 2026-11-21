@@ -144,7 +144,7 @@
     <string name="model3d_picker_hint">Dokunun: tuvale ekle · kalem: 3B düzenleyicide aç</string>
     <string name="model3d_inserting">3B şekil hazırlanıyor…</string>
     <string name="add_model3d">3B şekil ekle</string>
-    <string name="drawer_models3d">3B Şekiller</string>
+    <string name="drawer_models3d">3B Çizim</string>
     <!-- v23 yazı ve şekil önerisi ayrı -->
     <string name="text_suggest_title">Yazı önerisi:</string>
     <string name="text_suggest_setting">Yazı önerisi</string>

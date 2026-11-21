@@ -33,6 +33,8 @@ fun CanvasEditRoute(
     /** v52 Diğer menüsünden paylaşım ve canlı yayın sayfaları. */
     onOpenShare: () -> Unit = {},
     onOpenLiveShare: () -> Unit = {},
+    /** v56 aşama 11 Diğer menüsünden yeni 3B Çizim (çocuk ve geçici tuvalde yok). */
+    onOpenSketch3D: (() -> Unit)? = null,
 ) {
     val vm: CanvasEditViewModel = koinViewModel(parameters = { parametersOf(canvasLocalId) })
     androidx.compose.runtime.LaunchedEffect(vm) { vm.openCanvas.collect { onSwitchCanvas(it) } }
@@ -100,6 +102,7 @@ fun CanvasEditRoute(
             viewModel = vm,
             onOpenShare = if (temp) null else onOpenShare,
             onOpenLiveShare = if (temp || !com.karapp.drawguidance.ui.screens.share.liveAllowed(kind)) null else onOpenLiveShare,
+            onOpenSketch3D = if (temp || kind == CanvasKind.KIDS) null else onOpenSketch3D,
         )
     }
     }

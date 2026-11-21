@@ -631,10 +631,14 @@ class GlRenderer3(private val gl: GlApi, private val shadowSize: Int = 256) {
                 val segs = max(1, s.count - 1)
                 val buf = scratch(segs * 6 * LINE_FLOATS)
                 val pt = s.points
-                if (s.count == 1) segment(buf, pt[0], pt[1], pt[2], pt[0], pt[1], pt[2], 0f, 0f, 0f, 0f, 0f, 0f, 0f)
+                // v56 nokta başına kalınlık çarpanı aN1.x / aN2.x'te (aN1.y = 1 işaret); çizgilerde normal kullanılmaz
+                val ws = s.widths
+                fun wm(i: Int) = ws?.getOrNull(i) ?: 1f
+                val flag = if (ws != null) 1f else 0f
+                if (s.count == 1) segment(buf, pt[0], pt[1], pt[2], pt[0], pt[1], pt[2], wm(0), flag, 0f, wm(0), 0f, 0f, 0f)
                 else for (i in 0 until s.count - 1) {
                     val a = 3 * i; val b = 3 * (i + 1)
-                    segment(buf, pt[a], pt[a + 1], pt[a + 2], pt[b], pt[b + 1], pt[b + 2], 0f, 0f, 0f, 0f, 0f, 0f, 0f)
+                    segment(buf, pt[a], pt[a + 1], pt[a + 2], pt[b], pt[b + 1], pt[b + 2], wm(i), flag, 0f, wm(i + 1), 0f, 0f, 0f)
                 }
                 flip(buf)
                 val vbo = e?.vbo ?: gl.genBuffer()
@@ -646,8 +650,11 @@ class GlRenderer3(private val gl: GlApi, private val shadowSize: Int = 256) {
             }
             bindLineBuffer(e.vbo)
             gl.uniform1f(p.u("uWorldWidth"), s.width * k)
-            color(p, s.color, 1f)
+            // v56 örtücülük
+            if (s.opacity < 0.995f) { gl.enable(GL.BLEND); gl.blendFuncSeparate(GL.SRC_ALPHA, GL.ONE_MINUS_SRC_ALPHA, GL.ONE, GL.ONE_MINUS_SRC_ALPHA) }
+            color(p, s.color, s.opacity.coerceIn(0f, 1f))
             draw(GL.TRIANGLES, 0, e.count)
+            if (s.opacity < 0.995f) gl.disable(GL.BLEND)
         }
     }
 

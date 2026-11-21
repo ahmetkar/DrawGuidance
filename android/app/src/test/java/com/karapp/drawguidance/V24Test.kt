@@ -40,15 +40,11 @@ import com.karapp.drawguidance.content.model3d.Samples3D
 import com.karapp.drawguidance.content.model3d.Transform3
 import com.karapp.drawguidance.content.model3d.V3
 import com.karapp.drawguidance.data.library.Model3DRepository
-import com.karapp.drawguidance.data.library.Model3DResults
 import com.karapp.drawguidance.data.library.TextureRepository
 import com.karapp.drawguidance.data.local.AppDatabase
 import com.karapp.drawguidance.data.local.Model3DEntity
 import com.karapp.drawguidance.data.repository.CanvasRepository
 import com.karapp.drawguidance.ui.screens.canvasedit.state.Model3DController
-import com.karapp.drawguidance.ui.screens.model3d.Model3DEditorViewModel
-import com.karapp.drawguidance.ui.screens.model3d.OpKind
-import com.karapp.drawguidance.ui.screens.model3d.Tool3
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.json.Json
@@ -178,209 +174,6 @@ class V24InlineBoxBackgroundTest : V24EditorBase() {
     }
 }
 
-/** v24 (3): 3B düzenleyicide Nokta/Kenar aracı, kaydırıcı işlemleri, Ayarlar paneli ve hazır şekiller (ekranda). */
-@RunWith(AndroidJUnit4::class)
-@GraphicsMode(GraphicsMode.Mode.NATIVE)
-@Config(sdk = [34], application = TestDrawGuidanceApp::class, qualifiers = "w411dp-h891dp-xxhdpi")
-class V24Model3DEditorUiTest : V24EditorBase() {
-    @Test
-    fun edgeToolSettingsAndReadyShapes() {
-        waitForText("Henüz bir tuvaliniz yok", substring = true)
-        compose.onNodeWithText("3B Şekiller").performSemanticsAction(SemanticsActions.OnClick)
-        waitFor { exists("models3d_screen") }
-        // Hazır şekiller sekmesi
-        compose.onNodeWithText("Hazır şekiller").performClick()
-        waitFor { exists("model3d_catalog") }
-        settleFor(2500)
-        shot("v24-05-ready-shapes")
-        compose.onNodeWithText("Fizik").performClick()
-        settleFor(2000)
-        shot("v24-06-ready-physics")
-        compose.onNodeWithContentDescription("Eğik düzlem").performClick()
-        waitFor { exists("model3d_editor") }
-        settleFor(1500)
-        shot("v24-07-editor-incline")
-        compose.onNodeWithContentDescription("Geri").performClick()
-        waitFor { exists("model3d_exit_dialog") || compose.onAllNodesWithText("Kaydetme").fetchSemanticsNodes().isNotEmpty() }
-        compose.onNodeWithText("Kaydetme").performClick()
-        waitFor { exists("models3d_screen") }
-
-        // Yeni şekil: Kenar aracı
-        compose.onNodeWithText("Şekillerim").performClick()
-        compose.onNodeWithText("Yeni 3B şekil").performClick()
-        waitFor { exists("model3d_editor") }
-        settleFor(1200)
-        tool3("Kenar")
-        val vp = compose.onNodeWithTag("model3d_viewport").fetchSemanticsNode().size
-        // Küpe dokun: önce parça seçilir, sonra kenar
-        compose.onNodeWithTag("model3d_viewport").performTouchInput { click(Offset(vp.width * 0.5f, vp.height * 0.5f)) }
-        settleFor(400)
-        shot("v24-08-edge-tool")
-        assertTrue(compose.onAllNodesWithText("Eğ").fetchSemanticsNodes().isNotEmpty())
-        // Ayarlar paneli: bölümler ve başarım (v26 üst çubukta)
-        compose.onNodeWithContentDescription("Ayarlar").performClick()
-        waitFor { exists("model3d_panel_settings") }
-        compose.onNodeWithText("Ekran kartıyla çiz (hızlı)").performScrollTo()
-        assertTrue(compose.onAllNodesWithText("Görüntü kalitesi").fetchSemanticsNodes().isNotEmpty())
-        settleFor(400)
-        shot("v24-09-settings")
-        compose.onNodeWithTag("model3d_panel_close").performClick()
-        // Ekle: cisimler ve hazır şekiller
-        mode3("Ekle")
-        waitFor { exists("model3d_panel_add") }
-        compose.onNodeWithTag("model3d_catalog").performScrollTo()
-        settleFor(1500)
-        shot("v24-10-add-panel-ready")
-    }
-
-}
-
-/**
- * v24 (3): 3B düzenleyicinin ViewModel'i: dokunuşlar ışın atarak (Pick3) kenara/noktaya çevrilir; kenar eğme ve
- * yuvarlatma kaydırıcıyla önizlenip tek adımda uygulanır; nokta eklenir; sürüklenen taşıma ve nokta taşıma geçmişe tek
- * adım girer; hazır şekil eklenir.
- */
-@RunWith(AndroidJUnit4::class)
-@GraphicsMode(GraphicsMode.Mode.NATIVE)
-@Config(sdk = [34], application = TestDrawGuidanceApp::class)
-class V24Model3DViewModelTest {
-
-    private val db = Room.inMemoryDatabaseBuilder(ApplicationProvider.getApplicationContext(), AppDatabase::class.java)
-        .allowMainThreadQueries().build()
-
-    @After
-    fun close() {
-        db.close()
-        org.koin.core.context.stopKoin()
-    }
-
-    private fun idle() = repeat(5) { shadowOf(Looper.getMainLooper()).idle() }
-
-    private fun vm(): Model3DEditorViewModel {
-        val tex = TextureRepository(db.texture3DDao())
-        val repo = Model3DRepository(ApplicationProvider.getApplicationContext(), db.model3DDao(), tex)
-        val vm = Model3DEditorViewModel(repo, tex, Model3DResults(), null, null, null)
-        idle()
-        vm.setViewport(900, 900)
-        return vm
-    }
-
-    /** Asıl parçanın görünür bir kenarının ekran ortası. */
-    private fun visibleEdgePoint(vm: Model3DEditorViewModel): Offset {
-        val m = vm.model.value!!
-        val view = vm.currentView()!!
-        val part = m.parts[0]
-        val w = Pick3.worldVertices(part)
-        val e = part.mesh.edges
-        var i = 0
-        while (i < e.size) {
-            val a = e[i]; val b = e[i + 1]
-            val mid = V3((w[3 * a] + w[3 * b]) / 2f, (w[3 * a + 1] + w[3 * b + 1]) / 2f, (w[3 * a + 2] + w[3 * b + 2]) / 2f)
-            if (Pick3.visible(m, view, mid, 0)) {
-                val s = view.project(mid)
-                val hit = Pick3.edge(m, view, 0, s[0], s[1], 20f)
-                if (hit != null && hit.second.visible) return Offset(s[0], s[1])
-            }
-            i += 4
-        }
-        error("görünür kenar yok")
-    }
-
-    @Test
-    fun edgeSelectionBendRoundAndUndo() {
-        val vm = vm()
-        val m0 = vm.model.value!!
-        assertFalse("Robolectric'te yazılım çizici", vm.gpu.value)
-        vm.selectPart(m0.parts[0].id)
-        vm.setTool(Tool3.EDGE)
-        val p = visibleEdgePoint(vm)
-        vm.tapAt(p.x, p.y, 30f)
-        assertEquals(1, vm.selection.value.edges.size)
-        // Eğ: önizleme (geçmişe girmez), Tamam ile tek adım
-        vm.startOp(OpKind.BEND)
-        assertNotNull(vm.op.value)
-        vm.setOpAmount(0.4f)
-        vm.setOpAmount(0.6f)
-        assertFalse(vm.canUndo.value)
-        vm.applyOp()
-        val bent = vm.model.value!!.parts[0].mesh
-        assertTrue("eğilen kenar bölündü: ${bent.vertexCount}", bent.vertexCount > 8)
-        assertTrue(vm.canUndo.value)
-        vm.undo()
-        assertEquals(8, vm.model.value!!.parts[0].mesh.vertexCount)
-        // Yuvarlat: küp kenarında yapılabilir
-        vm.tapAt(p.x, p.y, 30f)
-        assertEquals(1, vm.selection.value.edges.size)
-        vm.startOp(OpKind.ROUND)
-        vm.setOpAmount(0.3f)
-        assertFalse("yuvarlatma yapılabildi", vm.op.value!!.failed)
-        assertTrue(vm.model.value!!.parts[0].mesh.faceCount > 6)
-        // Vazgeç: model başa döner
-        vm.cancelOp()
-        assertEquals(6, vm.model.value!!.parts[0].mesh.faceCount)
-        assertNull(vm.op.value)
-    }
-
-    @Test
-    fun addPointAndDragVerticesIsOneUndoStep() {
-        val vm = vm()
-        val id = vm.model.value!!.parts[0].id
-        vm.selectPart(id)
-        vm.setTool(Tool3.EDGE)
-        val p = visibleEdgePoint(vm)
-        assertTrue(vm.addPointAt(p.x, p.y, 30f))
-        val mesh = vm.model.value!!.parts[0].mesh
-        assertEquals(9, mesh.vertexCount)
-        assertEquals(setOf(8), vm.selection.value.vertices)
-        // Yeni noktayı sürükle: 10 ara adım, geçmişte tek adım
-        val undoBefore = undoDepth(vm)
-        val pt = vm.toScreen(Transform3.of(vm.model.value!!.parts[0]).apply(mesh.vertex(8)))!!
-        assertTrue(vm.beginVertexDrag(pt.first, pt.second, 30f))
-        repeat(10) { vm.dragVerticesBy(4f, -3f) }
-        vm.endVertexDrag()
-        val moved = vm.model.value!!.parts[0].mesh.vertex(8)
-        assertTrue("nokta taşındı", (moved - mesh.vertex(8)).length > 0.02f)
-        assertEquals(undoBefore + 1, undoDepth(vm))
-        vm.undo()
-        assertEquals(mesh.vertex(8), vm.model.value!!.parts[0].mesh.vertex(8))
-    }
-
-    @Test
-    fun liveMoveAndCatalogAdd() {
-        val vm = vm()
-        val part = vm.model.value!!.parts[0]
-        vm.selectPart(part.id)
-        vm.setTool(Tool3.MOVE)
-        vm.beginLive()
-        repeat(15) { vm.moveSelected(V3(0.02f, 0f, 0f)) }
-        vm.endLive()
-        assertEquals(part.position.x + 0.3f, vm.model.value!!.parts[0].position.x, 1e-3f)
-        vm.undo()
-        assertEquals(part.position.x, vm.model.value!!.parts[0].position.x, 1e-5f)
-        assertFalse(vm.canUndo.value)
-        // Hazır şekil: parçaları yeni kimliklerle eklenir ve seçilir
-        val before = vm.model.value!!.parts.size
-        vm.addCatalog("geo.cube_diag")
-        val after = vm.model.value!!
-        val item = Catalog3D.byId("geo.cube_diag")!!.build()
-        assertEquals(before + item.parts.size, after.parts.size)
-        assertEquals(item.parts.size, vm.selection.value.parts.size)
-        assertTrue(after.strokes.size >= item.strokes.size)
-        // Ayrıntı sınırı: cisim dilimleri en çok 48
-        vm.selectPart(after.parts[0].id)
-        vm.setPrimitiveSpec(com.karapp.drawguidance.content.model3d.PrimitiveSpec(PrimitiveKind.SPHERE, segments = 200, rings = 200))
-        assertTrue(vm.model.value!!.parts[0].primitive!!.segments <= Primitives.MAX_SEGMENTS)
-    }
-
-    private fun undoDepth(vm: Model3DEditorViewModel): Int {
-        // Geri alma adımı sayısı: geri alınabildikçe say, sonra yinele
-        var n = 0
-        while (vm.canUndo.value) { vm.undo(); n++ }
-        repeat(n) { vm.redo() }
-        return n
-    }
-}
-
 /**
  * v24 (4): 3B modeller GLB olarak saklanır (eski kayıtlar dönüştürülür), dışa aktarma dokuları gömer, başka programın
  * GLB'si ayrıntısı düşürülerek içe aktarılır; tuvaldeki 3B şeklin verisi GLB.
@@ -421,29 +214,27 @@ class V24GlbDataTest {
         val tex = TextureRepository(db.texture3DDao())
         tex.seed()
         val repo = Model3DRepository(ApplicationProvider.getApplicationContext(), db.model3DDao(), tex)
-        // Kayıt GLB
+        // v56 kayıt D3 v2
         val sample = Samples3D.all.first()
         repo.save(sample)
         val row = db.model3DDao().get(sample.id)!!
-        assertTrue("GLB olarak saklandı", Gltf3.isGlb(row.data))
+        assertFalse("D3 v2 olarak saklandı", Model3DStore.isLegacy(row.data))
         assertEquals(sample.parts, repo.load(sample.id)!!.parts)
 
-        // Eski (v23) kayıt açılışta GLB'ye çevrilir
-        val legacy = Model3D("eski", "Eski model", listOf(ModelEdit.newPart(PrimitiveKind.CYLINDER, "c1", 0)))
-        db.model3DDao().upsert(Model3DEntity("eski", "Eski model", Model3DCodec.encode(legacy), null, 1L, 2L, Model3DEntity.USER))
-        assertNotNull(repo.load("eski"))
-        repo.migrateToGlb()
+        // v56 eski GLB kaydı açılışta D3 v2'ye çevrilir; elle düzenlenmiş parça kilitli cisim olur
+        val cyl = ModelEdit.newPart(PrimitiveKind.CYLINDER, "c1", 0)
+        val legacy = Model3D("eski", "Eski model", listOf(cyl, cyl.copy(id = "c2", primitive = null)))
+        db.model3DDao().upsert(Model3DEntity("eski", "Eski model", Gltf3.write(legacy), null, 1L, 2L, Model3DEntity.USER))
+        assertTrue(repo.load("eski")!!.parts.first { it.id == "c2" }.locked)
+        repo.migrateToSketch()
         val migrated = db.model3DDao().get("eski")!!
-        assertTrue(Gltf3.isGlb(migrated.data))
+        assertFalse(Model3DStore.isLegacy(migrated.data))
         assertEquals(2L, migrated.updatedAt)
-        assertEquals(legacy.parts, Model3DStore.decode(migrated.data).parts)
-
-        // Dışa aktarma: dokular gömülü (başka programlar için)
-        val textured = sample.copy(parts = sample.parts.map { it.copy(material = Material(texture = "wood.oak")) })
-        val exported = repo.exportGlb(textured)
-        val jsonLen = ByteBuffer.wrap(exported).order(ByteOrder.LITTLE_ENDIAN).getInt(12)
-        val json = String(exported, 20, jsonLen, Charsets.UTF_8)
-        assertTrue("gömülü resim", json.contains("\"images\"") && json.contains("image/png"))
+        val back = Model3DStore.decode(migrated.data)
+        assertFalse(back.parts.first { it.id == "c1" }.locked)
+        assertTrue(back.parts.first { it.id == "c2" }.locked)
+        // Asıl GLB yedekte
+        assertTrue(java.io.File(ApplicationProvider.getApplicationContext<android.content.Context>().filesDir, "models3d-backup/eski.glb").exists())
 
         // Başka programın ayrıntılı modeli: üçgen sayısı düşürülür, boyut uygulamaya uyar
         val big = Part("b", "Küre", Primitives.sphere(64, 32), null, position = V3(0f, 50f, 0f), scale = V3(100f, 100f, 100f), smooth = true)

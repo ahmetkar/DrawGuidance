@@ -342,7 +342,7 @@ class V23Model3DEditorTest : V23EditorBase() {
     @Test
     fun newModelEditAndSave() {
         waitForText("Henüz bir tuvaliniz yok", substring = true)
-        compose.onNodeWithText("3B Şekiller").performSemanticsAction(SemanticsActions.OnClick)
+        compose.onNodeWithText("3B Çizim").performSemanticsAction(SemanticsActions.OnClick)
         waitFor { exists("models3d_screen") }
         shot("v23-13-models-empty")
         compose.onNodeWithText("Yeni 3B şekil").performClick()

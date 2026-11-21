@@ -217,6 +217,8 @@ fun CanvasEditScreen(
     /** v52 Diğer menüsünde Tuval paylaş ve Canlı yayın (null: gösterilmez). */
     onOpenShare: (() -> Unit)? = null,
     onOpenLiveShare: (() -> Unit)? = null,
+    /** v56 aşama 11 Diğer menüsünde "3B çiz": yeni 3B Çizim modu açılır (null: gösterilmez). */
+    onOpenSketch3D: (() -> Unit)? = null,
 ) {
     val colors = NeuTheme.colors
     val canvas by viewModel.canvas.collectAsState()
@@ -496,6 +498,14 @@ fun CanvasEditScreen(
             onShare = onOpenShare,
             onLive = onOpenLiveShare,
             extraItems = { close ->
+                if (onOpenSketch3D != null) {
+                    androidx.compose.material3.DropdownMenuItem(
+                        text = { androidx.compose.material3.Text(stringResource(R.string.sk3_open_from_canvas)) },
+                        leadingIcon = { Icon(Icons.Filled.ViewInAr, null, tint = colors.accent) },
+                        onClick = { close(); onOpenSketch3D() },
+                        modifier = Modifier.testTag("sketch3d_menu_item"),
+                    )
+                }
                 com.karapp.drawguidance.ui.screens.canvasedit.components.V40MoreMenuItems(kind, viewModel, close)
                 // v42 Cetvel ve Şekil kalıbı ⋮ menüsünde değil, Çiz satırında
             },

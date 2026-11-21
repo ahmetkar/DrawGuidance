@@ -104,7 +104,7 @@ class Model3DController(
         val png = BitmapCodec.encode(trimmed, opaque = false)
         val image = PreparedImage(png, "image/png", trimmed.width, trimmed.height, trimmed, png.size, 0f)
         val assetId = assetStore.save(store.canvasLocalId, image)
-        val dataId = assetStore.saveData(store.canvasLocalId, Model3DStore.encode(model), MIME)
+        val dataId = assetStore.saveData(store.canvasLocalId, Model3DStore.encodeShape(model), MIME)
         val link = Model3DLink(model.id, dataId)
         val current = store.canvas.value ?: return
         val q = ContentCodec::quantize

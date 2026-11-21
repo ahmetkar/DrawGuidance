@@ -116,8 +116,10 @@ data class Part(
     val visible: Boolean = true,
     /** v26 parçanın grubu ([Model3D.groups] kimliği): gruptaki parçalar birlikte seçilir ve taşınır. */
     val group: String? = null,
-    /** v26 fırçayla çizilen parçanın kaynağı (silgi bununla yeniden kurar); başka parçalarda null. */
-    val brush: BrushSource? = null,
+    /** v56 kilitli cisim (eski 3B Şekillerim kaydından çevrilen parça): taşınır, üstüne çizilir, ağı düzenlenmez. */
+    val locked: Boolean = false,
+    /** v56 3B katmanı ([Model3D.layers] kimliği; null: ilk katman). */
+    val layer: String? = null,
 ) {
     fun materialOf(face: Int): Material = faceMaterials[face] ?: material
 }
@@ -129,13 +131,58 @@ data class Group3(val id: String, val name: String)
  * 3B düzleme çizilmiş çizgi: dünya noktaları (x, y, z…), renk ve kalınlık (dünya birimi). v26 [time] çizildiği an
  * ("Son çizimi sil" için; silgiyle bölünen parçalar aynı anı taşır).
  */
-class Stroke3(val id: String, val points: FloatArray, val color: Int, val width: Float, val time: Long = 0L) {
+class Stroke3(
+    val id: String,
+    val points: FloatArray,
+    val color: Int,
+    val width: Float,
+    val time: Long = 0L,
+    /** v56 nokta başına kalınlık çarpanı (kalem basıncı; 0..1+, null: düz kalınlık). Boyu [count] olur. */
+    val widths: FloatArray? = null,
+    /** v56 örtücülük 0..1. */
+    val opacity: Float = 1f,
+    /** v56 fırça türü ([Brush3D] sırası). */
+    val brush: Int = 0,
+    /** v56 çizildiği düzlemin ya da yüzün kimliği (bilgi; yapıştırmada kullanılır). */
+    val plane: String? = null,
+    /** v56 3B katmanı ([Model3D.layers] kimliği; null: ilk katman). */
+    val layer: String? = null,
+) {
     val count: Int get() = points.size / 3
 
+    /** [i]. noktanın kalınlığı (dünya birimi). */
+    fun widthAt(i: Int): Float = width * (widths?.getOrNull(i) ?: 1f)
+
+    fun copy(
+        points: FloatArray = this.points, color: Int = this.color, width: Float = this.width, widths: FloatArray? = this.widths,
+        opacity: Float = this.opacity, layer: String? = this.layer, id: String = this.id,
+    ) = Stroke3(id, points, color, width, time, widths, opacity, brush, plane, layer)
+
     override fun equals(other: Any?): Boolean =
-        other is Stroke3 && id == other.id && color == other.color && width == other.width && points.contentEquals(other.points)
+        other is Stroke3 && id == other.id && color == other.color && width == other.width && points.contentEquals(other.points) &&
+            (widths?.contentEquals(other.widths ?: FloatArray(0)) ?: (other.widths == null)) && opacity == other.opacity &&
+            brush == other.brush && plane == other.plane && layer == other.layer
 
     override fun hashCode(): Int = (id.hashCode() * 31 + points.contentHashCode()) * 31 + color
+}
+
+/** v56 3B Çizim fırçaları (kalem, mürekkep, markör, geniş boya). */
+enum class Brush3D { PEN, INK, MARKER, WIDE }
+
+/** v56 3B katmanı: ad, görünür, kilitli. */
+data class Layer3(val id: String, val name: String, val visible: Boolean = true, val locked: Boolean = false)
+
+/**
+ * v56 çizim düzlemi: merkez [origin], düzlem içindeki birim eksenler [u] (sağ) ve [v] (yukarı). Normal u × v'dir.
+ * [id] yapıştırıldığı yüzün ya da hazır yönün adı (bilgi).
+ */
+data class Plane3(val origin: V3, val u: V3, val v: V3, val id: String = "front") {
+    val normal: V3 get() = (u cross v).normalized()
+
+    /** Dünya noktasının düzlemdeki (u, v) koordinatı. */
+    fun local(p: V3): Pair<Float, Float> { val d = p - origin; return (d dot u) to (d dot v) }
+
+    fun world(a: Float, b: Float): V3 = origin + u * a + v * b
 }
 
 /** Işık: yatay ve dikey açı (derece; ışığın geldiği yön), güç, ortam ışığı ve rengi. */
@@ -189,8 +236,20 @@ data class Model3D(
     val camera: Camera3 = Camera3(),
     /** v26 parça grupları. */
     val groups: List<Group3> = emptyList(),
+    /** v56 3B katmanları (boşsa tek örtük katman). */
+    val layers: List<Layer3> = emptyList(),
+    /** v56 son kullanılan çizim düzlemi (null: ön düzlem). */
+    val plane: Plane3? = null,
 ) {
     val isEmpty: Boolean get() = parts.none { it.visible } && strokes.isEmpty()
+
+    /** v56 görünmez ya da kilitli katman. */
+    fun layerHidden(id: String?): Boolean = layers.firstOrNull { it.id == (id ?: layers.firstOrNull()?.id) }?.visible == false
+    fun layerLocked(id: String?): Boolean = layers.firstOrNull { it.id == (id ?: layers.firstOrNull()?.id) }?.locked == true
+
+    /** v56 çizimde görünenler: gizli katmanlardaki parça ve çizgiler çıkarılır. */
+    fun visibleLayers(): Model3D = if (layers.none { !it.visible }) this
+        else copy(parts = parts.map { if (layerHidden(it.layer)) it.copy(visible = false) else it }, strokes = strokes.filterNot { layerHidden(it.layer) })
 
     fun part(id: String): Part? = parts.firstOrNull { it.id == id }
 

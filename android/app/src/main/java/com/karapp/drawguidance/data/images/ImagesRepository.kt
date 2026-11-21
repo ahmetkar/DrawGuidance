@@ -148,6 +148,12 @@ class ImagesRepository(
         exporter.exportCbz(canvas, options).also { record(canvas, it, SavedImageEntity.CBZ_MIME) }
     }
 
+    /** v56 aşama 9 açık sayfayı SVG, PSD ya da DXF olarak kaydeder (Kaydedilenler'e eklenir). */
+    suspend fun exportDoc(canvas: CanvasUi, format: com.karapp.drawguidance.data.export.DocFormat, fileName: String): V56DocExport.Result = withContext(Dispatchers.Default) {
+        assetStore.ensureLoaded(canvas, listOf(canvas.pages.getOrElse(canvas.currentPage) { canvas.strokes }))
+        V56DocExport.export(exporter, canvas, format, fileName).also { record(canvas, it.file, format.mime) }
+    }
+
     /** v40 CMYK önizlemesi için tuvalin küçük resmi ([maxSide] kenar). */
     suspend fun previewBitmap(canvas: CanvasUi, maxSide: Int): android.graphics.Bitmap = withContext(Dispatchers.Default) {
         assetStore.ensureLoaded(canvas)

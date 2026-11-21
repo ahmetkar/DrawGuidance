@@ -3720,6 +3720,9 @@
 "v56_dash_on" = "خط متقطع";
 "v56_distribute_h" = "توزيع أفقي";
 "v56_distribute_v" = "توزيع عمودي";
+"v56_doc_dxf_skipped" = "لم يُصدَّر %1$d من الصور أو ضربات الطلاء إلى DXF.";
+"v56_doc_failed" = "تعذر حفظ الملف";
+"v56_doc_saved" = "تم الحفظ: %1$@ (%2$@)";
 "v56_effects_title" = "تأثيرات";
 "v56_element_lasso_fill" = "تعبئة بالحبل";
 "v56_extra_fills" = "تعبئات إضافية";
@@ -3840,6 +3843,16 @@
 "v56_repeat_scale" = "المقياس: %1$d / 100";
 "v56_repeat_step" = "تكرار بخطوة";
 "v56_repeat_title" = "تكرار";
+"v56_save_as" = "حفظ %1$@";
+"v56_save_dxf_hint" = "تُكتب الخطوط والأشكال والنصوص في ملف CAD بالمليمتر. لا تُصدَّر الصور وضربات الطلاء إلى DXF.";
+"v56_save_file_name" = "اسم الملف";
+"v56_save_location" = "الموقع: %1$@";
+"v56_save_other_formats" = "صيغ أخرى:";
+"v56_save_psd_hint" = "تُحفظ الصفحة المفتوحة مع طبقاتها (الاسم، الظهور، العتامة، وضع المزج، القص). تفتحها Photoshop وKrita وGIMP.";
+"v56_save_svg_hint" = "تُحفظ الصفحة المفتوحة كمتجهات؛ وتصبح كل طبقة مجموعة. تُضمَّن فرش الملمس والصور كصور.";
+"v56_save_tab_dxf" = "DXF";
+"v56_save_tab_psd" = "PSD (بطبقات)";
+"v56_save_tab_svg" = "SVG";
 "v56_select_all" = "تحديد الكل";
 "v56_select_invert" = "عكس التحديد";
 "v56_shadow_layer" = "طبقة الظل";

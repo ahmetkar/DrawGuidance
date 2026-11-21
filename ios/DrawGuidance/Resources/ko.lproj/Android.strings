@@ -3720,6 +3720,9 @@
 "v56_dash_on" = "점선";
 "v56_distribute_h" = "가로 분배";
 "v56_distribute_v" = "세로 분배";
+"v56_doc_dxf_skipped" = "이미지 또는 페인트 획 %1$d개는 DXF로 내보내지 않았습니다.";
+"v56_doc_failed" = "파일을 저장할 수 없습니다";
+"v56_doc_saved" = "저장됨: %1$@ (%2$@)";
 "v56_effects_title" = "효과";
 "v56_element_lasso_fill" = "올가미 채우기";
 "v56_extra_fills" = "추가 채우기";
@@ -3840,6 +3843,16 @@
 "v56_repeat_scale" = "배율: %1$d / 100";
 "v56_repeat_step" = "단계별 복제";
 "v56_repeat_title" = "반복";
+"v56_save_as" = "%1$@ 저장";
+"v56_save_dxf_hint" = "선, 도형, 글자를 밀리미터 단위로 CAD 파일에 씁니다. 이미지와 페인트 획은 DXF로 내보내지지 않습니다.";
+"v56_save_file_name" = "파일 이름";
+"v56_save_location" = "저장 위치: %1$@";
+"v56_save_other_formats" = "다른 형식:";
+"v56_save_psd_hint" = "열린 페이지를 레이어와 함께 저장합니다(이름, 표시, 불투명도, 혼합 모드, 클리핑). Photoshop, Krita, GIMP에서 열립니다.";
+"v56_save_svg_hint" = "열린 페이지를 벡터로 저장합니다. 각 레이어는 그룹이 됩니다. 질감 브러시와 이미지는 포함된 그림으로 추가됩니다.";
+"v56_save_tab_dxf" = "DXF";
+"v56_save_tab_psd" = "PSD (레이어)";
+"v56_save_tab_svg" = "SVG";
 "v56_select_all" = "모두 선택";
 "v56_select_invert" = "선택 반전";
 "v56_shadow_layer" = "그림자 레이어";

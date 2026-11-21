@@ -3720,6 +3720,9 @@
 "v56_dash_on" = "虚线";
 "v56_distribute_h" = "水平分布";
 "v56_distribute_v" = "垂直分布";
+"v56_doc_dxf_skipped" = "有 %1$d 个图片或颜料笔触未导出到 DXF。";
+"v56_doc_failed" = "无法保存文件";
+"v56_doc_saved" = "已保存：%1$@（%2$@）";
 "v56_effects_title" = "效果";
 "v56_element_lasso_fill" = "套索填充";
 "v56_extra_fills" = "附加填充";
@@ -3840,6 +3843,16 @@
 "v56_repeat_scale" = "缩放：%1$d / 100";
 "v56_repeat_step" = "步进复制";
 "v56_repeat_title" = "重复";
+"v56_save_as" = "保存 %1$@";
+"v56_save_dxf_hint" = "线条、形状和文字以毫米为单位写入 CAD 文件。图片和颜料笔触不会导出到 DXF。";
+"v56_save_file_name" = "文件名";
+"v56_save_location" = "位置：%1$@";
+"v56_save_other_formats" = "其他格式：";
+"v56_save_psd_hint" = "当前页面连同图层一起保存（名称、可见性、不透明度、混合模式、剪贴）。可在 Photoshop、Krita 和 GIMP 中打开。";
+"v56_save_svg_hint" = "当前页面以矢量保存；每个图层成为一个组。纹理画笔和图片以嵌入图像形式加入。";
+"v56_save_tab_dxf" = "DXF";
+"v56_save_tab_psd" = "PSD（分层）";
+"v56_save_tab_svg" = "SVG";
 "v56_select_all" = "全选";
 "v56_select_invert" = "反选";
 "v56_shadow_layer" = "阴影图层";

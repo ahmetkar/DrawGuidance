@@ -90,6 +90,23 @@ fun V40EditorSheets(viewModel: CanvasEditViewModel, snackbar: SnackbarHostState,
         snackbar.currentSnackbarData?.dismiss()
         scope.launch { snackbar.showSnackbar(message) }
     }
+    // v56 aşama 9 SVG / PSD / DXF kaydedildi
+    val doc by viewModel.v40.doc.collectAsState()
+    val docSaved = stringResource(R.string.v56_doc_saved)
+    val docSkipped = stringResource(R.string.v56_doc_dxf_skipped)
+    val docFailed = stringResource(R.string.v56_doc_failed)
+    LaunchedEffect(doc) {
+        val message = when (val s = doc) {
+            is com.karapp.drawguidance.ui.screens.canvasedit.state.V40ExportController.DocState.Done ->
+                docSaved.format(s.file.location, com.karapp.drawguidance.ui.screens.canvasedit.formatBytes(s.file.sizeBytes)) +
+                    (if (s.skipped > 0) "\n" + docSkipped.format(s.skipped) else "")
+            com.karapp.drawguidance.ui.screens.canvasedit.state.V40ExportController.DocState.Failed -> docFailed
+            else -> null
+        } ?: return@LaunchedEffect
+        viewModel.v40.dismissDoc()
+        snackbar.currentSnackbarData?.dismiss()
+        scope.launch { snackbar.showSnackbar(message) }
+    }
     // CMYK TIFF/PDF (resim kaydetme penceresinden) kaydedildi
     val pdf by viewModel.pdfExport.collectAsState()
     val printSaved = stringResource(R.string.v40_cmyk_saved)

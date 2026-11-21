@@ -7,11 +7,14 @@ import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Archive
 import androidx.compose.material.icons.filled.Image
+import androidx.compose.material.icons.filled.Layers
+import androidx.compose.material.icons.filled.Polyline
 import androidx.compose.material.icons.filled.PictureAsPdf
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
@@ -54,6 +57,9 @@ fun UnifiedSaveSheet(viewModel: CanvasEditViewModel, canvas: CanvasUi) {
                                 SaveTab.IMAGE -> R.string.v42_save_tab_image
                                 SaveTab.PDF -> R.string.v42_save_tab_pdf
                                 SaveTab.CBZ -> R.string.v42_save_tab_cbz
+                                SaveTab.SVG -> R.string.v56_save_tab_svg
+                                SaveTab.PSD -> R.string.v56_save_tab_psd
+                                SaveTab.DXF -> R.string.v56_save_tab_dxf
                             },
                         ),
                         t == current, { viewModel.selectSaveTab(t) },
@@ -61,6 +67,8 @@ fun UnifiedSaveSheet(viewModel: CanvasEditViewModel, canvas: CanvasUi) {
                             SaveTab.IMAGE -> Icons.Filled.Image
                             SaveTab.PDF -> Icons.Filled.PictureAsPdf
                             SaveTab.CBZ -> Icons.Filled.Archive
+                            SaveTab.SVG, SaveTab.DXF -> Icons.Filled.Polyline
+                            SaveTab.PSD -> Icons.Filled.Layers
                         },
                         modifier = Modifier.testTag("save_tab_${t.name.lowercase()}"),
                     )
@@ -108,6 +116,60 @@ fun UnifiedSaveSheet(viewModel: CanvasEditViewModel, canvas: CanvasUi) {
                     inline = true,
                     header = header,
                 )
+            }
+            SaveTab.SVG, SaveTab.PSD, SaveTab.DXF -> V56DocSavePanel(viewModel, current, header, close)
+        }
+    }
+}
+
+/** v56 aşama 9 SVG / PSD / DXF ayarları: dosya adı, biçimin açıklaması ve Kaydet. */
+@Composable
+private fun V56DocSavePanel(viewModel: CanvasEditViewModel, tab: SaveTab, header: @Composable () -> Unit, close: () -> Unit) {
+    val format = when (tab) {
+        SaveTab.SVG -> com.karapp.drawguidance.data.export.DocFormat.SVG
+        SaveTab.PSD -> com.karapp.drawguidance.data.export.DocFormat.PSD
+        else -> com.karapp.drawguidance.data.export.DocFormat.DXF
+    }
+    var name by androidx.compose.runtime.saveable.rememberSaveable { androidx.compose.runtime.mutableStateOf(viewModel.v40.defaultDocName()) }
+    Column(Modifier.testTag("v56_doc_save"), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        header()
+        Text(
+            stringResource(when (format) {
+                com.karapp.drawguidance.data.export.DocFormat.SVG -> R.string.v56_save_svg_hint
+                com.karapp.drawguidance.data.export.DocFormat.PSD -> R.string.v56_save_psd_hint
+                com.karapp.drawguidance.data.export.DocFormat.DXF -> R.string.v56_save_dxf_hint
+            }),
+            style = MaterialTheme.typography.bodySmall, color = NeuTheme.colors.contentMuted,
+        )
+        com.karapp.drawguidance.ui.components.NeuTextField(name, { name = it }, stringResource(R.string.v56_save_file_name), Modifier.testTag("v56_doc_name"))
+        Text(stringResource(R.string.v56_save_location, viewModel.v40.documentLocation), style = MaterialTheme.typography.labelSmall, color = NeuTheme.colors.contentMuted)
+        androidx.compose.foundation.layout.Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            com.karapp.drawguidance.ui.components.NeuButton(stringResource(R.string.cancel_button), close)
+            com.karapp.drawguidance.ui.components.NeuButton(
+                stringResource(R.string.v56_save_as, format.extension.uppercase()),
+                { viewModel.v40.exportDoc(format, name); close() }, Modifier.testTag("v56_doc_save_button"), primary = true,
+            )
+        }
+    }
+}
+
+/** v56 aşama 9 resim kaydetme penceresinin başlığı: başlık + SVG / PSD / DXF'e geçiş (özellik kapalıysa null). */
+@OptIn(ExperimentalLayoutApi::class)
+@Composable
+fun v56ImageSaveHeader(viewModel: CanvasEditViewModel): (@Composable () -> Unit)? {
+    val docs = viewModel.saveTabs().filter { it == SaveTab.SVG || it == SaveTab.PSD || it == SaveTab.DXF }
+    if (docs.isEmpty()) return null
+    return {
+        Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            Text(stringResource(R.string.save_options_title), style = MaterialTheme.typography.headlineSmall)
+            FlowRow(Modifier.testTag("v56_doc_formats"), horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                Text(stringResource(R.string.v56_save_other_formats), style = MaterialTheme.typography.labelMedium, color = NeuTheme.colors.contentMuted)
+                docs.forEach { t ->
+                    NeuChip(
+                        stringResource(when (t) { SaveTab.SVG -> R.string.v56_save_tab_svg; SaveTab.PSD -> R.string.v56_save_tab_psd; else -> R.string.v56_save_tab_dxf }),
+                        false, { viewModel.openDocTab(t) }, modifier = Modifier.testTag("save_doc_${t.name.lowercase()}"),
+                    )
+                }
             }
         }
     }

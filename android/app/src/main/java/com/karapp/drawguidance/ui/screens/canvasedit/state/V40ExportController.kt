@@ -72,6 +72,38 @@ class V40ExportController(
 
     fun dismissCbz() { _cbz.value = PdfExportState.Idle }
 
+    // --- v56 aşama 9: SVG / PSD / DXF ---
+
+    sealed interface DocState {
+        data object Idle : DocState
+        data object Exporting : DocState
+        data class Done(val file: com.karapp.drawguidance.data.images.ExportedFile, val skipped: Int) : DocState
+        data object Failed : DocState
+    }
+
+    private val _doc = MutableStateFlow<DocState>(DocState.Idle)
+    val doc: StateFlow<DocState> = _doc.asStateFlow()
+
+    fun exportDoc(format: com.karapp.drawguidance.data.export.DocFormat, fileName: String) {
+        val current = store.canvas.value ?: return
+        if (_doc.value == DocState.Exporting) return
+        _doc.value = DocState.Exporting
+        host.scope.launch {
+            _doc.value = try {
+                val r = imagesRepository.exportDoc(current, format, fileName)
+                DocState.Done(r.file, r.skipped)
+            } catch (e: Exception) {
+                com.karapp.drawguidance.diagnostics.AppLog.e("DocExport", "${format.name} kaydedilemedi", e, userVisible = true)
+                DocState.Failed
+            }
+        }
+    }
+
+    fun dismissDoc() { _doc.value = DocState.Idle }
+
+    /** Varsayılan dosya adı. */
+    fun defaultDocName(): String = store.canvas.value?.let { ImageExporter.defaultFileName(it.name) } ?: ""
+
     /** CBZ'nin varsayılan yeri. */
     val documentLocation: String get() = imagesRepository.pdfLocationLabel
 }

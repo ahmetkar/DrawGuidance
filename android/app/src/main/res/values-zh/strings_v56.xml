@@ -272,4 +272,17 @@
     <string name="v56_repeat_live_hint">源对象更改时副本会同步更新。</string>
     <string name="v56_help_clone">创建链接副本，源对象更改时副本同步更新。</string>
     <string name="v56_help_opacity_mask">所选最上层对象成为下方对象的蒙版：亮处显示，暗处隐藏。</string>
+    <string name="v56_save_tab_svg">SVG</string>
+    <string name="v56_save_tab_psd">PSD（分层）</string>
+    <string name="v56_save_tab_dxf">DXF</string>
+    <string name="v56_save_svg_hint">当前页面以矢量保存；每个图层成为一个组。纹理画笔和图片以嵌入图像形式加入。</string>
+    <string name="v56_save_psd_hint">当前页面连同图层一起保存（名称、可见性、不透明度、混合模式、剪贴）。可在 Photoshop、Krita 和 GIMP 中打开。</string>
+    <string name="v56_save_dxf_hint">线条、形状和文字以毫米为单位写入 CAD 文件。图片和颜料笔触不会导出到 DXF。</string>
+    <string name="v56_save_file_name">文件名</string>
+    <string name="v56_save_location">位置：%1$s</string>
+    <string name="v56_save_as">保存 %1$s</string>
+    <string name="v56_doc_saved">已保存：%1$s（%2$s）</string>
+    <string name="v56_doc_failed">无法保存文件</string>
+    <string name="v56_doc_dxf_skipped">有 %1$d 个图片或颜料笔触未导出到 DXF。</string>
+    <string name="v56_save_other_formats">其他格式：</string>
 </resources>

@@ -3720,6 +3720,9 @@
 "v56_dash_on" = "破線";
 "v56_distribute_h" = "水平に分布";
 "v56_distribute_v" = "垂直に分布";
+"v56_doc_dxf_skipped" = "%1$d 個の画像またはペイントはDXFに含まれませんでした。";
+"v56_doc_failed" = "ファイルを保存できませんでした";
+"v56_doc_saved" = "保存しました: %1$@ (%2$@)";
 "v56_effects_title" = "効果";
 "v56_element_lasso_fill" = "なげなわ塗り";
 "v56_extra_fills" = "追加の塗り";
@@ -3840,6 +3843,16 @@
 "v56_repeat_scale" = "拡大率: %1$d / 100";
 "v56_repeat_step" = "ステップ複製";
 "v56_repeat_title" = "繰り返し";
+"v56_save_as" = "%1$@で保存";
+"v56_save_dxf_hint" = "線、図形、文字をミリ単位でCADファイルに書き出します。画像とペイントのストロークはDXFに含まれません。";
+"v56_save_file_name" = "ファイル名";
+"v56_save_location" = "保存先: %1$@";
+"v56_save_other_formats" = "その他の形式:";
+"v56_save_psd_hint" = "開いているページをレイヤー付きで保存します（名前、表示、不透明度、描画モード、クリッピング）。Photoshop、Krita、GIMPで開けます。";
+"v56_save_svg_hint" = "開いているページをベクターで保存します。各レイヤーはグループになります。テクスチャブラシと画像は埋め込み画像になります。";
+"v56_save_tab_dxf" = "DXF";
+"v56_save_tab_psd" = "PSD（レイヤー付き）";
+"v56_save_tab_svg" = "SVG";
 "v56_select_all" = "すべて選択";
 "v56_select_invert" = "選択範囲を反転";
 "v56_shadow_layer" = "影レイヤー";

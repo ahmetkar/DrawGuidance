@@ -2444,6 +2444,7 @@ fun CanvasEditScreen(
             onDismiss = viewModel::closeSaveDialog,
             preview = viewModel::cmykPreview,
             documentLocationLabel = viewModel.pdfLocation,
+            header = com.karapp.drawguidance.ui.screens.canvasedit.components.v56ImageSaveHeader(viewModel),
         )
     }
 

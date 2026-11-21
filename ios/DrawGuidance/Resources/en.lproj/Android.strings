@@ -3720,6 +3720,9 @@
 "v56_dash_on" = "Dashed line";
 "v56_distribute_h" = "Distribute horizontally";
 "v56_distribute_v" = "Distribute vertically";
+"v56_doc_dxf_skipped" = "%1$d images or paint strokes were not exported to DXF.";
+"v56_doc_failed" = "Could not save the file";
+"v56_doc_saved" = "Saved: %1$@ (%2$@)";
 "v56_effects_title" = "Effects";
 "v56_element_lasso_fill" = "Lasso fill";
 "v56_extra_fills" = "Extra fills";
@@ -3840,6 +3843,16 @@
 "v56_repeat_scale" = "Scale: %1$d / 100";
 "v56_repeat_step" = "Step and repeat";
 "v56_repeat_title" = "Repeat";
+"v56_save_as" = "Save %1$@";
+"v56_save_dxf_hint" = "Lines, shapes and text are written to a CAD file in millimetres. Images and paint strokes are not exported to DXF.";
+"v56_save_file_name" = "File name";
+"v56_save_location" = "Location: %1$@";
+"v56_save_other_formats" = "Other formats:";
+"v56_save_psd_hint" = "The open page is saved with its layers (name, visibility, opacity, blend mode, clipping). Opens in Photoshop, Krita and GIMP.";
+"v56_save_svg_hint" = "The open page is saved as vectors; each layer becomes a group. Textured brushes and images are embedded as pictures.";
+"v56_save_tab_dxf" = "DXF";
+"v56_save_tab_psd" = "PSD (layered)";
+"v56_save_tab_svg" = "SVG";
 "v56_select_all" = "Select all";
 "v56_select_invert" = "Invert selection";
 "v56_shadow_layer" = "Shadow layer";

@@ -2129,7 +2129,7 @@ class CanvasEditViewModel(
     fun closeSaveDialog() { images.closeSaveDialog(); _saveTab.value = null }
 
     /** v42 birleşik Kaydet penceresinin sekmeleri: resim, PDF ve (çizgi romanda) CBZ. */
-    enum class SaveTab { IMAGE, PDF, CBZ }
+    enum class SaveTab { IMAGE, PDF, CBZ, SVG, PSD, DXF }
 
     private val _saveTab = MutableStateFlow<SaveTab?>(null)
     /** v42 açık birleşik Kaydet penceresinin sekmesi (null: kapalı). */
@@ -2140,7 +2140,11 @@ class CanvasEditViewModel(
         com.karapp.drawguidance.data.model.CanvasKind.COMIC -> listOf(SaveTab.PDF, SaveTab.CBZ, SaveTab.IMAGE)
         com.karapp.drawguidance.data.model.CanvasKind.NOTES, com.karapp.drawguidance.data.model.CanvasKind.SIMPLE_NOTES -> listOf(SaveTab.PDF, SaveTab.IMAGE)
         else -> listOf(SaveTab.IMAGE)
-    }
+    } + (if (docTabsOn()) listOf(SaveTab.SVG, SaveTab.PSD, SaveTab.DXF) else emptyList())
+
+    /** v56 aşama 9 SVG, PSD ve DXF sekmeleri (çocuk tuvalinde yok). */
+    private fun docTabsOn(): Boolean = v56(com.karapp.drawguidance.data.model.V56Flags.Feature.EXPORT_SVG_PSD_DXF) &&
+        canvas.value?.kind != com.karapp.drawguidance.data.model.CanvasKind.KIDS
 
     /**
      * v42 başlıktaki Kaydet düğmesi: kaydetme işlemlerinin hepsi tek pencerede (resim, PDF, çizgi romanda CBZ). Çizgi
@@ -2150,7 +2154,7 @@ class CanvasEditViewModel(
     fun openUnifiedSave() {
         val c = canvas.value ?: return
         images.openSaveDialog()
-        // Resim modlarında (tek biçim) eski resim kaydetme penceresi açılır
+        // Resim modlarında (tek biçim) eski resim kaydetme penceresi açılır; v56 SVG/PSD/DXF varsa birleşik pencere
         if (!c.kind.paged) return
         images.openPdfDialog()
         val printReady = c.kind == com.karapp.drawguidance.data.model.CanvasKind.COMIC || c.kind == com.karapp.drawguidance.data.model.CanvasKind.NOTES ||
@@ -2166,6 +2170,9 @@ class CanvasEditViewModel(
     }
 
     fun selectSaveTab(tab: SaveTab) { if (_saveTab.value != null) _saveTab.value = tab }
+
+    /** v56 aşama 9 resim kaydetme penceresinden SVG / PSD / DXF'e geçiş (birleşik pencere o sekmeyle açılır). */
+    fun openDocTab(tab: SaveTab) { if (tab in saveTabs()) { if (images.saveOptions.value == null) images.openSaveDialog(); _saveTab.value = tab } }
 
     /** v42 birleşik Kaydet penceresi kapandı (ya da kaydedildi). */
     fun closeUnifiedSave() {

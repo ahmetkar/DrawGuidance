@@ -3720,6 +3720,9 @@
 "v56_dash_on" = "Kesikli çizgi";
 "v56_distribute_h" = "Yatay dağıt";
 "v56_distribute_v" = "Dikey dağıt";
+"v56_doc_dxf_skipped" = "%1$d resim ya da boya izi DXF'e aktarılmadı.";
+"v56_doc_failed" = "Dosya kaydedilemedi";
+"v56_doc_saved" = "Kaydedildi: %1$@ (%2$@)";
 "v56_effects_title" = "Efektler";
 "v56_element_lasso_fill" = "Kement dolgu";
 "v56_extra_fills" = "Ek dolgular";
@@ -3840,6 +3843,16 @@
 "v56_repeat_scale" = "Ölçek: %1$d / 100";
 "v56_repeat_step" = "Adımla çoğalt";
 "v56_repeat_title" = "Tekrarla";
+"v56_save_as" = "%1$@ kaydet";
+"v56_save_dxf_hint" = "Çizgiler, şekiller ve yazılar milimetre biriminde CAD dosyasına yazılır. Resimler ve boya izleri DXF'e aktarılmaz.";
+"v56_save_file_name" = "Dosya adı";
+"v56_save_location" = "Kayıt yeri: %1$@";
+"v56_save_other_formats" = "Diğer biçimler:";
+"v56_save_psd_hint" = "Açık sayfa katmanlarıyla kaydedilir (ad, görünürlük, opaklık, karışım modu, kırpma). Photoshop, Krita ve GIMP açar.";
+"v56_save_svg_hint" = "Açık sayfa vektör olarak kaydedilir; her katman ayrı grup olur. Doku fırçaları ve resimler gömülü resim olarak eklenir.";
+"v56_save_tab_dxf" = "DXF";
+"v56_save_tab_psd" = "PSD (katmanlı)";
+"v56_save_tab_svg" = "SVG";
 "v56_select_all" = "Tümünü seç";
 "v56_select_invert" = "Seçimi ters çevir";
 "v56_shadow_layer" = "Gölge katmanı";

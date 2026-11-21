@@ -272,4 +272,17 @@
     <string name="v56_repeat_live_hint">تتحدث النسخ عند تغيير المصدر.</string>
     <string name="v56_help_clone">ينشئ نسخة مرتبطة تتحدث عند تغيير المصدر.</string>
     <string name="v56_help_opacity_mask">يصبح الكائن العلوي المحدد قناعًا لما تحته: المناطق الفاتحة تظهر والداكنة تختفي.</string>
+    <string name="v56_save_tab_svg">SVG</string>
+    <string name="v56_save_tab_psd">PSD (بطبقات)</string>
+    <string name="v56_save_tab_dxf">DXF</string>
+    <string name="v56_save_svg_hint">تُحفظ الصفحة المفتوحة كمتجهات؛ وتصبح كل طبقة مجموعة. تُضمَّن فرش الملمس والصور كصور.</string>
+    <string name="v56_save_psd_hint">تُحفظ الصفحة المفتوحة مع طبقاتها (الاسم، الظهور، العتامة، وضع المزج، القص). تفتحها Photoshop وKrita وGIMP.</string>
+    <string name="v56_save_dxf_hint">تُكتب الخطوط والأشكال والنصوص في ملف CAD بالمليمتر. لا تُصدَّر الصور وضربات الطلاء إلى DXF.</string>
+    <string name="v56_save_file_name">اسم الملف</string>
+    <string name="v56_save_location">الموقع: %1$s</string>
+    <string name="v56_save_as">حفظ %1$s</string>
+    <string name="v56_doc_saved">تم الحفظ: %1$s (%2$s)</string>
+    <string name="v56_doc_failed">تعذر حفظ الملف</string>
+    <string name="v56_doc_dxf_skipped">لم يُصدَّر %1$d من الصور أو ضربات الطلاء إلى DXF.</string>
+    <string name="v56_save_other_formats">صيغ أخرى:</string>
 </resources>

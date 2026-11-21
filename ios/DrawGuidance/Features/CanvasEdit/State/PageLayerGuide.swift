@@ -205,6 +205,51 @@ final class LayerController {
         store.commitLayers(current, pages: pages)
     }
 
+    /// v56 aşama 7: katmanı çoğalt (hemen üstte "<ad> (kopya)"; bütün sayfalardaki elemanlar yeni kimlikle).
+    @discardableResult
+    func duplicate(_ id: String) -> String? {
+        guard let canvas = store.canvas, let layer = layers().first(where: { $0.id == id }) else { return nil }
+        let copyId = UUID().uuidString.lowercased()
+        let (outLayers, pages) = LayerOps.duplicate(layers(), canvas.pages, id, copyId: copyId, name: layer.name + I18n.tr(" (kopya)")) { UUID().uuidString.lowercased() }
+        store.commitLayers(outLayers, pages: pages)
+        store.activeLayer = copyId
+        store.select([])
+        return copyId
+    }
+
+    /// v56 aşama 7: katmanları vektör olarak birleştirir (en üstteki seçili katmanın yerinde).
+    @discardableResult
+    func mergeVector(_ ids: Set<String>) -> Bool {
+        let current = layers()
+        guard let canvas = store.canvas, current.filter({ ids.contains($0.id) }).count >= 2, let target = current.last(where: { ids.contains($0.id) }) else { return false }
+        let (outLayers, pages) = LayerOps.mergeVector(current, canvas.pages, ids)
+        store.commitLayers(outLayers, pages: pages)
+        store.activeLayer = target.id
+        store.select([])
+        return true
+    }
+
+    /// v56 aşama 7: resimli birleştirme ([images] sayfa başına; hedef katman Normal ve opaklık 1 olur).
+    @discardableResult
+    func mergeRaster(_ ids: Set<String>, _ images: [Stroke?]) -> Bool {
+        let current = layers()
+        guard let canvas = store.canvas, current.filter({ ids.contains($0.id) }).count >= 2, let target = current.last(where: { ids.contains($0.id) }) else { return false }
+        let outLayers = current.filter { !ids.contains($0.id) || $0.id == target.id }.map { l -> Layer in
+            guard l.id == target.id else { return l }
+            var c = l; c.opacity = 1; c.blend = .NORMAL; c.alphaLock = false; c.clipToBelow = false; return c
+        }
+        let pages = canvas.pages.enumerated().map { i, page -> [Stroke] in
+            let kept = page.filter { !ids.contains(Layers.of($0, current)) }
+            guard i < images.count, var img = images[i] else { return kept }
+            img.layerId = target.id; img.order = kept.count
+            return kept + [img]
+        }
+        store.commitLayers(outLayers, pages: pages)
+        store.activeLayer = target.id
+        store.select([])
+        return true
+    }
+
     func moveSelectionTo(_ id: String) {
         let ids = store.selection
         guard !ids.isEmpty, let canvas = store.canvas, let target = layers().first(where: { $0.id == id }),

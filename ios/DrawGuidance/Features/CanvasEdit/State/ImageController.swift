@@ -79,6 +79,50 @@ final class ImageController: ObservableObject {
         }
     }
 
+    /// v56 aşama 7: [assetId] resminin pikselleri [transform] ile işlenip yeni resim verisi olarak saklanır (yeni kimlik).
+    func transformAsset(_ assetId: String, _ transform: @escaping @Sendable ([UInt32]) -> [UInt32]) async -> String? {
+        let assets = self.assets
+        let prepared: PreparedImage? = await Task.detached(priority: .userInitiated) { () -> PreparedImage? in
+            guard let img = CanvasImageCache.get(assetId) ?? assets.bytes(assetId).flatMap({ CanvasImageCache.decode($0) }) else { return nil }
+            let maxSide = Budget3D.tier == .LOW ? 1400 : Budget3D.tier == .MID ? 2000 : 3000
+            guard let tex = PixelCodec.texture(img, maxSide: maxSide) else { return nil }
+            let out = transform(tex.px)
+            let opaque = out.allSatisfy { $0 >> 24 == 0xFF }
+            let cg = Bitmaps.image(argb: out, tex.w, tex.h)
+            guard let bytes = PixelCodec.encode(cg, jpeg: opaque, quality: 0.9) else { return nil }
+            return PreparedImage(bytes: bytes, mimeType: opaque ? "image/jpeg" : "image/png", width: tex.w, height: tex.h, image: cg,
+                                 originalBytes: bytes.count, detailScore: 0)
+        }.value
+        guard let prepared else { return nil }
+        let id = assets.save(store.canvasLocalId, prepared)
+        CanvasImageCache.put(id, prepared.image)
+        return id
+    }
+
+    /// v56 aşama 7 katman birleştirme (görünüm korunarak): [strokes] katman görünümleriyle tek resme çizilir (sayfaya eklenmez).
+    func renderToImage(_ strokes: [Stroke], layers: [Layer], width: Int, height: Int, layerId: String?) async -> Stroke? {
+        let sel = strokes.filter { !$0.hidden }
+        if sel.isEmpty { return nil }
+        guard let bounds = sel.compactMap({ StrokeRenderer.paintBounds($0) }).reduce(nil as CGRect?, { $0.map { a in a.union($1) } ?? $1 }) else { return nil }
+        let r = bounds.intersection(CGRect(x: 0, y: 0, width: CGFloat(width), height: CGFloat(height)))
+        if r.isNull || r.width < 1 || r.height < 1 { return nil }
+        let scale = min(1, 2048 / max(r.width, r.height))
+        let w = max(1, Int((r.width * scale).rounded(.up))), h = max(1, Int((r.height * scale).rounded(.up)))
+        let image = await Task.detached(priority: .userInitiated) {
+            Bitmaps.draw(w, h) { g in
+                g.scaleBy(x: scale, y: scale)
+                g.translateBy(x: -r.minX, y: -r.minY)
+                StrokeRenderer.drawStrokeList(g, sel, layers: layers)
+            }
+        }.value
+        guard let png = PixelCodec.encode(image) else { return nil }
+        let assetId = assets.save(store.canvasLocalId, PreparedImage(bytes: png, mimeType: "image/png", width: w, height: h, image: image,
+                                                                     originalBytes: png.count, detailScore: 0))
+        CanvasImageCache.put(assetId, image)
+        return Stroke(id: UUID().uuidString.lowercased(), points: Self.quad(Float(r.minX), Float(r.minY), Float(r.maxX), Float(r.maxY)),
+                      colorHex: "#000000", brushType: .IMAGE, sizePx: 1, opacity: 1, order: 0, assetId: assetId, layerId: layerId)
+    }
+
     // MARK: Resim olarak kaydetme
 
     @Published private(set) var save: ImageSaveState = .idle

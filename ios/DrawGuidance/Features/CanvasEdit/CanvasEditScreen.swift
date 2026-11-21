@@ -54,6 +54,7 @@ struct CanvasEditScreen: View {
                         }
                         // v56 aşama 6A Nesne menüsü
                         .sheet(isPresented: $vm.objectMenuOpen) { V56ObjectMenu(vm: vm) }
+                        .sheet(isPresented: $vm.colorAdjustOpen) { V56ColorAdjustSheet(vm: vm) }
                     if let b = vm.placingLocation {
                         LocationPlaceOverlay(background: b, panels: vm.comicPanelRects(), viewport: vm.viewport,
                                              onPlace: { vm.placeLocation($0) }, onCancel: { vm.placingLocation = nil })

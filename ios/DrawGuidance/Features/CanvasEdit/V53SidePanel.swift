@@ -178,6 +178,10 @@ struct LayersList: View {
     @ObservedObject var store: EditorStore
     @State private var renaming: Layer?
     @State private var newName = ""
+    // v56 aşama 7 çoklu seçimle birleştirme
+    @State private var picking = false
+    @State private var picked: Set<String> = []
+    @State private var confirmRaster = false
 
     var body: some View {
         ScrollView {
@@ -189,6 +193,17 @@ struct LayersList: View {
                 }
                 .buttonStyle(.plain)
                 .accessibilityIdentifier("layer_add")
+                if vm.v56(.LAYER_DUPLICATE_MERGE) && (store.canvas?.layers.count ?? 1) > 1 {
+                    HStack(spacing: 8) {
+                        Toggle(L("v56_layer_pick"), isOn: Binding(get: { picking }, set: { picking = $0; picked = [] }))
+                            .toggleStyle(.button).font(.caption).accessibilityIdentifier("v56_layer_pick")
+                        if picking {
+                            Button(L("v56_layer_merge", picked.count)) { merge(picked) }
+                                .buttonStyle(.borderedProminent).font(.caption).disabled(picked.count < 2)
+                                .accessibilityIdentifier("v56_layer_merge")
+                        }
+                    }
+                }
                 ForEach((store.canvas?.layers ?? [Layer.Default]).reversed()) { layer in row(layer) }
                 Text(L("layers_hint")).font(.caption).foregroundStyle(.secondary).padding(.top, 6)
             }
@@ -199,6 +214,15 @@ struct LayersList: View {
             Button(L("apply_button")) { if let r = renaming { vm.layers.rename(r.id, newName) }; renaming = nil }
             Button(L("v53_cancel"), role: .cancel) { renaming = nil }
         }
+        .alert(L("v56_layer_merge_raster_title"), isPresented: $confirmRaster) {
+            Button(L("v56_layer_merge_confirm")) { vm.mergeLayers(picked); picking = false; picked = [] }
+            Button(L("v53_cancel"), role: .cancel) {}
+        } message: { Text(L("v56_layer_merge_raster_text")) }
+    }
+
+    private func merge(_ ids: Set<String>) {
+        picked = ids
+        if vm.layersNeedRaster(ids) { confirmRaster = true } else { vm.mergeLayers(ids); picking = false; picked = [] }
     }
 
     private func row(_ layer: Layer) -> some View {
@@ -217,6 +241,12 @@ struct LayersList: View {
 
     private func rowHeader(_ layer: Layer, _ active: Bool) -> some View {
         HStack(spacing: 8) {
+            if picking {
+                Button { if picked.contains(layer.id) { picked.remove(layer.id) } else { picked.insert(layer.id) } } label: {
+                    Image(systemName: picked.contains(layer.id) ? "checkmark.square.fill" : "square")
+                }
+                .accessibilityIdentifier("v56_layer_check_\(layer.id)")
+            }
             Button { vm.layers.setActive(layer.id) } label: {
                 Image(systemName: active ? "largecircle.fill.circle" : "circle").foregroundStyle(active ? Color.accentColor : .secondary)
             }
@@ -232,6 +262,14 @@ struct LayersList: View {
                 Button { vm.layers.move(layer.id, -1) } label: { Label(L("order_backward"), systemImage: "arrow.down") }
                 if !store.selectedIds.isEmpty {
                     Button { vm.layers.moveSelectionTo(layer.id) } label: { Label(L("v53_layer_move_here"), systemImage: "square.and.arrow.down.on.square") }
+                }
+                if vm.v56(.LAYER_DUPLICATE_MERGE) {
+                    Button { vm.layers.duplicate(layer.id) } label: { Label(L("v56_layer_duplicate"), systemImage: "plus.square.on.square") }
+                        .accessibilityIdentifier("v56_layer_duplicate")
+                    if let below = LayerOps.below(store.canvas?.layers ?? [], layer.id) {
+                        Button { merge([layer.id, below.id]) } label: { Label(L("v56_layer_merge_down"), systemImage: "arrow.down.to.line") }
+                            .accessibilityIdentifier("v56_layer_merge_down")
+                    }
                 }
                 if vm.v56(.GRAIN) && !layer.locked && layer.visible {
                     Button { vm.textureFillTarget = "layer:\(layer.id)" } label: { Label(L("v56_texture_fill_layer"), systemImage: "square.grid.3x3.topleft.filled") }
@@ -318,6 +356,9 @@ struct PropertiesView: View {
             TextSettingsEditor(vm: vm, texts: texts, selected: nil)
         } else if vm.mode == .DRAW || vm.mode == .PEN {
             BrushSettingsEditor(vm: vm, brush: brush, brushPickerOpen: $brushPickerOpen)
+        } else if vm.v56(.LAYER_HSL_BALANCE) {
+            // v56 aşama 7 (2D-4): eleman seçili değilken etkin katmanın renkleri
+            V56LayerColorSection(vm: vm, store: store)
         } else {
             EmptyPanelNote(icon: "slider.horizontal.3", text: L("v53_properties_empty"))
         }

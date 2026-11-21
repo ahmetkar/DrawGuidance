@@ -780,6 +780,104 @@ final class EditorViewModel: ObservableObject, EditorHost {
     @discardableResult
     func repeatTransform(duplicate: Bool) -> Bool { transform.applyLast(duplicate: duplicate) }
 
+    // MARK: v56 aşama 7: katman çoğalt/birleştir, renk ayarları, hazır ayarlar
+
+    @Published private(set) var merging = false
+    @Published private(set) var colorApplying = false
+    @Published var colorAdjustOpen = false
+
+    func layersNeedRaster(_ ids: Set<String>) -> Bool { LayerOps.needsRaster(store.canvas?.layers ?? [Layer.Default], ids) }
+
+    /// Hepsi Normal ve opaklık 1 ise vektör olarak; değilse her sayfada seçili katmanlar tek resme çevrilerek birleştirilir.
+    func mergeLayers(_ ids: Set<String>) {
+        let current = store.canvas?.layers ?? [Layer.Default]
+        guard current.filter({ ids.contains($0.id) }).count >= 2, !merging, let canvas = store.canvas else { return }
+        if !layersNeedRaster(ids) { layers.mergeVector(ids); return }
+        guard let target = current.last(where: { ids.contains($0.id) }) else { return }
+        merging = true
+        Task {
+            defer { merging = false }
+            var imgs: [Stroke?] = []
+            for page in canvas.pages {
+                let part = page.filter { ids.contains(Layers.of($0, current)) }
+                imgs.append(part.isEmpty ? nil : await images.renderToImage(part, layers: current, width: canvas.width, height: canvas.height, layerId: target.id))
+            }
+            layers.mergeRaster(ids, imgs)
+        }
+    }
+
+    func mergeLayerDown(_ id: String) {
+        guard let below = LayerOps.below(store.canvas?.layers ?? [], id) else { return }
+        mergeLayers([id, below.id])
+    }
+
+    private var colorBase: [Stroke]?
+
+    private func colorTargets(_ base: [Stroke], _ layerId: String?) -> Set<String> {
+        guard let layerId else { return store.selection }
+        let current = store.canvas?.layers ?? [Layer.Default]
+        if current.first(where: { $0.id == layerId })?.locked == true { return [] }
+        return Set(base.filter { Layers.of($0, current) == layerId }.map(\.id))
+    }
+
+    /// Renk ayarı önizlemesi (vektör renkleri canlı; resim pikselleri Uygula'da işlenir).
+    func previewColorAdjust(_ adj: ColorAdjust, layerId: String?) {
+        if colorBase == nil { colorBase = store.canvas?.strokes }
+        guard let base = colorBase else { return }
+        store.previewStrokes(ColorAdjustOps.mapStrokes(base, colorTargets(base, layerId), adj))
+    }
+
+    func cancelColorAdjust() { if colorBase != nil { store.endPreview(); colorBase = nil } }
+
+    /// Renk ayarını uygula: vektör renkleri değişir, resimler piksel olarak işlenir; tek geri alma adımı.
+    func applyColorAdjust(_ adj: ColorAdjust, layerId: String?) {
+        guard let base = colorBase ?? store.canvas?.strokes else { return }
+        store.endPreview(); colorBase = nil
+        if adj.isIdentity { return }
+        let ids = colorTargets(base, layerId)
+        if ids.isEmpty { return }
+        let mapped = ColorAdjustOps.mapStrokes(base, ids, adj)
+        let imgs = base.filter { ids.contains($0.id) && $0.brushType == .IMAGE && $0.assetId != nil }
+        if imgs.isEmpty { if mapped != base { store.commit(mapped, useArea: false) }; return }
+        colorApplying = true
+        Task {
+            defer { colorApplying = false }
+            let mapper = ColorAdjustOps.Mapper(adj)
+            var newAssets: [String: String] = [:]
+            for img in imgs {
+                guard let old = img.assetId, newAssets[old] == nil else { continue }
+                if let n = await images.transformAsset(old, { px in px.map { mapper.map($0) } }) { newAssets[old] = n }
+            }
+            let out = mapped.map { s -> Stroke in
+                guard ids.contains(s.id), s.brushType == .IMAGE, let a = s.assetId, let n = newAssets[a] else { return s }
+                var c = s; c.assetId = n; return c
+            }
+            if out != base { store.commit(out, useArea: false) }
+        }
+    }
+
+    /// Ekle › Işık katmanı / Gölge katmanı.
+    @discardableResult
+    func addPresetLayer(_ kind: V56Presets.Kind) -> String {
+        let p = V56Presets.layer(kind)
+        let id = UUID().uuidString.lowercased()
+        let name = I18n.tr(kind == .LIGHT ? "Işık katmanı" : "Gölge katmanı")
+        store.commitLayers((store.canvas?.layers ?? [Layer.Default]) + [Layer(id: id, name: name, opacity: p.opacity, blend: p.blend)])
+        store.activeLayer = id
+        usePresetBrush(p)
+        return id
+    }
+
+    func useGlitterBrush() { usePresetBrush(V56Presets.glitter) }
+
+    private func usePresetBrush(_ p: V56Presets.LayerPreset) {
+        brush.select(p.brush)
+        updateBrushColor(p.colorHex)
+        brush.updateSize(p.size)
+        brush.updateOpacity(p.brushOpacity)
+        setMode(.DRAW)
+    }
+
     /// Katman menüsünden: o katman etkin yapılıp bütün sayfası dokuyla doldurulur.
     func textureFillLayer(_ layerId: String, _ textureId: String) {
         layers.setActive(layerId)

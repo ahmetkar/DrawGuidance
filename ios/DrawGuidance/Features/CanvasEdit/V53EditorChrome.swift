@@ -387,6 +387,10 @@ struct AdvancedMenus: View {
             ChromeButton(icon: "arrow.up.and.down.righttriangle.up.righttriangle.down", label: L("v56_reflection"), enabled: hasSelection, id: "v56_reflection") { vm.reflectSelection() }
             ChromeButton(icon: "water.waves", label: L("v56_liquify"), id: "v56_liquify") { vm.startLiquify() }
         }
+        // v56 aşama 7 seçime renk ayarları
+        if vm.v56(.COLOR_ADJUST) {
+            ChromeButton(icon: "paintpalette", label: L("v56_color_adjust"), enabled: hasSelection, id: "v56_color_adjust_open") { vm.colorAdjustOpen = true }
+        }
         if vm.v56(.ADV_ALIGN) || vm.v56(.ADV_EFFECTS) {
             ChromeButton(icon: "square.on.circle", label: L("v56_object_menu"), enabled: hasSelection, id: "v56_object_menu_open") { vm.objectMenuOpen = true }
         }
@@ -557,6 +561,12 @@ struct AddRowItems: View {
         if !kind.simple { item("guide", "grid", L("add_guide")) { sheet = .guide } }
         // v56 Ekle › Doku: etkin katmanın sayfası hazır dokuyla doldurulur
         if vm.v56(.GRAIN) { item("texture", "square.grid.3x3.topleft.filled", L("v56_add_texture")) { vm.textureFillTarget = "page" } }
+        // v56 aşama 7 hazır ayarlar: ışık katmanı, gölge katmanı, parıltı fırçası
+        if vm.v56(.PRESETS) {
+            item("light_layer", "sun.max", L("v56_light_layer")) { vm.addPresetLayer(.LIGHT) }
+            item("shadow_layer", "moon", L("v56_shadow_layer")) { vm.addPresetLayer(.SHADOW) }
+            item("glitter_brush", "sparkle", L("v56_glitter_brush")) { vm.useGlitterBrush() }
+        }
         item("model3d", "cube.transparent", L("add_model3d")) { addUi.open = .model3d }
         PhotosPicker(selection: $photo, matching: .images) {
             HStack(spacing: 6) {

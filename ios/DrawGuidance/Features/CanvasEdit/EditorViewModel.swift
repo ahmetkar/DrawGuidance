@@ -31,6 +31,17 @@ final class EditorViewModel: ObservableObject, EditorHost {
     @Published private(set) var mode: EditMode = .DRAW
     @Published private(set) var panel: PanelTab?
     @Published private(set) var canvasPick: CanvasPick = .NONE
+    /// v56 hızlı fırça seçici (son kullanılanlar, favoriler, köşe; mod başına).
+    let quickBrush = QuickBrushStore()
+    /// v56 damlalığın canlı renk dairesi: tuvaldeki nokta, altındaki renk, önceki renk.
+    struct Loupe: Equatable { var point: P; var hex: String?; var previous: String; var inside: Bool }
+    @Published private(set) var loupe: Loupe?
+    private var loupeSampleAt: P?
+    /// v56 çizim sürüyor mu (hızlı fırça şeridi kapanır, düğme %40 saydam) ve kalemin son noktası.
+    @Published private(set) var drawingNow = false
+    @Published var penPoint: P?
+    /// v56 renk penceresindeki damlalıktan sonra pencere yeniden açılacak mı.
+    @Published var reopenColorSheet = false
     /// v56 sihirli değnek ölçütü ve benzerlik toleransı (0..1).
     @Published var wandCriterion: V56Selection.WandCriterion = .COLOR
     @Published private(set) var wandTolerance: Float = 0.15
@@ -258,6 +269,9 @@ final class EditorViewModel: ObservableObject, EditorHost {
         brush.adaptTo(c.kind)
         modeTemplates?.warm()
         brush.restore(c.kind, canvasPrefs.lastBrush.flatMap(BrushType.init(rawValue:)), canvasPrefs.lastColor)
+        // v56 hızlı fırça seçici: bu modun son kullanılanları ve favorileri
+        quickBrush.bind(c.kind)
+        if V56Flags.enabled(.QUICK_BRUSH, c.kind) { quickBrush.used(brush.settings.brushType) }
         texts.adaptTo(c.width, c.height)
         if let (spec, size) = canvasPrefs.lastText { texts.restore(spec, sizePx: size > 0 ? size : nil) }
         formulas.adaptTo(c.width, c.height)
@@ -571,6 +585,39 @@ final class EditorViewModel: ObservableObject, EditorHost {
     func selectBrush(_ type: BrushType) {
         brush.select(type)
         if type != .ERASER { canvasPrefs.lastBrush = type.rawValue }
+        if v56(.QUICK_BRUSH) { quickBrush.used(type) }
+    }
+
+    // MARK: v56 hızlı fırça seçici (2) ve canlı renk dairesi (2D-5)
+
+    /// İki parmakla dokunma: son iki fırça arasında geçiş.
+    @discardableResult
+    func quickSwap() -> Bool {
+        guard v56(.QUICK_BRUSH), mode.allowsDrawTools, let prev = quickBrush.lists.previous(brush.settings.brushType) else { return false }
+        selectBrush(prev)
+        return true
+    }
+
+    func drawingChanged(_ active: Bool) {
+        drawingNow = active
+        if active { quickBrush.open = false } else { penPoint = nil }
+    }
+
+    func eyedropLoupeOn() -> Bool { v56(.EYEDROPPER_LOUPE) }
+
+    /// Damlalık sürüklenirken (nil: bırakıldı ya da iptal). 2 px'ten az kıpırdamada yeniden örneklenmez.
+    func eyedropHover(_ point: P?) {
+        guard let point, eyedropLoupeOn(), let c = store.canvas else { loupe = nil; loupeSampleAt = nil; return }
+        let inside = EyedropLoupe.inside(point.x, point.y, Float(c.width), Float(c.height))
+        var hex: String?
+        if let prev = loupe, let last = loupeSampleAt, hypot(last.x - point.x, last.y - point.y) < 2 { hex = prev.hex }
+        else if inside { hex = ColorSampler.sample(c, point.x, point.y); loupeSampleAt = point }
+        loupe = Loupe(point: point, hex: hex, previous: loupe?.previous ?? brush.settings.colorHex, inside: inside)
+    }
+
+    func eyedropFromColorSheet() {
+        reopenColorSheet = true
+        if canvasPick != .EYEDROPPER { toggleCanvasPick(.EYEDROPPER) }
     }
 
     func updateBrushColor(_ hex: String) {
@@ -591,6 +638,10 @@ final class EditorViewModel: ObservableObject, EditorHost {
     func eyedrop(_ point: P) -> String? {
         guard let c = store.canvas else { return nil }
         canvasPick = .NONE
+        loupe = nil
+        loupeSampleAt = nil
+        // v56 parmak sayfanın dışında bırakıldıysa iptal (renk değişmez)
+        if eyedropLoupeOn() && !EyedropLoupe.inside(point.x, point.y, Float(c.width), Float(c.height)) { return nil }
         guard let hex = ColorSampler.sample(c, point.x, point.y) else { return nil }
         updateBrushColor(hex)
         if mode == .PAINT { shapes.setRegionColor(hex) }

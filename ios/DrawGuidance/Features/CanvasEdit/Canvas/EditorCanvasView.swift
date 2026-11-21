@@ -89,6 +89,12 @@ final class EditorCanvasView: UIView {
     private var lastSpan: Float = 0
     private var longPressTimer: Timer?
     private var twoFingerTimer: Timer?
+    /// v56 iki parmakla kısa dokunma adayı (hızlı fırça: son iki fırça arasında geçiş) ve başlangıç zamanı.
+    private var twoFingerTap = false
+    private var twoFingerStart: Int64 = 0
+    /// v56 çizim başladı bildirildi mi (hızlı fırça şeridi kapanır, düğme saydamlaşır).
+    private var drawingSignaled = false
+    private var penAtTime: Int64 = 0
     private var tickTimer: Timer?
 
     // MARK: Önbellek
@@ -260,6 +266,7 @@ final class EditorCanvasView: UIView {
         if first.type == .pencil && mode == .DRAW && !fingerPans {
             dragging = true
             panOnly = !t.begin(c)
+            if !panOnly && t is DrawTool { drawingSignaled = true; actions.onDrawingChanged(true) }
             cancelLongPress()
         }
     }
@@ -301,7 +308,7 @@ final class EditorCanvasView: UIView {
         if touches.count >= 3 {
             if !threeFinger {
                 threeFinger = true
-                twoFingerPending = false; twoFingerTimer?.invalidate()
+                twoFingerPending = false; twoFingerTimer?.invalidate(); twoFingerTap = false
                 if dragging && !panOnly { tool?.cancel(ctx) }
                 if multiTouch { viewport.settle() }
                 multiTouch = true
@@ -315,6 +322,8 @@ final class EditorCanvasView: UIView {
             if dragging && !panOnly { tool?.cancel(ctx) }
             if !dragging {
                 twoFingerPending = true
+                twoFingerTap = true
+                twoFingerStart = Self.now()
                 twoFingerCentroid = c
                 twoFingerMoved = 0
                 twoFingerZoom = 1
@@ -330,6 +339,7 @@ final class EditorCanvasView: UIView {
     private func onTwoFingerHold() {
         guard twoFingerPending, let viewport else { return }
         twoFingerPending = false
+        twoFingerTap = false
         haptic()
         actions.onContextMenu(twoFingerCentroid, viewport.toCanvas(twoFingerCentroid))
         longPressed = true
@@ -374,7 +384,7 @@ final class EditorCanvasView: UIView {
                 if twoFingerPending {
                     twoFingerMoved += hypot(dx, dy)
                     twoFingerZoom *= zoom
-                    if twoFingerMoved > TOUCH_SLOP || abs(twoFingerZoom - 1) > 0.08 { twoFingerPending = false; twoFingerTimer?.invalidate() }
+                    if twoFingerMoved > TOUCH_SLOP || abs(twoFingerZoom - 1) > 0.08 { twoFingerPending = false; twoFingerTimer?.invalidate(); twoFingerTap = false }
                 }
                 viewport.panBy(dx, dy)
                 viewport.zoomBy(zoom, focus: c)
@@ -390,6 +400,7 @@ final class EditorCanvasView: UIView {
                 dragging = true
                 cancelLongPress()
                 panOnly = !tool.begin(ctx)
+                if !panOnly && tool is DrawTool { drawingSignaled = true; actions.onDrawingChanged(true) }
                 drag(first, pos, event)
             }
         } else {
@@ -417,6 +428,8 @@ final class EditorCanvasView: UIView {
             applyPen(t)
             tool.move(ctx, pos, viewport.toCanvas(pos))
         }
+        // v56 kalem hızlı fırça düğmesine yaklaşınca düğme kayar (en çok 50 ms'de bir bildirilir)
+        if drawingSignaled && ctx.eventTime - penAtTime >= 50 { penAtTime = ctx.eventTime; actions.onPenAt(viewport.toCanvas(pos)) }
         if tool.needsTicks { startTicks() }
         setNeedsDisplay()
     }
@@ -439,6 +452,7 @@ final class EditorCanvasView: UIView {
             return
         }
         guard let tool, let ctx else { resetGesture(); return }
+        if drawingSignaled { actions.onDrawingChanged(false) }
         ctx.eventTime = upTime
         if cancelled {
             if dragging && !panOnly { tool.cancel(ctx) }
@@ -448,6 +462,7 @@ final class EditorCanvasView: UIView {
             if multiTouch { viewport.settle() }
         } else if multiTouch || (dragging && panOnly) {
             viewport.settle()
+            if multiTouch && twoFingerTap && mode == .DRAW && upTime - twoFingerStart < 300 { actions.onTwoFingerTap() }
         } else if dragging {
             tool.end(ctx)
         } else {
@@ -465,6 +480,7 @@ final class EditorCanvasView: UIView {
         tool = nil; ctx = nil; guideDrag = nil
         dragging = false; panOnly = false; multiTouch = false; longPressed = false; atEdge = false
         twoFingerPending = false; threeFinger = false; threeDone = false; lastCentroid = nil; finger = nil
+        twoFingerTap = false; drawingSignaled = false
     }
 
     // MARK: Önbellek

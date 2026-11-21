@@ -43,6 +43,9 @@ struct CanvasEditScreen: View {
                     }
                     // v56 seçim alanı çubuğu ve sihirli değnek ayarları
                     V56SelectionOverlay(vm: vm, store: vm.store)
+                    // v56 hızlı fırça seçici (Resim ve Basit resim, Çiz modunda) ve damlalığın canlı renk dairesi
+                    QuickBrushView(vm: vm, store: vm.store, brush: vm.brush, quick: vm.quickBrush, brushPickerOpen: $brushPickerOpen)
+                    EyedropperLoupeView(vm: vm)
                     if let b = vm.placingLocation {
                         LocationPlaceOverlay(background: b, panels: vm.comicPanelRects(), viewport: vm.viewport,
                                              onPlace: { vm.placeLocation($0) }, onCancel: { vm.placingLocation = nil })

@@ -93,6 +93,11 @@ extension EditorViewModel {
         a.onPenEditDrag = { [unowned self] p, done in pen.editDrag(p, done: done) }
         a.canvasPick = { [unowned self] in canvasPick }
         a.onEyedrop = { [unowned self] p in _ = eyedrop(p) }
+        a.onEyedropHover = { [unowned self] p in eyedropHover(p) }
+        a.eyedropLoupe = { [unowned self] in eyedropLoupeOn() }
+        a.onTwoFingerTap = { [unowned self] in _ = quickSwap() }
+        a.onDrawingChanged = { [unowned self] active in drawingChanged(active) }
+        a.onPenAt = { [unowned self] p in penPoint = p }
         a.onRectSelect = { [unowned self] s, e in rectSelect(s, e) }
         a.onLassoSelect = { [unowned self] pts in lassoSelect(pts) }
         a.onMagicWand = { [unowned self] p, t in magicWand(p, tolerance: t) }

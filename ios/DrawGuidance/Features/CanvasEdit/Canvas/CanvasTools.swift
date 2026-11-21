@@ -87,6 +87,13 @@ final class CanvasActions {
     var onPenEditDrag: (P, Bool) -> Void = { _, _ in }
     var canvasPick: () -> CanvasPick = { .NONE }
     var onEyedrop: (P) -> Void = { _ in }
+    /// v56 damlalık sürüklenirken canlı renk dairesi (nil: bitti); [eyedropLoupe] açıksa parmak balonu gösterilmez.
+    var onEyedropHover: (P?) -> Void = { _ in }
+    var eyedropLoupe: () -> Bool = { false }
+    /// v56 hızlı fırça: iki parmakla kısa dokunma (son iki fırça arasında geçiş) ve çizim başladı / bitti.
+    var onTwoFingerTap: () -> Void = {}
+    var onDrawingChanged: (Bool) -> Void = { _ in }
+    var onPenAt: (P) -> Void = { _ in }
     var onRectSelect: (P, P) -> Void = { _, _ in }
     var onLassoSelect: ([P]) -> Void = { _ in }
     /// v56 sihirli değnek dokunuşu ve kement dolgu yolu.
@@ -543,10 +550,20 @@ final class EditPickTool: CanvasTool {
 
 final class EyedropperTool: CanvasTool {
     private var last = P(0, 0)
-    override func begin(_ ctx: GestureContext) -> Bool { last = ctx.startCanvas; ctx.setFinger(ctx.start); return true }
-    override func move(_ ctx: GestureContext, _ position: P, _ point: P) { last = point; ctx.setFinger(position) }
+    private var loupe = false
+    override func begin(_ ctx: GestureContext) -> Bool {
+        last = ctx.startCanvas
+        // v56 canlı renk dairesi: parmak balonu yerine altındaki rengi gösteren halka
+        loupe = ctx.actions.eyedropLoupe()
+        if loupe { ctx.actions.onEyedropHover(last) } else { ctx.setFinger(ctx.start) }
+        return true
+    }
+    override func move(_ ctx: GestureContext, _ position: P, _ point: P) {
+        last = point
+        if loupe { ctx.actions.onEyedropHover(point) } else { ctx.setFinger(position) }
+    }
     override func end(_ ctx: GestureContext) { ctx.setFinger(nil); ctx.actions.onEyedrop(last) }
-    override func cancel(_ ctx: GestureContext) { ctx.setFinger(nil) }
+    override func cancel(_ ctx: GestureContext) { ctx.setFinger(nil); ctx.actions.onEyedropHover(nil) }
     override func tap(_ ctx: GestureContext, _ point: P, _ upTime: Int64) { ctx.actions.onEyedrop(point) }
 }
 

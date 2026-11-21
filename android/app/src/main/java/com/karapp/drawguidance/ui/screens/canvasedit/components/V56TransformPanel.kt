@@ -63,6 +63,7 @@ private sealed interface Grip {
     data class Mesh(val i: Int) : Grip
     data object Move : Grip
     data object MeshInside : Grip
+    data object Pivot : Grip
 }
 
 /**
@@ -71,10 +72,11 @@ private sealed interface Grip {
  * kilitlenir.
  */
 @Composable
-fun V56TransformOverlay(controller: TransformController, viewport: ViewportState) {
+fun V56TransformOverlay(controller: TransformController, viewport: ViewportState, advanced: Boolean = false) {
     val state by controller.state.collectAsState()
     val guides by controller.guides.collectAsState()
     val snap by controller.snap.collectAsState()
+    @Suppress("UNUSED_VARIABLE") val pivotIndex by controller.pivot.collectAsState()
     val s = state ?: return
     val accent = NeuTheme.colors.accent
     val density = LocalDensity.current
@@ -92,7 +94,10 @@ fun V56TransformOverlay(controller: TransformController, viewport: ViewportState
                     total = Offset.Zero; applied = Offset.Zero
                     lastTime = System.currentTimeMillis()
                     val q = st.quad.map { viewport.toScreen(Offset(it.x, it.y)) }
+                    val pv = controller.pivotPoint(st)?.let { viewport.toScreen(Offset(it.first, it.second)) }
+                        ?: Offset(q.sumOf { it.x.toDouble() }.toFloat() / 4f, q.sumOf { it.y.toDouble() }.toFloat() / 4f)
                     grip = when {
+                        advanced && st.mesh == null && (pv - p).getDistance() < hit * 0.8f -> Grip.Pivot
                         st.kind == TransformKind.WARP && st.mesh != null -> {
                             val mesh = st.mesh!!
                             mesh.indexOfFirst { (viewport.toScreen(Offset(it.x, it.y)) - p).getDistance() < hit }.takeIf { it >= 0 }?.let { Grip.Mesh(it) }
@@ -133,6 +138,7 @@ fun V56TransformOverlay(controller: TransformController, viewport: ViewportState
                         }
                         is Grip.Mesh -> controller.dragMesh(g.i, c.x, c.y)
                         Grip.MeshInside -> controller.dragMeshInside(c.x, c.y, d.x, d.y)
+                        Grip.Pivot -> controller.setFreePivot(c.x, c.y)
                         Grip.Move -> {
                             // Mıknatıs: toplam sürüklemenin baskın eksenine kilitli
                             total += d
@@ -177,6 +183,15 @@ fun V56TransformOverlay(controller: TransformController, viewport: ViewportState
             q.forEach { drawCircle(Color.White, 11f, it); drawCircle(accent, 11f, it, style = line) }
             for (e in 0 until 4) { val m = (q[e] + q[(e + 1) % 4]) / 2f; drawCircle(Color.White, 7f, m); drawCircle(accent, 7f, m, style = line) }
         }
+        // 2E referans noktası (nişan)
+        if (advanced && mesh == null) {
+            val q = s.quad.map { viewport.toScreen(Offset(it.x, it.y)) }
+            val pv = controller.pivotPoint(s)?.let { viewport.toScreen(Offset(it.first, it.second)) }
+                ?: Offset(q.sumOf { it.x.toDouble() }.toFloat() / 4f, q.sumOf { it.y.toDouble() }.toFloat() / 4f)
+            drawCircle(accent, 8f, pv, style = line)
+            drawLine(accent, pv - Offset(13f, 0f), pv + Offset(13f, 0f), 2f)
+            drawLine(accent, pv - Offset(0f, 13f), pv + Offset(0f, 13f), 2f)
+        }
         // Yaslama kılavuzları (mavi)
         val blue = Color(0xFF2F80ED)
         guides.first?.let { gx -> val x = viewport.toScreen(Offset(gx, 0f)).x; drawLine(blue, Offset(x, 0f), Offset(x, size.height), 1.5f, pathEffect = PathEffect.dashPathEffect(floatArrayOf(10f, 6f))) }
@@ -215,12 +230,16 @@ private fun insideQuad(p: Offset, q: List<Offset>): Boolean {
  * 90°, tuvale sığdır, ara değerleme, sayısal giriş, sıfırla, iptal, bitti. Düğme sırası RTL'de aynalanır.
  */
 @Composable
-fun V56TransformPanel(controller: TransformController, modifier: Modifier = Modifier) {
+fun V56TransformPanel(controller: TransformController, modifier: Modifier = Modifier, advanced: Boolean = false, onDuplicate: () -> Unit = {}) {
     val state by controller.state.collectAsState()
     val snap by controller.snap.collectAsState()
     val advanced by controller.advancedMesh.collectAsState()
     val skipped by controller.skipped.collectAsState()
+    val pivot by controller.pivot.collectAsState()
+    val each by controller.each.collectAsState()
+    val last by controller.last.collectAsState()
     val s = state ?: return
+    var pivotOpen by remember { mutableStateOf(false) }
     var snapOpen by remember { mutableStateOf(false) }
     var numericOpen by remember { mutableStateOf(false) }
     val colors = NeuTheme.colors
@@ -232,7 +251,7 @@ fun V56TransformPanel(controller: TransformController, modifier: Modifier = Modi
             listOf(
                 TransformKind.FREE to R.string.v56_tf_free, TransformKind.UNIFORM to R.string.v56_tf_uniform,
                 TransformKind.DISTORT to R.string.v56_tf_distort, TransformKind.WARP to R.string.v56_tf_warp,
-            ).forEach { (k, label) ->
+            ).let { if (advanced) it + (TransformKind.SHEAR to R.string.v56_tf_shear) else it }.forEach { (k, label) ->
                 NeuChip(stringResource(label), s.kind == k, { controller.setKind(k) }, Modifier.testTag("v56_tf_${k.name.lowercase()}"))
             }
             if (s.kind == TransformKind.WARP) {
@@ -251,6 +270,14 @@ fun V56TransformPanel(controller: TransformController, modifier: Modifier = Modi
                 controller.setFilter(TransformFilter.entries[(s.filter.ordinal + 1) % TransformFilter.entries.size])
             }, Modifier.testTag("v56_tf_filter"))
             NeuChip(stringResource(R.string.v56_tf_numeric), false, { numericOpen = true }, Modifier.testTag("v56_tf_numeric"))
+            if (advanced) {
+                // 2E: referans noktası, her birini dönüştür, dönüşümü tekrarla / çoğalt
+                NeuChip(stringResource(R.string.v56_tf_pivot), pivot != 4, { pivotOpen = true }, Modifier.testTag("v56_tf_pivot"))
+                val affine = s.kind != TransformKind.DISTORT && s.kind != TransformKind.WARP
+                if (affine) NeuChip(stringResource(R.string.v56_tf_each), each, { controller.setEach(!each) }, Modifier.testTag("v56_tf_each"))
+                if (last != null && affine) NeuChip(stringResource(R.string.v56_tf_repeat), false, { controller.repeatLast() }, Modifier.testTag("v56_tf_repeat"))
+                NeuChip(stringResource(R.string.v56_tf_duplicate), false, onDuplicate, Modifier.testTag("v56_tf_duplicate"))
+            }
             NeuChip(stringResource(R.string.v56_tf_reset), false, { controller.reset() }, Modifier.testTag("v56_tf_reset"))
             NeuChip(stringResource(R.string.cancel_button), false, { controller.cancel() }, Modifier.testTag("v56_tf_cancel"))
             NeuChip(stringResource(R.string.v56_tf_done), true, { controller.done() }, Modifier.testTag("v56_tf_done"))
@@ -260,6 +287,7 @@ fun V56TransformPanel(controller: TransformController, modifier: Modifier = Modi
         }
     }
     if (snapOpen) SnapDialog(controller) { snapOpen = false }
+    if (pivotOpen) PivotDialog(pivot, { controller.setPivot(it); pivotOpen = false }) { pivotOpen = false }
     if (numericOpen) NumericDialog(controller) { numericOpen = false }
 }
 
@@ -292,6 +320,27 @@ private fun SnapDialog(controller: TransformController, onDismiss: () -> Unit) {
     )
 }
 
+/** 2E referans noktası: 3×3 nokta (dönüşümler bu noktanın çevresinde); serbest için tuvaldeki nişan sürüklenir. */
+@Composable
+private fun PivotDialog(current: Int, onPick: (Int) -> Unit, onDismiss: () -> Unit) {
+    AlertDialog(
+        onDismissRequest = onDismiss, containerColor = NeuTheme.colors.background,
+        title = { Text(stringResource(R.string.v56_tf_pivot)) },
+        text = {
+            Column(Modifier.testTag("v56_tf_pivot_dialog"), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                for (r in 0 until 3) Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    for (c in 0 until 3) {
+                        val i = r * 3 + c
+                        NeuChip(if (i == current) "●" else "○", i == current, { onPick(i) }, Modifier.testTag("v56_tf_pivot_$i"))
+                    }
+                }
+                Text(stringResource(R.string.v56_tf_pivot_hint), style = MaterialTheme.typography.bodySmall, color = NeuTheme.colors.contentMuted)
+            }
+        },
+        confirmButton = { TextButton(onClick = onDismiss) { Text(stringResource(R.string.close)) } },
+    )
+}
+
 @Composable
 private fun NumericDialog(controller: TransformController, onDismiss: () -> Unit) {
     val m = controller.metrics() ?: run { onDismiss(); return }
@@ -300,6 +349,8 @@ private fun NumericDialog(controller: TransformController, onDismiss: () -> Unit
     var w by remember { mutableStateOf(m[2].roundToInt().toString()) }
     var h by remember { mutableStateOf(m[3].roundToInt().toString()) }
     var a by remember { mutableStateOf(m[4].roundToInt().toString()) }
+    var lock by remember { mutableStateOf(false) }
+    val ratio = if (m[3] > 0f) m[2] / m[3] else 1f
     @Composable
     fun field(label: Int, value: String, tag: String, set: (String) -> Unit) =
         NeuTextField(value = value, onValueChange = set, label = stringResource(label), modifier = Modifier.testTag(tag),
@@ -311,8 +362,12 @@ private fun NumericDialog(controller: TransformController, onDismiss: () -> Unit
             Column(Modifier.testTag("v56_tf_numeric_dialog"), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 field(R.string.v56_tf_x, x, "v56_tf_num_x") { x = it }
                 field(R.string.v56_tf_y, y, "v56_tf_num_y") { y = it }
-                field(R.string.v56_tf_w, w, "v56_tf_num_w") { w = it }
-                field(R.string.v56_tf_h, h, "v56_tf_num_h") { h = it }
+                field(R.string.v56_tf_w, w, "v56_tf_num_w") { w = it; if (lock) it.toFloatOrNull()?.let { v -> h = (v / ratio).roundToInt().toString() } }
+                field(R.string.v56_tf_h, h, "v56_tf_num_h") { h = it; if (lock) it.toFloatOrNull()?.let { v -> w = (v * ratio).roundToInt().toString() } }
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text(stringResource(R.string.v56_tf_lock_ratio), Modifier.weight(1f))
+                    NeuSwitch(lock, { lock = it }, Modifier.testTag("v56_tf_lock_ratio"))
+                }
                 field(R.string.v56_tf_angle, a, "v56_tf_num_angle") { a = it }
             }
         },

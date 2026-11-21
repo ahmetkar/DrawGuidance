@@ -1157,6 +1157,66 @@ class CanvasEditViewModel(
         viewModelScope.launch { images.rasterize(ids)?.let { liquify.begin(it) } }
     }
 
+    // --- v56 aşama 6A (2E): hizala ve dağıt, vektör efektleri, dönüşümü tekrarla ---
+
+    private fun unitBounds(s: com.karapp.drawguidance.data.model.Stroke): FloatArray? =
+        com.karapp.drawguidance.ui.screens.canvasedit.editor.ElementOps.bounds(s)?.let { floatArrayOf(it.left, it.top, it.right, it.bottom) }
+
+    /** Ana nesne: seçimde en son dokunulan eleman (yoksa en büyük birim). */
+    fun keyObjectId(): String? {
+        val c = store.canvas.value ?: return null
+        val sel = store.selection
+        selection.lastPicked?.takeIf { it in sel }?.let { return it }
+        return com.karapp.drawguidance.data.model.V56Arrange.units(c.strokes, sel, ::unitBounds).maxByOrNull { (it.r - it.l) * (it.b - it.t) }?.ids?.firstOrNull()
+    }
+
+    /** Nesne › Hizala: tek geri alma adımı; değişiklik olduysa true. */
+    fun alignObjects(align: com.karapp.drawguidance.data.model.V56Arrange.Align, ref: com.karapp.drawguidance.data.model.V56Arrange.Ref): Boolean {
+        val c = store.canvas.value ?: return false
+        val units = com.karapp.drawguidance.data.model.V56Arrange.units(c.strokes, store.selection, ::unitBounds)
+        if (units.isEmpty()) return false
+        val off = com.karapp.drawguidance.data.model.V56Arrange.align(units, align, ref, c.width.toFloat(), c.height.toFloat(), keyObjectId())
+        if (off.all { it.first == 0f && it.second == 0f }) return false
+        store.commit(com.karapp.drawguidance.data.model.V56Arrange.applyOffsets(c.strokes, units, off), useArea = false)
+        return true
+    }
+
+    /** Nesne › Dağıt (en az 3 birim): tek geri alma adımı. */
+    fun distributeObjects(mode: com.karapp.drawguidance.data.model.V56Arrange.Distribute): Boolean {
+        val c = store.canvas.value ?: return false
+        val units = com.karapp.drawguidance.data.model.V56Arrange.units(c.strokes, store.selection, ::unitBounds)
+        val off = com.karapp.drawguidance.data.model.V56Arrange.distribute(units, mode)
+        if (off.all { it.first == 0f && it.second == 0f }) return false
+        store.commit(com.karapp.drawguidance.data.model.V56Arrange.applyOffsets(c.strokes, units, off), useArea = false)
+        return true
+    }
+
+    private var effectBase: List<com.karapp.drawguidance.data.model.Stroke>? = null
+
+    /** Nesne › Efektler önizlemesi (geçmişe girmez). */
+    fun previewEffect(effect: com.karapp.drawguidance.data.model.V56Arrange.Effect, amount: Float) {
+        val base = effectBase ?: store.canvas.value?.strokes?.also { effectBase = it } ?: return
+        store.previewStrokes(com.karapp.drawguidance.data.model.V56Arrange.effect(base, store.selection, effect, amount))
+    }
+
+    /** Efekti uygula: tek geri alma adımı. */
+    fun applyEffect(effect: com.karapp.drawguidance.data.model.V56Arrange.Effect, amount: Float): Boolean {
+        val base = effectBase ?: store.canvas.value?.strokes ?: return false
+        store.endPreview(); effectBase = null
+        val out = com.karapp.drawguidance.data.model.V56Arrange.effect(base, store.selection, effect, amount)
+        if (out == base) return false
+        store.commit(out, useArea = false)
+        return true
+    }
+
+    fun cancelEffect() { if (effectBase != null) { store.endPreview(); effectBase = null } }
+
+    /** Seçimde efekt uygulanabilecek vektör eleman var mı. */
+    fun canEffect(): Boolean = store.canvas.value?.strokes?.any { it.id in store.selection && com.karapp.drawguidance.data.model.V56Arrange.canEffect(it) } == true
+
+    /** Dönüşümü tekrarla / çoğalt (panel kapalıyken). */
+    fun repeatTransform(duplicate: Boolean): Boolean = transform.applyLast(duplicate) { java.util.UUID.randomUUID().toString() }
+
     /** Katman menüsünden: o katman etkin yapılıp bütün sayfası dokuyla doldurulur. */
     fun textureFillLayer(layerId: String, textureId: String) {
         setActiveLayer(layerId)

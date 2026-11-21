@@ -13,8 +13,13 @@ class SelectionController(private val store: EditorStore, private val host: Edit
         val index = store.currentIndex()
         val element = ElementOps.hitTest(index, Offset(x, y), tolerance, store.lockedIds()) ?: return false
         store.select(index.expand(element.allIds))
+        lastPicked = element.allIds.firstOrNull()
         return true
     }
+
+    /** v56 2E hizalamada ana nesne: seçimde en son dokunulan eleman. */
+    var lastPicked: String? = null
+        private set
 
     /** Elemana uzun (2 sn) basılınca: Seç moduna geçer ve yalnızca o elemanı (grubuyla) seçer. */
     fun selectOnlyAt(x: Float, y: Float, tolerance: Float): Boolean {
@@ -69,6 +74,7 @@ class SelectionController(private val store: EditorStore, private val host: Edit
         val index = store.currentIndex()
         val element = ElementOps.hitTest(index, Offset(x, y), tolerance, store.lockedIds()) ?: return false
         store.select(index.expand(store.selection + element.allIds))
+        lastPicked = element.allIds.firstOrNull()
         return true
     }
 

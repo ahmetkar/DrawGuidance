@@ -19,7 +19,8 @@ import kotlin.math.sqrt
  * Bozma'da seçimin sınır kutusu (başlangıç dörtgeni) → güncel dörtgen homografisi; Çarpıtma'da sınır kutusundaki
  * düz ağ → güncel ağ (Catmull-Rom yüzeyi, ağ çizgileri eğri olarak bükülür).
  */
-enum class TransformKind { FREE, UNIFORM, DISTORT, WARP }
+/** [SHEAR] (2E 2.7–2.8, yalnız Resim): kenar paralel kayar, köşe paralelkenarı kendi eksenlerinde ölçekler. */
+enum class TransformKind { FREE, UNIFORM, DISTORT, WARP, SHEAR }
 
 /** Resim ara değerlemesi (planın 2A "Ara değerleme"): ImageWarp.filter kodları. */
 enum class TransformFilter(val code: Int) { NEAREST(0), BILINEAR(1), BICUBIC(2);
@@ -253,21 +254,21 @@ object TransformOps {
     fun translate(s: TransformState, dx: Float, dy: Float): TransformState = mapAll(s) { x, y -> (x + dx) to (y + dy) }
 
     /** Merkez etrafında döndür (derece, saat yönünde). */
-    fun rotate(s: TransformState, degrees: Float): TransformState {
-        val (cx, cy) = center(s.quad)
+    fun rotate(s: TransformState, degrees: Float, pivot: Pair<Float, Float>? = null): TransformState {
+        val (cx, cy) = pivot ?: center(s.quad)
         val a = Math.toRadians(degrees.toDouble()); val c = cos(a).toFloat(); val sn = sin(a).toFloat()
         return mapAll(s) { x, y -> (cx + (x - cx) * c - (y - cy) * sn) to (cy + (x - cx) * sn + (y - cy) * c) }
     }
 
     /** Döndürme tutamacı: dörtgenin açısını [degrees] yapar (mıknatısla 15° katları). */
-    fun rotateTo(s: TransformState, degrees: Float, magnet: Boolean): TransformState {
+    fun rotateTo(s: TransformState, degrees: Float, magnet: Boolean, pivot: Pair<Float, Float>? = null): TransformState {
         val target = if (magnet) Snapping.angle(degrees) else degrees
-        return rotate(s, target - angleOf(s.quad))
+        return rotate(s, target - angleOf(s.quad), pivot)
     }
 
     /** Yatay ya da dikey çevir (dörtgenin kendi ekseninde, merkezine göre). */
-    fun flip(s: TransformState, horizontal: Boolean): TransformState {
-        val (cx, cy) = center(s.quad)
+    fun flip(s: TransformState, horizontal: Boolean, pivot: Pair<Float, Float>? = null): TransformState {
+        val (cx, cy) = pivot ?: center(s.quad)
         val a = Math.toRadians(angleOf(s.quad).toDouble()); val ux = cos(a).toFloat(); val uy = sin(a).toFloat()
         // Yerel eksen: u (üst kenar yönü), v (dik)
         return mapAll(s) { x, y ->
@@ -283,6 +284,22 @@ object TransformOps {
      * Bozma'da köşe serbestçe taşınır (dörtgen dışbükey kalmıyorsa değişmez).
      */
     fun dragCorner(s: TransformState, i: Int, x: Float, y: Float): TransformState {
+        if (s.kind == TransformKind.SHEAR) {
+            // Paralelkenar kendi kenar yönlerinde ölçeklenir (karşı köşe sabit)
+            val q = s.quad
+            val o = q[(i + 2) % 4]; val na = q[(i + 1) % 4]; val nb = q[(i + 3) % 4]
+            val ax = na.x - o.x; val ay = na.y - o.y; val bx = nb.x - o.x; val by = nb.y - o.y
+            val det = ax * by - ay * bx
+            if (abs(det) < 1e-6f) return s
+            val px = x - o.x; val py = y - o.y
+            val a = (px * by - py * bx) / det; val b = (ax * py - ay * px) / det
+            if (a * hypot(ax, ay) < 1f || b * hypot(bx, by) < 1f) return s
+            val nq = q.toMutableList()
+            nq[(i + 1) % 4] = StrokePoint(o.x + a * ax, o.y + a * ay)
+            nq[(i + 3) % 4] = StrokePoint(o.x + b * bx, o.y + b * by)
+            nq[i] = StrokePoint(o.x + a * ax + b * bx, o.y + a * ay + b * by)
+            return s.copy(quad = nq)
+        }
         if (s.kind == TransformKind.DISTORT) {
             val q = s.quad.mapIndexed { k, p -> if (k == i) StrokePoint(x, y) else p }
             return if (Homography.convex(q)) s.copy(quad = q) else s
@@ -315,7 +332,7 @@ object TransformOps {
     fun dragEdge(s: TransformState, e: Int, dx: Float, dy: Float): TransformState {
         val q = s.quad
         val i0 = e; val i1 = (e + 1) % 4
-        if (s.kind == TransformKind.DISTORT) {
+        if (s.kind == TransformKind.DISTORT || s.kind == TransformKind.SHEAR) {
             // Eğme: kenar kendi doğrultusunda kayar
             val ex = q[i1].x - q[i0].x; val ey = q[i1].y - q[i0].y; val len = max(1e-3f, hypot(ex, ey))
             val along = (dx * ex + dy * ey) / len
@@ -440,6 +457,71 @@ object TransformOps {
     }
 
     data class Applied(val strokes: List<Stroke>, val skipped: Set<String>)
+
+    /**
+     * 2E göreli afin dönüşüm (her birini dönüştür, dönüşümü tekrarla): p' = c + (dx, dy) + L·(p − c); c kutunun merkezi.
+     * L = [[a, b], [c, d]] (satır satır).
+     */
+    data class Relative(val a: Float, val b: Float, val c: Float, val d: Float, val dx: Float, val dy: Float) {
+        val isIdentity: Boolean get() = abs(a - 1f) < 1e-5f && abs(b) < 1e-5f && abs(c) < 1e-5f && abs(d - 1f) < 1e-5f && abs(dx) < 1e-3f && abs(dy) < 1e-3f
+        fun map(cx: Float, cy: Float, x: Float, y: Float): Pair<Float, Float> =
+            (cx + dx + a * (x - cx) + b * (y - cy)) to (cy + dy + c * (x - cx) + d * (y - cy))
+    }
+
+    /** Durumun göreli afin karşılığı; ağ ya da perspektif (paralelkenar olmayan dörtgen) ise null. */
+    fun relative(s: TransformState): Relative? {
+        if (s.mesh != null) return null
+        val q = s.quad
+        val w = s.r - s.l; val h = s.b - s.t
+        if (w <= 0f || h <= 0f) return null
+        // Paralelkenar mı: q2 = q1 + q3 − q0
+        val ex = q[1].x + q[3].x - q[0].x; val ey = q[1].y + q[3].y - q[0].y
+        if (hypot(q[2].x - ex, q[2].y - ey) > max(0.5f, max(widthOf(q), heightOf(q)) * 0.002f)) return null
+        val a = (q[1].x - q[0].x) / w; val c = (q[1].y - q[0].y) / w
+        val b = (q[3].x - q[0].x) / h; val d = (q[3].y - q[0].y) / h
+        val cx = (s.l + s.r) / 2f; val cy = (s.t + s.b) / 2f
+        val mx = q[0].x + a * (cx - s.l) + b * (cy - s.t); val my = q[0].y + c * (cx - s.l) + d * (cy - s.t)
+        return Relative(a, b, c, d, mx - cx, my - cy)
+    }
+
+    /** Noktalardan sınır kutusu (sol, üst, sağ, alt). */
+    fun pointsBounds(strokes: List<Stroke>): FloatArray? {
+        var l = Float.MAX_VALUE; var t = Float.MAX_VALUE; var r = -Float.MAX_VALUE; var b = -Float.MAX_VALUE
+        for (s in strokes) for (p in s.points) { l = min(l, p.x); t = min(t, p.y); r = max(r, p.x); b = max(b, p.y) }
+        return if (l > r) null else floatArrayOf(l, t, r, b)
+    }
+
+    /** Seçimin birimleri: aynı gruptakiler birlikte, öteki elemanlar tek başına. */
+    fun units(strokes: List<Stroke>, ids: Set<String>): List<Set<String>> =
+        strokes.filter { it.id in ids }.groupBy { it.groupId ?: ("#" + it.id) }.values.map { g -> g.mapTo(LinkedHashSet()) { it.id } }
+
+    /** Göreli dönüşümü [ids] elemanlarına uygular: [each] ise her birim kendi merkezinde, değilse seçimin merkezinde. */
+    fun applyRelative(strokes: List<Stroke>, ids: Set<String>, rel: Relative, each: Boolean): List<Stroke> {
+        val groups = if (each) units(strokes, ids) else listOf(ids)
+        var out = strokes
+        for (g in groups) {
+            val bb = pointsBounds(out.filter { it.id in g }) ?: continue
+            val st = TransformState.start(bb[0], bb[1], bb[2], bb[3], TransformKind.FREE)
+            val cx = (st.l + st.r) / 2f; val cy = (st.t + st.b) / 2f
+            val q = st.box.map { p -> rel.map(cx, cy, p.x, p.y).let { (x, y) -> StrokePoint(x, y) } }
+            out = apply(out, g, st.copy(quad = q)).strokes
+        }
+        return out
+    }
+
+    /** Her birini dönüştür: durum afin ise her birim kendi merkezinde aynı dönüşümü alır (değilse bütün seçim). */
+    fun applyEach(strokes: List<Stroke>, ids: Set<String>, s: TransformState): Applied {
+        val rel = relative(s) ?: return apply(strokes, ids, s)
+        return Applied(applyRelative(strokes, ids, rel, each = true), emptySet())
+    }
+
+    /** Referans noktası: 9 noktadan biri (0 sol-üst … 4 merkez … 8 sağ-alt), dörtgen üzerinde. */
+    fun anchorPoint(q: List<StrokePoint>, index: Int): Pair<Float, Float> {
+        val u = (index % 3) / 2f; val v = (index / 3) / 2f
+        val tx = q[0].x + (q[1].x - q[0].x) * u; val ty = q[0].y + (q[1].y - q[0].y) * u
+        val bx = q[3].x + (q[2].x - q[3].x) * u; val by = q[3].y + (q[2].y - q[3].y) * u
+        return (tx + (bx - tx) * v) to (ty + (by - ty) * v)
+    }
 }
 
 /**

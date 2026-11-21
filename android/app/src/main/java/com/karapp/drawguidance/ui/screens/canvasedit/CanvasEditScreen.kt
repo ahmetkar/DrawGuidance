@@ -525,6 +525,8 @@ fun CanvasEditScreen(
         if (uri != null) viewModel.createImageBrush(uri)
     }
     var textureFillTarget by remember { mutableStateOf<String?>(null) }
+    // v56 aşama 6A Nesne menüsü (hizala ve dağıt, efektler, tekrarla)
+    var objectMenuOpen by remember { mutableStateOf(false) }
 
     val imageAddedText = stringResource(R.string.image_added)
     val erasedRemovedText = stringResource(R.string.erased_removed)
@@ -930,6 +932,7 @@ fun CanvasEditScreen(
             if (viewModel.v56(com.karapp.drawguidance.data.model.V56Flags.Feature.TRANSFORM_PANEL)) ToolItem(Icons.Filled.Transform, stringResource(R.string.v56_transform), { viewModel.openTransform() }, enabled = hasSelection, tag = "v56_open_transform") else null,
             if (viewModel.v56(com.karapp.drawguidance.data.model.V56Flags.Feature.REFLECTION_LIQUIFY)) ToolItem(Icons.Filled.Flip, stringResource(R.string.v56_reflection), { viewModel.reflectSelection() }, enabled = hasSelection, tag = "v56_reflection") else null,
             if (viewModel.v56(com.karapp.drawguidance.data.model.V56Flags.Feature.REFLECTION_LIQUIFY)) ToolItem(Icons.Filled.Waves, stringResource(R.string.v56_liquify), { viewModel.startLiquify() }, tag = "v56_liquify") else null,
+            if (viewModel.v56(com.karapp.drawguidance.data.model.V56Flags.Feature.ADV_ALIGN) || viewModel.v56(com.karapp.drawguidance.data.model.V56Flags.Feature.ADV_EFFECTS)) ToolItem(Icons.Filled.Category, stringResource(R.string.v56_object_menu), { objectMenuOpen = true }, enabled = hasSelection, tag = "v56_object_menu_open") else null,
         ) + (if (clipboardOn) listOf(
             ToolItem(Icons.Filled.ContentCut, stringResource(R.string.v56_clip_cut), { viewModel.cutSelected() }, enabled = hasSelection, tag = "clip_cut"),
             ToolItem(Icons.Filled.CopyAll, stringResource(R.string.v56_clip_copy), { viewModel.copySelected() }, enabled = hasSelection, tag = "clip_copy"),
@@ -1545,11 +1548,16 @@ fun CanvasEditScreen(
             if (kids && mode == EditMode.PAINT) com.karapp.drawguidance.ui.screens.canvasedit.components.KidsPaintOverlay(viewModel, viewport)
             // v56 seçim alanı çubuğu ve sihirli değnek ayarları
             com.karapp.drawguidance.ui.screens.canvasedit.components.V56SelectionOverlay(viewModel, mode, canvasPick) { textureFillTarget = "area" }
+            if (objectMenuOpen) com.karapp.drawguidance.ui.screens.canvasedit.components.V56ObjectMenu(viewModel) { objectMenuOpen = false }
             // v56 aşama 6 Dönüştür paneli ve Sıvılaştır
             if (viewModel.transform.state.collectAsState().value != null) {
                 Box(Modifier.fillMaxSize()) {
-                    com.karapp.drawguidance.ui.screens.canvasedit.components.V56TransformOverlay(viewModel.transform, viewport)
-                    com.karapp.drawguidance.ui.screens.canvasedit.components.V56TransformPanel(viewModel.transform, Modifier.align(Alignment.BottomCenter))
+                    val advTransform = viewModel.v56(com.karapp.drawguidance.data.model.V56Flags.Feature.ADV_TRANSFORM)
+                    com.karapp.drawguidance.ui.screens.canvasedit.components.V56TransformOverlay(viewModel.transform, viewport, advTransform)
+                    com.karapp.drawguidance.ui.screens.canvasedit.components.V56TransformPanel(
+                        viewModel.transform, Modifier.align(Alignment.BottomCenter), advanced = advTransform,
+                        onDuplicate = { viewModel.transform.doneDuplicate { java.util.UUID.randomUUID().toString() } },
+                    )
                 }
             }
             if (viewModel.liquify.target.collectAsState().value != null) {

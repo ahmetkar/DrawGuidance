@@ -2,6 +2,7 @@ package com.karapp.drawguidance.ui.screens.canvasedit.state
 
 import com.karapp.drawguidance.data.model.Snapping
 import com.karapp.drawguidance.data.model.Stroke
+import com.karapp.drawguidance.data.model.StrokePoint
 import com.karapp.drawguidance.data.model.TransformFilter
 import com.karapp.drawguidance.data.model.TransformKind
 import com.karapp.drawguidance.data.model.TransformOps
@@ -57,6 +58,19 @@ class TransformController(
     private val _advancedMesh = MutableStateFlow(false)
     val advancedMesh: StateFlow<Boolean> = _advancedMesh.asStateFlow()
 
+    /** 2E referans noktası: 0..8 dokuz nokta (4 merkez); -1 serbest ([freePivot], tuval). */
+    private val _pivot = MutableStateFlow(4)
+    val pivot: StateFlow<Int> = _pivot.asStateFlow()
+    private var freePivot: Pair<Float, Float>? = null
+
+    /** 2E her birini dönüştür (yalnız afin kiplerde). */
+    private val _each = MutableStateFlow(false)
+    val each: StateFlow<Boolean> = _each.asStateFlow()
+
+    /** 2E son uygulanan afin dönüşüm (dönüşümü tekrarla / çoğalt). */
+    private val _last = MutableStateFlow<Pair<TransformOps.Relative, Boolean>?>(null)
+    val last: StateFlow<Pair<TransformOps.Relative, Boolean>?> = _last.asStateFlow()
+
     private var ids: Set<String> = emptySet()
     private var original: List<Stroke> = emptyList()
     private var targetsX: List<Float> = emptyList()
@@ -83,15 +97,20 @@ class TransformController(
         }
         targetsX = xs; targetsY = ys
         _skipped.value = 0
+        _pivot.value = 4; freePivot = null
         _state.value = TransformOps.setKind(TransformState.start(b.left, b.top, b.right, b.bottom), kind, meshSize())
         return true
     }
 
     private fun meshSize() = if (_advancedMesh.value) WarpMesh.ADVANCED else WarpMesh.BASIC
 
+    private fun applied(s: TransformState): TransformOps.Applied =
+        if (_each.value && s.kind != TransformKind.DISTORT && s.kind != TransformKind.WARP) TransformOps.applyEach(original, ids, s)
+        else TransformOps.apply(original, ids, s)
+
     private fun preview(s: TransformState) {
         _state.value = s
-        val applied = TransformOps.apply(original, ids, s)
+        val applied = applied(s)
         _skipped.value = applied.skipped.size
         store.previewStrokes(applied.strokes)
     }
@@ -148,13 +167,37 @@ class TransformController(
     }
 
     fun dragEdge(e: Int, dx: Float, dy: Float) = change { TransformOps.dragEdge(it, e, dx, dy) }
-    fun rotateTo(degrees: Float) = change { TransformOps.rotateTo(it, degrees, _snap.value.magnets) }
+    fun rotateTo(degrees: Float) = change { TransformOps.rotateTo(it, degrees, _snap.value.magnets, pivotPoint(it)) }
     fun dragMesh(index: Int, x: Float, y: Float) = change { TransformOps.dragMesh(it, index, x, y) }
     fun dragMeshInside(px: Float, py: Float, dx: Float, dy: Float) = change { TransformOps.dragMeshInside(it, px, py, dx, dy) }
-    fun flip(horizontal: Boolean) = change { TransformOps.flip(it, horizontal) }
+    fun flip(horizontal: Boolean) = change { TransformOps.flip(it, horizontal, pivotPoint(it)) }
 
-    /** 45° döndür (uzun basınca 90°). */
-    fun rotateStep(degrees: Float = 45f) = change { TransformOps.rotate(it, degrees) }
+    /** 45° ya da 90° döndür (referans noktası çevresinde). */
+    fun rotateStep(degrees: Float = 45f) = change { TransformOps.rotate(it, degrees, pivotPoint(it)) }
+
+    /** Referans noktasının tuvaldeki yeri (merkez: null, dörtgenin merkezi kullanılır). */
+    fun pivotPoint(s: TransformState? = _state.value): Pair<Float, Float>? {
+        val st = s ?: return null
+        val p = _pivot.value
+        if (p == -1) return freePivot
+        if (p == 4) return null
+        val q = st.mesh?.let { m -> val n = WarpMesh.sizeOf(m); listOf(m[0], m[n - 1], m[n * n - 1], m[n * (n - 1)]) } ?: st.quad
+        return TransformOps.anchorPoint(q, p)
+    }
+
+    fun setPivot(index: Int) { _pivot.value = index.coerceIn(0, 8); freePivot = null }
+    fun setFreePivot(x: Float, y: Float) { _pivot.value = -1; freePivot = x to y }
+
+    fun setEach(on: Boolean) { _each.value = on; change { it } }
+
+    /** Panelde: son dönüşüm geçerli duruma bir kez daha eklenir. */
+    fun repeatLast() {
+        val (rel, _) = _last.value ?: return
+        change { s ->
+            val cx = s.quad.sumOf { it.x.toDouble() }.toFloat() / 4f; val cy = s.quad.sumOf { it.y.toDouble() }.toFloat() / 4f
+            s.copy(quad = s.quad.map { p -> rel.map(cx, cy, p.x, p.y).let { (x, y) -> StrokePoint(x, y) } }, mesh = s.mesh)
+        }
+    }
 
     fun fitToCanvas() = change { s ->
         val c = store.canvas.value ?: return@change s
@@ -172,11 +215,53 @@ class TransformController(
         val s = _state.value ?: return
         store.endPreview()
         if (!s.isIdentity) {
-            val applied = TransformOps.apply(original, ids, s).strokes
-            store.commit(applied, useArea = false)
+            store.commit(applied(s).strokes, useArea = false)
             store.select(ids)
+            TransformOps.relative(s)?.takeIf { !it.isIdentity }?.let { _last.value = it to _each.value }
         }
         close()
+    }
+
+    /** Dönüştür ve çoğalt: özgünler yerinde kalır, dönüşmüş kopyalar eklenir ve seçilir (tek geri alma adımı). */
+    fun doneDuplicate(newId: () -> String) {
+        val s = _state.value ?: return
+        store.endPreview()
+        val copies = duplicates(original, ids, newId)
+        val withCopies = original + copies.first
+        val out = if (_each.value && s.kind != TransformKind.DISTORT && s.kind != TransformKind.WARP) TransformOps.applyEach(withCopies, copies.second, s.copy())
+            else TransformOps.apply(withCopies, copies.second, s)
+        store.commit(out.strokes, useArea = false)
+        store.select(copies.second)
+        TransformOps.relative(s)?.takeIf { !it.isIdentity }?.let { _last.value = it to _each.value }
+        close()
+    }
+
+    /**
+     * Panel kapalıyken: son dönüşüm seçime uygulanır ([duplicate] ise kopyalara); tek geri alma adımı. Uygulanınca true.
+     */
+    fun applyLast(duplicate: Boolean, newId: () -> String): Boolean {
+        val (rel, each) = _last.value ?: return false
+        val c = store.canvas.value ?: return false
+        val sel = store.selection
+        if (sel.isEmpty() || isOpen) return false
+        var strokes = c.strokes
+        var target = sel
+        if (duplicate) {
+            val (copies, copyIds) = duplicates(strokes, sel, newId)
+            strokes = strokes + copies; target = copyIds
+        }
+        store.commit(TransformOps.applyRelative(strokes, target, rel, each), useArea = false)
+        store.select(target)
+        return true
+    }
+
+    private fun duplicates(strokes: List<Stroke>, sel: Set<String>, newId: () -> String): Pair<List<Stroke>, Set<String>> {
+        val groups = HashMap<String, String>()
+        val src = strokes.filter { it.id in sel }
+        val copies = src.mapIndexed { i, st ->
+            st.copy(id = newId(), order = strokes.size + i, groupId = st.groupId?.let { g -> groups.getOrPut(g) { newId() } })
+        }
+        return copies to copies.mapTo(LinkedHashSet()) { it.id }
     }
 
     fun cancel() {

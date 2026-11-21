@@ -427,7 +427,12 @@ class ShapeController(
         if (paths === g.paths) return setSelection(sel, stroke)
         val current = store.canvas.value ?: return
         if (!VectorEdit.drawable(paths)) return removeShape(current, stroke)
-        val edited = ShapeFactory.fromEditable(stroke, refreshRegions(stroke, paths)) ?: return
+        val edited0 = ShapeFactory.fromEditable(stroke, refreshRegions(stroke, paths)) ?: return
+        // v56: görünüm, bağlı kopya ve maske korunur; efektler düğüm düzenlemesinde kalıcı olur
+        val edited = edited0.copy(
+            style2 = stroke.style2?.copy(effects = emptyList(), effectBase = null)?.takeUnless { it.isDefault },
+            cloneOf = stroke.cloneOf, repeat = stroke.repeat, mask = stroke.mask,
+        )
         store.commit(current.strokes.map { if (it.id == stroke.id) edited.copy(order = it.order) else it })
         store.select(setOf(stroke.id))
         setSelection(sel, edited)
@@ -927,6 +932,15 @@ class ShapeController(
         val sel = _vector.value
         return when (_tool.value) {
             ShapeTool.NODES, ShapeTool.ADD_NODE -> {
+                // v56 aşama 9C: tek seçili düğümün tutamağından sürükleme eğriyi değiştirir
+                if (bezierOn()) singleNode(g, sel)?.let { id ->
+                    val hs = VectorEdit.nodeHandles(g, id)
+                    val hit = hs.indices.minByOrNull { (hs[it] - point).getDistance() }
+                    if (hit != null && (hs[hit] - point).getDistance() <= tolerance * NODE_HIT && (hs[hit] - g.nodes[id].point).getDistance() > 1f) {
+                        dragNodes = setOf(id); dragHandle = hit
+                        return ShapeDrag.BEZIER
+                    }
+                }
                 val node = g.nodeAt(point, tolerance * NODE_HIT) ?: return ShapeDrag.NONE
                 val selected = selectedNodeIds(g, sel)
                 // Seçili bir nokta sürüklenirse seçili noktaların hepsi birlikte taşınır
@@ -1012,8 +1026,121 @@ class ShapeController(
                 val connected = VectorEdit.connect(VectorEdit.graph(paths), start, at, ::withLineStyle) ?: return null
                 DragOutcome(connected, VectorSelection(nodes = listOf(at), linkFrom = at))
             }
+            ShapeDrag.BEZIER -> {
+                val id = dragNodes.firstOrNull() ?: return null
+                val paths = bezierDrag(g, id, dragHandle, to) ?: return null
+                DragOutcome(paths, VectorSelection(nodes = listOf(g.nodes[id].point)))
+            }
             ShapeDrag.NONE, ShapeDrag.HANDLE -> null
         }
+    }
+
+    // --- v56 aşama 9C düğüm türü, Bezier tutamakları, yolu uzat ---
+
+    private var dragHandle: Int = -1
+    private val _smoothNodes = MutableStateFlow(true)
+    /** Tutamak sürüklenirken karşı tutamak aynalansın mı (yumuşak düğüm). */
+    val smoothNodes: StateFlow<Boolean> = _smoothNodes.asStateFlow()
+
+    fun bezierOn(): Boolean = store.canvas.value?.kind?.let { com.karapp.drawguidance.data.model.V56Flags.enabled(com.karapp.drawguidance.data.model.V56Flags.Feature.ADV_NODES, it) } == true
+
+    private fun singleNode(g: VectorEdit.Graph, sel: VectorSelection): Int? = selectedNodeIds(g, sel).singleOrNull()
+
+    /** Seçili tek düğümün tutamakları (yoksa boş). */
+    fun selectedHandles(): List<Pair<Offset, Offset>> {
+        if (!bezierOn() || _tool.value != ShapeTool.NODES) return emptyList()
+        val stroke = selectedShape.value ?: return emptyList()
+        val g = graphOf(stroke)
+        val id = singleNode(g, _vector.value) ?: return emptyList()
+        val p = g.nodes[id].point
+        return VectorEdit.nodeHandles(g, id).map { p to it }
+    }
+
+    /** Bir tutamağı [to] noktasına taşır; yumuşak düğümde karşı tutamak aynı doğruya gelir. */
+    private fun bezierDrag(g: VectorEdit.Graph, id: Int, handle: Int, to: Offset): List<ShapeFactory.EditablePath>? {
+        val edges = VectorEdit.nodeEdges(g, id)
+        val (e, atStart) = edges.getOrNull(handle) ?: return null
+        val node = g.nodes[id].point
+        val far = VectorEdit.handleOf(e, !atStart)
+        var paths = if (atStart) VectorEdit.bezierEdge(g, e, to, far) else VectorEdit.bezierEdge(g, e, far, to)
+        if (_smoothNodes.value && edges.size == 2) {
+            val (e2, start2) = edges[1 - handle]
+            val other = e2.points.let { if (start2) it.last() else it.first() }
+            val g2 = graphOf(paths)
+            val ne = g2.edgeBetween(node, other) ?: return paths
+            val atStart2 = (ne.start - node).getDistance() < 0.5f
+            val len2 = (VectorEdit.handleOf(e2, start2) - node).getDistance().coerceAtLeast(1f)
+            val d = node - to
+            val dl = d.getDistance()
+            if (dl > 1e-3f) {
+                val h2 = node + d / dl * len2
+                val far2 = VectorEdit.handleOf(ne, !atStart2)
+                paths = if (atStart2) VectorEdit.bezierEdge(g2, ne, h2, far2) else VectorEdit.bezierEdge(g2, ne, far2, h2)
+            }
+        }
+        return paths
+    }
+
+    /** Seçili düğümü yumuşak (tutamaklar aynı doğruda) ya da köşe (çizgiler düğüme düz gelir) yapar. */
+    fun setNodeSmooth(smooth: Boolean) {
+        _smoothNodes.value = smooth
+        val stroke = selectedShape.value ?: return
+        val g = graphOf(stroke)
+        val ids = selectedNodeIds(g)
+        if (ids.isEmpty()) return
+        var paths = g.paths
+        var graph = g
+        for (id0 in ids) {
+            val node = g.nodes[id0].point
+            val nid = graph.nodeNear(node)?.id ?: continue
+            val edges = VectorEdit.nodeEdges(graph, nid)
+            if (edges.isEmpty()) continue
+            if (smooth && edges.size == 2) {
+                val h1 = VectorEdit.handleOf(edges[0].first, edges[0].second); val h2 = VectorEdit.handleOf(edges[1].first, edges[1].second)
+                val d1 = (h1 - node).let { val l = it.getDistance(); if (l < 1e-3f) it else it / l }
+                val d2 = (h2 - node).let { val l = it.getDistance(); if (l < 1e-3f) it else it / l }
+                val dir = (d1 - d2).let { val l = it.getDistance(); if (l < 1e-3f) Offset(1f, 0f) else it / l }
+                val targets = listOf(node + dir * (h1 - node).getDistance(), node - dir * (h2 - node).getDistance())
+                edges.forEachIndexed { k, (e0, start0) ->
+                    val other = if (start0) e0.end else e0.start
+                    val e = graph.edgeBetween(node, other) ?: return@forEachIndexed
+                    val st = (e.start - node).getDistance() < 0.5f
+                    val far = VectorEdit.handleOf(e, !st)
+                    paths = if (st) VectorEdit.bezierEdge(graph, e, targets[k], far) else VectorEdit.bezierEdge(graph, e, far, targets[k])
+                    graph = graphOf(paths)
+                }
+            } else if (!smooth) {
+                edges.forEach { (e0, start0) ->
+                    val other = if (start0) e0.end else e0.start
+                    val e = graph.edgeBetween(node, other) ?: return@forEach
+                    val st = (e.start - node).getDistance() < 0.5f
+                    val far = VectorEdit.handleOf(e, !st)
+                    val straight = node + (other - node) / 3f
+                    paths = if (st) VectorEdit.bezierEdge(graph, e, straight, far) else VectorEdit.bezierEdge(graph, e, far, straight)
+                    graph = graphOf(paths)
+                }
+            }
+        }
+        if (paths !== g.paths) commitPaths(stroke, g, paths, _vector.value)
+    }
+
+    /** Seçili uç düğümden yolu uzatır: Çizgi çiz aracı o düğümden başlar. */
+    fun extendFromSelectedNode(): Boolean {
+        val stroke = selectedShape.value ?: return false
+        val g = graphOf(stroke)
+        val id = singleNode(g, _vector.value) ?: return false
+        if (g.degree(id) != 1) return false
+        val p = g.nodes[id].point
+        selectTool(ShapeTool.CONNECT)
+        setSelection(VectorSelection(nodes = listOf(p), linkFrom = p), stroke)
+        return true
+    }
+
+    /** Seçili tek düğüm bir uç mu (yol uzatılabilir). */
+    fun selectedNodeIsEnd(): Boolean {
+        val stroke = selectedShape.value ?: return false
+        val g = graphOf(stroke)
+        return singleNode(g, _vector.value)?.let { g.degree(it) == 1 } == true
     }
 
     private fun rotated(e: VectorEdit.Edge, degrees: Float): Pair<Offset, Offset> {

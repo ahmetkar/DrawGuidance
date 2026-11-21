@@ -229,6 +229,10 @@ data class CanvasOverlay(
     val vector: com.karapp.drawguidance.ui.screens.canvasedit.VectorSelection? = null,
     /** v17 çizim düzeltme önerisinin önizlemesi (düzeltilmiş çizgiler, tuval koordinatı; kesik vurgu çizgisiyle). v21: çok parçalı. */
     val correction: List<List<Offset>>? = null,
+    /** v56 aşama 9C seçili düğümün tutamakları (düğüm, tutamak). */
+    val handles: List<Pair<Offset, Offset>> = emptyList(),
+    /** v56 aşama 9C şekil oluşturucu. */
+    val builder: com.karapp.drawguidance.ui.screens.canvasedit.CanvasEditViewModel.ShapeBuilderUi? = null,
 )
 
 /** Önizleme hangi çizim listesi/tuval boyutu üzerinde başladıysa yalnızca onlara uygulanır. */
@@ -837,6 +841,16 @@ fun DrawingCanvas(
                                 path, colors.accent,
                                 style = DrawStroke(width = 1.5f / scale, pathEffect = androidx.compose.ui.graphics.PathEffect.dashPathEffect(floatArrayOf(8f / scale, 6f / scale), 0f)),
                             )
+                        }
+                        // v56 aşama 9C şekil oluşturucu bölgeleri ve seçili düğümün Bezier tutamakları
+                        overlay.builder?.let { b -> drawShapeBuilder(b, scale, colors) }
+                        if (overlay.handles.isNotEmpty() && activePreview !is Preview.ShapeEdit) {
+                            val hp = 14.dp.toPx() / 14f / scale
+                            overlay.handles.forEach { (n, h) ->
+                                drawLine(colors.accent, n, h, 1.5f * hp)
+                                drawCircle(colors.background, 6f * hp, h)
+                                drawCircle(colors.accent, 6f * hp, h, style = DrawStroke(width = 2f * hp))
+                            }
                         }
                         (activePreview as? Preview.Guideline)?.let { line ->
                             drawLine(
@@ -1465,4 +1479,22 @@ object SelectionIsolation {
     fun active(mode: EditMode, kind: com.karapp.drawguidance.data.model.CanvasKind, selected: Set<String>): Boolean =
         selected.isNotEmpty() && kind != com.karapp.drawguidance.data.model.CanvasKind.KIDS &&
             (mode == EditMode.SELECT || mode.transformsSelection)
+}
+
+/** v56 aşama 9C şekil oluşturucu: bölgeler kesik çizgili; birleşecekler vurgulu, silinecekler kırmızı taralı. */
+private fun androidx.compose.ui.graphics.drawscope.DrawScope.drawShapeBuilder(
+    b: com.karapp.drawguidance.ui.screens.canvasedit.CanvasEditViewModel.ShapeBuilderUi, scale: Float, colors: NeuColors,
+) {
+    val red = androidx.compose.ui.graphics.Color(0xFFE53935)
+    b.regions.forEachIndexed { i, rings ->
+        val path = androidx.compose.ui.graphics.Path().apply {
+            rings.forEach { r -> if (r.size >= 3) { moveTo(r[0].x, r[0].y); for (k in 1 until r.size) lineTo(r[k].x, r[k].y); close() } }
+        }
+        when {
+            i in b.merge -> drawPath(path, colors.accent.copy(alpha = 0.35f))
+            i in b.remove -> drawPath(path, red.copy(alpha = 0.30f))
+        }
+        drawPath(path, androidx.compose.ui.graphics.Color.White, style = DrawStroke(width = 2.5f / scale))
+        drawPath(path, if (i in b.remove) red else colors.accent, style = DrawStroke(width = 1.5f / scale, pathEffect = androidx.compose.ui.graphics.PathEffect.dashPathEffect(floatArrayOf(6f / scale, 5f / scale), 0f)))
+    }
 }

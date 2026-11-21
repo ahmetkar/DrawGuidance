@@ -55,11 +55,40 @@ data class VectorStyle(
     @EncodeDefault(EncodeDefault.Mode.NEVER) val strokes: List<PaintLayer> = emptyList(),
     /** Opaklık maskesi: maske nesneleri (parlaklıkları görünürlüğü verir; siyah = gizli). */
     @EncodeDefault(EncodeDefault.Mode.NEVER) val opacityMask: List<Stroke>? = null,
+    /** v56 aşama 9C sonradan değiştirilebilen efektler (sırayla [effectBase] geometrisine uygulanır). */
+    @EncodeDefault(EncodeDefault.Mode.NEVER) val effects: List<VectorEffect> = emptyList(),
+    /** Efektlerden önceki geometri (efekt yokken null). */
+    @EncodeDefault(EncodeDefault.Mode.NEVER) val effectBase: EffectBase? = null,
 ) {
     val isDefault: Boolean get() = this == VectorStyle()
     /** Yalnız şekil çiziminde etkili seçenekler var mı. */
-    val hasShapeOptions: Boolean get() = copy(blend = LayerBlend.NORMAL, opacityMask = null) != VectorStyle()
+    val hasShapeOptions: Boolean get() = copy(blend = LayerBlend.NORMAL, opacityMask = null, effects = emptyList(), effectBase = null) != VectorStyle()
 }
+
+/** v56 aşama 9C efekt türleri. */
+@Serializable enum class EffectKind { OFFSET, BEND, ROUGHEN, ZIGZAG, WAVE }
+
+/**
+ * Bir efekt: [amount] OFFSET'te mesafe (px), BEND'de -1..1 kıvırma; [size] pürüz/zikzak genliği (px); [detail] 100 px'te
+ * tepe sayısı; [seed] pürüzün tohumu.
+ */
+@OptIn(ExperimentalSerializationApi::class)
+@Serializable
+data class VectorEffect(
+    val kind: EffectKind,
+    @EncodeDefault(EncodeDefault.Mode.NEVER) val amount: Float = 0f,
+    @EncodeDefault(EncodeDefault.Mode.NEVER) val size: Float = 8f,
+    @EncodeDefault(EncodeDefault.Mode.NEVER) val detail: Float = 6f,
+    @EncodeDefault(EncodeDefault.Mode.NEVER) val seed: Int = 1,
+)
+
+/** Efektlerden önceki noktalar ve (şekilde) alt yol nokta sayıları. */
+@OptIn(ExperimentalSerializationApi::class)
+@Serializable
+data class EffectBase(
+    val points: List<StrokePoint>,
+    @EncodeDefault(EncodeDefault.Mode.NEVER) val counts: List<Int>? = null,
+)
 
 /**
  * Bağlı kopya: kaynak [source]; kopya = M·kaynak + t (M = [[a, b], [c, d]], t = (tx, ty)). [repeat] true: Tekrarla'nın
@@ -188,8 +217,11 @@ object V56Vector {
 
     /** Opaklık maskesi nesnelerinin noktalarını eşler (taşıma, döndürme, ölçekleme her yerde bununla). */
     fun mapStyle(style: VectorStyle?, f: (StrokePoint) -> StrokePoint): VectorStyle? {
-        val masks = style?.opacityMask ?: return style
-        return style.copy(opacityMask = masks.map { ms -> ms.copy(points = ms.points.map(f), clip = ms.clip?.map(f)) })
+        if (style == null || (style.opacityMask == null && style.effectBase == null)) return style
+        return style.copy(
+            opacityMask = style.opacityMask?.map { ms -> ms.copy(points = ms.points.map(f), clip = ms.clip?.map(f)) },
+            effectBase = style.effectBase?.let { b -> b.copy(points = b.points.map(f)) },
+        )
     }
 
     // ---------------------------------------------------------------- bağlı kopya

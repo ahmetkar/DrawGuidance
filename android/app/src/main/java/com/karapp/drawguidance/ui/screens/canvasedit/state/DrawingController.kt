@@ -30,7 +30,11 @@ class DrawingController(
      * v18: [penEraser] kalemin silgi ucuyla ya da yan tuşu basılıyken çizildiyse çizgi (seçili fırçadan bağımsız) silgi
      * olarak kaydedilir.
      */
+    /** v56 aşama 9C bıçak: çizilen çizgi kesme çizgisi olarak kullanılır (true: çizgi eklenmez). */
+    var knife: ((List<StrokePoint>) -> Boolean)? = null
+
     fun onStrokeFinished(points: List<StrokePoint>, strokeId: String? = null, penEraser: Boolean = false) {
+        if (!penEraser && points.size >= 2) knife?.let { if (it(points)) return }
         if (points.isEmpty()) return
         val current = store.canvas.value ?: return
         // Gizli ya da kilitli katmana çizilmez

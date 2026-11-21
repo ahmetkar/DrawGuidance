@@ -583,6 +583,38 @@ object VectorEdit {
         }
     }
 
+    // --- v56 aşama 9C Bezier tutamakları ve düğüm türü ---
+
+    /** Düğüme bağlı çizgiler ve düğüm çizginin başında mı. */
+    fun nodeEdges(g: Graph, node: Int): List<Pair<Edge, Boolean>> =
+        g.edges.filter { it.a == node || it.b == node }.map { it to (it.a == node) }
+
+    /** Çizginin bir ucundaki tutamak: ilk ara noktaya doğru, çizgi uzunluğunun üçte biri. */
+    fun handleOf(e: Edge, atStart: Boolean): Offset {
+        val pts = if (atStart) e.points else e.points.asReversed()
+        val n = pts.first()
+        val toward = if (pts.size > 2) pts[1] else pts.last()
+        val d = toward - n
+        val len = d.getDistance()
+        val l3 = e.length() / 3f
+        return if (len < 1e-4f) n else n + d / len * l3
+    }
+
+    /** Düğümün tutamakları (her bağlı çizgi için). */
+    fun nodeHandles(g: Graph, node: Int): List<Offset> = nodeEdges(g, node).map { (e, start) -> handleOf(e, start) }
+
+    /** Çizgiyi iki uç tutamağıyla kübik Bezier eğrisi yapar. */
+    fun bezierEdge(g: Graph, e: Edge, hStart: Offset, hEnd: Offset): List<EditablePath> {
+        val a = e.start; val b = e.end
+        val approx = (hStart - a).getDistance() + (hEnd - hStart).getDistance() + (b - hEnd).getDistance()
+        val steps = (approx / 4f).toInt().coerceIn(8, 96)
+        val inner = (1 until steps).map { i ->
+            val t = i.toFloat() / steps; val u = 1f - t
+            a * (u * u * u) + hStart * (3f * u * u * t) + hEnd * (3f * u * t * t) + b * (t * t * t)
+        }
+        return replaceInner(g, e, inner)
+    }
+
     // --- Tutamaklar ---
 
     /** Kavis tutamağı: çizginin ortası. */

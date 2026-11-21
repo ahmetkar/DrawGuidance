@@ -253,7 +253,9 @@ data class PartStyle(
 /** Şekil düzenlemede sürüklemenin yaptığı iş: noktaları taşı, çizgi çek, çizgiyi taşı / bük / döndür. */
 enum class ShapeDrag { NONE, NODES, CONNECT, EDGE, BEND, TURN,
     /** v45 parametreli şeklin tutamağı. */
-    HANDLE }
+    HANDLE,
+    /** v56 aşama 9C seçili düğümün Bezier tutamağı. */
+    BEZIER }
 
 /** Yeni yazıların (ve seçili yazıların) yazı tipi ayarları; yazı boyutu tuval birimindedir. */
 data class TextSettings(val spec: TextSpec = TextSpec(""), val sizePx: Float = 48f)
@@ -894,6 +896,9 @@ class CanvasEditViewModel(
         pen.onModeChange(mode)
         formulas.onModeChange(mode)
         if (mode != from) handwriting.reset()
+        // v56 aşama 9C bıçak yalnız Çiz'de, şekil oluşturucu yalnız Seç'te
+        if (mode != EditMode.DRAW && drawing.knife != null) stopKnife()
+        if (mode != EditMode.SELECT && builderActive) cancelShapeBuilder()
         // v43 alanla seçim yalnız Seç'te (Ölçekle'ye geçişte de kalır: Bitti ile Seç'e dönülür)
         if (mode != EditMode.SELECT && mode != EditMode.SCALE && mode != EditMode.DRAW) _canvasPick.value = com.karapp.drawguidance.ui.screens.canvasedit.components.CanvasPick.NONE
         if (mode == EditMode.DRAW && _canvasPick.value != com.karapp.drawguidance.ui.screens.canvasedit.components.CanvasPick.EYEDROPPER) _canvasPick.value = com.karapp.drawguidance.ui.screens.canvasedit.components.CanvasPick.NONE
@@ -1328,11 +1333,15 @@ class CanvasEditViewModel(
     fun toggleElement(elementId: String) = selection.toggleElement(elementId)
     fun toggleGroup(groupId: String) = selection.toggleGroup(groupId)
     fun selectAt(x: Float, y: Float, tolerance: Float): Boolean {
+        // v56 aşama 9C şekil oluşturucu açıkken dokunuş bölge seçer
+        if (_builder.value != null) return shapeBuilderTap(x, y)
         // v56 2E grup içindeyken dokunuş yalnız o elemanı seçer (gruptan dışarı dokununca çıkılır)
         if (v56(com.karapp.drawguidance.data.model.V56Flags.Feature.ADV_SELECTION)) selection.selectInGroupAt(x, y, tolerance)?.let { return it }
         return selection.selectAt(x, y, tolerance)
     }
     fun deselectAt(x: Float, y: Float, tolerance: Float): Boolean {
+        // v56 aşama 9C şekil oluşturucu: çift dokunuş bölgeyi silinecek yapar
+        if (_builder.value != null) return shapeBuilderTap(x, y, remove = true)
         // v56 2E gruplu elemana çift dokunuş grubun içine girer
         if (v56(com.karapp.drawguidance.data.model.V56Flags.Feature.ADV_SELECTION) && selection.enterGroupAt(x, y, tolerance)) return true
         return selection.deselectAt(x, y, tolerance)
@@ -1742,6 +1751,135 @@ class CanvasEditViewModel(
         val out = com.karapp.drawguidance.data.model.V56Vector.releaseOpacityMask(c.strokes, store.selection)
         if (out != c.strokes) store.commit(out, useArea = false)
     }
+
+    // ---------------------------------------------------------------- v56 aşama 9C yol işlemleri, bıçak, efektler
+
+    private fun pathCommit(out: List<Stroke>?, selectNew: Boolean = true): Boolean {
+        val c = store.canvas.value ?: return false
+        if (out == null || out == c.strokes) return false
+        val before = c.strokes.mapTo(HashSet()) { it.id }
+        store.commit(out, useArea = false)
+        if (selectNew) store.select(out.filter { it.id !in before }.mapTo(HashSet()) { it.id }.ifEmpty { store.selection.filter { id -> out.any { it.id == id } }.toSet() })
+        return true
+    }
+
+    /** Seçimde yol işlemine girebilen eleman sayısı. */
+    fun pathOperableCount(): Int = store.canvas.value?.strokes?.count { it.id in store.selection && com.karapp.drawguidance.data.model.V56PathOps.operable(it) } ?: 0
+
+    fun pathOp(op: com.karapp.drawguidance.data.model.V56PathOps.PathOp): Boolean {
+        val c = store.canvas.value ?: return false
+        return pathCommit(com.karapp.drawguidance.data.model.V56PathOps.apply(c.strokes, store.selection, op, ::newId))
+    }
+
+    fun outlineStroke(): Boolean = store.canvas.value?.let { pathCommit(com.karapp.drawguidance.data.model.V56PathOps.outlineStroke(it.strokes, store.selection, ::newId)) } == true
+    fun separatePaths(): Boolean = store.canvas.value?.let { pathCommit(com.karapp.drawguidance.data.model.V56PathOps.separate(it.strokes, store.selection, ::newId)) } == true
+    fun closeSelectedPaths(): Boolean = store.canvas.value?.let { pathCommit(com.karapp.drawguidance.data.model.V56PathOps.closePaths(it.strokes, store.selection), false) } == true
+    fun reverseSelectedPaths(): Boolean = store.canvas.value?.let { pathCommit(com.karapp.drawguidance.data.model.V56PathOps.reversePaths(it.strokes, store.selection), false) } == true
+    fun envelopeDistort(): Boolean = store.canvas.value?.let { pathCommit(com.karapp.drawguidance.data.model.V56PathOps.envelope(it.strokes, store.selection), false) } == true
+
+    /** Seçimin efektleri (ilk efekt uygulanabilir elemanın). */
+    fun selectedEffects(): List<com.karapp.drawguidance.data.model.VectorEffect> =
+        store.canvas.value?.strokes?.firstOrNull { it.id in store.selection && com.karapp.drawguidance.data.model.V56PathOps.effectable(it) }?.style2?.effects.orEmpty()
+
+    fun canApplyEffects(): Boolean = store.canvas.value?.strokes?.any { it.id in store.selection && com.karapp.drawguidance.data.model.V56PathOps.effectable(it) } == true
+
+    private fun effected(strokes: List<Stroke>, effects: List<com.karapp.drawguidance.data.model.VectorEffect>): List<Stroke> = strokes.map { s ->
+        if (s.id in store.selection && com.karapp.drawguidance.data.model.V56PathOps.effectable(s)) com.karapp.drawguidance.data.model.V56PathOps.withEffects(s, effects) else s
+    }
+
+    /** Efekt önizlemesi (geçmişe girmez). */
+    fun previewEffects(effects: List<com.karapp.drawguidance.data.model.VectorEffect>) {
+        val base = (if (store.inPreview) store.endPreview() else store.canvas.value) ?: return
+        store.previewStrokes(effected(base.strokes, effects))
+    }
+
+    fun cancelEffectsPreview() { store.endPreview() }
+
+    /** Efektleri uygular (tek geri alma adımı; liste boşsa efektler kaldırılır). */
+    fun applyEffects(effects: List<com.karapp.drawguidance.data.model.VectorEffect>) {
+        store.endPreview()
+        val c = store.canvas.value ?: return
+        val out = effected(c.strokes, effects)
+        if (out != c.strokes) store.commit(out, useArea = false)
+    }
+
+    private val _knife = MutableStateFlow(false)
+    /** Bıçak açık mı (çizilen çizgi kesme çizgisi olur). */
+    val knife: StateFlow<Boolean> = _knife.asStateFlow()
+    private var knifeIds: Set<String> = emptySet()
+
+    /** Bıçağı açar: Çiz modunda çizilen her çizgi seçili (yoksa kilitsiz katmanlardaki tüm) şekilleri keser. */
+    fun startKnife() {
+        knifeIds = store.selection
+        _knife.value = true
+        setMode(EditMode.DRAW)
+        drawing.knife = { pts -> applyKnife(pts); true }
+    }
+
+    fun stopKnife() { _knife.value = false; drawing.knife = null; knifeIds = emptySet() }
+
+    fun applyKnife(points: List<com.karapp.drawguidance.data.model.StrokePoint>): Boolean {
+        val c = store.canvas.value ?: return false
+        val locked = c.layers.filter { it.locked || !it.visible }.mapTo(HashSet()) { it.id }
+        val out = com.karapp.drawguidance.data.model.V56PathOps.knife(c.strokes, knifeIds.filter { id -> c.strokes.any { it.id == id } }.toSet(), points, ::newId, locked)
+            ?: return false
+        val before = c.strokes.mapTo(HashSet()) { it.id }
+        store.commit(out, useArea = false)
+        // Kesilen parçalar sonraki kesimlere de açık kalır
+        if (knifeIds.isNotEmpty()) knifeIds = knifeIds.filter { id -> out.any { it.id == id } }.toSet() + out.filter { it.id !in before }.map { it.id }
+        return true
+    }
+
+    /** Şekil oluşturucu durumu: bölgeler (tuval koordinatı), birleşecekler (sırayla), silinecekler. */
+    data class ShapeBuilderUi(val regions: List<List<List<Offset>>>, val merge: List<Int> = emptyList(), val remove: Set<Int> = emptySet())
+
+    private val _builder = MutableStateFlow<ShapeBuilderUi?>(null)
+    val shapeBuilder: StateFlow<ShapeBuilderUi?> = _builder.asStateFlow()
+    private var builderIds: Set<String> = emptySet()
+    private var builderActive = false
+    private var builderRegions: List<Pair<List<List<com.karapp.drawguidance.data.model.V56Bool.P>>, Stroke>> = emptyList()
+
+    /** Şekil oluşturucuyu açar (seçimde en az iki yol işlemine girebilen eleman). */
+    fun startShapeBuilder(): Boolean {
+        val c = store.canvas.value ?: return false
+        val sel = c.strokes.filter { it.id in store.selection && com.karapp.drawguidance.data.model.V56PathOps.operable(it) }
+        if (sel.size < 2) return false
+        builderIds = sel.map { it.id }.toSet()
+        builderRegions = com.karapp.drawguidance.data.model.V56PathOps.builderRegions(sel)
+        builderActive = true
+        _builder.value = ShapeBuilderUi(builderRegions.map { (rs, _) -> rs.map { r -> r.map { Offset(it.x.toFloat(), it.y.toFloat()) } } })
+        setMode(EditMode.SELECT)
+        return true
+    }
+
+    /** Dokunuş: bölge birleşecekler listesine girer/çıkar; [remove] true: bölge silinecek olarak işaretlenir. */
+    fun shapeBuilderTap(x: Float, y: Float, remove: Boolean = false): Boolean {
+        val b = _builder.value ?: return false
+        val i = com.karapp.drawguidance.data.model.V56PathOps.regionAt(builderRegions, x, y)
+        if (i < 0) return true
+        _builder.value = if (remove) b.copy(remove = if (i in b.remove) b.remove - i else b.remove + i, merge = b.merge - i)
+        else b.copy(merge = if (i in b.merge) b.merge - i else b.merge + i, remove = b.remove - i)
+        return true
+    }
+
+    fun applyShapeBuilder(): Boolean {
+        val b = _builder.value ?: return false
+        val c = store.canvas.value
+        _builder.value = null
+        builderActive = false
+        if (c == null) return false
+        return pathCommit(com.karapp.drawguidance.data.model.V56PathOps.build(c.strokes, builderIds, b.merge, b.remove, ::newId))
+    }
+
+    fun cancelShapeBuilder() { _builder.value = null; builderActive = false }
+
+    /** v56 aşama 9C düğüm türü ve Bezier tutamakları (şekil düzenleme, Noktalar aracı). */
+    fun selectedHandles(): List<Pair<Offset, Offset>> = shapes.selectedHandles()
+    fun setNodeSmooth(smooth: Boolean) = shapes.setNodeSmooth(smooth)
+    val smoothNodes: StateFlow<Boolean> get() = shapes.smoothNodes
+    fun extendFromSelectedNode(): Boolean = shapes.extendFromSelectedNode()
+    fun selectedNodeIsEnd(): Boolean = shapes.selectedNodeIsEnd()
+    fun bezierOn(): Boolean = shapes.bezierOn()
     fun updateGraphSpec(graph: GraphSpec) = shapes.updateGraphSpec(graph)
     fun shapeStrokes(gestureId: String, start: Offset, end: Offset): List<Stroke> = shapes.shapeStrokes(gestureId, start, end)
     fun addShape(gestureId: String, start: Offset, end: Offset) = shapes.addShape(gestureId, start, end)

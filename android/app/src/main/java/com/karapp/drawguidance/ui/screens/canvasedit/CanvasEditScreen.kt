@@ -1322,10 +1322,12 @@ fun CanvasEditScreen(
         // v33 nokta paneli: Taşı / seç, Nokta ekle, Çizgi çiz (Noktalar aracının alt araçları)
         mode == EditMode.SHAPE_EDIT && shapeTool.nodeFamily -> {
             {
-                com.karapp.drawguidance.ui.screens.canvasedit.components.NodeToolControls(
-                    tool = shapeTool, onTool = viewModel::selectShapeTool,
-                    icon = ::shapeToolIcon,
-                )
+                com.karapp.drawguidance.ui.screens.canvasedit.components.V56NodePanel(viewModel, shapeTool) {
+                    com.karapp.drawguidance.ui.screens.canvasedit.components.NodeToolControls(
+                        tool = shapeTool, onTool = viewModel::selectShapeTool,
+                        icon = ::shapeToolIcon,
+                    )
+                }
             }
         }
         // v43 Seç: dokunarak, dikdörtgenle ya da kalemle alan çizerek seçim; damlalık
@@ -1537,6 +1539,8 @@ fun CanvasEditScreen(
                     vector = vectorSelection.takeIf { mode == EditMode.SHAPE_EDIT && shapeTool != ShapeTool.GRAPH && shapeTool != ShapeTool.FILL },
                     correction = (shapeSuggestion?.preview?.takeIf { it.isNotEmpty() } ?: lineSuggestion?.preview?.takeIf { it.isNotEmpty() })
                         ?.map { s -> s.map { Offset(it.x, it.y) } },
+                    handles = com.karapp.drawguidance.ui.screens.canvasedit.components.v56Handles(viewModel, vectorSelection, mode),
+                    builder = com.karapp.drawguidance.ui.screens.canvasedit.components.v56Builder(viewModel),
                 ),
                 activeLayerId = activeLayer,
                 area = v56Area,
@@ -2400,6 +2404,7 @@ fun CanvasEditScreen(
             }
         }
         com.karapp.drawguidance.ui.screens.canvasedit.components.V56SymmetryBottom(viewModel, current, mode)
+        com.karapp.drawguidance.ui.screens.canvasedit.components.V56PathBars(viewModel)
         // Çizim alanının hemen altındaki sayfa şeridi (çalışma/not tuvali; v27 çizgi roman da)
         if (kind.paged) com.karapp.drawguidance.ui.screens.canvasedit.components.ToolHelpScope(toolHelp) {
             com.karapp.drawguidance.ui.screens.canvasedit.components.PageStrip(

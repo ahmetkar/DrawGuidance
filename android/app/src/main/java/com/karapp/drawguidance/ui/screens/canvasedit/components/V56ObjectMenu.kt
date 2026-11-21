@@ -78,8 +78,13 @@ fun V56ObjectMenu(viewModel: CanvasEditViewModel, onDismiss: () -> Unit) {
                         if (viewModel.v56(V56Flags.Feature.REFLECTION_LIQUIFY)) {
                             NeuChip(stringResource(R.string.v56_reflection), false, { viewModel.reflectSelection(); onDismiss() }, Modifier.testTag("v56_fx_reflection"))
                         }
+                        // v56 aşama 9C: değiştirilebilir efektler ve zarf bozma
+                        V56EffectChips(viewModel, onDismiss)
                     }
                 }
+                // v56 aşama 9C: yol işlemleri ve yol düzenle
+                V56PathfinderSection(viewModel, onDismiss)
+                V56PathEditSection(viewModel, onDismiss)
                 if (viewModel.v56(V56Flags.Feature.ADV_TRANSFORM) || viewModel.v56(V56Flags.Feature.ADV_REPEAT)) {
                     Text(stringResource(R.string.v56_repeat_title), style = MaterialTheme.typography.titleSmall)
                     if (viewModel.v56(V56Flags.Feature.ADV_TRANSFORM)) row {

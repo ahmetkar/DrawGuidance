@@ -1,16 +1,66 @@
 # v56 durum
 
-Son güncelleme: 2026-11-21, K2 durağı.
+Son güncelleme: 2026-11-21, K3 durağı (otomatik geçiş: K7 sonuna kadar duraklarda beklenmiyor).
 
 | Durak | Durum | Not |
 |---|---|---|
 | Aşama 0A (ödüllü reklam, madde 23) | Bitti | Android + iOS |
 | K0 (aşama 0: canlı yayın) | Bitti | Android + iOS |
 | K1 (V11 model, katman motoru, seçim maskesi, kes/kopyala/yapıştır, fark paketi) | Bitti | Android + iOS |
-| **K2** (hızlı fırça seçici, gren ve doku, Dönüştür paneli, yansıma, sıvılaştır, 2E dönüştürme/hizalama/efektler) | **Bitti, "devam" bekleniyor** | Android + iOS |
-| K3 (renk ayarları, HSL/Color Balance, katman çoğalt/birleştir, SVG/PSD/DXF, e-posta girişi, mağaza flavor'ları, sunucu 56.0.0) | Başlamadı | |
+| K2 (hızlı fırça seçici, gren ve doku, Dönüştür paneli, yansıma, sıvılaştır, 2E dönüştürme/hizalama/efektler) | Bitti | Android + iOS |
+| **K3** (aşama 7, 8, 8A, 9: renk ayarları, katman çoğalt/birleştir, hazır ayarlar, simetri, desen, gelişmiş görünüm, bağlı kopya, opaklık maskesi, canlı Tekrarla, SVG/PSD/DXF) | **Bitti** | Android + iOS |
+| K3A (aşama 9C: 2E vektör araçları) | Sırada | |
 | K4–K6 (3B Çizim) | Başlamadı | |
-| K7 (eğitim, metinler, tam test, imzalı derlemeler) | Başlamadı | |
+| K7 (aşama 14) | Başlamadı | |
+| K8 (9A e-posta girişi, 9B mağaza flavor'ları, aşama 15) | Başlamadı, Ahmet'in onayı gerekir | Ahmet: "9a ve 9b yi en sona al" |
+
+## K3'te yapılanlar
+
+- **Aşama 7, renk ayarları (2D-4):** Özellikler penceresinde Ton/Doygunluk/Açıklık (HSL), Renk Dengesi (gölge, orta
+  ton, parlak; açıklığı koru) ve Eğriler; seçime ya da katmana uygulanır, tek geri alma adımı. Katman menüsünde
+  **çoğalt** ve **aşağıyla birleştir / görünenleri birleştir**. Ekle menüsünde hazır ayarlar: ışık katmanı (Ekran),
+  gölge katmanı (Çarp), parıltı fırçası.
+- **Aşama 8, simetri ve desen:** Kılavuzlar penceresinde Simetri (dikey, yatay, dörtlü, radyal 2–16 kol). Simetri
+  açıkken Çiz/Kalem/Boya kiplerinde alt panel: tür, kol sayısı, eksen açısı, merkez (çubuklar + Ortala), canlı ayna,
+  kapat. Eksenler tuvalde görünür; çizilen çizginin kopyaları ayrı eleman olarak kaydedilir. Seçimde **Desen yap**
+  (aralık çubuğu, kopya sayısı gösterilir, en çok 200). Basit resimde üst menüde simetri aç/kapa düğmesi.
+- **Aşama 8A (2E):** Özellikler penceresinde **Gelişmiş görünüm**: uç biçimi, köşe birleşimi, sivri sınırı, çizgi
+  hizası (orta/iç/dış), kesik çizgi, ok uçları, karışım modu, serbest gradyan, ek dolgular ve ek konturlar.
+  **Bağlı kopya** (klon; kaynak değişince kopya da değişir, bağı kopar), **opaklık maskesi** (üstteki nesnenin
+  parlaklığı alttakinin opaklığı olur; maskeyi bırak), Nesne › **Tekrarla** canlı (doğrusal, ızgara, dairesel, aynalı,
+  adımla çoğalt; önizlemeli; sonradan değiştirilir ya da kaldırılır).
+- **Aşama 9, dışa aktarma (2D-3):** Kaydet penceresinde **SVG** (her katman ayrı grup, Inkscape katman adı, opaklık ve
+  karışım modu; düz kalemler, şekiller, yazılar ve kement dolgu vektör; doku fırçaları, resimler ve silgili katmanların
+  fırça izleri gömülü PNG), **PSD** (katmanlı: ad, görünürlük, opaklık, 17 karışım modu, alfa kilidi, alttakine kırpma;
+  en altta "Arka plan"; birleşik görüntü; Photoshop, Krita, GIMP okur) ve **DXF** (R12, mm, katman tablosu; çizgiler
+  ve şekiller POLYLINE, yazılar TEXT; resimler ve boya izleri yazılmaz, sayısı bildirilir). Dosyalar Kaydedilenler'e
+  eklenir. Çocuk tuvalinde yok.
+
+### Plandan sapmalar (K3)
+
+- 9A (e-posta/şifre girişi) ve 9B (mağaza flavor'ları, sunucu 56.0.0) Ahmet'in isteğiyle K8'e alındı.
+- Renk ayarı önizlemesi yalnız vektörlerde canlı; resimler Uygula'da işlenir. Katman renk ayarı yalnız açık sayfaya
+  uygulanır. Renk ayarı hesabı `core/model` içinde (`ColorAdjust`).
+- Simetri belge düzeyinde `DocExtras` yerine tuvalin kılavuz ayarında (`GuideSpec.symmetry`) tutulur; merkez tuvalde
+  sürüklenmez, çubuklarla ve "Ortala" ile ayarlanır. Basit resimdeki simetri düğmesi yalnız dikey simetriyi açar/kapar
+  (çocuk modunda yok).
+- Opaklık maskesi nesnenin görünümüne gömülür (`style2.opacityMask`); maske nesnesi tuvalden kalkar, "Maskeyi bırak"
+  geri koyar.
+- Bağlı kopya ve canlı Tekrarla tek modelde (`CloneLink`: kaynak + afin matris); eşitleme `EditorStore.commit` ve
+  önizlemede yapılır. Klon, bağı kopar ve opaklık maskesi Seç satırında; Tekrarla Nesne menüsünde.
+- Ek dolgu/kontur rengi Android'de hazır renk satırından, iOS'ta renk satırından seçilir. Serbest gradyan ters uzaklık
+  ağırlıklı (48 px'lik bitmap ölçeklenir).
+- Resim modlarında (Resim, Basit resim, Çizgi roman dışı) eski resim kaydetme penceresi korunur; başlığında "Diğer
+  biçimler: SVG / PSD / DXF" düğmeleri birleşik pencereyi o sekmeyle açar. Sayfalı tuvallerde sekmeler doğrudan
+  pencerede. iOS'ta Kaydet penceresinde sekme olarak.
+- SVG/PSD/DXF açık sayfayı 1x tuval boyutunda yazar (sayfa seçimi ve ölçek yok). PNG, JPEG, PDF ve CBZ zaten vardı.
+
+## Testler (K3)
+
+- Android: `V56ColorTest`, `V56SymmetryRulesTest` 3/3 + `V56SymmetryUiTest` 2/2, `V56VectorRulesTest` 3/3 +
+  `V56VectorUiTest` 1/1, `V56ExportRulesTest` 4/4 + `V56ExportUiTest` 1/1. 8A sonunda V56*, *Codec* ve V47* takımları
+  (87 test) geçti; 9 sonunda V42SaveTest 4/4 ve V40EditorUiTest 6/6 geçti. Derleme hatasız.
+- iOS: `V56ColorTests`, `V56SymmetryTests`, `V56VectorTests`, `V56ExportTests` yazıldı (Swift derleyicisi yok).
 
 ## K2'de yapılanlar
 
@@ -109,6 +159,6 @@ Son güncelleme: 2026-11-21, K2 durağı.
 - Ödüllü reklamda AdMob tarafı: uygulamanın AdMob'da "onaylı" görünmesi ve app-ads.txt kontrolü Ahmet'te.
 - Seçim alanı varken çizilmekte olan çizginin önizlemesi maskelenmiyor (bırakınca maskelenir).
 - Tuval küçük resimleri katman karışım modlarını henüz yansıtmıyor.
-- `DocExtras` (belge düzeyi simetri vb.) modelde var, düzenleyiciye K3'te bağlanacak.
-- iOS'ta K2 kodu derlenmedi (ortamda Swift yok); ilk derlemede küçük düzeltmeler gerekebilir.
+- `DocExtras` modelde var ama kullanılmıyor (simetri `GuideSpec.symmetry`'de).
+- iOS'ta K2 ve K3 kodu derlenmedi (ortamda Swift yok); ilk derlemede küçük düzeltmeler gerekebilir.
 - Sıvılaştır ve çarpıtılmış resim iOS'ta ağdan önbellekli bir görüntüyle çizilir; çok büyük resimde ilk çizim yavaş olabilir.

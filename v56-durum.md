@@ -1,16 +1,56 @@
 # v56 durum
 
-Son güncelleme: 2026-11-20, K1 durağı.
+Son güncelleme: 2026-11-21, K2 durağı.
 
 | Durak | Durum | Not |
 |---|---|---|
 | Aşama 0A (ödüllü reklam, madde 23) | Bitti | Android + iOS |
 | K0 (aşama 0: canlı yayın) | Bitti | Android + iOS |
-| **K1** (V11 model, katman motoru, seçim maskesi, kes/kopyala/yapıştır, fark paketi) | **Bitti, "devam" bekleniyor** | Android + iOS |
-| K2 (hızlı fırça seçici, renk butonu, damlalık + büyüteç, Dönüştür paneli…) | Başlamadı | |
+| K1 (V11 model, katman motoru, seçim maskesi, kes/kopyala/yapıştır, fark paketi) | Bitti | Android + iOS |
+| **K2** (hızlı fırça seçici, gren ve doku, Dönüştür paneli, yansıma, sıvılaştır, 2E dönüştürme/hizalama/efektler) | **Bitti, "devam" bekleniyor** | Android + iOS |
 | K3 (renk ayarları, HSL/Color Balance, katman çoğalt/birleştir, SVG/PSD/DXF, e-posta girişi, mağaza flavor'ları, sunucu 56.0.0) | Başlamadı | |
 | K4–K6 (3B Çizim) | Başlamadı | |
 | K7 (eğitim, metinler, tam test, imzalı derlemeler) | Başlamadı | |
+
+## K2'de yapılanlar
+
+- **Aşama 4, hızlı fırça seçici:** köşe düğmesi; son kullanılan ve sabitlenen fırçalar; boyut ve opaklık; silgi; tüm
+  fırçalar; iki parmakla fırça geçişi; çizerken kapanır, kaleme yol verir; tablette köşesi taşınır. Renk düğmesi ve
+  renk penceresinde damlalık; damlalıkta canlı renk dairesi. Android sağ kenar boşluğu (rail inset) gerekmedi. iOS hızlı
+  renk penceresi sistemin ColorPicker'ını kullanır.
+- **Aşama 5, gren ve doku:** 6 hazır doku (kâğıt, tuval, kömür, gürültü, nokta, tarama; Android ve iOS aynı karolar),
+  fırça greni (doku, ölçek, güç, kayan), resimden fırça (resim uç olarak iz boyunca damgalanır), dokuyla doldur (seçim
+  alanı, katman menüsü, Ekle › Doku).
+- **Aşama 6, Dönüştür paneli:** Serbest, Tekdüze, Bozma (perspektif), Çarpıtma (4×4 ağ; "Gelişmiş ağ" 6×6; ağ
+  çizgileri eğri). Yaslama ayarları (mıknatıslar, kılavuza yaslama, mesafe, hız; tuval türü başına kayıtlı), yatay/
+  dikey çevir, 45° ve 90° döndür, tuvale sığdır (çizgi romanda panele), ara değerleme (en yakın / çift doğrusal / çift
+  kübik), sayısal giriş, sıfırla, iptal, bitti. Bitti tek geri alma adımı; Sıfırla ve İptal belgeyi değiştirmez.
+  Yapıştırınca panel açılır. Seç satırında Dönüştür, Yansıma, Sıvılaştır.
+- **Yansıma:** seçimin altına dikey çevrilmiş, dalgalı ve aşağı doğru solan kopya (tek adım).
+- **Sıvılaştır:** it, döndür, büzüştür, şişir; boyut ve güç. Seçili resim yoksa seçim ya da etkin katman önce resme
+  çevrilir; deformasyon resmin 17×17 ağında tutulur (asıl resim değişmez).
+- **Aşama 6A (2E, yalnız Resim):** Kaydır/Eğ kipi; referans noktası (9 nokta + tuvalde sürüklenen serbest nişan;
+  döndürme ve çevirme bu noktanın çevresinde); her birini dönüştür; dönüşümü tekrarla; dönüştür ve çoğalt; sayısalda
+  orantıyı kilitle. Seç satırında **Nesne** menüsü: hizala (sola, yatay orta, sağa, üste, dikey orta, alta; kâğıda /
+  seçime / ana nesneye göre), dağıt (yatay, dikey, boşlukları eşitle), efektler (girdap, büzüştür, şişir: önizlemeli,
+  tek adım; yansıma oluştur), tekrarla (dönüşümü tekrarla / çoğalt).
+
+### Plandan sapmalar (K2)
+
+- Bozma ve Çarpıtma'da yazı, şema ve formül değişmez (panelde "N yazı/şema bu kipte değişmez" bilgisi); yola
+  çevrilmezler.
+- 45° düğmesine uzun basmak 90° yerine ayrı "90° döndür" düğmesi var (uzun basma her düğmede araç yardımını açıyor).
+- Nesne menüsü üst menüde değil, Seç satırında bir düğme (aynı yerde Dönüştür, Yansıma, Sıvılaştır).
+- Ana nesne: seçimde en son dokunulan nesne (dokunulmadıysa en büyük nesne).
+- Girdap/büzüştür/şişir kalıcı uygulanır (tek geri alma adımı); sonradan değiştirilebilen efekt listesi
+  (`Stroke.effects`) K3A'daki öteki efektlerle gelecek.
+
+## Testler (K2)
+
+- Android: yeni `V56QuickBrushTest`, `V56GrainTest` 7/7, `V56TransformTest` 10/10, `V56ArrangeTest` 7/7. K2 sonunda
+  V56 testlerinin hepsi, V45EditorUiTest, BrushDynamics ve V33ToolHelp birlikte koşuldu: 66/66 geçti. Derleme hatasız.
+- iOS: `V56QuickBrushTests`, `V56GrainTests`, `V56TransformTests`, `V56ArrangeTests` yazıldı (Swift derleyicisi yok;
+  derleme Ahmet'te).
 
 ## K1'de yapılanlar
 
@@ -67,7 +107,8 @@ Son güncelleme: 2026-11-20, K1 durağı.
 ## Açık konular
 
 - Ödüllü reklamda AdMob tarafı: uygulamanın AdMob'da "onaylı" görünmesi ve app-ads.txt kontrolü Ahmet'te.
-- Yapıştırınca Dönüştür paneli açılmıyor; panel K2'de gelecek.
 - Seçim alanı varken çizilmekte olan çizginin önizlemesi maskelenmiyor (bırakınca maskelenir).
 - Tuval küçük resimleri katman karışım modlarını henüz yansıtmıyor.
-- `DocExtras` (belge düzeyi simetri vb.) modelde var, düzenleyiciye K2/K3'te bağlanacak.
+- `DocExtras` (belge düzeyi simetri vb.) modelde var, düzenleyiciye K3'te bağlanacak.
+- iOS'ta K2 kodu derlenmedi (ortamda Swift yok); ilk derlemede küçük düzeltmeler gerekebilir.
+- Sıvılaştır ve çarpıtılmış resim iOS'ta ağdan önbellekli bir görüntüyle çizilir; çok büyük resimde ilk çizim yavaş olabilir.

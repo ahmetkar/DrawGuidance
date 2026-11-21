@@ -154,7 +154,7 @@ class V39EntitlementsTest {
             .forEach { assertTrue(it.name, comic.locked(it)) }
         assertEquals(FeatureKeys.COMIC_EFFECTS_ADVANCED, PremiumFeature.IMAGE_EFFECTS_ADVANCED.key(CanvasKind.COMIC))
         // Çocuk modu ve basit modlar kilitlenmez (v40: çocuk modunda yalnız çizim görevinin son seviyeleri)
-        val anyKind = setOf(PremiumFeature.MODEL3D_SUGGEST, PremiumFeature.MODEL3D_EXPORT, PremiumFeature.KIDS_CHALLENGE_ADVANCED)
+        val anyKind = setOf(PremiumFeature.KIDS_CHALLENGE_ADVANCED)
         val kids = PremiumAccess(Entitlements.FREE, CanvasKind.KIDS) {}
         PremiumFeature.entries.filter { it !in anyKind }.forEach { assertFalse(it.name, kids.locked(it)) }
         assertTrue(kids.locked(PremiumFeature.KIDS_CHALLENGE_ADVANCED))
@@ -165,8 +165,9 @@ class V39EntitlementsTest {
         }
         val premium = PremiumAccess(Entitlements.premium(), CanvasKind.COMIC) {}
         PremiumFeature.entries.forEach { assertFalse(premium.locked(it)) }
-        assertTrue(PremiumAccess(Entitlements.FREE, null) {}.locked(PremiumFeature.MODEL3D_SUGGEST))
-        assertEquals(21, FeatureKeys.PREMIUM.size)
+        // v56 aşama 10: 3B öneri ve GLB dışa aktarma artık sorulmaz (RETIRED)
+        assertTrue(PremiumFeature.entries.none { it.name.startsWith("MODEL3D") })
+        assertEquals(19, FeatureKeys.PREMIUM.size)
         assertEquals("kids", FeatureKeys.modeOf(FeatureKeys.KIDS_CHALLENGE_ADVANCED))
     }
 

@@ -33,11 +33,11 @@ object Routes {
     const val SHARE_LIVE = "share_live"
     const val LIVE = "live/{localId}"
     fun live(localId: String) = "live/$localId"
-    const val MODEL_EDIT = "model3dEdit?modelId={modelId}&canvasId={canvasId}&strokeId={strokeId}&name={name}"
+    const val MODEL_EDIT = "model3dEdit?modelId={modelId}&name={name}"
     fun canvasEdit(localId: String) = "canvasEdit/$localId"
-    /** v33 [name]: yeni 3B şeklin adı (ana sayfadaki 3B tuval oluşturma). */
-    fun modelEdit(modelId: String?, canvasId: String?, strokeId: String?, name: String? = null) =
-        "model3dEdit?modelId=${modelId.orEmpty()}&canvasId=${canvasId.orEmpty()}&strokeId=${strokeId.orEmpty()}&name=${android.net.Uri.encode(name.orEmpty())}"
+    /** v33 [name]: yeni 3B şeklin adı (ana sayfadaki 3B tuval oluşturma). v56 aşama 10: tuvalden açılmaz (canvasId/strokeId yok). */
+    fun modelEdit(modelId: String?, name: String? = null) =
+        "model3dEdit?modelId=${modelId.orEmpty()}&name=${android.net.Uri.encode(name.orEmpty())}"
 }
 
 @Composable
@@ -81,7 +81,7 @@ fun DrawGuidanceNavGraph(
                 com.karapp.drawguidance.ui.screens.home.HomeScreen(
                     onOpenCanvas = { localId -> navController.navigate(Routes.canvasEdit(localId)) },
                     onOpenTab = ::openTab,
-                    onNewModel = { name -> navController.navigate(Routes.modelEdit(null, null, null, name)) },
+                    onNewModel = { name -> navController.navigate(Routes.modelEdit(null, name)) },
                     bottomBar = bar,
                     // v34 profil fotoğrafına dokununca doğrudan hesap ayarları
                     onOpenAccount = { navController.navigate(Routes.ACCOUNT) },
@@ -106,7 +106,7 @@ fun DrawGuidanceNavGraph(
         composable(Routes.MODELS) {
             if (!com.karapp.drawguidance.ui.kids.kidsBlocked { openTab(MainTab.HOME) }) MainSectionFrame(MainTab.MODELS, ::openTab) { bar ->
                 com.karapp.drawguidance.ui.screens.model3d.Model3DListScreen(
-                    onOpen = { id -> navController.navigate(Routes.modelEdit(id, null, null)) },
+                    onOpen = { id -> navController.navigate(Routes.modelEdit(id)) },
                     bottomBar = bar,
                 )
             }
@@ -115,8 +115,6 @@ fun DrawGuidanceNavGraph(
             Routes.MODEL_EDIT,
             arguments = listOf(
                 androidx.navigation.navArgument("modelId") { type = androidx.navigation.NavType.StringType; defaultValue = "" },
-                androidx.navigation.navArgument("canvasId") { type = androidx.navigation.NavType.StringType; defaultValue = "" },
-                androidx.navigation.navArgument("strokeId") { type = androidx.navigation.NavType.StringType; defaultValue = "" },
                 androidx.navigation.navArgument("name") { type = androidx.navigation.NavType.StringType; defaultValue = "" },
             ),
         ) { entry ->
@@ -127,8 +125,8 @@ fun DrawGuidanceNavGraph(
                 com.karapp.drawguidance.ui.premium.PremiumScope(null, { navController.navigate(Routes.SUBSCRIPTION) }) {
                 com.karapp.drawguidance.ui.screens.model3d.Model3DEditorScreen(
                     modelId = arg("modelId"),
-                    canvasId = arg("canvasId"),
-                    strokeId = arg("strokeId"),
+                    canvasId = null,
+                    strokeId = null,
                     initialName = arg("name"),
                     onBack = { navController.popBackStack() },
                 )
@@ -191,7 +189,6 @@ fun DrawGuidanceNavGraph(
                 com.karapp.drawguidance.ui.screens.canvasedit.CanvasEditRoute(
                     canvasLocalId = localId,
                     onBack = { navController.popBackStack() },
-                    onOpenModel3d = { modelId, strokeId -> navController.navigate(Routes.modelEdit(modelId, localId, strokeId)) },
                     onOpenSubscription = { navController.navigate(Routes.SUBSCRIPTION) },
                     // v52 çizim ekranının Diğer menüsünden paylaşım ve canlı yayın
                     onOpenShare = { navController.navigate(Routes.SHARE) },

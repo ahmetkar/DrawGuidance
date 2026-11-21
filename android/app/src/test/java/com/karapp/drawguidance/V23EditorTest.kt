@@ -409,53 +409,44 @@ class V23Model3DEditorTest : V23EditorBase() {
 }
 
 /**
- * v23 (2): tuvale 3B Şekillerim'den şekil eklenir (resmi ve modeliyle); bağlam menüsünden "3B düzenle" kaydetme sorusuyla
- * düzenleyiciyi açar; kaydedilince tuvaldeki şeklin resmi yenilenir.
+ * v23 (2), v56 aşama 10: tuvale kütüphaneden şekil eklenir (açı seçimiyle; resmi ve modeliyle); bağlam menüsünde
+ * "3B düzenle" yok, "Açıyı değiştir" resmi yeniden çizer (tek geri alma adımı).
  */
 @RunWith(AndroidJUnit4::class)
 @GraphicsMode(GraphicsMode.Mode.NATIVE)
 @Config(sdk = [34], application = TestDrawGuidanceApp::class, qualifiers = "w411dp-h891dp-xxhdpi")
 class V23Model3DCanvasTest : V23EditorBase() {
     @Test
-    fun insertEditAndApplyBack() {
+    fun insertWithAngleThenChangeAngle() {
         waitForText("Henüz bir tuvaliniz yok", substring = true)
-        val repo = GlobalContext.get().get<Model3DRepository>()
-        runBlocking { repo.save(Samples3D.all.first()) }
         createCanvasAndOpen("3B tuval")
         addMenu("3B şekil ekle")
         waitFor { exists("model3d_picker") }
+        assertTrue(compose.onAllNodesWithText("Yeni 3B şekil").fetchSemanticsNodes().isEmpty())
         settleFor(500)
         shotAll("v23-22-model-picker")
-        val name = Samples3D.all.first().name
-        // v25 dokunmak seçer, "3B şekil ekle" düğmesi ekler
-        compose.onNodeWithContentDescription(name).performClick()
+        val item = com.karapp.drawguidance.content.model3d.Catalog3D.all.first { it.category == com.karapp.drawguidance.content.model3d.Catalog3D.categories.first() }
+        compose.onNode(hasContentDescription(item.name) and hasAnyAncestor(hasTestTag("model3d_catalog"))).performScrollTo().performClick()
         compose.onNodeWithTag("model3d_add_button").performClick()
+        waitFor { exists("model3d_angle") }
+        compose.onNodeWithTag("model3d_angle_90_0").performClick()
+        compose.onNodeWithTag("model3d_angle_confirm").performClick()
         waitFor(30_000) { canvas().strokes.any { it.model != null } }
         val placed = canvas().strokes.first { it.model != null }
         assertEquals(BrushType.IMAGE, placed.brushType)
         assertNotNull(placed.assetId)
-        modeBarTitle("Taşı")
         settleFor(500)
         shot("v23-23-model-on-canvas")
-        // Bağlam menüsü → 3B düzenle → kaydetme sorusu
+        // Bağlam menüsü: "3B düzenle" yok, "Açıyı değiştir" var
         val q = placed.points
         twoFingerHold(screenOf((q[0].x + q[2].x) / 2f, (q[0].y + q[2].y) / 2f))
-        waitFor { compose.onAllNodes(hasText("3B düzenle") and inContextMenu()).fetchSemanticsNodes().isNotEmpty() }
+        waitFor { compose.onAllNodes(hasText("Açıyı değiştir") and inContextMenu()).fetchSemanticsNodes().isNotEmpty() }
+        assertTrue(compose.onAllNodes(hasText("3B düzenle") and inContextMenu()).fetchSemanticsNodes().isEmpty())
         shotAll("v23-24-context-3d")
-        menuItem("3B düzenle").clickInPopup()
-        waitFor { exists("model3d_open_dialog") }
-        shotAll("v23-25-open-dialog")
-        compose.onNodeWithText("Kaydet ve aç").performClick()
-        waitFor(20_000) { exists("model3d_editor") }
-        settleFor(1500)
-        shot("v23-26-editor-from-canvas")
-        mode3("Ekle")
-        panelItem3("Küp")
-        settleFor(800)
-        compose.onNodeWithContentDescription("Kaydet").performClick()
-        waitForText("tuvale uygulanacak", substring = true)
-        compose.onNodeWithContentDescription("Geri").performClick()
-        waitFor { compose.onAllNodesWithTag("drawing_canvas").fetchSemanticsNodes().isNotEmpty() }
+        menuItem("Açıyı değiştir").clickInPopup()
+        waitFor(20_000) { exists("model3d_angle") }
+        compose.onNodeWithTag("model3d_angle_0_80").performClick()
+        compose.onNodeWithTag("model3d_angle_confirm").performClick()
         waitFor(30_000) { canvas().strokes.first { it.model != null }.assetId != placed.assetId }
         assertEquals(1, canvas().strokes.count { it.model != null })
         settleFor(600)

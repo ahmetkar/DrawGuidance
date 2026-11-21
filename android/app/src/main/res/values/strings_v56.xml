@@ -322,4 +322,23 @@
     <string name="v56_node_smooth">Yumuşak düğüm</string>
     <string name="v56_path_extend">Yolu uzat</string>
     <string name="v56_node_hint">Tek düğüm seçin; tutamaklarını sürükleyerek eğriyi değiştirin.</string>
+    <string name="v56_m3_library">Kütüphane</string>
+    <string name="v56_m3_glb">GLB dosyası</string>
+    <string name="v56_m3_glb_hint">Cihazınızdan bir GLB/glTF dosyası seçin; ayrıntı düzeyini seçip açıyı ayarlayın.</string>
+    <string name="v56_m3_glb_pick">Dosya seç</string>
+    <string name="v56_m3_next">İleri</string>
+    <string name="v56_m3_angle_title">Açıyı seç</string>
+    <string name="v56_m3_angle_hint">Önizlemeyi parmağınızla çevirin ya da hazır açılardan birini seçin.</string>
+    <string name="v56_m3_change_angle">Açıyı değiştir</string>
+    <string name="v56_m3_front">Önden</string>
+    <string name="v56_m3_side">Yandan</string>
+    <string name="v56_m3_top">Üstten</string>
+    <string name="v56_m3_iso">Üç çeyrek</string>
+    <string name="v56_m3_yaw">Dönüş · %1$d°</string>
+    <string name="v56_m3_pitch">Eğim · %1$d°</string>
+    <string name="v56_m3_search">Kütüphanede ara</string>
+    <string name="v56_m3_my_drawings">3B Çizimlerim</string>
+    <string name="v56_m3_list_hint">3B çizimleriniz burada. Uzun basarak silebilirsiniz.</string>
+    <string name="v56_m3_new_drawing">Yeni 3B çizim</string>
+    <string name="v56_m3_list_empty">Henüz 3B çiziminiz yok. \"Yeni 3B çizim\" ile başlayın.</string>
 </resources>

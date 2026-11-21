@@ -194,7 +194,6 @@ enum class ToolRowKind { DRAW, SELECT, MOVE, ADD, EDIT, FRAME }
 enum class SelectionKind { NONE, TEXT, SHAPE, INK, FORMULA, IMAGE, DIAGRAM, MIXED }
 
 /** v22 3B sahnenin hazır açıları. */
-enum class CameraPreset { ISO, FRONT, SIDE, TOP }
 
 /**
  * Mod oturumu politikası — tüm mod geçişleri bu tabloya göre yapılır (özel durum yazmak yerine):
@@ -306,8 +305,6 @@ sealed interface EditEvent {
     /** v27 seçimde kendiliğinden öneri kapatıldı. */
     data object SelectionSuggestionsOff : EditEvent
     /** v21 3B çizim modu açıldı / kapandı. */
-    data object Draw3dOn : EditEvent
-    data object Draw3dOff : EditEvent
     /** v27 hazır metinli bildirim (ör. GLB içe aktarma sonucu). */
     data class Message(val text: String) : EditEvent
     /** v29 aktarma sonucu: hedef tuvalin adı (null: aktarılamadı; [empty]: aktarılacak çizim yok). */
@@ -354,9 +351,8 @@ class CanvasEditViewModel(
     /** v21 şekil veritabanı (öneride değiştirme şablonları). */
     private val shapeDb: com.karapp.drawguidance.data.repository.ShapeTemplateRepository?,
     private val canvasLocalId: String,
-    /** v23 3B Şekillerim ve 3B düzenleyiciden dönen sonuçlar. */
+    /** v23 3B şekiller (v56 aşama 10: kütüphane ve GLB; düzenleyiciye yol yok). */
     model3dRepository: com.karapp.drawguidance.data.library.Model3DRepository? = null,
-    model3dResults: com.karapp.drawguidance.data.library.Model3DResults? = null,
     /** v29 not alma / çizgi roman tuvaline aktarma. */
     private val transfer: com.karapp.drawguidance.data.transfer.CanvasTransfer? = null,
     /** v29 moda özel şekil tahmini modelleri (her modun kendi sinir ağı). */
@@ -469,7 +465,7 @@ class CanvasEditViewModel(
     private val scene = ObjectSceneController(store, this)
     private val layerOps = LayerController(store)
     private val imageEdit = ImageEditController(store, this)
-    private val models3d = com.karapp.drawguidance.ui.screens.canvasedit.state.Model3DController(store, this, assetStore, model3dRepository, model3dResults)
+    private val models3d = com.karapp.drawguidance.ui.screens.canvasedit.state.Model3DController(store, this, assetStore, model3dRepository)
     // v17: çizim düzeltme önerisi ayarsız, Çiz modunda hep açık
     // v20: öneriler Ayarlar'dan, ⋮ menüsünden ya da öneri balonundan kapatılabilir
     // v23 yazı ve şekil önerisi ayrı algoritmalar, ayrı balonlar ve ayrı ayarlar
@@ -2422,15 +2418,22 @@ class CanvasEditViewModel(
         emit(EditEvent.Saved)
     }
 
-    // --- v23 3B şekiller (düzenleme ayrı pencerede) ---
+    // --- v23 3B şekiller; v56 aşama 10: kütüphane + GLB, açı seçimi, Açıyı değiştir ---
 
-    val models3dList get() = models3d.models
     val model3dBusy get() = models3d.busy
 
-    /** 3B Şekillerim'den tuvale ekler ("buraya ekle" konumu varsa oraya). */
-    fun insertModel3d(modelId: String) = models3d.insert(modelId, takeAddAnchor())
-    /** v24 hazır 3B şekli tuvale ekler. */
-    fun insertCatalogModel3d(catalogId: String) = models3d.insertCatalog(catalogId, takeAddAnchor())
+    /** Kütüphanedeki şeklin modeli (açı seçimi önizlemesi için). */
+    fun catalogModel3d(catalogId: String): com.karapp.drawguidance.content.model3d.Model3D? = models3d.catalogModel(catalogId)
+    /** GLB dosyasının modeli (ayrıntı düşürülmüş). */
+    suspend fun glbModel3d(bytes: ByteArray, name: String, maxTriangles: Int) = models3d.glbModel(bytes, name, maxTriangles)
+    /** Açı önizlemesi. */
+    suspend fun previewModel3d(model: com.karapp.drawguidance.content.model3d.Model3D, yaw: Float, pitch: Float, size: Int) = models3d.preview(model, yaw, pitch, size)
+    /** Modeli seçilen açıyla tuvale ekler ("buraya ekle" konumu varsa oraya). */
+    fun insertModel3d(model: com.karapp.drawguidance.content.model3d.Model3D, yaw: Float, pitch: Float) = models3d.insert(model, yaw, pitch, takeAddAnchor())
+    /** Seçili 3B şeklin modeli (Açıyı değiştir). */
+    suspend fun selectedModel3dData() = models3d.selectedModel()
+    /** Seçili 3B şeklin açısını değiştirir. */
+    fun changeModel3dAngle(yaw: Float, pitch: Float) = models3d.changeAngle(yaw, pitch)
 
     // --- v53 ekran tonları, desenler ve hızlı yazı kutusu ---
 
@@ -2602,17 +2605,8 @@ class CanvasEditViewModel(
     fun editEffect(scale: Float = 1f, rotate: Float = 0f, colorHex: String? = null, opacity: Float? = null) =
         comic.editEffect(scale, rotate, colorHex, opacity)
 
-    /** v27 GLB dosyasını tuvale ekler; [save] ise 3B Şekillerim'e de ayrı şekil olarak kaydedilir. */
-    fun importGlbToCanvas(bytes: ByteArray, name: String, maxTriangles: Int, save: Boolean) =
-        models3d.importGlb(bytes, name, maxTriangles, save, takeAddAnchor())
-
     /** Seçili tek 3B şekil. */
     fun selectedModel3d(): com.karapp.drawguidance.data.model.Stroke? = models3d.selected()
-
-    /** Düzenleyiciyi açmadan önce modeli hazırlar (3B Şekillerim'de yoksa tuvalden geri yükler). */
-    fun prepareModelEdit(stroke: com.karapp.drawguidance.data.model.Stroke, onReady: (String) -> Unit) {
-        viewModelScope.launch { models3d.prepareEdit(stroke)?.let(onReady) }
-    }
 
     /** Tuvali hemen kaydeder (3B düzenleyiciye geçmeden önce "Kaydet ve aç"). */
     fun saveBeforeLeaving() {
@@ -2788,27 +2782,10 @@ class CanvasEditViewModel(
         return store.strokes.firstOrNull { it.id in store.selection && kindOf(it.brushType) == want }?.colorHex ?: brush.settings.value.colorHex
     }
 
-    // --- v21 3B çizim modu ---
+    // --- v21 3B çizim modu (v56 aşama 10: kılavuz kaldırıldı; eski tuvallerde açılışta kapanır) ---
 
     /** 3B çizim modu açıksa düzlem ve derinlik (çizim aracı ve yeni izler için). */
     fun draw3dFor(): com.karapp.drawguidance.data.model.Depth3D? = store.canvas.value?.guide?.draw3dSpec
-
-    /** 3B çizim modunu açar/kapatır (tuval başına, hemen kaydedilir). */
-    fun toggleDraw3d() {
-        val g = store.canvas.value?.guide ?: return
-        guides.setGuide(g.copy(draw3d = !g.draw3d))
-        emit(if (!g.draw3d) EditEvent.Draw3dOn else EditEvent.Draw3dOff)
-    }
-
-    fun setPlane3d(plane: com.karapp.drawguidance.data.model.Plane3D) {
-        val g = store.canvas.value?.guide ?: return
-        guides.setGuide(g.copy(draw3d = true, plane3d = plane))
-    }
-
-    fun setDepth3d(depth: Float, persist: Boolean = true) {
-        val g = store.canvas.value?.guide ?: return
-        guides.setGuide(g.copy(depth3d = depth.coerceIn(0f, 1f)), persist)
-    }
 
     // --- v22 döndürülebilir 3B sahne ---
 
@@ -2817,44 +2794,6 @@ class CanvasEditViewModel(
         val c = store.canvas.value ?: return null
         if (!c.guide.draw3d) return null
         return com.karapp.drawguidance.ui.drawing.Scene3D.camera(c.guide, c.width, c.height)
-    }
-
-    /** O anki kamera (3B çubuğu için), 3B mod kapalıyken de. */
-    fun camera3d(): Triple<Float, Float, Float> {
-        val g = store.canvas.value?.guide ?: GuideSpec()
-        return Triple(g.yaw3d, g.pitch3d, g.persp3d)
-    }
-
-    /**
-     * Sahneyi döndürür / perspektifi değiştirir: kamera kılavuzda saklanır (geçmişe girmez, görünüm ayarı), 3B izler ve
-     * cisimler yeni görünümden çizilir. [persist] false iken (sürükleme sürerken) kaydedilmez.
-     */
-    fun setCamera3d(yaw: Float, pitch: Float, persp: Float, persist: Boolean = true) {
-        val g = store.canvas.value?.guide ?: return
-        var y = yaw % 360f
-        if (y < 0f) y += 360f
-        val next = g.copy(draw3d = true, yaw3d = y, pitch3d = pitch.coerceIn(-90f, 90f), persp3d = persp.coerceIn(0f, 1f))
-        if (next == g && !persist) return
-        guides.setGuide(next, persist)
-        store.applyView(persist)
-    }
-
-    /** Döndürme alanında sürükleme: yatay hareket yatay dönüş, dikey hareket eğim (derece). */
-    fun orbit3d(dYaw: Float, dPitch: Float, persist: Boolean) {
-        val g = store.canvas.value?.guide ?: return
-        setCamera3d(g.yaw3d + dYaw, g.pitch3d + dPitch, g.persp3d, persist)
-    }
-
-    /** Hazır açılar: izometrik, önden, yandan, üstten. */
-    fun presetCamera3d(preset: CameraPreset) {
-        val g = store.canvas.value?.guide ?: return
-        val (y, p) = when (preset) {
-            CameraPreset.ISO -> GuideSpec.DEFAULT_YAW to GuideSpec.DEFAULT_PITCH
-            CameraPreset.FRONT -> 0f to 0f
-            CameraPreset.SIDE -> 90f to 0f
-            CameraPreset.TOP -> 0f to 90f
-        }
-        setCamera3d(y, p, g.persp3d, true)
     }
 
     /** v21: seçili fırça izleri için düzeltme önerisi verilebilir mi (fırçanın görünümünü bozmayacaksa). */

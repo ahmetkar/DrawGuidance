@@ -427,6 +427,8 @@ object TransformOps {
         val out = strokes.map { st ->
             if (st.id !in ids) return@map st
             when {
+                // v56 aşama 10: 3B şekil yeniden çizilen bir görüntüdür; Bozma ve Çarpıtma ona uygulanmaz
+                nonAffine && st.model != null -> { skipped += st.id; st }
                 st.brushType == BrushType.IMAGE && st.points.size >= 4 -> {
                     val corners = st.points.take(4)
                     val oldMesh = st.warp?.mesh

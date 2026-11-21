@@ -90,7 +90,7 @@ class SubscriptionRepository(
 
     /** Plan kartları (sıralı). */
     val plans: StateFlow<List<PlanUi>> = combine(dao.observePlans(), dao.observePlanFeatures()) { plans, pf ->
-        plans.map { p -> PlanUi(p, FeatureKeys.PREMIUM.filter { k -> pf.any { it.planId == p.id && it.featureKey == k } } + pf.filter { it.planId == p.id && it.featureKey !in FeatureKeys.PREMIUM }.map { it.featureKey }) }
+        plans.map { p -> PlanUi(p, FeatureKeys.PREMIUM.filter { k -> pf.any { it.planId == p.id && it.featureKey == k } } + pf.filter { it.planId == p.id && it.featureKey !in FeatureKeys.PREMIUM && it.featureKey !in FeatureKeys.RETIRED }.map { it.featureKey }) }
     }.stateIn(scope, SharingStarted.Eagerly, emptyList())
 
     val signedIn: StateFlow<Boolean> = signedInUid.map { it != null }.stateIn(scope, SharingStarted.Eagerly, false)

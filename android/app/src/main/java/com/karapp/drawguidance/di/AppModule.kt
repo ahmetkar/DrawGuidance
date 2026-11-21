@@ -305,7 +305,7 @@ fun appModule(apiBaseUrl: String) = module {
     viewModel { SettingsViewModel(get(), get(), get(), tutorials = get()) }
     viewModel { com.karapp.drawguidance.ui.screens.logs.LogsViewModel(androidContext()) }
     viewModel { (canvasLocalId: String) ->
-        CanvasEditViewModel(get(), get(), get(), get(), get(), get(), get(), get(), canvasLocalId, get(), get(), transfer = get(), shapeModels = get(), recent = get(), tutorialPrefs = get(), tempImages = get())
+        CanvasEditViewModel(get(), get(), get(), get(), get(), get(), get(), get(), canvasLocalId, get(), transfer = get(), shapeModels = get(), recent = get(), tutorialPrefs = get(), tempImages = get())
     }
     // Boş kimlik: yok (yeni model / tuvalsiz açılış)
     viewModel { (modelId: String, canvasId: String, strokeId: String, name: String) ->

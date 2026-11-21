@@ -53,12 +53,13 @@ class V40DesignUiTest : V33EditorBase() {
         ?.config?.getOrNull(SemanticsProperties.ContentDescription)?.joinToString(" ")
 
     @Test
-    fun glbImportButtonIsLabelled() {
+    fun drawingsListHasNoGlbImport() {
+        // v56 aşama 10: 3B Çizimlerim'de GLB içe aktarma yok (GLB yalnız tuvale eklemede)
         waitForText("Henüz bir tuvaliniz yok", substring = true)
         compose.onNodeWithText("3B Şekiller").performSemanticsAction(SemanticsActions.OnClick)
         waitFor { exists("models3d_screen") }
-        assertTrue(exists("models3d_import_glb"))
-        assertTrue(exists("button_label:GLB içe aktar"))
+        assertTrue(!exists("models3d_import_glb"))
+        assertTrue(exists("models3d_new"))
     }
 
     @Test

@@ -322,4 +322,23 @@
     <string name="v56_node_smooth">スムーズポイント</string>
     <string name="v56_path_extend">パスを延長</string>
     <string name="v56_node_hint">ポイントを1つ選び、ハンドルをドラッグして曲線を変えます。</string>
+    <string name="v56_m3_library">ライブラリ</string>
+    <string name="v56_m3_glb">GLBファイル</string>
+    <string name="v56_m3_glb_hint">端末からGLB/glTFファイルを選び、詳細度を選んで角度を調整します。</string>
+    <string name="v56_m3_glb_pick">ファイルを選択</string>
+    <string name="v56_m3_next">次へ</string>
+    <string name="v56_m3_angle_title">角度を選択</string>
+    <string name="v56_m3_angle_hint">指でプレビューを回すか、プリセットの角度を選びます。</string>
+    <string name="v56_m3_change_angle">角度を変更</string>
+    <string name="v56_m3_front">正面</string>
+    <string name="v56_m3_side">側面</string>
+    <string name="v56_m3_top">上面</string>
+    <string name="v56_m3_iso">斜め</string>
+    <string name="v56_m3_yaw">回転 · %1$d°</string>
+    <string name="v56_m3_pitch">傾き · %1$d°</string>
+    <string name="v56_m3_search">ライブラリを検索</string>
+    <string name="v56_m3_my_drawings">マイ3Dドローイング</string>
+    <string name="v56_m3_list_hint">3Dドローイングはここにあります。長押しで削除できます。</string>
+    <string name="v56_m3_new_drawing">新しい3Dドローイング</string>
+    <string name="v56_m3_list_empty">3Dドローイングはまだありません。「新しい3Dドローイング」から始めましょう。</string>
 </resources>

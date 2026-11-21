@@ -322,4 +322,23 @@
     <string name="v56_node_smooth">عقدة ناعمة</string>
     <string name="v56_path_extend">تمديد المسار</string>
     <string name="v56_node_hint">اختر عقدة واحدة واسحب مقابضها لتغيير المنحنى.</string>
+    <string name="v56_m3_library">المكتبة</string>
+    <string name="v56_m3_glb">ملف GLB</string>
+    <string name="v56_m3_glb_hint">اختر ملف GLB/glTF من جهازك، ثم حدد مستوى التفاصيل واضبط الزاوية.</string>
+    <string name="v56_m3_glb_pick">اختيار ملف</string>
+    <string name="v56_m3_next">التالي</string>
+    <string name="v56_m3_angle_title">اختر الزاوية</string>
+    <string name="v56_m3_angle_hint">أدر المعاينة بإصبعك أو اختر زاوية جاهزة.</string>
+    <string name="v56_m3_change_angle">تغيير الزاوية</string>
+    <string name="v56_m3_front">أمامي</string>
+    <string name="v56_m3_side">جانبي</string>
+    <string name="v56_m3_top">علوي</string>
+    <string name="v56_m3_iso">ثلاثة أرباع</string>
+    <string name="v56_m3_yaw">الدوران · %1$d°</string>
+    <string name="v56_m3_pitch">الميل · %1$d°</string>
+    <string name="v56_m3_search">ابحث في المكتبة</string>
+    <string name="v56_m3_my_drawings">رسوماتي ثلاثية الأبعاد</string>
+    <string name="v56_m3_list_hint">رسوماتك ثلاثية الأبعاد هنا. اضغط مطولاً للحذف.</string>
+    <string name="v56_m3_new_drawing">رسم ثلاثي الأبعاد جديد</string>
+    <string name="v56_m3_list_empty">لا توجد رسومات ثلاثية الأبعاد بعد. ابدأ بـ \"رسم ثلاثي الأبعاد جديد\".</string>
 </resources>

@@ -550,7 +550,10 @@ class V25CanvasAdd3DTest : V23EditorBase() {
         compose.onNodeWithTag("model3d_add_button").assertIsEnabled()
         shotAll("v25-09-picker-selected")
         compose.onNodeWithTag("model3d_add_button").performClick()
+        // v56 aşama 10: açı adımı
+        waitFor { exists("model3d_angle") }
+        compose.onNodeWithTag("model3d_angle_confirm").performClick()
         waitFor(30_000) { canvas().strokes.any { it.model != null } }
-        waitFor { !exists("model3d_picker") }
+        waitFor { !exists("model3d_picker") && !exists("model3d_angle") }
     }
 }

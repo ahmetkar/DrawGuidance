@@ -322,4 +322,23 @@
     <string name="v56_node_smooth">Smooth node</string>
     <string name="v56_path_extend">Extend path</string>
     <string name="v56_node_hint">Select one node and drag its handles to reshape the curve.</string>
+    <string name="v56_m3_library">Library</string>
+    <string name="v56_m3_glb">GLB file</string>
+    <string name="v56_m3_glb_hint">Choose a GLB/glTF file from your device, pick a detail level and set the angle.</string>
+    <string name="v56_m3_glb_pick">Choose file</string>
+    <string name="v56_m3_next">Next</string>
+    <string name="v56_m3_angle_title">Choose the angle</string>
+    <string name="v56_m3_angle_hint">Turn the preview with your finger or pick a preset angle.</string>
+    <string name="v56_m3_change_angle">Change angle</string>
+    <string name="v56_m3_front">Front</string>
+    <string name="v56_m3_side">Side</string>
+    <string name="v56_m3_top">Top</string>
+    <string name="v56_m3_iso">Three-quarter</string>
+    <string name="v56_m3_yaw">Turn · %1$d°</string>
+    <string name="v56_m3_pitch">Tilt · %1$d°</string>
+    <string name="v56_m3_search">Search the library</string>
+    <string name="v56_m3_my_drawings">My 3D drawings</string>
+    <string name="v56_m3_list_hint">Your 3D drawings are here. Long-press to delete.</string>
+    <string name="v56_m3_new_drawing">New 3D drawing</string>
+    <string name="v56_m3_list_empty">No 3D drawings yet. Start with \"New 3D drawing\".</string>
 </resources>

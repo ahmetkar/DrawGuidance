@@ -25,7 +25,6 @@ import org.koin.core.parameter.parametersOf
 fun CanvasEditRoute(
     canvasLocalId: String,
     onBack: () -> Unit,
-    onOpenModel3d: (modelId: String?, strokeId: String?) -> Unit,
     onOpenSubscription: () -> Unit,
     /** v51 notta resim düzenleme: geçici basit resim tuvali açılır (bu düzenleyicinin üstünde). */
     onOpenCanvas: (String) -> Unit = {},
@@ -99,7 +98,6 @@ fun CanvasEditRoute(
             canvasLocalId = canvasLocalId,
             onBack = leave,
             viewModel = vm,
-            onOpenModel3d = onOpenModel3d,
             onOpenShare = if (temp) null else onOpenShare,
             onOpenLiveShare = if (temp || !com.karapp.drawguidance.ui.screens.share.liveAllowed(kind)) null else onOpenLiveShare,
         )

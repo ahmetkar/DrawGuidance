@@ -163,15 +163,7 @@ private object PrimitiveThumbs {
 
 @Composable
 private fun AddPanel(vm: Model3DEditorViewModel) {
-    // v27 GLB içe aktarma: parçalar bu modele eklenir; ayrıca 3B Şekillerim'e ayrı şekil olarak kaydedilip
-    // kaydedilmeyeceği sorulur
-    var pending by remember { mutableStateOf<PendingGlb?>(null) }
-    val failText = stringResource(R.string.glb_import_failed)
-    val pick = rememberGlbPicker(onRead = { pending = it }, onFail = { vm.message(failText.format(it)) })
-    NeuButton(stringResource(R.string.glb_import_button), pick, Modifier.fillMaxWidth().testTag("model3d_import_glb"), icon = Icons.Filled.FileUpload)
-    pending?.let { p ->
-        GlbImportAskDialog(p.name, p.bytes.size, onImport = { tris, save -> pending = null; vm.importGlbParts(p.bytes, p.name, tris, save) }, onDismiss = { pending = null })
-    }
+    // v56 aşama 10: 3B modda GLB içe aktarma yok (GLB yalnız tuvale eklemede)
     NeuSectionTitle(stringResource(R.string.model3d_primitives))
     Text(stringResource(R.string.model3d_add_hint), style = MaterialTheme.typography.bodySmall, color = NeuTheme.colors.contentMuted)
     PrimitiveKind.entries.chunked(4).forEach { row ->

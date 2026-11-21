@@ -186,18 +186,6 @@ fun Model3DEditorScreen(
     var message by remember { mutableStateOf<String?>(null) }
     val context = androidx.compose.ui.platform.LocalContext.current
     val scope = rememberCoroutineScope()
-    val exportedText = stringResource(R.string.model3d_exported)
-    val exportFailedText = stringResource(R.string.model3d_export_failed)
-    // v24 GLB dışa aktarma (dosya seçicisiyle)
-    val exportLauncher = rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument("model/gltf-binary")) { uri ->
-        if (uri != null) scope.launch {
-            val r = runCatching {
-                val bytes = vm.exportGlb() ?: error("model yok")
-                withContext(Dispatchers.IO) { context.contentResolver.openOutputStream(uri)?.use { it.write(bytes) } ?: error("dosya açılamadı") }
-            }
-            vm.message(if (r.isSuccess) exportedText else exportFailedText.format(r.exceptionOrNull()?.message ?: ""))
-        }
-    }
     val savedText = stringResource(R.string.model3d_saved)
     val savedCanvasText = stringResource(R.string.model3d_saved_canvas)
 
@@ -241,25 +229,6 @@ fun Model3DEditorScreen(
                             leadingIcon = { Icon(Icons.AutoMirrored.Filled.Send, null) },
                             onClick = { menu = false; transferOpen = true },
                             modifier = Modifier.testTag("model3d_transfer_item"),
-                        )
-                        // v44 GLB dışa aktarma ve paylaşma Premium
-                        val exportAccess = com.karapp.drawguidance.ui.premium.LocalPremium.current
-                        val exportFeature = com.karapp.drawguidance.data.billing.PremiumFeature.MODEL3D_EXPORT
-                        val exportLocked = exportAccess.locked(exportFeature)
-                        DropdownMenuItem(
-                            text = { Text(stringResource(R.string.model3d_export)) }, leadingIcon = { Icon(Icons.Filled.FileDownload, null) },
-                            trailingIcon = if (exportLocked) ({ com.karapp.drawguidance.ui.premium.PremiumLockBadge(size = 14.dp) }) else null,
-                            onClick = {
-                                menu = false
-                                if (exportAccess.request(exportFeature)) exportLauncher.launch(((model?.name ?: "model").replace(Regex("[\\\\/:*?\"<>|]"), "_")) + ".glb")
-                            },
-                            modifier = Modifier.testTag("model3d_export_item"),
-                        )
-                        DropdownMenuItem(
-                            text = { Text(stringResource(R.string.model3d_share)) }, leadingIcon = { Icon(Icons.Filled.Share, null) },
-                            trailingIcon = if (exportLocked) ({ com.karapp.drawguidance.ui.premium.PremiumLockBadge(size = 14.dp) }) else null,
-                            onClick = { menu = false; if (exportAccess.request(exportFeature)) scope.launch { shareGlb(context, vm) } },
-                            modifier = Modifier.testTag("model3d_share_item"),
                         )
                     }
                 }
@@ -483,15 +452,13 @@ private fun SuggestionBubble(vm: Model3DEditorViewModel, modifier: Modifier) {
                     ),
                 )
                 Icon(Icons.Filled.AutoAwesome, stringResource(R.string.model3d_suggest_title), tint = colors.accent, modifier = Modifier.size(20.dp))
-                // v39 3B öneriler gösterilir, uygulamak Premium
-                val access = com.karapp.drawguidance.ui.premium.LocalPremium.current
-                val feature = com.karapp.drawguidance.data.billing.PremiumFeature.MODEL3D_SUGGEST
-                val locked = access.locked(feature)
+                // v56 aşama 10: 3B öneriler ücretsiz (MODEL3D_SUGGEST artık sorulmaz)
+                val locked = false
                 shown.kinds.forEach { k ->
                     val label = Model3DEditorViewModel.suggestName(k)
                     Row(
                         Modifier.height(38.dp).clip(NeuPillShape).background(colors.accent.copy(alpha = 0.12f))
-                            .clickable(role = Role.Button) { if (access.request(feature)) vm.applySuggestion(k) }
+                            .clickable(role = Role.Button) { vm.applySuggestion(k) }
                             .padding(horizontal = 12.dp).testTag(if (locked) "model3d_suggest_${k.name}_locked" else "model3d_suggest_${k.name}"),
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
@@ -994,24 +961,6 @@ private fun OpBar(vm: Model3DEditorViewModel, op: SliderOp) {
 }
 
 /** v24 modeli GLB olarak paylaşır (geçici dosya, dokular gömülü). */
-private suspend fun shareGlb(context: android.content.Context, vm: Model3DEditorViewModel) {
-    val name = (vm.model.value?.name ?: "model").replace(Regex("[\\\\/:*?\"<>|]"), "_")
-    val r = runCatching {
-        val bytes = vm.exportGlb() ?: error("model yok")
-        val file = withContext(Dispatchers.IO) {
-            val dir = java.io.File(context.cacheDir, "models3d").apply { mkdirs() }
-            java.io.File(dir, "$name.glb").apply { writeBytes(bytes) }
-        }
-        val uri = androidx.core.content.FileProvider.getUriForFile(context, "${context.packageName}.fileprovider", file)
-        val send = android.content.Intent(android.content.Intent.ACTION_SEND).apply {
-            type = "model/gltf-binary"
-            putExtra(android.content.Intent.EXTRA_STREAM, uri)
-            addFlags(android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION)
-        }
-        context.startActivity(android.content.Intent.createChooser(send, name).addFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK))
-    }
-    r.exceptionOrNull()?.let { vm.message(context.getString(R.string.model3d_export_failed, it.message ?: "")) }
-}
 
 /** v27 öneri baloncuğunun görünür kaldığı süre (ms). */
 private const val SUGGEST_MS = 12_000L

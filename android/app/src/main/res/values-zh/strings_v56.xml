@@ -322,4 +322,23 @@
     <string name="v56_node_smooth">平滑点</string>
     <string name="v56_path_extend">延长路径</string>
     <string name="v56_node_hint">选择一个节点并拖动手柄来调整曲线。</string>
+    <string name="v56_m3_library">素材库</string>
+    <string name="v56_m3_glb">GLB 文件</string>
+    <string name="v56_m3_glb_hint">从设备选择 GLB/glTF 文件，选择细节级别并调整角度。</string>
+    <string name="v56_m3_glb_pick">选择文件</string>
+    <string name="v56_m3_next">下一步</string>
+    <string name="v56_m3_angle_title">选择角度</string>
+    <string name="v56_m3_angle_hint">用手指旋转预览，或选择预设角度。</string>
+    <string name="v56_m3_change_angle">更改角度</string>
+    <string name="v56_m3_front">正视</string>
+    <string name="v56_m3_side">侧视</string>
+    <string name="v56_m3_top">俯视</string>
+    <string name="v56_m3_iso">斜视</string>
+    <string name="v56_m3_yaw">旋转 · %1$d°</string>
+    <string name="v56_m3_pitch">倾斜 · %1$d°</string>
+    <string name="v56_m3_search">搜索素材库</string>
+    <string name="v56_m3_my_drawings">我的 3D 绘图</string>
+    <string name="v56_m3_list_hint">您的 3D 绘图在这里。长按可删除。</string>
+    <string name="v56_m3_new_drawing">新建 3D 绘图</string>
+    <string name="v56_m3_list_empty">还没有 3D 绘图。从“新建 3D 绘图”开始。</string>
 </resources>

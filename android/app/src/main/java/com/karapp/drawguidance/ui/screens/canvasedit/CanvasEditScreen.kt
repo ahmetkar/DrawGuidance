@@ -214,7 +214,6 @@ fun CanvasEditScreen(
     onBack: () -> Unit,
     viewModel: CanvasEditViewModel = koinViewModel(parameters = { parametersOf(canvasLocalId) }),
     /** v23 3B düzenleyiciyi açar (model kimliği: null yeni; tuvaldeki şeklin kimliği: null ise kaydedince eklenir). */
-    onOpenModel3d: (modelId: String?, strokeId: String?) -> Unit = { _, _ -> },
     /** v52 Diğer menüsünde Tuval paylaş ve Canlı yayın (null: gösterilmez). */
     onOpenShare: (() -> Unit)? = null,
     onOpenLiveShare: (() -> Unit)? = null,
@@ -294,8 +293,9 @@ fun CanvasEditScreen(
         onRead = { glbPending = it },
         onFail = { viewModel.emit(EditEvent.Message(glbFailText.format(it))) },
     )
-    var open3dAsk by remember { mutableStateOf<Pair<String?, com.karapp.drawguidance.data.model.Stroke?>?>(null) }
-    var edit3dAsk by remember { mutableStateOf<com.karapp.drawguidance.data.model.Stroke?>(null) }
+    // v56 aşama 10: seçili 3B şeklin açısını değiştirme (model; null: kapalı)
+    var angle3d by remember { mutableStateOf<com.karapp.drawguidance.content.model3d.Model3D?>(null) }
+    val scope3d = androidx.compose.runtime.rememberCoroutineScope()
     var perspectiveOpen by rememberSaveable { mutableStateOf(false) }
     val diagramFocus by viewModel.diagramFocus.collectAsState()
     val diagramLinking by viewModel.diagramLinking.collectAsState()
@@ -551,8 +551,6 @@ fun CanvasEditScreen(
     val textSuggestOffText = stringResource(R.string.text_suggest_off_event)
     val shapeSuggestOffText = stringResource(R.string.shape_suggest_off_event)
     val selectionSuggestOffText = stringResource(R.string.selection_suggest_off_event)
-    val draw3dOnText = stringResource(R.string.draw3d_on_event)
-    val draw3dOffText = stringResource(R.string.draw3d_off_event)
     val pdfSavedText = stringResource(R.string.pdf_saved)
     val pdfFailedText = stringResource(R.string.pdf_failed)
     LaunchedEffect(pdfExport) {
@@ -609,8 +607,6 @@ fun CanvasEditScreen(
                 EditEvent.TextSuggestionsOff -> textSuggestOffText
                 EditEvent.ShapeSuggestionsOff -> shapeSuggestOffText
                 EditEvent.SelectionSuggestionsOff -> selectionSuggestOffText
-                EditEvent.Draw3dOn -> draw3dOnText
-                EditEvent.Draw3dOff -> draw3dOffText
                 is EditEvent.Message -> event.text
                 is EditEvent.Transferred -> when {
                     event.empty -> transferEmptyText
@@ -1715,8 +1711,10 @@ fun CanvasEditScreen(
                     )
                     SelectionKind.IMAGE -> listOfNotNull(
                         action(R.string.image_edit_open, Icons.Filled.Image) { viewModel.editSelectedImage() },
-                        // v23 tuvaldeki 3B şekil: düzenleyici ayrı pencerede (önce kaydetme sorulur)
-                        if (selected3d != null) action(R.string.model3d_edit, Icons.Filled.ViewInAr) { edit3dAsk = selected3d } else null,
+                        // v56 aşama 10 tuvaldeki 3B şekil: "Düzenle" yok, "Açıyı değiştir" var
+                        if (selected3d != null) action(R.string.v56_m3_change_angle, Icons.Filled.ViewInAr) {
+                            scope3d.launch { angle3d = viewModel.selectedModel3dData() }
+                        } else null,
                         action(R.string.image_vectorize, Icons.Filled.Polyline) { viewModel.editSelectedImage(); vectorizeMode = null; vectorizeOpen = true },
                         // v30 arka plan kaldırma ve efektler (3B şekil resminde yok)
                         if (selected3d == null) action(R.string.bg_remove, com.karapp.drawguidance.ui.screens.canvasedit.components.BackgroundRemoveIcon) { viewModel.editSelectedImage(); bgRemoveOpen = true } else null,
@@ -2523,19 +2521,24 @@ fun CanvasEditScreen(
             )
         }
 
-        // v23 3B Şekillerim: tuvale ekle, düzenle, yeni
+        // v56 aşama 10 "3B şekil ekle": kütüphane ve GLB dosyası, açı seçimi
         if (models3dOpen) {
-            val models3d by viewModel.models3dList.collectAsState()
             com.karapp.drawguidance.ui.screens.canvasedit.components.Model3DPickerSheet(
-                models = models3d,
-                onInsert = { id -> models3dOpen = false; viewModel.insertModel3d(id) },
-                onInsertCatalog = { id -> models3dOpen = false; viewModel.insertCatalogModel3d(id) },
-                onEdit = { id -> models3dOpen = false; open3dAsk = id to null },
-                onNew = { models3dOpen = false; open3dAsk = null to null },
-                onDismiss = { models3dOpen = false },
-                // v33 basit çizimde GLB içe aktarma yok, hazır şekiller 10 tane
-                onImportGlb = if (simple) null else glbPicker,
+                loadCatalog = viewModel::catalogModel3d,
+                loadGlb = { g, tris -> viewModel.glbModel3d(g.bytes, g.name, tris) },
+                preview = viewModel::previewModel3d,
+                onInsert = { model, yaw, pitch -> models3dOpen = false; glbPending = null; viewModel.insertModel3d(model, yaw, pitch) },
+                onDismiss = { models3dOpen = false; glbPending = null },
+                // v33 basit çizimde GLB yok, hazır şekiller 10 tane
+                onPickGlb = if (simple) null else glbPicker,
+                glb = glbPending,
                 catalogOnly = com.karapp.drawguidance.ui.drawing.SimpleCatalog.models3d(kind),
+            )
+        }
+        angle3d?.let { m ->
+            com.karapp.drawguidance.ui.screens.canvasedit.components.Model3DAngleSheet(
+                m, viewModel::previewModel3d, title = stringResource(R.string.v56_m3_change_angle), confirm = stringResource(R.string.ok_button),
+                onConfirm = { yaw, pitch -> angle3d = null; viewModel.changeModel3dAngle(yaw, pitch) }, onDismiss = { angle3d = null },
             )
         }
         if (imageSourceOpen) {
@@ -2707,38 +2710,6 @@ fun CanvasEditScreen(
             onDismiss = { viewModel.ruler.helperPickOpen.value = false },
         )
         // v27 GLB içe aktarma: ayrıntı ve "3B Şekillerim'e ayrı şekil olarak kaydedilsin mi?" sorusu
-        glbPending?.let { p ->
-            com.karapp.drawguidance.ui.screens.model3d.GlbImportAskDialog(
-                p.name, p.bytes.size,
-                onImport = { tris, save -> glbPending = null; models3dOpen = false; viewModel.importGlbToCanvas(p.bytes, p.name, tris, save) },
-                onDismiss = { glbPending = null },
-            )
-        }
-        edit3dAsk?.let { stroke -> open3dAsk = stroke.model?.modelId to stroke; edit3dAsk = null }
-        // 3B düzenleyici ayrı pencerede açılır: önce tuvalin kaydedilmesi sorulur
-        open3dAsk?.let { (modelId, stroke) ->
-            val open: () -> Unit = {
-                open3dAsk = null
-                if (stroke != null) viewModel.prepareModelEdit(stroke) { id -> onOpenModel3d(id, stroke.id) } else onOpenModel3d(modelId, null)
-            }
-            androidx.compose.material3.AlertDialog(
-                onDismissRequest = { open3dAsk = null },
-                containerColor = colors.background,
-                title = { Text(stringResource(R.string.model3d_open_title)) },
-                text = { Text(stringResource(R.string.model3d_open_text)) },
-                confirmButton = {
-                    androidx.compose.material3.TextButton(onClick = { viewModel.saveBeforeLeaving(); open() }) { Text(stringResource(R.string.model3d_open_save)) }
-                },
-                dismissButton = {
-                    Row {
-                        androidx.compose.material3.TextButton(onClick = { open3dAsk = null }) { Text(stringResource(R.string.cancel_button)) }
-                        androidx.compose.material3.TextButton(onClick = open) { Text(stringResource(R.string.model3d_open_nosave)) }
-                    }
-                },
-                modifier = Modifier.testTag("model3d_open_dialog"),
-            )
-        }
-
         // v23 arka plan: kağıt rengi, desen ve resim
         if (backgroundOpen) current0?.let { c ->
             // v24 not tuvalinde birden çok sayfa varken açık sayfanın arka planı değişir; "Tüm sayfalara uygula" hepsine

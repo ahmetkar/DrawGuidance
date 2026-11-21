@@ -322,4 +322,23 @@
     <string name="v56_node_smooth">Гладкий узел</string>
     <string name="v56_path_extend">Продлить контур</string>
     <string name="v56_node_hint">Выберите узел и перетащите маркеры, чтобы изменить кривую.</string>
+    <string name="v56_m3_library">Библиотека</string>
+    <string name="v56_m3_glb">Файл GLB</string>
+    <string name="v56_m3_glb_hint">Выберите файл GLB/glTF на устройстве, укажите детализацию и настройте ракурс.</string>
+    <string name="v56_m3_glb_pick">Выбрать файл</string>
+    <string name="v56_m3_next">Далее</string>
+    <string name="v56_m3_angle_title">Выберите ракурс</string>
+    <string name="v56_m3_angle_hint">Поверните превью пальцем или выберите готовый ракурс.</string>
+    <string name="v56_m3_change_angle">Изменить ракурс</string>
+    <string name="v56_m3_front">Спереди</string>
+    <string name="v56_m3_side">Сбоку</string>
+    <string name="v56_m3_top">Сверху</string>
+    <string name="v56_m3_iso">Три четверти</string>
+    <string name="v56_m3_yaw">Поворот · %1$d°</string>
+    <string name="v56_m3_pitch">Наклон · %1$d°</string>
+    <string name="v56_m3_search">Поиск в библиотеке</string>
+    <string name="v56_m3_my_drawings">Мои 3D-рисунки</string>
+    <string name="v56_m3_list_hint">Здесь ваши 3D-рисунки. Удерживайте, чтобы удалить.</string>
+    <string name="v56_m3_new_drawing">Новый 3D-рисунок</string>
+    <string name="v56_m3_list_empty">3D-рисунков пока нет. Начните с «Новый 3D-рисунок».</string>
 </resources>

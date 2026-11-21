@@ -186,11 +186,10 @@ class V44RulesTest {
     // ------------------------------------------------------------------ 2-4 Premium ayrımı
 
     @Test
-    fun model3dExportIsPremium() {
-        assertTrue(FeatureKeys.MODEL3D_EXPORT in FeatureKeys.PREMIUM)
-        assertEquals(FeatureKeys.MODEL3D_EXPORT, PremiumFeature.MODEL3D_EXPORT.key(null))
-        assertTrue(PremiumAccess(Entitlements.FREE, null) {}.locked(PremiumFeature.MODEL3D_EXPORT))
-        assertFalse(PremiumAccess(Entitlements.premium(), null) {}.locked(PremiumFeature.MODEL3D_EXPORT))
+    fun model3dExportIsRetired() {
+        // v56 aşama 10: GLB dışa aktarma kalktı; anahtar abonelik sayfasında gösterilmez
+        assertTrue(FeatureKeys.MODEL3D_EXPORT !in FeatureKeys.PREMIUM)
+        assertTrue(FeatureKeys.MODEL3D_EXPORT in FeatureKeys.RETIRED)
     }
 
     @Test

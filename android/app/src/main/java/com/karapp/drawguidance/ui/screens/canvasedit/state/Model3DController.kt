@@ -7,22 +7,14 @@ import com.karapp.drawguidance.data.images.CanvasAssetStore
 import com.karapp.drawguidance.data.images.PreparedImage
 import com.karapp.drawguidance.data.library.BitmapCodec
 import com.karapp.drawguidance.data.library.Model3DRepository
-import com.karapp.drawguidance.data.library.Model3DResults
 import com.karapp.drawguidance.data.local.ContentCodec
-import com.karapp.drawguidance.data.local.Model3DInfo
 import com.karapp.drawguidance.data.model.BrushType
 import com.karapp.drawguidance.data.model.Model3DLink
 import com.karapp.drawguidance.data.model.Stroke
 import com.karapp.drawguidance.data.model.StrokePoint
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.filter
-import kotlinx.coroutines.flow.filterNotNull
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.flowOf
-import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import java.util.UUID
 import kotlin.math.hypot
@@ -30,122 +22,77 @@ import kotlin.math.hypot
 /**
  * v23 tuvaldeki 3B şekiller: tuvalde yalnızca genel işlemler (ekle, seç, taşı, ölçekle, döndür, sil) yapılır; şekil
  * 3B modelin o anki görünümünün resmidir ([Stroke.assetId]), modelin kendisi tuvalin verisinde ([Model3DLink]) saklanır.
- * Düzenleme ayrı pencerede (3B düzenleyici) yapılır; kaydedilince sonuç [Model3DResults] ile buraya döner ve resim
- * yenilenir.
+ * v56 aşama 10: kaynaklar yalnız kütüphane ([com.karapp.drawguidance.content.model3d.Catalog3D]) ve GLB dosyası;
+ * eklemeden önce açı seçilir, sonra "Açıyı değiştir" ile değişir. Tuvalden 3B düzenleyiciye yol yoktur.
  */
 class Model3DController(
     private val store: EditorStore,
     private val host: EditorHost,
     private val assetStore: CanvasAssetStore,
     private val repository: Model3DRepository?,
-    private val results: Model3DResults?,
 ) {
-    /** 3B Şekillerim (küçük resimleriyle). */
-    val models: StateFlow<List<Model3DInfo>> = (repository?.observe() ?: flowOf(emptyList()))
-        .stateIn(host.scope, SharingStarted.WhileSubscribed(5_000), emptyList())
-
     private val _busy = MutableStateFlow(false)
     /** Şekil resmi hazırlanıyor. */
     val busy: StateFlow<Boolean> = _busy.asStateFlow()
 
-    init {
-        // Düzenleyiciden dönen sonuçlar (tuval yüklendikten sonra) uygulanır
-        val res = results
-        if (res != null) host.scope.launch {
-            store.canvas.filterNotNull().first()
-            res.pending.filter { list -> list.any { it.canvasId == store.canvasLocalId } }.collect {
-                res.take(store.canvasLocalId).forEach { r -> runCatching { apply(r) }.onFailure { e -> com.karapp.drawguidance.diagnostics.AppLog.e("Model3D", "3B şekil tuvale uygulanamadı", e) } }
-            }
-        }
-    }
-
     /** Seçili tek 3B şekil (yoksa null). */
     fun selected(): Stroke? = store.selectedStroke { it.model != null }?.takeIf { store.selection.size == 1 }
 
-    /** "3B Şekillerim"deki modeli tuvalin ortasına (ya da [center]'a) ekler. */
-    fun insert(modelId: String, center: Offset? = null) {
-        val repo = repository ?: return
-        host.scope.launch {
-            _busy.value = true
-            try {
-                val model = repo.load(modelId) ?: return@launch
-                place(model, null, center)
-            } finally {
-                _busy.value = false
-            }
-        }
-    }
+    /** Kütüphanedeki şeklin modeli (açı seçimi için). */
+    fun catalogModel(catalogId: String): Model3D? = repository?.fromCatalog(catalogId)
 
-    /** v24 hazır şekli ([com.karapp.drawguidance.content.model3d.Catalog3D]) yeni kimlikle tuvale ekler. */
-    fun insertCatalog(catalogId: String, center: Offset? = null) {
-        val repo = repository ?: return
-        host.scope.launch {
-            _busy.value = true
-            try {
-                val model = repo.fromCatalog(catalogId) ?: return@launch
-                place(model, null, center)
-            } finally {
-                _busy.value = false
-            }
-        }
-    }
-
-    /**
-     * v27 GLB/glTF dosyasını içe aktarıp tuvale ekler (ayrıntı [maxTriangles]'a düşürülür). [save] ise model 3B
-     * Şekillerim'e ayrı şekil olarak da kaydedilir; değilse yalnız tuvalin verisinde durur (kalemle düzenlenince yine
-     * kaydedilebilir).
-     */
-    fun importGlb(bytes: ByteArray, name: String, maxTriangles: Int, save: Boolean, center: Offset? = null) {
-        val repo = repository ?: return
-        host.scope.launch {
-            _busy.value = true
-            try {
-                val r = runCatching { repo.importGlb(bytes, name, maxTriangles) }
-                val imported = r.getOrNull()
-                if (imported == null) {
-                    host.emit(com.karapp.drawguidance.ui.screens.canvasedit.EditEvent.Message(MSG_IMPORT_FAIL.format(r.exceptionOrNull()?.message ?: "?")))
-                    return@launch
-                }
-                if (save) repo.save(imported.model)
-                place(imported.model, null, center)
-                host.emit(
-                    com.karapp.drawguidance.ui.screens.canvasedit.EditEvent.Message(
-                        (if (save) MSG_IMPORT_SAVED else MSG_IMPORT_CANVAS).format(imported.model.name, imported.triangles),
-                    ),
-                )
-            } catch (e: kotlinx.coroutines.CancellationException) {
-                throw e
-            } catch (e: Throwable) {
-                // v27 bellek yetmezse (büyük GLB, giriş düzeyi cihaz) uygulama kapanmaz, bildirilir
-                com.karapp.drawguidance.diagnostics.AppLog.e("GlbImport", "İçe aktarılamadı", e, userVisible = true)
-                host.emit(com.karapp.drawguidance.ui.screens.canvasedit.EditEvent.Message(MSG_IMPORT_FAIL.format(e.message ?: e.javaClass.simpleName)))
-            } finally {
-                _busy.value = false
-            }
-        }
-    }
-
-    /**
-     * Düzenleyicide açmadan önce: model "3B Şekillerim"de yoksa (silinmişse) tuvaldeki veriden geri yüklenir. Açılacak
-     * modelin kimliğini döner.
-     */
-    suspend fun prepareEdit(stroke: Stroke): String? {
-        val link = stroke.model ?: return null
+    /** GLB/glTF dosyasının modeli (ayrıntı [maxTriangles]'a düşürülür); okunamazsa bildirilir, null döner. */
+    suspend fun glbModel(bytes: ByteArray, name: String, maxTriangles: Int): Model3D? {
         val repo = repository ?: return null
-        if (repo.load(link.modelId) != null) return link.modelId
-        val bytes = assetStore.bytes(link.dataAssetId) ?: return null
-        val model = runCatching { Model3DStore.decode(bytes) }.getOrNull() ?: return null
-        repo.save(model.copy(id = link.modelId))
-        return link.modelId
-    }
-
-    private suspend fun apply(r: Model3DResults.Result) {
-        val existing = r.strokeId?.let { id -> store.strokes.firstOrNull { it.id == id } }
         _busy.value = true
-        try {
-            place(r.model, existing, null)
+        return try {
+            repo.importGlb(bytes, name, maxTriangles).model
+        } catch (e: kotlinx.coroutines.CancellationException) {
+            throw e
+        } catch (e: Throwable) {
+            // v27 bellek yetmezse (büyük GLB, giriş düzeyi cihaz) uygulama kapanmaz, bildirilir
+            com.karapp.drawguidance.diagnostics.AppLog.e("GlbImport", "İçe aktarılamadı", e, userVisible = true)
+            host.emit(com.karapp.drawguidance.ui.screens.canvasedit.EditEvent.Message(MSG_IMPORT_FAIL.format(e.message ?: e.javaClass.simpleName)))
+            null
         } finally {
             _busy.value = false
+        }
+    }
+
+    /** Seçili 3B şeklin tuvalde saklanan modeli (Açıyı değiştir için). */
+    suspend fun selectedModel(): Model3D? {
+        val link = selected()?.model ?: return null
+        val bytes = assetStore.bytes(link.dataAssetId) ?: return null
+        return runCatching { Model3DStore.decode(bytes) }.getOrNull()
+    }
+
+    /** Önizleme: modeli [yaw]/[pitch] açısından [size] px kare resim olarak çizer. */
+    suspend fun preview(model: Model3D, yaw: Float, pitch: Float, size: Int): android.graphics.Bitmap? =
+        repository?.render(withAngle(model, yaw, pitch), size, size, ground = false, margin = 0.06f)
+
+    /** Modeli seçilen açıyla tuvalin ortasına (ya da [center]'a) ekler. */
+    fun insert(model: Model3D, yaw: Float, pitch: Float, center: Offset? = null) {
+        host.scope.launch {
+            _busy.value = true
+            try {
+                place(withAngle(model, yaw, pitch), null, center)
+            } finally {
+                _busy.value = false
+            }
+        }
+    }
+
+    /** Seçili 3B şeklin bakış açısını değiştirir (model aynı kalır; tek geri alma adımı). */
+    fun changeAngle(yaw: Float, pitch: Float) {
+        val stroke = selected() ?: return
+        host.scope.launch {
+            val model = selectedModel() ?: return@launch
+            _busy.value = true
+            try {
+                place(withAngle(model, yaw, pitch), stroke, null)
+            } finally {
+                _busy.value = false
+            }
         }
     }
 
@@ -219,11 +166,13 @@ class Model3DController(
     }
 
     companion object {
-        private const val MSG_IMPORT_SAVED = "\"%s\" tuvale eklendi ve 3B Şekillerim'e kaydedildi (%d üçgen)"
-        private const val MSG_IMPORT_CANVAS = "\"%s\" tuvale eklendi (%d üçgen)"
         private const val MSG_IMPORT_FAIL = "İçe aktarılamadı: %s"
         const val IMAGE_SIZE = 720
         /** v24 tuvaldeki 3B şeklin verisi GLB (eski "application/x-dg-model3d" kayıtları da okunur). */
         const val MIME = Model3DStore.MIME
+
+        /** Açı sınırları: dikey eğim −80..80, yatay dönüş 0..360. */
+        fun withAngle(model: Model3D, yaw: Float, pitch: Float): Model3D =
+            model.copy(camera = model.camera.copy(yaw = ((yaw % 360f) + 360f) % 360f, pitch = pitch.coerceIn(-80f, 80f)))
     }
 }

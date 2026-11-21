@@ -42,8 +42,14 @@ object FeatureKeys {
         NOTES_IMAGE_BG_REMOVAL, NOTES_IMAGE_EFFECTS_ADVANCED, NOTES_DIAGRAMS_ADVANCED, NOTES_SHAPE_SUGGEST_ADVANCED,
         COMIC_IMAGE_BG_REMOVAL, COMIC_EFFECTS_ADVANCED, COMIC_CHARACTERS_ADVANCED, COMIC_OBJECTS_SUGGEST_ADVANCED,
         COMIC_EFFECTS, COMIC_CHARACTERS, COMIC_BACKGROUNDS, COMIC_TEMPLATES, COMIC_SHAPES_ADVANCED,
-        MODEL3D_SUGGEST, MODEL3D_EXPORT, KIDS_CHALLENGE_ADVANCED, ADS_NONE,
+        KIDS_CHALLENGE_ADVANCED, ADS_NONE,
     )
+
+    /**
+     * v56 aşama 10: artık sorulmayan anahtarlar (3B'de hepsi ücretsiz). Sunucudaki plan listesinde eski sürümler için
+     * kalırlar; abonelik sayfasında gösterilmezler.
+     */
+    val RETIRED: Set<String> = setOf(MODEL3D_SUGGEST, MODEL3D_EXPORT)
 
     /** Anahtarın modu (önekten). */
     fun modeOf(key: String): String = key.substringBefore('.')
@@ -55,9 +61,7 @@ object FeatureKeys {
  */
 enum class PremiumFeature {
     IMAGE_BG_REMOVAL, IMAGE_EFFECTS_ADVANCED, SHAPE_SUGGEST_ADVANCED,
-    COMIC_EFFECTS, COMIC_CHARACTERS, COMIC_CHARACTERS_ADVANCED, COMIC_BACKGROUNDS, COMIC_TEMPLATES, MODEL3D_SUGGEST,
-    /** v44 3B modeli GLB olarak dışa aktarma ve paylaşma. */
-    MODEL3D_EXPORT,
+    COMIC_EFFECTS, COMIC_CHARACTERS, COMIC_CHARACTERS_ADVANCED, COMIC_BACKGROUNDS, COMIC_TEMPLATES,
     /** v40 çocuk modu çizim görevinin Premium seviyeleri (tuval türünden bağımsız: Ana sayfadan da sorulur). */
     KIDS_CHALLENGE_ADVANCED;
 
@@ -85,9 +89,6 @@ enum class PremiumFeature {
         COMIC_CHARACTERS_ADVANCED -> FeatureKeys.COMIC_CHARACTERS_ADVANCED.takeIf { kind == CanvasKind.COMIC }
         COMIC_BACKGROUNDS -> FeatureKeys.COMIC_BACKGROUNDS.takeIf { kind == CanvasKind.COMIC }
         COMIC_TEMPLATES -> FeatureKeys.COMIC_TEMPLATES.takeIf { kind == CanvasKind.COMIC }
-        // 3B düzenleyici ayrı ekran: tuval türünden bağımsız
-        MODEL3D_SUGGEST -> FeatureKeys.MODEL3D_SUGGEST
-        MODEL3D_EXPORT -> FeatureKeys.MODEL3D_EXPORT
         KIDS_CHALLENGE_ADVANCED -> FeatureKeys.KIDS_CHALLENGE_ADVANCED
     }
 }

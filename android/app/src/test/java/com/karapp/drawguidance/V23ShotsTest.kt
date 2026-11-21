@@ -71,7 +71,7 @@ class V23SuggestShotsTest : V23EditorBase() {
         // v25 3B şekiller Ekle menüsünde ayrı seçenek: "3B şekil ekle" penceresi
         addMenu("3B şekil ekle")
         waitFor { exists("model3d_picker") }
-        waitForText("Yeni 3B şekil")
+        waitFor { exists("model3d_tab_library") }
         shotAll("v23-30-shape-picker-3d")
         SystemBack.press()
         waitFor { !exists("model3d_picker") }

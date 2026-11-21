@@ -87,29 +87,6 @@ import org.koin.androidx.compose.koinViewModel
 class Model3DListViewModel(private val repository: Model3DRepository) : ViewModel() {
     val models: StateFlow<List<Model3DInfo>> = repository.observe().stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
     fun delete(id: String) { viewModelScope.launch { repository.delete(listOf(id)) } }
-
-    private val _importing = MutableStateFlow(false)
-    val importing: StateFlow<Boolean> = _importing.asStateFlow()
-
-    /** İçe aktarma sonucu: (açılacak model kimliği ya da null, ileti). */
-    private val _imported = MutableSharedFlow<Pair<String?, String>>(extraBufferCapacity = 2)
-    val imported: SharedFlow<Pair<String?, String>> = _imported
-
-    /** v24 glTF/GLB içe aktarma: ayrıntı [maxTriangles]'a düşürülür, 3B Şekillerim'e kaydedilir. */
-    fun import(data: ByteArray, name: String, maxTriangles: Int, okText: String, failText: String) {
-        viewModelScope.launch {
-            _importing.value = true
-            try {
-                val r = repository.importGlb(data, name, maxTriangles)
-                repository.save(r.model)
-                _imported.emit(r.model.id to okText.format(r.model.name, r.sourceTriangles, r.triangles))
-            } catch (e: Exception) {
-                _imported.emit(null to failText.format(e.message ?: e.javaClass.simpleName))
-            } finally {
-                _importing.value = false
-            }
-        }
-    }
 }
 
 /**
@@ -166,12 +143,10 @@ fun Model3DCard(
 }
 
 /** İçe aktarılacak dosya (ayrıntı seçilene kadar). */
-private class PendingImport(val name: String, val bytes: ByteArray)
 
 /**
- * v23 "3B Şekiller" bölümü: kaydedilen 3B şekiller (dokununca 3B düzenleyici), yeni şekil ve silme. v24: "Hazır
- * şekiller" sekmesi (ders ve çizim için; dokununca kopyası düzenleyicide açılır) ve glTF/GLB içe aktarma (ayrıntı düzeyi
- * seçilerek).
+ * v56 aşama 10 ana sekmedeki **3B Çizimlerim**: kullanıcının 3B çizimleri (eski 3B Şekillerim kayıtları dahil).
+ * GLB içe/dışa aktarma ve hazır şekiller sekmesi kalktı (kütüphane yalnız tuvale eklemede). Uzun basınca silinir.
  */
 @Composable
 fun Model3DListScreen(
@@ -180,60 +155,20 @@ fun Model3DListScreen(
     vm: Model3DListViewModel = koinViewModel(),
 ) {
     val colors = NeuTheme.colors
-    val context = LocalContext.current
-    val scope = rememberCoroutineScope()
     val models by vm.models.collectAsState()
-    val importing by vm.importing.collectAsState()
     var deleting by remember { mutableStateOf<Model3DInfo?>(null) }
-    var ready by rememberSaveable { mutableStateOf(false) }
-    var pending by remember { mutableStateOf<PendingImport?>(null) }
-    var message by remember { mutableStateOf<String?>(null) }
     var query by rememberSaveable { mutableStateOf("") }
     val shownModels = remember(models, query) { com.karapp.drawguidance.ui.components.TitleSearch.filter(models, query) { it.name } }
-    val okText = stringResource(R.string.model3d_imported)
-    val failText = stringResource(R.string.model3d_import_failed)
-    val picker = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
-        if (uri != null) scope.launch {
-            val r = runCatching {
-                withContext(Dispatchers.IO) {
-                    val name = context.contentResolver.query(uri, arrayOf(OpenableColumns.DISPLAY_NAME), null, null, null)?.use { c ->
-                        if (c.moveToFirst()) c.getString(0) else null
-                    } ?: "model"
-                    val bytes = context.contentResolver.openInputStream(uri)?.use { it.readBytes() } ?: error("dosya okunamadı")
-                    PendingImport(name.substringBeforeLast('.'), bytes)
-                }
-            }
-            r.onSuccess { pending = it }.onFailure { message = failText.format(it.message ?: "") }
-        }
-    }
-    LaunchedEffect(vm) {
-        vm.imported.collect { (id, text) ->
-            message = text
-            if (id != null) onOpen(id)
-        }
-    }
-    LaunchedEffect(message) { if (message != null) { kotlinx.coroutines.delay(3000); message = null } }
 
     Scaffold(containerColor = colors.background, bottomBar = bottomBar) { padding ->
         Column(Modifier.fillMaxSize().padding(padding).statusBarsPadding().testTag("models3d_screen")) {
             NeuTopBar(
-                title = stringResource(R.string.model3d_my_models),
-                subtitle = stringResource(if (ready) R.string.model3d_open_ready else R.string.model3d_list_hint),
+                title = stringResource(R.string.v56_m3_my_drawings),
+                subtitle = stringResource(R.string.v56_m3_list_hint),
                 actions = {
-                    // v40 içe aktarma düğmesinin altında "GLB içe aktar" yazar (yalnız simge anlaşılmıyordu)
-                    androidx.compose.runtime.CompositionLocalProvider(com.karapp.drawguidance.ui.components.LocalButtonLabels provides true) {
-                        NeuIconButton(Icons.Filled.FileUpload, stringResource(R.string.glb_import_button), {
-                            picker.launch(arrayOf("model/gltf-binary", "model/gltf+json", "application/octet-stream", "*/*"))
-                        }, Modifier.testTag("models3d_import_glb"), size = 40.dp, enabled = !importing, label = stringResource(R.string.glb_import_button))
-                    }
-                    NeuButton(stringResource(R.string.model3d_new), { onOpen(null) }, primary = true, icon = Icons.Filled.Add)
+                    NeuButton(stringResource(R.string.v56_m3_new_drawing), { onOpen(null) }, Modifier.testTag("models3d_new"), primary = true, icon = Icons.Filled.Add)
                 },
             )
-            Row(Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 4.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                NeuChip(stringResource(R.string.model3d_my_shapes_tab), !ready, onClick = { ready = false })
-                NeuChip(stringResource(R.string.model3d_ready_shapes), ready, onClick = { ready = true })
-            }
-            // v33 başlıkta anlık arama (açık sekmede: 3B Şekillerim ya da Hazır şekiller)
             com.karapp.drawguidance.ui.components.TitleSearchField(
                 query = query,
                 onQueryChange = { query = it },
@@ -242,34 +177,23 @@ fun Model3DListScreen(
                 modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 6.dp, bottom = 2.dp),
                 tag = "models3d_search",
             )
-            if (importing) Text(stringResource(R.string.model3d_importing), style = MaterialTheme.typography.bodySmall, color = colors.accent, modifier = Modifier.padding(horizontal = 20.dp))
-            message?.let { Text(it, style = MaterialTheme.typography.bodySmall, color = colors.accent, modifier = Modifier.padding(horizontal = 20.dp, vertical = 4.dp).testTag("models3d_message")) }
-            if (ready) {
-                BoxWithConstraints(Modifier.fillMaxSize()) {
-                    val columns = (maxWidth / 110.dp).toInt().coerceIn(3, 8)
-                    Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(16.dp)) {
-                        CatalogGrid(onPick = { onOpen(Catalog3D.PREFIX + it.id) }, columns = columns, tile = 84.dp, query = query)
-                    }
-                }
-            } else {
-                if (models.isEmpty()) {
-                    Text(stringResource(R.string.model3d_list_empty), style = MaterialTheme.typography.bodyMedium, color = colors.contentMuted, modifier = Modifier.padding(24.dp))
-                } else if (shownModels.isEmpty()) {
-                    Text(
-                        stringResource(R.string.search_no_result, query.trim()), style = MaterialTheme.typography.bodyMedium, color = colors.contentMuted,
-                        modifier = Modifier.padding(24.dp).testTag("models3d_search_empty"),
-                    )
-                }
-                LazyVerticalGrid(
-                    columns = GridCells.Adaptive(150.dp),
-                    contentPadding = PaddingValues(16.dp),
-                    horizontalArrangement = Arrangement.spacedBy(14.dp),
-                    verticalArrangement = Arrangement.spacedBy(14.dp),
-                    modifier = Modifier.fillMaxSize(),
-                ) {
-                    items(shownModels, key = { it.id }) { info ->
-                        Model3DCard(info, onClick = { onOpen(info.id) }, onLongClick = { deleting = info })
-                    }
+            if (models.isEmpty()) {
+                Text(stringResource(R.string.v56_m3_list_empty), style = MaterialTheme.typography.bodyMedium, color = colors.contentMuted, modifier = Modifier.padding(24.dp))
+            } else if (shownModels.isEmpty()) {
+                Text(
+                    stringResource(R.string.search_no_result, query.trim()), style = MaterialTheme.typography.bodyMedium, color = colors.contentMuted,
+                    modifier = Modifier.padding(24.dp).testTag("models3d_search_empty"),
+                )
+            }
+            LazyVerticalGrid(
+                columns = GridCells.Adaptive(150.dp),
+                contentPadding = PaddingValues(16.dp),
+                horizontalArrangement = Arrangement.spacedBy(14.dp),
+                verticalArrangement = Arrangement.spacedBy(14.dp),
+                modifier = Modifier.fillMaxSize(),
+            ) {
+                items(shownModels, key = { it.id }) { info ->
+                    Model3DCard(info, onClick = { onOpen(info.id) }, onLongClick = { deleting = info })
                 }
             }
         }
@@ -284,33 +208,6 @@ fun Model3DListScreen(
             dismissButton = { TextButton(onClick = { deleting = null }) { Text(stringResource(R.string.cancel_button)) } },
         )
     }
-    pending?.let { p ->
-        ImportDetailDialog(p.name, p.bytes.size, onPick = { tris -> pending = null; vm.import(p.bytes, p.name, tris, okText, failText) }, onDismiss = { pending = null })
-    }
-}
-
-/** v24 içe aktarmada ayrıntı düzeyi: az ayrıntı her cihazda hızlı düzenlenir. */
-@Composable
-fun ImportDetailDialog(name: String, bytes: Int, onPick: (Int) -> Unit, onDismiss: () -> Unit) {
-    val colors = NeuTheme.colors
-    val size = if (bytes >= 1_048_576) String.format(java.util.Locale.ROOT, "%.1f MB", bytes / 1_048_576f) else "${bytes / 1024} KB"
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        containerColor = colors.background,
-        modifier = Modifier.testTag("model3d_import_dialog"),
-        title = { Text(stringResource(R.string.model3d_import_title)) },
-        text = {
-            Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                Text(stringResource(R.string.model3d_import_text, name, size), style = MaterialTheme.typography.bodyMedium)
-                listOf(R.string.model3d_detail_low, R.string.model3d_detail_mid, R.string.model3d_detail_high).forEachIndexed { i, label ->
-                    // v25 önerilen düzey cihaz sınıfına göre (giriş düzeyinde az, diğerlerinde orta)
-                    NeuButton(stringResource(label), { onPick(Model3DRepository.DETAIL_LEVELS[i]) }, Modifier.fillMaxWidth(), primary = i == Budget3D.importDetail)
-                }
-            }
-        },
-        confirmButton = {},
-        dismissButton = { TextButton(onClick = onDismiss) { Text(stringResource(R.string.cancel_button)) } },
-    )
 }
 
 /** v27 seçilen GLB dosyası (ad ve içerik). */
@@ -344,41 +241,3 @@ fun rememberGlbPicker(onRead: (PendingGlb) -> Unit, onFail: (String) -> Unit): (
 /** v27 içe aktarılan GLB dosyasının en büyük boyutu. */
 private const val MAX_GLB_BYTES = 96L shl 20
 
-/**
- * v27 GLB içe aktarma sorusu (tuvalde ve 3B düzenleyicide): ayrıntı düzeyi ve "3B Şekillerim'e ayrı şekil olarak
- * kaydedilsin mi?" — Evet (kaydet ve ekle) / Hayır (yalnız ekle).
- */
-@Composable
-fun GlbImportAskDialog(name: String, bytes: Int, onImport: (maxTriangles: Int, save: Boolean) -> Unit, onDismiss: () -> Unit) {
-    val colors = NeuTheme.colors
-    val size = if (bytes >= 1_048_576) String.format(java.util.Locale.ROOT, "%.1f MB", bytes / 1_048_576f) else "${bytes / 1024} KB"
-    var detail by remember { mutableStateOf(Budget3D.importDetail) }
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        containerColor = colors.background,
-        modifier = Modifier.testTag("glb_import_ask"),
-        title = { Text(stringResource(R.string.model3d_import_title)) },
-        text = {
-            Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                Text(stringResource(R.string.glb_import_file, name, size), style = MaterialTheme.typography.bodyMedium)
-                Text(stringResource(R.string.glb_import_detail), style = MaterialTheme.typography.labelLarge)
-                Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                    listOf(R.string.model3d_detail_low, R.string.model3d_detail_mid, R.string.model3d_detail_high).forEachIndexed { i, label ->
-                        com.karapp.drawguidance.ui.components.NeuChip(stringResource(label).substringBefore(" ("), detail == i, onClick = { detail = i }, modifier = Modifier.weight(1f))
-                    }
-                }
-                Text(stringResource(R.string.glb_import_save_question), style = MaterialTheme.typography.bodyMedium, color = colors.accent)
-                NeuButton(
-                    stringResource(R.string.glb_import_save_yes), { onImport(Model3DRepository.DETAIL_LEVELS[detail], true) },
-                    Modifier.fillMaxWidth().testTag("glb_import_save"), primary = true,
-                )
-                NeuButton(
-                    stringResource(R.string.glb_import_save_no), { onImport(Model3DRepository.DETAIL_LEVELS[detail], false) },
-                    Modifier.fillMaxWidth().testTag("glb_import_nosave"),
-                )
-            }
-        },
-        confirmButton = {},
-        dismissButton = { TextButton(onClick = onDismiss) { Text(stringResource(R.string.cancel_button)) } },
-    )
-}

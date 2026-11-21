@@ -1,6 +1,6 @@
 # v56 durum
 
-Son güncelleme: 2026-11-21, K4 durağı (otomatik geçiş: K7 sonuna kadar duraklarda beklenmiyor).
+Son güncelleme: 2026-11-21, K5 durağı (otomatik geçiş: K7 sonuna kadar duraklarda beklenmiyor).
 
 | Durak | Durum | Not |
 |---|---|---|
@@ -10,10 +10,59 @@ Son güncelleme: 2026-11-21, K4 durağı (otomatik geçiş: K7 sonuna kadar dura
 | K2 (hızlı fırça seçici, gren ve doku, Dönüştür paneli, yansıma, sıvılaştır, 2E dönüştürme/hizalama/efektler) | Bitti | Android + iOS |
 | K3 (aşama 7, 8, 8A, 9: renk ayarları, katman çoğalt/birleştir, hazır ayarlar, simetri, desen, gelişmiş görünüm, bağlı kopya, opaklık maskesi, canlı Tekrarla, SVG/PSD/DXF) | Bitti | Android + iOS |
 | K3A (aşama 9C: yol işlemleri, şekil oluşturucu, Bezier düğümleri, bıçak, efektler, zarf) | Bitti | Android + iOS |
-| **K4** (aşama 10: 3B temizlik, tuvale 3B ekleme) | **Bitti** | Android + iOS |
-| K5–K6 (3B Çizim) | Sırada (K5) | |
+| K4 (aşama 10: 3B temizlik, tuvale 3B ekleme) | Bitti | Android + iOS |
+| **K5** (aşama 11: 3B Çizim temeli, iOS Metal) | **Bitti** | Android + iOS |
+| K6 (aşama 12–13: 3B Çizim tamamlama) | Sırada | |
 | K7 (aşama 14) | Başlamadı | |
 | K8 (9A e-posta girişi, 9B mağaza flavor'ları, aşama 15) | Başlamadı, Ahmet'in onayı gerekir | Ahmet: "9a ve 9b yi en sona al" |
+
+## K5'te yapılanlar
+
+- **3B Çizim modu** (eski 3B düzenleyicinin yerine; ana sekme ve liste "3B Çizim"): alt mod çubuğu Çiz · Düzlem · Seç ·
+  Ekle · Görünüm. Üstte geri al/yinele, Katmanlar, Özellikler, Kaydet ve menü (yeniden adlandır, farklı kaydet, sığdır,
+  resim olarak dışa aktar).
+- **Çiz:** görünür çizim düzlemine kalem basınçlı çizgi (Kalem, Mürekkep: uçları incelen, Markör: kalın ve yarı saydam),
+  çizgiyi bitirirken 450 ms basılı tutunca düz çizgi, Silgi çizgiyi değdiği yerden böler (tek geri alma adımı).
+  Kalem görülünce "Parmakla çiz" kendiliğinden kapanır; açıkken tek parmak çizer, iki parmak döndürür. İki parmakla
+  kısa dokunma geri alır.
+- **Düzlem:** Ön / Yan / Üst / Kameraya dönük hazır yönler; yüze, çizgi ucuna ya da iki çizginin kesişimine dokununca
+  yapışır; ortadaki tutamaç sürüklenince normali boyunca kayar; Öne eğ / Yana çevir / Döndür 15° adımlı. Düzlem kameraya
+  75°'den yatıksa turuncu olur ve uyarı çıkar. Düzlem kayıtta saklanır.
+- **Seç:** çizgi ya da cisme dokunma seçer; seçiliyi sürüklemek Taşı / Döndür (X, Y, Z) / Ölçekle yapar, sürükleme tek
+  geri alma adımı. Tümünü seç, Kopyala, Çevir, Zemine oturt, Sil.
+- **Ekle:** küp, silindir, küre, koni, düzlem (çizime yardımcı bloklar; etkin katmana, düzlemin altına zemine oturur).
+- **Katmanlar:** ekle, etkin seç, gizle, kilitle, yeniden adlandır, yukarı/aşağı, sil (içindekilerle), seçimi katmana taşı.
+  Gizli katman çizilmez, kilitli katmana çizilmez ve seçilmez.
+- **Kayıt biçimi D3 v2:** nokta kalınlıkları, örtücülük, fırça, düzlem, katman, kilit, grup, doku koordinatları, gradyan,
+  katmanlar ve son düzlem. Android ve iOS aynı baytları yazar (ortak SHA-256 sınaması). Eski GLB / D3 v1 kayıtları ilk
+  açılışta bir kez çevrilir: elle düzenlenmiş parçalar "kilitli cisim" olur, asıl dosya `models3d-backup/` altında saklanır.
+  Tuvaldeki 3B şeklin verisi eski sürümlerle uyum için GLB kalır.
+- **Tuvalden giriş:** çizim ekranının Diğer (⋮) menüsünde "3B çiz" yeni 3B Çizim'i açar (çocuk ve geçici tuvalde yok).
+- **iOS Metal çizici:** izdüşüm ve yüz ışığı işlemcide (yazılım çiziciyle aynı açı), üçgenleme ve derinlik Metal'de;
+  çizgiler nokta kalınlıklı şerit, saydam çizgiler ayrı geçişte. Metal açılamazsa yazılım çiziciye düşer ve bildirir.
+  Android'de GL çizici nokta kalınlığı ve örtücülüğü artık çiziyor.
+- **Kaldırılanlar:** eski modelleme kodu (CSG, ağ topolojisi, fırça şekilleri, 3B eskiz önerisi, katı işlemler, fırça
+  silgisi; Android ve iOS) ve eski düzenleyici ekranları.
+
+### Plandan sapmalar (K5)
+
+- Ekle (temel cisimler) planda K6'daydı; K5'te geldi.
+- Seçim döndürmesi dünya eksenleri çevresinde (X/Y/Z); düzlem eksenine göre döndürme yok. Çizgiler gruplanmıyor.
+- Dolgu, Geniş boya fırçası (WIDE, veri biçiminde yeri var), toon/mürekkep kenar, Görünüm paneli ışık ayarlarının
+  tamamı, resim olarak galeriye kaydetme ve tuvale ekleme, yüzeye boya, dönen video, telefon düzeni K6'da.
+- iOS Metal çizicide gölge ve kenar çizgisi yok (yazılım çizici ve dışa aktarma çiziyor); K6'da toon kenarla birlikte.
+- Model mesajları Türkçe kaynak metinle I18n tablosundan çevriliyor (Android ve iOS aynı tsv).
+- Eski `models3d` örnek modelleri korundu (çevrilip kilitli cisim olarak açılıyor).
+- ShapePickerModal'daki erişilmeyen 3B bölümü hâlâ duruyor.
+
+## Testler (K5)
+
+- Android: `Sketch3DCoreTest` 5/5 (D3 v2 gidiş-dönüş ve ortak SHA, v1 okuma, eski GLB çevrimi, düzlem hazır yönleri ve
+  yatıklık, 15° yaslama, yüze/uca/kesişime yapışma, gizli katman), `V56Sketch3DViewModelTest` 5/5, `V56Sketch3DUiTest` 1/1,
+  `V24GlbDataTest` 1/1 (D3 v2 kayıt, çevrim, kilitli parça, yedek dosya), V25CanvasAdd3D 1/1, V40DesignUi 4/4, V56Model3D 3/3.
+  Eski düzenleyici testleri (V24/V25/V26/V27 3B düzenleyici, V25Geo, Sketch3Test, Model3DV25/V26) kaldırıldı.
+- iOS: `Sketch3DCoreTests` (aynı SHA vektörü, Metal sahne kurulumu, 3B Çizim modeli) ve UI testi `testSketch3DDrawUndo`
+  yazıldı; ortamda Swift derleyicisi yok (indirilen Linux araç zinciri bu ortamda çalıştırılamadı), CI çalıştırılmadı.
 
 ## K4'te yapılanlar
 
@@ -223,5 +272,5 @@ Son güncelleme: 2026-11-21, K4 durağı (otomatik geçiş: K7 sonuna kadar dura
 - Seçim alanı varken çizilmekte olan çizginin önizlemesi maskelenmiyor (bırakınca maskelenir).
 - Tuval küçük resimleri katman karışım modlarını henüz yansıtmıyor.
 - `DocExtras` modelde var ama kullanılmıyor (simetri `GuideSpec.symmetry`'de).
-- iOS'ta K2 ve K3 kodu derlenmedi (ortamda Swift yok); ilk derlemede küçük düzeltmeler gerekebilir.
+- iOS'ta K2, K3, K3A, K4 ve K5 kodu derlenmedi (ortamda Swift yok); ilk derlemede küçük düzeltmeler gerekebilir.
 - Sıvılaştır ve çarpıtılmış resim iOS'ta ağdan önbellekli bir görüntüyle çizilir; çok büyük resimde ilk çizim yavaş olabilir.

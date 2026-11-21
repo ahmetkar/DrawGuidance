@@ -1,4 +1,4 @@
-# v56 devir notu (K4)
+# v56 devir notu (K5)
 
 Tarih: 2026-11-21. Dal: `claude/project-thread-ypg1wj` (GitHub ahmetkar/DrawGuidance). Taban: `claude/v55`.
 
@@ -19,14 +19,20 @@ Tarih: 2026-11-21. Dal: `claude/project-thread-ypg1wj` (GitHub ahmetkar/DrawGuid
 - K4: aşama 10 (tuvale 3B ekleme: kütüphane + GLB, açı seçimi, Açıyı değiştir; tuvalden 3B düzenleyiciye yol, eski 3B
   çizim çubuğu, GLB dışa aktarma kaldırıldı; 3B öneri ücretsiz; 3B Çizimlerim listesi). Android + iOS. Sapmalar:
   `v56-durum.md` "Plandan sapmalar (K4)".
+- K5: aşama 11 (3B Çizim modu: düzlemde basınçlı çizim, düzlem yapışma ve 15° döndürme, seçim/dönüştürme, temel
+  cisimler, katmanlar, D3 v2 kayıt ve eski kayıt çevrimi, tuvalin Diğer menüsünden "3B çiz", iOS Metal çizici).
+  Android + iOS. Sapmalar: `v56-durum.md` "Plandan sapmalar (K5)".
 - Plan güncellemeleri: 9A ve 9B K8'e alındı (Ahmet: "9a ve 9b yi en sona al"). Ahmet: "son k7 ye kadar otamatik geç":
   K7 sonuna kadar duraklarda "devam" beklenmez; her durakta commit, zip, durum ve not yine yapılır. K8 onay ister.
 - Plan güncellemeleri (önceki): e-posta/şifre girişi tamamen Firebase'de, sunucu değişmez; Xiaomi GetApps iptal.
 
-## Sıradaki adım (K5)
-Aşama 11: 3B Çizim temeli (düzlemde çizim, iOS'ta Metal). Sonra K6 (12–13), K7 (14). K8: 9A, 9B, 15.
+## Sıradaki adım (K6)
+Aşama 12–13: dolgu ve üçgenleme, toon/mürekkep kenar, Görünüm paneli, resim olarak kaydet / galeri / tuvale ekle,
+yüzeye boya (WIDE), dönen video, telefon düzeni. Sonra K7 (14). K8: 9A, 9B, 15.
 
 ## Testler / derleme
+- K5: Sketch3DCoreTest 5/5, V56Sketch3DViewModelTest 5/5, V56Sketch3DUiTest 1/1, V24GlbDataTest 1/1, V25CanvasAdd3D 1/1,
+  V40DesignUi 4/4, V56Model3D 3/3.
 - K4: V56Model3DTest 3/3, V23Model3DCanvas 1/1, V25CanvasAdd3D 1/1, V40DesignUi 4/4, V44Rules 9/9.
 - K3A: V56PathOpsTest 4/4, V56PathOpsUiTest 1/1; V56*, *Codec*, *VectorEdit*, *ShapeEdit* 0 hata.
 - K3: V56ColorTest, V56Symmetry*, V56Vector*, V56Export* geçti; V42SaveTest 4/4, V40EditorUiTest 6/6.
@@ -37,6 +43,8 @@ Aşama 11: 3B Çizim temeli (düzlemde çizim, iOS'ta Metal). Sonra K6 (12–13)
 - iOS: Swift testleri yazıldı; ortamda Swift derleyicisi yok. Duraklarda derleme/CI yok (Ahmet'in kararı).
 
 ## PC teslimi
+- K5'te PC bağlı değildi. `v56/K5/DrawGuidance-v56-K5-degisen.zip` K4'ten bu yana değişenler (eskileri
+  `_eski_v55\v56-K5-oncesi\` altına alın; silinenler SILINEN.txt'de), `DrawGuidance-v56-K5-toplam.zip` v55'ten birikimli.
 - K4'te PC bağlı değildi. `v56/K4/DrawGuidance-v56-K4-degisen.zip` K3A'dan bu yana değişen dosyaları içerir
   (eskileri `_eski_v55\v56-K4-oncesi\` altına alın; silinenler zip içindeki SILINEN.txt'de).
   `DrawGuidance-v56-K4-toplam.zip` v55 tabanından bu yana birikimli (önceki zip'ler uygulanmadıysa bunu kullanın).
@@ -50,4 +58,4 @@ Aşama 11: 3B Çizim temeli (düzlemde çizim, iOS'ta Metal). Sonra K6 (12–13)
 ```
 git clone https://github.com/ahmetkar/DrawGuidance && cd DrawGuidance && git checkout claude/project-thread-ypg1wj
 ```
-İlk mesaj: "v56 planına K5'ten devam et. Devir notu ve plan: v56-devir-notu.md, v56-plan-tek-surum.md."
+İlk mesaj: "v56 planına K6'dan devam et. Devir notu ve plan: v56-devir-notu.md, v56-plan-tek-surum.md."

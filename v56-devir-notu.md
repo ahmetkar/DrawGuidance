@@ -1,4 +1,4 @@
-# v56 devir notu (K5)
+# v56 devir notu (K6)
 
 Tarih: 2026-11-21. Dal: `claude/project-thread-ypg1wj` (GitHub ahmetkar/DrawGuidance). Taban: `claude/v55`.
 
@@ -22,15 +22,19 @@ Tarih: 2026-11-21. Dal: `claude/project-thread-ypg1wj` (GitHub ahmetkar/DrawGuid
 - K5: aşama 11 (3B Çizim modu: düzlemde basınçlı çizim, düzlem yapışma ve 15° döndürme, seçim/dönüştürme, temel
   cisimler, katmanlar, D3 v2 kayıt ve eski kayıt çevrimi, tuvalin Diğer menüsünden "3B çiz", iOS Metal çizici).
   Android + iOS. Sapmalar: `v56-durum.md` "Plandan sapmalar (K5)".
+- K6: aşama 12–13 (3B Çizim: dolgu ve kement dolgu, yüzeye boya, Yumuşak/Toon/Sadece çizgi görünümü ve mürekkep kenar,
+  Parlat, Tuvale ekle, dönen video MP4/GIF, telefon düzeni). Android + iOS. Sapmalar: `v56-durum.md` "Plandan sapmalar (K6)".
 - Plan güncellemeleri: 9A ve 9B K8'e alındı (Ahmet: "9a ve 9b yi en sona al"). Ahmet: "son k7 ye kadar otamatik geç":
   K7 sonuna kadar duraklarda "devam" beklenmez; her durakta commit, zip, durum ve not yine yapılır. K8 onay ister.
 - Plan güncellemeleri (önceki): e-posta/şifre girişi tamamen Firebase'de, sunucu değişmez; Xiaomi GetApps iptal.
 
-## Sıradaki adım (K6)
-Aşama 12–13: dolgu ve üçgenleme, toon/mürekkep kenar, Görünüm paneli, resim olarak kaydet / galeri / tuvale ekle,
-yüzeye boya (WIDE), dönen video, telefon düzeni. Sonra K7 (14). K8: 9A, 9B, 15.
+## Sıradaki adım (K7)
+Aşama 14: öğreticiler (3B Çizim adımları dahil), 7 dilde metin denetimi, tam test. Sonra dur ve tam rapor. K8 (9A, 9B, 15)
+Ahmet'in onayıyla.
 
 ## Testler / derleme
+- K6: Sketch3K6CoreTest 6/6 (+ :core:content:test tamamı), V56Sketch3DK6ViewModelTest 3/3, V56Sketch3DPhoneUiTest 1/1,
+  V56Sketch3DViewModelTest 5/5, V56Sketch3DUiTest 1/1.
 - K5: Sketch3DCoreTest 5/5, V56Sketch3DViewModelTest 5/5, V56Sketch3DUiTest 1/1, V24GlbDataTest 1/1, V25CanvasAdd3D 1/1,
   V40DesignUi 4/4, V56Model3D 3/3.
 - K4: V56Model3DTest 3/3, V23Model3DCanvas 1/1, V25CanvasAdd3D 1/1, V40DesignUi 4/4, V44Rules 9/9.
@@ -43,6 +47,8 @@ yüzeye boya (WIDE), dönen video, telefon düzeni. Sonra K7 (14). K8: 9A, 9B, 1
 - iOS: Swift testleri yazıldı; ortamda Swift derleyicisi yok. Duraklarda derleme/CI yok (Ahmet'in kararı).
 
 ## PC teslimi
+- K6'da PC bağlı değildi. `v56/K6/DrawGuidance-v56-K6-degisen.zip` K5'ten bu yana değişenler (eskileri
+  `_eski_v55\v56-K6-oncesi\` altına alın), `DrawGuidance-v56-K6-toplam.zip` v55'ten birikimli.
 - K5'te PC bağlı değildi. `v56/K5/DrawGuidance-v56-K5-degisen.zip` K4'ten bu yana değişenler (eskileri
   `_eski_v55\v56-K5-oncesi\` altına alın; silinenler SILINEN.txt'de), `DrawGuidance-v56-K5-toplam.zip` v55'ten birikimli.
 - K4'te PC bağlı değildi. `v56/K4/DrawGuidance-v56-K4-degisen.zip` K3A'dan bu yana değişen dosyaları içerir
@@ -58,4 +64,4 @@ yüzeye boya (WIDE), dönen video, telefon düzeni. Sonra K7 (14). K8: 9A, 9B, 1
 ```
 git clone https://github.com/ahmetkar/DrawGuidance && cd DrawGuidance && git checkout claude/project-thread-ypg1wj
 ```
-İlk mesaj: "v56 planına K6'dan devam et. Devir notu ve plan: v56-devir-notu.md, v56-plan-tek-surum.md."
+İlk mesaj: "v56 planına K7'den devam et. Devir notu ve plan: v56-devir-notu.md, v56-plan-tek-surum.md."

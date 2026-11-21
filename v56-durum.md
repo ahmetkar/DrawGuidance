@@ -1,6 +1,6 @@
 # v56 durum
 
-Son güncelleme: 2026-11-21, K5 durağı (otomatik geçiş: K7 sonuna kadar duraklarda beklenmiyor).
+Son güncelleme: 2026-11-21, K6 durağı (otomatik geçiş: K7 sonuna kadar duraklarda beklenmiyor).
 
 | Durak | Durum | Not |
 |---|---|---|
@@ -11,10 +11,55 @@ Son güncelleme: 2026-11-21, K5 durağı (otomatik geçiş: K7 sonuna kadar dura
 | K3 (aşama 7, 8, 8A, 9: renk ayarları, katman çoğalt/birleştir, hazır ayarlar, simetri, desen, gelişmiş görünüm, bağlı kopya, opaklık maskesi, canlı Tekrarla, SVG/PSD/DXF) | Bitti | Android + iOS |
 | K3A (aşama 9C: yol işlemleri, şekil oluşturucu, Bezier düğümleri, bıçak, efektler, zarf) | Bitti | Android + iOS |
 | K4 (aşama 10: 3B temizlik, tuvale 3B ekleme) | Bitti | Android + iOS |
-| **K5** (aşama 11: 3B Çizim temeli, iOS Metal) | **Bitti** | Android + iOS |
-| K6 (aşama 12–13: 3B Çizim tamamlama) | Sırada | |
-| K7 (aşama 14) | Başlamadı | |
+| K5 (aşama 11: 3B Çizim temeli, iOS Metal) | Bitti | Android + iOS |
+| **K6** (aşama 12–13: 3B Çizim tamamlama) | **Bitti** | Android + iOS |
+| K7 (aşama 14) | Sırada | |
 | K8 (9A e-posta girişi, 9B mağaza flavor'ları, aşama 15) | Başlamadı, Ahmet'in onayı gerekir | Ahmet: "9a ve 9b yi en sona al" |
+
+## K6'da yapılanlar
+
+- **Dolgu (Çiz modunda Doldur):** kapalı bir çizginin içine dokununca o çizgi seçili renkle dolar (iç içe halkalarda en
+  küçüğü); boş yerde parmakla alan çizmek (kement) o alanı çizim düzleminde doldurur. Dolgu iki yüzlü düz bir parçadır
+  ("Dolgu"): seçilir, taşınır, döndürülür, silinir; silgi dokunduğu dolguyu kaldırır. İçbükey şekiller kulak kesme ile
+  üçgenlenir. Tek geri alma adımı.
+- **Yüzeye boya (Çiz modunda Yüzeye boya, GENİŞ fırça):** iz cisimlerin yüzeyine düşer ve yüzeyi izler; yüzeyi ıskalayan
+  yerde çizgi bölünür, hiç cisme değmezse düzleme çizer. Silgi boyayı da siler.
+- **Görünüm modu:** Yumuşak / Toon / Sadece çizgi tarzı (toon: üç bantlı ışık, keskin parlama, koyu mürekkep kenar;
+  sadece çizgi: beyaz yüzey + mürekkep kenar). Yazılım çizici, Android GL ve iOS Metal üçü de çiziyor; resim ve video
+  dışa aktarımı seçili tarzı kullanır. Işık yönü/yüksekliği, gölge, ortam ışığı, zemin ızgarası, hazır kamera açıları,
+  perspektif ve arka plan rengi aynı modda.
+- **Parlat (Seç modunda):** seçili cisimler parlayan malzeme olur (tekrar basınca normale döner).
+- **Tuvale ekle (menü):** çizim saydam PNG olarak çizilir ve tuvale resim elemanı olarak sayfanın ortasına eklenir.
+  Tuvalin Diğer menüsünden açıldıysa doğrudan o tuvale döner; ana sayfadan açıldıysa (Android) tuval seçilir ve o tuval
+  açılır.
+- **Dönen video (menü):** kamera çizimin çevresinde bir tur atar; MP4 1080p 30 fps (Android MediaCodec, iOS
+  AVAssetWriter) ya da GIF 480 px (iki platformda aynı saf GIF yazıcısı), hız 0.5× / 1× / 2× (1× = 6 sn). İlerleme
+  çubuğu gösterilir; bitince galeriye (Android Movies/DrawGuidance, GIF Pictures/DrawGuidance; iOS Fotoğraflar)
+  kaydedilir ve paylaşım penceresi açılır.
+- **Resim olarak kaydet / galeri:** K5'teki dışa aktarma galeriye yazıyor (Android Pictures/DrawGuidance ve Resimlerim,
+  iOS Fotoğraflar); artık seçili görünüm tarzıyla.
+- **Telefon düzeni:** dar ekranda panel altta açılır, araç satırı yatay kayar, mod çubuğunda yalnız seçili modun adı
+  yazar; 360 dp genişlikte UI testiyle sınandı.
+
+### Plandan sapmalar (K6)
+
+- Görünüm tarzı kayda girmez (ekran açıkken geçerli; kayıt biçimi D3 v2 değişmedi).
+- Kamera yolu yalnız tam tur; "Görünümü ekle" ile özel kamera yolu yapılmadı.
+- iOS'ta "Tuvale ekle" yalnız tuvalden açılan 3B Çizim'de var (ana sayfadan açılınca menüde yok; resim olarak kaydedip
+  tuvale resim eklenebilir).
+- iOS Metal çizicide gölge hâlâ yok (yazılım çizici ve dışa aktarma çiziyor); toon/çizgi tarzı ve mürekkep kenar var.
+- Öğeler paneli yapılmadı (Katmanlar paneli ve seçim yeterli görüldü).
+- Video yazılım çiziciyle çizilir; 1080p MP4 orta düzey telefonda yaklaşık yarım dakika sürebilir.
+
+## Testler (K6)
+
+- Android çekirdek: `Sketch3K6CoreTest` 6/6 (dolgu alanı ve iki yüz, içbükey üçgenleme, ekran çokgeni, toon/çizgi
+  renkleri, küp yüzeyine boya ve bölünme, GIF'in ImageIO ile geri okunması ve LZW sözlük sıfırlaması, dönen kamera),
+  `:core:content:test` tamamı geçti.
+- Android uygulama: `V56Sketch3DK6ViewModelTest` 3/3 (dokunarak ve kementle dolgu, silginin dolguyu kaldırması, yüzeye
+  boya, Parlat, tarz, tuvale ekle PNG'si, GIF video dosyası), `V56Sketch3DPhoneUiTest` 1/1 (360 dp: kapalı çizgi + Doldur,
+  Toon, Dönen video penceresi).
+- iOS: `Sketch3DK6Tests` (aynı sınamalar + Metal mürekkep kenarı) yazıldı; Swift derleyicisi yok, CI çalıştırılmadı.
 
 ## K5'te yapılanlar
 

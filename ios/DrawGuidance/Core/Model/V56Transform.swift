@@ -406,6 +406,8 @@ enum TransformOps {
         let out = strokes.map { st -> Stroke in
             guard ids.contains(st.id) else { return st }
             var o = st
+            // v56 aşama 10: 3B şeklin resmi bozulmaz (açısı "Açıyı değiştir" ile değişir)
+            if nonAffine && st.model != nil { skipped.insert(st.id); return st }
             if st.brushType == .IMAGE && st.points.count >= 4 {
                 let corners = Array(st.points.prefix(4))
                 let oldMesh = st.warp?.mesh

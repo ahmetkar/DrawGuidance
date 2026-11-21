@@ -1,45 +1,24 @@
-import Combine
 import CoreGraphics
 import Foundation
 
 /// v23 tuvaldeki 3B şekiller (Android `Model3DController`): tuvalde genel işlemler yapılır; şekil modelin resmidir,
-/// model tuvalin verisinde saklanır. Düzenleme 3B düzenleyicide yapılır, sonuç [Model3DResults] ile döner.
+/// model tuvalin verisinde saklanır. v56 aşama 10: kaynaklar yalnız kütüphane ve GLB dosyası; eklemeden önce açı
+/// seçilir, sonra "Açıyı değiştir". Tuvalden 3B düzenleyiciye yol yoktur.
 @MainActor
 final class Model3DController: ObservableObject {
     private let store: EditorStore
     private unowned let host: EditorHost
     private let assets: CanvasAssetStore
     let repository: Model3DRepository?
-    private let results: Model3DResults?
-    private var bag: Set<AnyCancellable> = []
 
     @Published private(set) var busy = false
 
     static let IMAGE_SIZE = 720
     static let MIME = Model3DStore.MIME
-    static let MSG_IMPORT_SAVED = "\"{0}\" tuvale eklendi ve 3B Şekillerim'e kaydedildi ({1} üçgen)"
-    static let MSG_IMPORT_CANVAS = "\"{0}\" tuvale eklendi ({1} üçgen)"
     static let MSG_IMPORT_FAIL = "İçe aktarılamadı: {0}"
 
-    init(_ store: EditorStore, _ host: EditorHost, assets: CanvasAssetStore = .shared, repository: Model3DRepository?, results: Model3DResults?) {
-        self.store = store; self.host = host; self.assets = assets; self.repository = repository; self.results = results
-        // Düzenleyiciden dönen sonuçlar (tuval yüklendikten sonra) uygulanır
-        if let results {
-            results.$pending.combineLatest(store.$canvas.map { $0 != nil })
-                .filter { [weak self] list, loaded in loaded && list.contains { $0.canvasId == self?.store.canvasLocalId } }
-                .receive(on: DispatchQueue.main)
-                .sink { [weak self] _, _ in self?.drainResults() }
-                .store(in: &bag)
-        }
-    }
-
-    var models: [Model3DInfo] { repository?.models ?? [] }
-
-    private func drainResults() {
-        guard let results else { return }
-        for r in results.take(store.canvasLocalId) {
-            Task { await apply(r) }
-        }
+    init(_ store: EditorStore, _ host: EditorHost, assets: CanvasAssetStore = .shared, repository: Model3DRepository?) {
+        self.store = store; self.host = host; self.assets = assets; self.repository = repository
     }
 
     func selected() -> Stroke? {
@@ -47,59 +26,61 @@ final class Model3DController: ObservableObject {
         return store.selectedStroke { $0.model != nil }
     }
 
-    func insert(_ modelId: String, center: P? = nil) {
-        guard let repo = repository else { return }
-        Task {
-            busy = true
-            defer { busy = false }
-            guard let model = await repo.load(modelId) else { return }
-            await place(model, nil, center)
-        }
+    /// Açı sınırları: dikey eğim −80..80, yatay dönüş 0..360.
+    nonisolated static func withAngle(_ model: Model3D, yaw: Float, pitch: Float) -> Model3D {
+        var m = model
+        m.camera.yaw = (yaw.truncatingRemainder(dividingBy: 360) + 360).truncatingRemainder(dividingBy: 360)
+        m.camera.pitch = min(max(pitch, -80), 80)
+        return m
     }
 
-    func insertCatalog(_ catalogId: String, center: P? = nil) {
-        guard let repo = repository else { return }
-        Task {
-            busy = true
-            defer { busy = false }
-            guard let model = repo.fromCatalog(catalogId) else { return }
-            await place(model, nil, center)
-        }
-    }
+    /// Kütüphanedeki şeklin modeli (açı seçimi için).
+    func catalogModel(_ catalogId: String) -> Model3D? { repository?.fromCatalog(catalogId) }
 
-    /// v27 GLB/glTF dosyasını içe aktarıp tuvale ekler.
-    func importGlb(_ bytes: [UInt8], name: String, maxTriangles: Int, save: Bool, center: P? = nil) {
-        guard let repo = repository else { return }
-        Task {
-            busy = true
-            defer { busy = false }
-            do {
-                let imported = try await repo.importGlb(bytes, name, maxTriangles)
-                if save { await repo.save(imported.model) }
-                await place(imported.model, nil, center)
-                host.emit(.message(I18n.trf(save ? Self.MSG_IMPORT_SAVED : Self.MSG_IMPORT_CANVAS, imported.model.name, imported.triangles)))
-            } catch {
-                AppLog.e("GlbImport", "İçe aktarılamadı", error)
-                host.emit(.message(I18n.trf(Self.MSG_IMPORT_FAIL, error.localizedDescription)))
-            }
-        }
-    }
-
-    /// Düzenleyicide açmadan önce: model "3B Şekillerim"de yoksa tuvaldeki veriden geri yüklenir.
-    func prepareEdit(_ stroke: Stroke) async -> String? {
-        guard let link = stroke.model, let repo = repository else { return nil }
-        if await repo.load(link.modelId) != nil { return link.modelId }
-        guard let bytes = assets.bytes(link.dataAssetId), var model = try? Model3DStore.decode(bytes) else { return nil }
-        model.id = link.modelId
-        await repo.save(model)
-        return link.modelId
-    }
-
-    private func apply(_ r: Model3DResults.Result) async {
-        let existing = r.strokeId.flatMap { id in store.strokes.first { $0.id == id } }
+    /// GLB/glTF dosyasının modeli (ayrıntı düşürülür); okunamazsa bildirilir.
+    func glbModel(_ bytes: [UInt8], name: String, maxTriangles: Int) async -> Model3D? {
+        guard let repo = repository else { return nil }
         busy = true
         defer { busy = false }
-        await place(r.model, existing, nil)
+        do {
+            return try await repo.importGlb(bytes, name, maxTriangles).model
+        } catch {
+            AppLog.e("GlbImport", "İçe aktarılamadı", error)
+            host.emit(.message(I18n.trf(Self.MSG_IMPORT_FAIL, error.localizedDescription)))
+            return nil
+        }
+    }
+
+    /// Seçili 3B şeklin tuvalde saklanan modeli (Açıyı değiştir için).
+    func selectedModel() -> Model3D? {
+        guard let link = selected()?.model, let bytes = assets.bytes(link.dataAssetId) else { return nil }
+        return try? Model3DStore.decode(bytes)
+    }
+
+    /// Önizleme: modeli verilen açıdan kare resim olarak çizer.
+    func preview(_ model: Model3D, yaw: Float, pitch: Float, size: Int) async -> CGImage? {
+        guard let tex = repository?.textures else { return nil }
+        let m = Self.withAngle(model, yaw: yaw, pitch: pitch)
+        return await Task.detached(priority: .userInitiated) { Model3DRepository.render(m, size, size, tex) }.value
+    }
+
+    /// Modeli seçilen açıyla tuvale ekler.
+    func insert(_ model: Model3D, yaw: Float, pitch: Float, center: P? = nil) {
+        Task {
+            busy = true
+            defer { busy = false }
+            await place(Self.withAngle(model, yaw: yaw, pitch: pitch), nil, center)
+        }
+    }
+
+    /// Seçili 3B şeklin bakış açısını değiştirir (model aynı; tek geri alma adımı).
+    func changeAngle(yaw: Float, pitch: Float) {
+        guard let stroke = selected(), let model = selectedModel() else { return }
+        Task {
+            busy = true
+            defer { busy = false }
+            await place(Self.withAngle(model, yaw: yaw, pitch: pitch), stroke, nil)
+        }
     }
 
     /// Saydam kenarları kırpılmış ARGB resim.

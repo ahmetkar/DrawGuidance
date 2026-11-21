@@ -31,8 +31,11 @@ enum FeatureKeys {
         NOTES_IMAGE_BG_REMOVAL, NOTES_IMAGE_EFFECTS_ADVANCED, NOTES_DIAGRAMS_ADVANCED, NOTES_SHAPE_SUGGEST_ADVANCED,
         COMIC_IMAGE_BG_REMOVAL, COMIC_EFFECTS_ADVANCED, COMIC_CHARACTERS_ADVANCED, COMIC_OBJECTS_SUGGEST_ADVANCED,
         COMIC_EFFECTS, COMIC_CHARACTERS, COMIC_BACKGROUNDS, COMIC_TEMPLATES, COMIC_SHAPES_ADVANCED,
-        MODEL3D_SUGGEST, MODEL3D_EXPORT, KIDS_CHALLENGE_ADVANCED, ADS_NONE,
+        KIDS_CHALLENGE_ADVANCED, ADS_NONE,
     ]
+
+    /// v56 aşama 10 kaldırılan haklar (3B öneri herkese açık, GLB dışa aktarma kalktı); sunucudan gelse de sayılmaz.
+    static let RETIRED: Set<String> = [MODEL3D_SUGGEST, MODEL3D_EXPORT]
 
     static func modeOf(_ key: String) -> String { String(key.split(separator: ".").first ?? "") }
 }
@@ -40,8 +43,8 @@ enum FeatureKeys {
 /// v39 kilitlenebilen özellik; tuval türüne göre hangi hakkı istediği `key` ile bulunur (Android `PremiumFeature`).
 enum PremiumFeature {
     case IMAGE_BG_REMOVAL, IMAGE_EFFECTS_ADVANCED, SHAPE_SUGGEST_ADVANCED
-    case COMIC_EFFECTS, COMIC_CHARACTERS, COMIC_CHARACTERS_ADVANCED, COMIC_BACKGROUNDS, COMIC_TEMPLATES, MODEL3D_SUGGEST
-    case MODEL3D_EXPORT, KIDS_CHALLENGE_ADVANCED
+    case COMIC_EFFECTS, COMIC_CHARACTERS, COMIC_CHARACTERS_ADVANCED, COMIC_BACKGROUNDS, COMIC_TEMPLATES
+    case KIDS_CHALLENGE_ADVANCED
 
     func key(_ kind: CanvasKind?) -> String? {
         switch self {
@@ -59,8 +62,6 @@ enum PremiumFeature {
         case .COMIC_CHARACTERS_ADVANCED: return kind == .COMIC ? FeatureKeys.COMIC_CHARACTERS_ADVANCED : nil
         case .COMIC_BACKGROUNDS: return kind == .COMIC ? FeatureKeys.COMIC_BACKGROUNDS : nil
         case .COMIC_TEMPLATES: return kind == .COMIC ? FeatureKeys.COMIC_TEMPLATES : nil
-        case .MODEL3D_SUGGEST: return FeatureKeys.MODEL3D_SUGGEST
-        case .MODEL3D_EXPORT: return FeatureKeys.MODEL3D_EXPORT
         case .KIDS_CHALLENGE_ADVANCED: return FeatureKeys.KIDS_CHALLENGE_ADVANCED
         }
     }

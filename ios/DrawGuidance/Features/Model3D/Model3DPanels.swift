@@ -167,34 +167,10 @@ struct AsyncThumb: View {
     }
 }
 
-private struct PendingGlb: Identifiable { let id = UUID(); let name: String; let bytes: [UInt8] }
-
 private struct AddPanel3: View {
     @ObservedObject var vm: Model3DEditorModel
-    @State private var picking = false
-    @State private var pending: PendingGlb?
 
     var body: some View {
-        Button { picking = true } label: { Label(L("glb_import_button"), systemImage: "square.and.arrow.down").frame(maxWidth: .infinity) }
-            .buttonStyle(.bordered)
-            .accessibilityIdentifier("model3d_import_glb")
-            .fileImporter(isPresented: $picking, allowedContentTypes: [.glb, .gltf, .data]) { r in
-                switch r {
-                case .success(let url):
-                    let ok = url.startAccessingSecurityScopedResource()
-                    defer { if ok { url.stopAccessingSecurityScopedResource() } }
-                    do { pending = PendingGlb(name: url.deletingPathExtension().lastPathComponent, bytes: [UInt8](try Data(contentsOf: url))) } catch {
-                        vm.message(L("glb_import_failed", error.localizedDescription))
-                    }
-                case .failure(let e): vm.message(L("glb_import_failed", e.localizedDescription))
-                }
-            }
-            .sheet(item: $pending) { p in
-                GlbImportSheet(name: p.name, bytes: p.bytes.count, askSave: true) { tris, save in
-                    pending = nil
-                    vm.importGlbParts(p.bytes, p.name, tris, save)
-                } onDismiss: { pending = nil }
-            }
         Text(L("model3d_primitives")).font(.subheadline.weight(.semibold))
         hint(L("model3d_add_hint"))
         LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 8), count: 4), spacing: 8) {

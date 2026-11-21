@@ -21,8 +21,6 @@ enum EditEventText {
         case .textSuggestionsOff: return L("text_suggest_off_event")
         case .shapeSuggestionsOff: return L("shape_suggest_off_event")
         case .selectionSuggestionsOff: return L("selection_suggest_off_event")
-        case .draw3dOn: return L("draw3d_on_event")
-        case .draw3dOff: return L("draw3d_off_event")
         case let .message(text): return I18n.tr(text)
         case let .transferred(name, empty):
             if empty { return L("transfer_empty") }

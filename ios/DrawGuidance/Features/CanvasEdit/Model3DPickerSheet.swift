@@ -1,20 +1,22 @@
 import SwiftUI
 import UniformTypeIdentifiers
 
-/// v25 tuvalde "3B şekil ekle" penceresi (Android `Model3DPickerSheet`): 3B Şekillerim ve hazır şekiller; dokunmak şekli
-/// seçer, alttaki "3B şekil ekle" düğmesi seçili şekli tuvale ekler. Kalem 3B düzenleyicide açar, "Yeni 3B şekil" boş
-/// düzenleyiciyi açar. v27 GLB içe aktarma (basit çizimde yok); v33 basit resimde yalnız 10 hazır şekil.
+/// v56 aşama 10 tuvalde "3B şekil ekle" penceresi (Android `Model3DPickerSheet`): iki kaynak, **Kütüphane** (kategoriler
+/// ve arama) ve **GLB dosyası** (dosya seç, ayrıntı düzeyi; basit çizimde yok). Şekil seçilince açı adımı gelir:
+/// önizleme parmakla çevrilir, "3B şekil ekle" tuvale koyar. 3B Şekillerim, kalemle düzenleme ve "Yeni 3B şekil" yoktur.
 struct Model3DPickerSheet: View {
     @ObservedObject var vm: EditorViewModel
     @ObservedObject var repository: Model3DRepository
     let kind: CanvasKind
     @Environment(\.dismiss) private var dismiss
+    @State private var glbTab = false
     @State private var chosen: String?
-    @State private var editor: Model3DListView.OpenModel?
+    @State private var query = ""
     @State private var picking = false
-    @State private var pending: (name: String, bytes: [UInt8])?
-
-    private static let MY = "my:", CAT = "cat:"
+    @State private var glb: (name: String, bytes: [UInt8])?
+    @State private var detail = Budget3D.importDetail
+    @State private var loading = false
+    @State private var model: Model3D?
 
     /// Basit resim ve çocuk çiziminde 10 hazır 3B şekil (Android `SimpleCatalog.models3d`); öteki türlerde bütün katalog.
     static func catalogOnly(_ kind: CanvasKind) -> [String]? {
@@ -24,10 +26,8 @@ struct Model3DPickerSheet: View {
     }
 
     private var chosenName: String? {
-        guard let key = chosen else { return nil }
-        if key.hasPrefix(Self.MY) { return repository.models.first { $0.id == key.dropFirst(Self.MY.count) }?.name }
-        if key.hasPrefix(Self.CAT) { return Catalog3D.all.first { $0.id == key.dropFirst(Self.CAT.count) }?.name.tr }
-        return nil
+        if glbTab { return glb?.name }
+        return chosen.flatMap { id in Catalog3D.all.first { $0.id == id }?.name.tr }
     }
 
     var body: some View {
@@ -35,56 +35,39 @@ struct Model3DPickerSheet: View {
             VStack(spacing: 0) {
                 ScrollView {
                     VStack(alignment: .leading, spacing: 12) {
-                        Text(L("model3d_add_pick_hint")).font(.footnote).foregroundStyle(.secondary)
-                        HStack(spacing: 10) {
-                            Button { editor = .init(id: UUID().uuidString, modelId: nil) } label: {
-                                Label(L("model3d_new"), systemImage: "cube").frame(maxWidth: .infinity)
+                        if !kind.simple {
+                            Picker("", selection: $glbTab) {
+                                Text(L("v56_m3_library")).tag(false)
+                                Text(L("v56_m3_glb")).tag(true)
                             }
-                            .buttonStyle(.bordered)
-                            .accessibilityIdentifier("model3d_new")
-                            if !kind.simple {
-                                Button { picking = true } label: {
-                                    Label(L("glb_import_button"), systemImage: "square.and.arrow.down").frame(maxWidth: .infinity)
-                                }
-                                .buttonStyle(.bordered)
-                                .accessibilityIdentifier("model3d_import_glb")
-                            }
+                            .pickerStyle(.segmented)
+                            .accessibilityIdentifier("model3d_tabs")
                         }
-                        Text(L("model3d_my_models")).font(.headline)
-                        if repository.models.isEmpty { Text(L("model3d_list_empty")).foregroundStyle(.secondary) }
-                        LazyVGrid(columns: [GridItem(.adaptive(minimum: 120), spacing: 12)], spacing: 12) {
-                            ForEach(repository.models) { info in
-                                let key = Self.MY + info.id
-                                Model3DCard(info: info, selected: chosen == key)
-                                    .overlay(alignment: .topTrailing) {
-                                        Button { editor = .init(id: info.id, modelId: info.id) } label: {
-                                            Image(systemName: "pencil").padding(6).background(Circle().fill(.regularMaterial))
-                                        }
-                                        .padding(6)
-                                        .accessibilityLabel(L("model3d_edit"))
-                                    }
-                                    .onTapGesture { chosen = chosen == key ? nil : key }
+                        if glbTab { glbSection } else {
+                            Text(L("model3d_add_pick_hint")).font(.footnote).foregroundStyle(.secondary)
+                            if Self.catalogOnly(kind) == nil {
+                                TextField(L("v56_m3_search"), text: $query)
+                                    .textFieldStyle(.roundedBorder)
+                                    .accessibilityIdentifier("model3d_search")
                             }
-                        }
-                        Text(L("model3d_ready_shapes")).font(.headline)
-                        Text(L("model3d_add_ready_hint")).font(.footnote).foregroundStyle(.secondary)
-                        CatalogGrid3(columns: 5, tile: 60, selected: chosen.flatMap { $0.hasPrefix(Self.CAT) ? String($0.dropFirst(Self.CAT.count)) : nil },
-                                     only: Self.catalogOnly(kind)) { item in
-                            let key = Self.CAT + item.id
-                            chosen = chosen == key ? nil : key
+                            CatalogGrid3(columns: 5, tile: 64, selected: chosen, query: query, only: Self.catalogOnly(kind)) { item in
+                                chosen = chosen == item.id ? nil : item.id
+                            }
                         }
                     }
                     .padding(16)
                 }
                 Divider()
+                // Alt çubuk her ekran yönünde görünür
                 HStack(spacing: 12) {
                     Text(chosenName.map { L("model3d_add_selected", $0) } ?? L("model3d_add_none"))
                         .font(.subheadline).lineLimit(2)
                         .foregroundStyle(chosenName != nil ? Color.accentColor : .secondary)
                         .frame(maxWidth: .infinity, alignment: .leading)
-                    Button { insert() } label: { Label(L("model3d_add_button"), systemImage: "plus") }
+                    if loading { ProgressView() }
+                    Button { next() } label: { Label(L("v56_m3_next"), systemImage: "chevron.right") }
                         .buttonStyle(.borderedProminent)
-                        .disabled(chosenName == nil)
+                        .disabled(chosenName == nil || loading)
                         .accessibilityIdentifier("model3d_add_button")
                 }
                 .padding(.horizontal, 20).padding(.vertical, 12)
@@ -92,33 +75,136 @@ struct Model3DPickerSheet: View {
             .navigationTitle(L("model3d_add_title"))
             .navigationBarTitleDisplayMode(.inline)
             .toolbar { ToolbarItem(placement: .cancellationAction) { Button(L("close")) { dismiss() } } }
+            .navigationDestination(isPresented: Binding(get: { model != nil }, set: { if !$0 { model = nil } })) {
+                if let m = model {
+                    Model3DAngleView(model: m, title: L("v56_m3_angle_title"), confirm: L("model3d_add_button"),
+                                     preview: { m, y, p, s in await vm.previewModel3d(m, yaw: y, pitch: p, size: s) }) { yaw, pitch in
+                        vm.insertModel3d(m, yaw: yaw, pitch: pitch)
+                        dismiss()
+                    }
+                }
+            }
         }
         .accessibilityIdentifier("model3d_picker")
-        .fullScreenCover(item: $editor) { o in
-            NavigationStack { Model3DEditorView(repository: repository, modelId: o.modelId) }
-        }
         .fileImporter(isPresented: $picking, allowedContentTypes: [.glb, .gltf, .data]) { r in
             guard case .success(let url) = r else { return }
             let ok = url.startAccessingSecurityScopedResource()
             defer { if ok { url.stopAccessingSecurityScopedResource() } }
-            if let d = try? Data(contentsOf: url) { pending = (url.deletingPathExtension().lastPathComponent, [UInt8](d)) }
-        }
-        .sheet(isPresented: Binding(get: { pending != nil }, set: { if !$0 { pending = nil } })) {
-            if let p = pending {
-                GlbImportSheet(name: p.name, bytes: p.bytes.count, askSave: true) { tris, save in
-                    pending = nil
-                    vm.importGlbToCanvas(p.bytes, name: p.name, maxTriangles: tris, save: save)
-                    dismiss()
-                } onDismiss: { pending = nil }
-            }
+            if let d = try? Data(contentsOf: url) { glb = (url.deletingPathExtension().lastPathComponent, [UInt8](d)) }
         }
         .task { await repository.warmUp() }
     }
 
-    private func insert() {
-        guard let key = chosen, chosenName != nil else { return }
-        if key.hasPrefix(Self.MY) { vm.insertModel3d(String(key.dropFirst(Self.MY.count))) }
-        else { vm.insertCatalogModel3d(String(key.dropFirst(Self.CAT.count))) }
-        dismiss()
+    @ViewBuilder private var glbSection: some View {
+        Text(L("v56_m3_glb_hint")).font(.footnote).foregroundStyle(.secondary)
+        Button { picking = true } label: { Label(L("v56_m3_glb_pick"), systemImage: "square.and.arrow.down").frame(maxWidth: .infinity) }
+            .buttonStyle(.bordered)
+            .accessibilityIdentifier("model3d_import_glb")
+        if let g = glb {
+            let bytes = g.bytes.count
+            let size = bytes >= 1_048_576 ? String(format: "%.1f MB", Double(bytes) / 1_048_576) : "\(bytes / 1024) KB"
+            Text(L("glb_import_file", g.name, size)).font(.subheadline)
+            Text(L("glb_import_detail")).font(.subheadline.weight(.semibold))
+            Picker("", selection: $detail) {
+                ForEach(0..<3, id: \.self) { i in
+                    Text(L(["model3d_detail_low", "model3d_detail_mid", "model3d_detail_high"][i]).components(separatedBy: " (")[0]).tag(i)
+                }
+            }
+            .pickerStyle(.segmented)
+        }
+    }
+
+    private func next() {
+        if glbTab {
+            guard let g = glb else { return }
+            loading = true
+            Task {
+                model = await vm.glbModel3d(g.bytes, name: g.name, maxTriangles: Model3DRepository.DETAIL_LEVELS[detail])
+                loading = false
+            }
+        } else if let id = chosen {
+            model = vm.catalogModel3d(id)
+        }
+    }
+}
+
+/// Açı seçimi (ekleme ve "Açıyı değiştir"): önizleme parmakla sürüklenince döner (yatay: dönüş, dikey: eğim); hazır
+/// açılar ve kaydırıcılar. Onay modeli değiştirmez, yalnız bakış açısını verir.
+struct Model3DAngleView: View {
+    let model: Model3D
+    let title: String
+    let confirm: String
+    let preview: (Model3D, Float, Float, Int) async -> CGImage?
+    let onConfirm: (Float, Float) -> Void
+    @Environment(\.dismiss) private var dismiss
+    @State private var yaw: Float = 35
+    @State private var pitch: Float = 24
+    @State private var image: CGImage?
+    @State private var dragBase: (Float, Float)?
+
+    private static let presets: [(String, Float, Float)] = [("v56_m3_front", 0, 0), ("v56_m3_side", 90, 0), ("v56_m3_top", 0, 80), ("v56_m3_iso", 35, 24)]
+
+    var body: some View {
+        ScrollView {
+            VStack(spacing: 12) {
+                Text(L("v56_m3_angle_hint")).font(.footnote).foregroundStyle(.secondary).frame(maxWidth: .infinity, alignment: .leading)
+                ZStack {
+                    RoundedRectangle(cornerRadius: 16).fill(Color.secondary.opacity(0.08))
+                    if let img = image { Image(decorative: img, scale: 1).resizable().scaledToFit() } else { ProgressView() }
+                }
+                .aspectRatio(1, contentMode: .fit)
+                .frame(maxWidth: 360)
+                .gesture(DragGesture().onChanged { g in
+                    let base = dragBase ?? (yaw, pitch)
+                    dragBase = base
+                    yaw = ((base.0 - Float(g.translation.width) * 0.5).truncatingRemainder(dividingBy: 360) + 360).truncatingRemainder(dividingBy: 360)
+                    pitch = min(max(base.1 + Float(g.translation.height) * 0.4, -80), 80)
+                }.onEnded { _ in dragBase = nil })
+                .accessibilityIdentifier("model3d_angle_preview")
+                HStack(spacing: 6) {
+                    ForEach(Self.presets, id: \.0) { key, y, p in
+                        Button(L(key)) { yaw = y; pitch = p }
+                            .buttonStyle(.bordered)
+                            .accessibilityIdentifier("model3d_angle_\(Int(y))_\(Int(p))")
+                    }
+                }
+                Text(L("v56_m3_yaw", Int(yaw.rounded()))).font(.caption).frame(maxWidth: .infinity, alignment: .leading)
+                Slider(value: Binding(get: { Double(yaw) }, set: { yaw = Float($0) }), in: 0...360).accessibilityIdentifier("model3d_angle_yaw")
+                Text(L("v56_m3_pitch", Int(pitch.rounded()))).font(.caption).frame(maxWidth: .infinity, alignment: .leading)
+                Slider(value: Binding(get: { Double(pitch) }, set: { pitch = Float($0) }), in: -80...80).accessibilityIdentifier("model3d_angle_pitch")
+            }
+            .padding(16)
+        }
+        .navigationTitle(title)
+        .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            ToolbarItem(placement: .confirmationAction) {
+                Button(confirm) { onConfirm(yaw, pitch) }.accessibilityIdentifier("model3d_angle_confirm")
+            }
+        }
+        .accessibilityIdentifier("model3d_angle")
+        .onAppear { yaw = model.camera.yaw; pitch = model.camera.pitch }
+        .task(id: "\(Int(yaw))_\(Int(pitch))") {
+            try? await Task.sleep(nanoseconds: 40_000_000)
+            image = await preview(model, yaw, pitch, 320)
+        }
+    }
+}
+
+/// "Açıyı değiştir" penceresi (seçili 3B şekil).
+struct Model3DChangeAngleSheet: View {
+    @ObservedObject var vm: EditorViewModel
+    let model: Model3D
+    @Environment(\.dismiss) private var dismiss
+
+    var body: some View {
+        NavigationStack {
+            Model3DAngleView(model: model, title: L("v56_m3_change_angle"), confirm: L("ok_button"),
+                             preview: { m, y, p, s in await vm.previewModel3d(m, yaw: y, pitch: p, size: s) }) { yaw, pitch in
+                vm.changeModel3dAngle(yaw: yaw, pitch: pitch)
+                dismiss()
+            }
+            .toolbar { ToolbarItem(placement: .cancellationAction) { Button(L("cancel_button")) { dismiss() } } }
+        }
     }
 }

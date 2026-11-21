@@ -54,6 +54,9 @@ struct CanvasEditScreen: View {
                         }
                         // v56 aşama 6A Nesne menüsü
                         .sheet(isPresented: $vm.objectMenuOpen) { V56ObjectMenu(vm: vm) }
+                        .sheet(isPresented: Binding(get: { vm.angle3dModel != nil }, set: { if !$0 { vm.angle3dModel = nil } })) {
+                            if let m = vm.angle3dModel { Model3DChangeAngleSheet(vm: vm, model: m) }
+                        }
                         .sheet(isPresented: $vm.colorAdjustOpen) { V56ColorAdjustSheet(vm: vm) }
                         .sheet(isPresented: $vm.patternOpen) { V56PatternSheet(vm: vm) }
                     // v56 aşama 8 simetri çubuğu (Çiz modlarında)
@@ -96,7 +99,6 @@ struct CanvasEditScreen: View {
             // v53 balon yazısı doğrudan balonun üstünde
             .overlay { if vm.loaded { BalloonInlineEditor(vm: vm, texts: vm.texts, store: vm.store, viewport: vm.viewport) } }
             .overlay(alignment: .top) { if vm.loaded { ParamControlsHost(vm: vm, shapes: vm.shapes) } }
-            .overlay(alignment: .bottom) { if vm.loaded { Draw3dHost(vm: vm, store: vm.store) } }
             .overlay(alignment: .bottom) { if vm.loaded { SuggestionLayer(vm: vm, hw: vm.handwriting, texts: vm.texts, ctl: vm.challenge) } }
             // v51 canlı yayın: bu tuval yayındaysa değişiklikler karşı cihaza gider
             .overlay(alignment: .bottom) { if vm.loaded { LiveBroadcastBridge(store: vm.store, canvasLocalId: vm.canvasLocalId, owner: vm.liveOwner) } }

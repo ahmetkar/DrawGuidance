@@ -46,6 +46,8 @@ final class EditorViewModel: ObservableObject, EditorHost {
     @Published var textureFillTarget: String?
     /// v56 aşama 6A Nesne menüsü açık mı.
     @Published var objectMenuOpen = false
+    /// v56 aşama 10 "Açıyı değiştir" penceresinin modeli (nil: kapalı).
+    @Published var angle3dModel: Model3D?
     /// v56 sihirli değnek ölçütü ve benzerlik toleransı (0..1).
     @Published var wandCriterion: V56Selection.WandCriterion = .COLOR
     @Published private(set) var wandTolerance: Float = 0.15
@@ -225,7 +227,7 @@ final class EditorViewModel: ObservableObject, EditorHost {
         scene = ObjectSceneController(store)
         layers = LayerController(store)
         imageEdit = ImageEditController(store, self)
-        models3d = Model3DController(store, self, assets: deps.assets, repository: deps.models3d, results: deps.model3dResults)
+        models3d = Model3DController(store, self, assets: deps.assets, repository: deps.models3d)
         let mt = ModeTemplateSource(deps.shapeDb, deps.shapeModels, mode: { [weak store] in store?.canvas?.kind.shapeMode },
                                     kind: { [weak store] in store?.canvas?.kind })
         modeTemplates = mt
@@ -1750,55 +1752,6 @@ final class EditorViewModel: ObservableObject, EditorHost {
         if changed { store.commit(updated, coalesce: coalesce.map { "\($0)-\(ids.sorted().joined().javaHashCode)" }) }
     }
 
-    // MARK: v21–v23 3B çizim ve kamera
-
-    func toggleDraw3d() {
-        guard var g = store.canvas?.guide else { return }
-        g.draw3d.toggle()
-        guides.setGuide(g)
-        emit(g.draw3d ? .draw3dOn : .draw3dOff)
-    }
-
-    func setPlane3d(_ plane: Plane3D) {
-        guard var g = store.canvas?.guide else { return }
-        g.draw3d = true; g.plane3d = plane
-        guides.setGuide(g)
-    }
-
-    func setDepth3d(_ depth: Float, persist: Bool = true) {
-        guard var g = store.canvas?.guide else { return }
-        g.depth3d = depth.coerceIn(0, 1)
-        guides.setGuide(g, persist: persist)
-    }
-
-    func setCamera3d(_ yaw: Float, _ pitch: Float, _ persp: Float, persist: Bool = true) {
-        guard let g = store.canvas?.guide else { return }
-        var y = yaw.truncatingRemainder(dividingBy: 360)
-        if y < 0 { y += 360 }
-        var next = g
-        next.draw3d = true; next.yaw3d = y; next.pitch3d = pitch.coerceIn(-90, 90); next.persp3d = persp.coerceIn(0, 1)
-        if next == g && !persist { return }
-        guides.setGuide(next, persist: persist)
-        store.applyView(persist: persist)
-    }
-
-    func orbit3d(_ dYaw: Float, _ dPitch: Float, persist: Bool) {
-        guard let g = store.canvas?.guide else { return }
-        setCamera3d(g.yaw3d + dYaw, g.pitch3d + dPitch, g.persp3d, persist: persist)
-    }
-
-    func presetCamera3d(_ preset: CameraPreset) {
-        guard let g = store.canvas?.guide else { return }
-        let (y, p): (Float, Float)
-        switch preset {
-        case .ISO: (y, p) = (GuideSpec.DEFAULT_YAW, GuideSpec.DEFAULT_PITCH)
-        case .FRONT: (y, p) = (0, 0)
-        case .SIDE: (y, p) = (90, 0)
-        case .TOP: (y, p) = (0, 90)
-        }
-        setCamera3d(y, p, g.persp3d)
-    }
-
     // MARK: Çizgi roman
 
     func insertBalloon(_ style: BalloonStyle, speakers: Int, options: BalloonTextOptions = BalloonTextOptions()) {
@@ -1874,9 +1827,16 @@ final class EditorViewModel: ObservableObject, EditorHost {
 
     // MARK: 3B şekiller
 
-    func insertModel3d(_ modelId: String) { models3d.insert(modelId, center: takeAddAnchor()) }
-    func insertCatalogModel3d(_ catalogId: String) { models3d.insertCatalog(catalogId, center: takeAddAnchor()) }
-    func importGlbToCanvas(_ bytes: [UInt8], name: String, maxTriangles: Int, save: Bool) {
-        models3d.importGlb(bytes, name: name, maxTriangles: maxTriangles, save: save, center: takeAddAnchor())
+    // v56 aşama 10: kütüphane + GLB, açı seçimi, Açıyı değiştir (tuvalden 3B düzenleyiciye yol yok)
+    func catalogModel3d(_ catalogId: String) -> Model3D? { models3d.catalogModel(catalogId) }
+    func glbModel3d(_ bytes: [UInt8], name: String, maxTriangles: Int) async -> Model3D? {
+        await models3d.glbModel(bytes, name: name, maxTriangles: maxTriangles)
     }
+    func previewModel3d(_ model: Model3D, yaw: Float, pitch: Float, size: Int) async -> CGImage? {
+        await models3d.preview(model, yaw: yaw, pitch: pitch, size: size)
+    }
+    func insertModel3d(_ model: Model3D, yaw: Float, pitch: Float) { models3d.insert(model, yaw: yaw, pitch: pitch, center: takeAddAnchor()) }
+    func selectedModel3dData() -> Model3D? { models3d.selectedModel() }
+    func selectedIs3d() -> Bool { models3d.selected() != nil }
+    func changeModel3dAngle(yaw: Float, pitch: Float) { models3d.changeAngle(yaw: yaw, pitch: pitch) }
 }

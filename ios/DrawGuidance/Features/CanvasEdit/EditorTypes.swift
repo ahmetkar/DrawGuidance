@@ -150,7 +150,6 @@ enum EditMode: String, CaseIterable {
 enum SelectionKind { case NONE, TEXT, SHAPE, INK, FORMULA, IMAGE, DIAGRAM, MIXED }
 
 /// v22 3B sahnenin hazır açıları.
-enum CameraPreset { case ISO, FRONT, SIDE, TOP }
 
 /// Tuval üstü diyagram düzenlemede odaktaki öğe.
 enum DiagramFocus: Equatable {
@@ -233,8 +232,6 @@ enum EditEvent: Equatable {
     case textSuggestionsOff
     case shapeSuggestionsOff
     case selectionSuggestionsOff
-    case draw3dOn
-    case draw3dOff
     case message(String)
     case transferred(name: String?, empty: Bool)
     case aiOn

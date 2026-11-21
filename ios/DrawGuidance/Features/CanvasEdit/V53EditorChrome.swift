@@ -351,7 +351,6 @@ struct AdvancedMenus: View {
         if kind == .ART {
             ChromeButton(icon: "squareshape.split.3x3", label: L("v52_helpers_short"), selected: vm.helpers.active, id: "helpers_button") { sheet = .helpers }
         }
-        ChromeButton(icon: "cube", label: L("v53_draw3d"), selected: store.canvas?.guide.draw3d == true, id: "draw3d") { vm.toggleDraw3d() }
         ChromeButton(icon: "photo.on.rectangle", label: L("add_background"), id: "background_button", anchor: TutorialAnchor.BACKGROUND) { sheet = .background }
     }
 
@@ -386,6 +385,10 @@ struct AdvancedMenus: View {
         if vm.v56(.REFLECTION_LIQUIFY) {
             ChromeButton(icon: "arrow.up.and.down.righttriangle.up.righttriangle.down", label: L("v56_reflection"), enabled: hasSelection, id: "v56_reflection") { vm.reflectSelection() }
             ChromeButton(icon: "water.waves", label: L("v56_liquify"), id: "v56_liquify") { vm.startLiquify() }
+        }
+        // v56 aşama 10 tuvaldeki 3B şekil: "Düzenle" yok, "Açıyı değiştir" var
+        if hasSelection && vm.selectedIs3d() {
+            ChromeButton(icon: "rotate.3d", label: L("v56_m3_change_angle"), id: "model3d_change_angle") { vm.angle3dModel = vm.selectedModel3dData() }
         }
         // v56 aşama 7 seçime renk ayarları
         if vm.v56(.COLOR_ADJUST) {

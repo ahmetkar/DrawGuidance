@@ -15,8 +15,6 @@ struct Model3DEditorView: View {
     @State private var clearAsk = false
     @State private var toast: String?
     @State private var nameText = ""
-    @State private var shareItem: ShareFile?
-    @State private var exportDoc: GlbDocument?
 
     init(repository: Model3DRepository, modelId: String?, canvasId: String? = nil, strokeId: String? = nil, initialName: String? = nil) {
         _vm = StateObject(wrappedValue: Model3DEditorModel(repository: repository, modelId: modelId, canvasId: canvasId, strokeId: strokeId, initialName: initialName))
@@ -75,11 +73,6 @@ struct Model3DEditorView: View {
             Button(L("cancel_button"), role: .cancel) {}
         }
         .sheet(isPresented: $imageExport) { ImageExportSheet3(vm: vm) }
-        .sheet(item: $shareItem) { ShareSheet(items: [$0.url]) }
-        .fileExporter(isPresented: Binding(get: { exportDoc != nil }, set: { if !$0 { exportDoc = nil } }), document: exportDoc,
-                      contentType: .glb, defaultFilename: safeName) { r in
-            if case .failure(let e) = r { vm.message(L("model3d_export_failed", e.localizedDescription)) } else { vm.message(L("model3d_exported")) }
-        }
     }
 
     private var safeName: String {
@@ -111,18 +104,6 @@ struct Model3DEditorView: View {
                 Button { nameText = (vm.model?.name ?? "") + " (2)"; savingAs = true } label: { Label(L("model3d_save_as"), systemImage: "doc.on.doc") }
                 Button { vm.fitView() } label: { Label(L("model3d_fit"), systemImage: "viewfinder") }
                 Button { imageExport = true } label: { Label(L("model3d_export_image"), systemImage: "photo") }
-                Button {
-                    Task { if let b = await vm.exportGlb() { exportDoc = GlbDocument(data: Data(b)) } }
-                } label: { Label(L("model3d_export"), systemImage: "square.and.arrow.down.on.square") }
-                    .accessibilityIdentifier("model3d_export_item")
-                Button {
-                    Task {
-                        guard let b = await vm.exportGlb() else { return }
-                        let url = FileManager.default.temporaryDirectory.appendingPathComponent("\(safeName).glb")
-                        do { try Data(b).write(to: url); shareItem = ShareFile(url: url) } catch { vm.message(L("model3d_export_failed", error.localizedDescription)) }
-                    }
-                } label: { Label(L("model3d_share"), systemImage: "square.and.arrow.up") }
-                    .accessibilityIdentifier("model3d_share_item")
             } label: { Image(systemName: "ellipsis.circle").frame(width: 38, height: 38) }
                 .accessibilityLabel(L("more_options"))
         }

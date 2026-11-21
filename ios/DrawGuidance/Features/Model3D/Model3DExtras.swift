@@ -217,101 +217,53 @@ struct Checker: View {
 
 // MARK: - 3B Şekillerim
 
-/// v23 "3B Şekiller" bölümü: kaydedilen şekiller (dokununca düzenleyici), yeni şekil, silme, hazır şekiller ve GLB içe aktarma.
+/// v56 aşama 10 **3B Çizimlerim** (Android `Model3DListScreen`): kullanıcının 3B çizimleri. GLB içe/dışa aktarma ve
+/// hazır şekiller sekmesi kalktı (kütüphane yalnız tuvale eklemede). Uzun basınca silinir.
 struct Model3DListView: View {
     @ObservedObject var repository: Model3DRepository
-    @State private var ready = false
     @State private var query = ""
     @State private var open: OpenModel?
     @State private var deleting: Model3DInfo?
-    @State private var picking = false
-    @State private var pending: (name: String, bytes: [UInt8])?
-    @State private var importing = false
-    @State private var message: String?
 
     struct OpenModel: Identifiable, Hashable { let id: String; let modelId: String? }
 
     var body: some View {
         VStack(spacing: 0) {
-            HStack(spacing: 8) {
-                Chip3(L("model3d_my_shapes_tab"), !ready) { ready = false }
-                Chip3(L("model3d_ready_shapes"), ready) { ready = true }
-                Spacer()
-            }
-            .padding(.horizontal, 16).padding(.vertical, 4)
+            Text(L("v56_m3_list_hint")).font(.caption).foregroundStyle(.secondary)
+                .frame(maxWidth: .infinity, alignment: .leading).padding(.horizontal, 16).padding(.top, 4)
             TextField(L("search_models_hint"), text: $query).textFieldStyle(.roundedBorder).padding(.horizontal, 16).padding(.vertical, 6)
                 .accessibilityIdentifier("models3d_search")
-            if importing { Text(L("model3d_importing")).font(.caption).foregroundStyle(Color.accentColor) }
-            if let message { Text(message).font(.caption).foregroundStyle(Color.accentColor).padding(.horizontal, 20).accessibilityIdentifier("models3d_message") }
             ScrollView {
-                if ready {
-                    CatalogGrid3(columns: 4, tile: 72, query: query) { open = OpenModel(id: UUID().uuidString, modelId: Catalog3D.PREFIX + $0.id) }.padding(16)
-                } else {
-                    let q = query.trimmingCharacters(in: .whitespaces)
-                    let shown = q.isEmpty ? repository.models : repository.models.filter { $0.name.localizedCaseInsensitiveContains(q) }
-                    if repository.models.isEmpty { Text(L("model3d_list_empty")).foregroundStyle(.secondary).padding(24) } else if shown.isEmpty {
-                        Text(L("search_no_result", q)).foregroundStyle(.secondary).padding(24)
-                    }
-                    LazyVGrid(columns: [GridItem(.adaptive(minimum: 150), spacing: 14)], spacing: 14) {
-                        ForEach(shown) { info in
-                            Model3DCard(info: info)
-                                .onTapGesture { open = OpenModel(id: info.id, modelId: info.id) }
-                                .contextMenu { Button(L("delete_button"), role: .destructive) { deleting = info } }
-                                .onLongPressGesture { deleting = info }
-                        }
-                    }
-                    .padding(16)
+                let q = query.trimmingCharacters(in: .whitespaces)
+                let shown = q.isEmpty ? repository.models : repository.models.filter { $0.name.localizedCaseInsensitiveContains(q) }
+                if repository.models.isEmpty { Text(L("v56_m3_list_empty")).foregroundStyle(.secondary).padding(24) } else if shown.isEmpty {
+                    Text(L("search_no_result", q)).foregroundStyle(.secondary).padding(24)
                 }
+                LazyVGrid(columns: [GridItem(.adaptive(minimum: 150), spacing: 14)], spacing: 14) {
+                    ForEach(shown) { info in
+                        Model3DCard(info: info)
+                            .onTapGesture { open = OpenModel(id: info.id, modelId: info.id) }
+                            .contextMenu { Button(L("delete_button"), role: .destructive) { deleting = info } }
+                            .onLongPressGesture { deleting = info }
+                    }
+                }
+                .padding(16)
             }
         }
-        .navigationTitle(L("model3d_my_models"))
+        .navigationTitle(L("v56_m3_my_drawings"))
         .toolbar {
             ToolbarItemGroup(placement: .navigationBarTrailing) {
-                Button { picking = true } label: { Label(L("glb_import_button"), systemImage: "square.and.arrow.down") }
-                    .disabled(importing).accessibilityIdentifier("models3d_import_glb")
-                Button { open = OpenModel(id: UUID().uuidString, modelId: nil) } label: { Label(L("model3d_new"), systemImage: "plus") }
+                Button { open = OpenModel(id: UUID().uuidString, modelId: nil) } label: { Label(L("v56_m3_new_drawing"), systemImage: "plus") }
                     .accessibilityIdentifier("models3d_new")
             }
         }
         .navigationDestinationCompat(item: $open) { o in Model3DEditorView(repository: repository, modelId: o.modelId).toolbar(.hidden, for: .tabBar) }
-        .fileImporter(isPresented: $picking, allowedContentTypes: [.glb, .gltf, .data]) { r in
-            guard case .success(let url) = r else { return }
-            let ok = url.startAccessingSecurityScopedResource()
-            defer { if ok { url.stopAccessingSecurityScopedResource() } }
-            if let d = try? Data(contentsOf: url) { pending = (url.deletingPathExtension().lastPathComponent, [UInt8](d)) } else { show(L("model3d_import_failed", "")) }
-        }
-        .sheet(isPresented: Binding(get: { pending != nil }, set: { if !$0 { pending = nil } })) {
-            if let p = pending {
-                GlbImportSheet(name: p.name, bytes: p.bytes.count, askSave: false) { tris, _ in
-                    pending = nil
-                    importGlb(p.bytes, p.name, tris)
-                } onDismiss: { pending = nil }
-            }
-        }
         .alert(deleting.map { L("model3d_delete_title", $0.name) } ?? "", isPresented: Binding(get: { deleting != nil }, set: { if !$0 { deleting = nil } })) {
             Button(L("delete_button"), role: .destructive) { if let d = deleting { repository.delete([d.id]) }; deleting = nil }
             Button(L("cancel_button"), role: .cancel) { deleting = nil }
         } message: { Text(L("model3d_delete_text")) }
         .task { await repository.warmUp() }
         .accessibilityIdentifier("models3d_screen")
-    }
-
-    private func show(_ s: String) {
-        message = s
-        DispatchQueue.main.asyncAfter(deadline: .now() + 3) { if message == s { message = nil } }
-    }
-
-    private func importGlb(_ bytes: [UInt8], _ name: String, _ tris: Int) {
-        importing = true
-        Task {
-            defer { importing = false }
-            do {
-                let r = try await repository.importGlb(bytes, name, tris)
-                await repository.save(r.model)
-                show(L("model3d_imported", r.model.name, r.sourceTriangles, r.triangles))
-                open = OpenModel(id: r.model.id, modelId: r.model.id)
-            } catch { show(L("model3d_import_failed", "\(error)")) }
-        }
     }
 }
 

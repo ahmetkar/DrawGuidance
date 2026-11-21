@@ -136,6 +136,9 @@ final class ImagesRepository {
                                        defaultLocation: true))
     }
 
+    /// v56 aşama 9 belge kaydı (varsayılan yer).
+    func recordDoc(_ canvas: CanvasUi, _ file: ExportedFile, _ mime: String) { record(canvas, file, mime, .defaultLocation) }
+
     private func record(_ canvas: CanvasUi, _ file: ExportedFile, _ mime: String, _ target: SaveTarget) {
         let (path, bm) = relative(file.url, target)
         store.insert(SavedImage(id: 0, canvasLocalId: canvas.localId, title: canvas.name, path: path, bookmark: bm, width: canvas.width,

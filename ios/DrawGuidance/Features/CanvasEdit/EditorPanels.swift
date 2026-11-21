@@ -12,6 +12,7 @@ struct SaveSheet: View {
     @State private var scale: Double = 1
     @State private var allPages = false
     @State private var includeGuides = false
+    @State private var docName = ""
 
     var body: some View {
         NavigationStack {
@@ -19,7 +20,7 @@ struct SaveSheet: View {
                 let tabs = vm.saveTabs()
                 if tabs.count > 1 {
                     Picker("", selection: $tab) {
-                        ForEach(tabs, id: \.self) { t in Text(t == .IMAGE ? "PNG / JPEG" : t == .PDF ? "PDF" : "CBZ").tag(t) }
+                        ForEach(tabs, id: \.self) { t in Text(Self.tabTitle(t)).tag(t) }
                     }
                     .pickerStyle(.segmented)
                 }
@@ -27,6 +28,9 @@ struct SaveSheet: View {
                 case .IMAGE: imageSection
                 case .PDF: pdfSection
                 case .CBZ: cbzSection
+                case .SVG: docSection(.SVG)
+                case .PSD: docSection(.PSD)
+                case .DXF: docSection(.DXF)
                 }
             }
             .navigationTitle(L("save_button"))
@@ -36,6 +40,7 @@ struct SaveSheet: View {
             tab = vm.saveTabs().first ?? .IMAGE
             images.openSaveDialog()
             if let o = images.saveOptions { format = o.format; scale = Double(o.scale); allPages = o.allPages; includeGuides = o.includeGuides }
+            if docName.isEmpty { docName = v40.defaultDocName() }
         }
         .onDisappear { vm.closeUnifiedSave() }
     }
@@ -77,6 +82,40 @@ struct SaveSheet: View {
             switch images.pdf {
             case let .done(f), let .printDone(f): ShareLink(item: f.url) { Label(f.location, systemImage: "square.and.arrow.up") }
             case .failed: Text("⚠︎").foregroundStyle(.red)
+            default: EmptyView()
+            }
+        }
+    }
+
+    static func tabTitle(_ t: SaveTab) -> String {
+        switch t {
+        case .IMAGE: return "PNG / JPEG"
+        case .PDF: return "PDF"
+        case .CBZ: return "CBZ"
+        case .SVG: return "SVG"
+        case .PSD: return "PSD"
+        case .DXF: return "DXF"
+        }
+    }
+
+    /// v56 aşama 9 SVG / PSD / DXF: açıklama, dosya adı, Kaydet ve paylaş.
+    @ViewBuilder private func docSection(_ format: DocFormat) -> some View {
+        Section {
+            Text(L(format == .SVG ? "v56_save_svg_hint" : format == .PSD ? "v56_save_psd_hint" : "v56_save_dxf_hint"))
+                .font(.footnote).foregroundStyle(.secondary)
+            TextField(L("v56_save_file_name"), text: $docName)
+            Text(L("v56_save_location", v40.documentLocation)).font(.caption).foregroundStyle(.secondary)
+            Button {
+                v40.exportDoc(format, docName)
+            } label: {
+                if v40.doc == .exporting { ProgressView() } else { Label(L("v56_save_as", format.rawValue), systemImage: "square.and.arrow.down") }
+            }
+            .accessibilityIdentifier("v56_doc_save_button")
+            switch v40.doc {
+            case let .done(f, skipped):
+                ShareLink(item: f.url) { Label(f.location, systemImage: "square.and.arrow.up") }
+                if skipped > 0 { Text(L("v56_doc_dxf_skipped", skipped)).font(.caption).foregroundStyle(.secondary) }
+            case .failed: Text(L("v56_doc_failed")).foregroundStyle(.red)
             default: EmptyView()
             }
         }

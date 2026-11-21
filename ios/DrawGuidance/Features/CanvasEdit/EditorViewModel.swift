@@ -8,7 +8,7 @@ enum CanvasPick { case NONE, EYEDROPPER, RECT_SELECT, LASSO_SELECT, MAGIC_WAND, 
 struct TempEditDoc: Identifiable, Equatable { let id: String }
 
 /// Birleşik kaydetme penceresinin sekmeleri.
-enum SaveTab { case IMAGE, PDF, CBZ }
+enum SaveTab { case IMAGE, PDF, CBZ, SVG, PSD, DXF }
 
 /// Kağıdı kenardan genişletme yönü.
 enum ExpandSide { case LEFT, TOP, RIGHT, BOTTOM }
@@ -1367,11 +1367,15 @@ final class EditorViewModel: ObservableObject, EditorHost {
     // MARK: Kaydetme penceresi
 
     func saveTabs() -> [SaveTab] {
+        let base: [SaveTab]
         switch store.canvas?.kind {
-        case .COMIC: return [.PDF, .CBZ, .IMAGE]
-        case .NOTES, .SIMPLE_NOTES: return [.PDF, .IMAGE]
-        default: return [.IMAGE]
+        case .COMIC: base = [.PDF, .CBZ, .IMAGE]
+        case .NOTES, .SIMPLE_NOTES: base = [.PDF, .IMAGE]
+        default: base = [.IMAGE]
         }
+        // v56 aşama 9 SVG, PSD ve DXF (çocuk tuvalinde yok)
+        let docs = v56(.EXPORT_SVG_PSD_DXF) && store.canvas?.kind != .KIDS
+        return base + (docs ? [.SVG, .PSD, .DXF] : [])
     }
 
     func openUnifiedSave() {

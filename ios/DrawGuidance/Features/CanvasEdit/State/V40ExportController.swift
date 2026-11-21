@@ -54,5 +54,37 @@ final class V40ExportController: ObservableObject {
 
     func dismissCbz() { cbz = .idle }
 
+    // MARK: v56 aşama 9 SVG / PSD / DXF
+
+    enum DocState: Equatable {
+        case idle, exporting, failed
+        case done(ExportedFile, Int)
+        static func == (a: DocState, b: DocState) -> Bool {
+            switch (a, b) {
+            case (.idle, .idle), (.exporting, .exporting), (.failed, .failed): return true
+            case let (.done(f1, s1), .done(f2, s2)): return f1.url == f2.url && s1 == s2
+            default: return false
+            }
+        }
+    }
+
+    @Published private(set) var doc: DocState = .idle
+
+    func exportDoc(_ format: DocFormat, _ fileName: String) {
+        guard let current = store.canvas, let images, doc != .exporting else { return }
+        doc = .exporting
+        Task {
+            await Task.yield()
+            do { let r = try images.exportDoc(current, format, fileName); doc = .done(r.file, r.skipped) } catch {
+                AppLog.e("DocExport", "\(format.rawValue) kaydedilemedi", error)
+                doc = .failed
+            }
+        }
+    }
+
+    func dismissDoc() { doc = .idle }
+
+    func defaultDocName() -> String { store.canvas.map { ImageExporter.defaultFileName($0.name) } ?? "" }
+
     var documentLocation: String { images?.pdfLocationLabel ?? ImageExporter.FOLDER }
 }

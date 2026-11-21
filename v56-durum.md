@@ -1,6 +1,6 @@
 # v56 durum
 
-Son güncelleme: 2026-11-21, K3 durağı (otomatik geçiş: K7 sonuna kadar duraklarda beklenmiyor).
+Son güncelleme: 2026-11-21, K3A durağı (otomatik geçiş: K7 sonuna kadar duraklarda beklenmiyor).
 
 | Durak | Durum | Not |
 |---|---|---|
@@ -8,11 +8,46 @@ Son güncelleme: 2026-11-21, K3 durağı (otomatik geçiş: K7 sonuna kadar dura
 | K0 (aşama 0: canlı yayın) | Bitti | Android + iOS |
 | K1 (V11 model, katman motoru, seçim maskesi, kes/kopyala/yapıştır, fark paketi) | Bitti | Android + iOS |
 | K2 (hızlı fırça seçici, gren ve doku, Dönüştür paneli, yansıma, sıvılaştır, 2E dönüştürme/hizalama/efektler) | Bitti | Android + iOS |
-| **K3** (aşama 7, 8, 8A, 9: renk ayarları, katman çoğalt/birleştir, hazır ayarlar, simetri, desen, gelişmiş görünüm, bağlı kopya, opaklık maskesi, canlı Tekrarla, SVG/PSD/DXF) | **Bitti** | Android + iOS |
-| K3A (aşama 9C: 2E vektör araçları) | Sırada | |
-| K4–K6 (3B Çizim) | Başlamadı | |
+| K3 (aşama 7, 8, 8A, 9: renk ayarları, katman çoğalt/birleştir, hazır ayarlar, simetri, desen, gelişmiş görünüm, bağlı kopya, opaklık maskesi, canlı Tekrarla, SVG/PSD/DXF) | Bitti | Android + iOS |
+| **K3A** (aşama 9C: yol işlemleri, şekil oluşturucu, Bezier düğümleri, bıçak, efektler, zarf) | **Bitti** | Android + iOS |
+| K4 (aşama 10: 3B temizlik, tuvale 3B ekleme) | Sırada | |
+| K5–K6 (3B Çizim) | Başlamadı | |
 | K7 (aşama 14) | Başlamadı | |
 | K8 (9A e-posta girişi, 9B mağaza flavor'ları, aşama 15) | Başlamadı, Ahmet'in onayı gerekir | Ahmet: "9a ve 9b yi en sona al" |
+
+## K3A'da yapılanlar
+
+- **Yol işlemleri (Nesne menüsü, yalnız Resim):** Birleştir, Öndekini çıkar, Kesişim, Hariç tut, Böl, Kırp (görünen
+  parçalar), Aynı renkleri birleştir, Kırpma (üstteki şekille), Anahat. Kapalı şekiller, kement dolgu ve açık
+  yollar/kalem izleri (konturuyla) girer; sonuç tek geri alma adımı. Kendi poligon boolean motoru (`V56Bool`):
+  kesişimlerde bölme, kenar sınıflandırma, halka zincirleme; delikli sonuçlar desteklenir.
+- **Şekil oluşturucu:** seçimdeki şekillerin bütün bölgeleri tuvalde gösterilir; dokunuş bölgeyi birleştirilecek
+  yapar, çift dokunuş silinecek yapar; Uygula/İptal alt panelde.
+- **Bezier düğümleri:** Şekil düzenle › Noktalar'da tek seçili düğümün tutamakları görünür ve sürüklenir (kübik
+  eğri); Köşe / Yumuşak düğüm (yumuşakta karşı tutamak aynalanır); **Yolu uzat** uç düğümden Çizgi çiz aracını açar.
+- **Yol düzenle:** Konturu yola çevir (uç ve köşe biçimine göre), **Bıçak** (Çiz'de çizilen çizgi seçili ya da
+  kilitsiz katmanlardaki şekilleri keser; açık yollar da bölünür), Yolu ayır, Yolu kapat, Yönü ters çevir.
+- **Efektler:** Nesne › Efektler'e **Efekt listesi** (Öteleme, Kıvırma, Pürüz, Zikzak, Dalga; eklenir, ayarlanır,
+  kaldırılır, önizlemeli; değiştirilebilir: taban geometri saklanır) ve **Zarf bozma** (üstteki kapalı şekil zarf olur,
+  alttakiler içine bükülür).
+
+### Plandan sapmalar (K3A)
+
+- Düğüm türü ve tutamaklar `ShapeSpec`'te saklanmaz; yoğun çizgiden türetilir (tutamak = çizgi uzunluğunun üçte biri,
+  ilk ara noktaya doğru). Sürükleme çizgiyi kübik eğriye çevirir.
+- Efektler `style2.effects` + `style2.effectBase` içinde; dönüşümler tabanı da taşır. Düğüm düzenlemesi efektleri
+  kalıcı yapar (taban silinir). Zarf, girdap/büzüştür/şişir yıkıcı kalır.
+- Yolu uzat ayrı bir kalem modu değil, uç düğümden Çizgi çiz (CONNECT) aracıdır. "Yolu birleştir" mevcut Bağla aracıyla
+  yapılır; "Yolu ayır" alt yolları ayrı nesnelere böler.
+- Şekil oluşturucu Seç kipinde çalışır (sürükleyerek birleştirme yok; dokunuşla). Bıçak, açılırken seçili olanları
+  (seçim yoksa kilitsiz/görünür katmanlardaki tüm şekilleri) keser; serbest kalem izlerini kesmez.
+- Boolean sonuçları dolgulu şekil olur; kontur genişliği Böl/Kırp/Kırpma/Aynı renkleri birleştir'de sıfırlanır.
+
+## Testler (K3A)
+
+- Android: `V56PathOpsTest` 4/4 + `V56PathOpsUiTest` 1/1; V56*, *Codec*, *VectorEdit*, *ShapeEdit* takımları 0 hata.
+  Derleme hatasız.
+- iOS: `V56PathOpsTests` (5 test, Bezier tutamakları dahil) yazıldı (Swift derleyicisi yok, duraklarda CI yok).
 
 ## K3'te yapılanlar
 

@@ -59,6 +59,9 @@ struct SelectionMenu: View {
         if store.selectedIds.count > 1 {
             items.append(Action(id: "sel_group", label: L("group_selection"), icon: "square.stack.3d.up") { vm.selection.group() })
         }
+        if vm.v56(.TRANSFORM_PANEL) {
+            items.append(Action(id: "sel_transform", label: L("v56_transform"), icon: "skew") { vm.openTransform() })
+        }
         if vm.canUseClipboard() {
             items.append(Action(id: "sel_cut", label: L("v56_clip_cut"), icon: "scissors") { vm.clipboard.cut() })
             items.append(Action(id: "sel_copy", label: L("v56_clip_copy"), icon: "doc.on.doc") { vm.clipboard.copy() })

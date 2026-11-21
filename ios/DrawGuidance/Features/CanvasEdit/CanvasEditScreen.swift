@@ -43,6 +43,8 @@ struct CanvasEditScreen: View {
                     }
                     // v56 seçim alanı çubuğu ve sihirli değnek ayarları
                     V56SelectionOverlay(vm: vm, store: vm.store)
+                    // v56 aşama 6 Dönüştür paneli ve Sıvılaştır
+                    V56TransformLayer(vm: vm, transform: vm.transform, liquify: vm.liquify, viewport: vm.viewport)
                     // v56 hızlı fırça seçici (Resim ve Basit resim, Çiz modunda) ve damlalığın canlı renk dairesi
                     QuickBrushView(vm: vm, store: vm.store, brush: vm.brush, quick: vm.quickBrush, brushPickerOpen: $brushPickerOpen)
                     EyedropperLoupeView(vm: vm)

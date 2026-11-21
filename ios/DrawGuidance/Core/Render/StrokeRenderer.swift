@@ -5,6 +5,15 @@ import Foundation
 enum StrokeRenderer {
     /// Tek çizim: kırpma dörtgeni varsa içinde.
     static func drawStroke(_ c: CGContext, _ stroke: Stroke) {
+        // v56 aşama 6 yansıma: vektör noktaları dalgayla kayar (resimde ağ kayar), gradyan katmanla uygulanır
+        if WarpRenderer.hasWave(stroke), let w = stroke.warp?.wave {
+            let s = stroke.brushType == .IMAGE ? stroke : WarpRenderer.displaced(stroke)
+            let ys = stroke.points.map(\.y)
+            WarpRenderer.withFade(c, w, top: ys.min() ?? 0, bottom: ys.max() ?? 0) {
+                clipped(c, s) { grained(c, s) { drawUnclipped(c, s) } }
+            }
+            return
+        }
         clipped(c, stroke) { grained(c, stroke) { drawUnclipped(c, stroke) } }
     }
 
@@ -225,12 +234,14 @@ enum StrokeRenderer {
         for p in pts { bb.add(p.x, p.y) }
         let pad: Float
         switch stroke.brushType {
-        case .IMAGE, .TEXT, .DIAGRAM, .FORMULA: pad = 2
+        case .IMAGE, .TEXT, .DIAGRAM, .FORMULA:
+            pad = 2 + (stroke.warp?.wave.map { abs($0.amplitude) } ?? 0)
+            if let m = stroke.warp?.mesh { for p in m { bb.add(p.x, p.y) } }
         case .SHAPE:
             let label = stroke.shape?.subpaths.map { sub in sub.label.map { sub.labelSize * Float($0.count + 1) } ?? 0 }.max() ?? 0
             pad = (stroke.shape?.style.strokeWidth ?? stroke.sizePx) + 4 + label
         default:
-            pad = stroke.sizePx * stroke.brushType.reachFactor(stroke.params) + 4 +
+            pad = stroke.sizePx * stroke.brushType.reachFactor(stroke.params) + 4 + (stroke.warp?.wave.map { abs($0.amplitude) } ?? 0) +
                 Iso3D.extrudeReach(stroke.params?.depth3d, stroke.brushType.inkWidth(stroke.sizePx, strength: stroke.strength))
         }
         return bb.rect(pad)

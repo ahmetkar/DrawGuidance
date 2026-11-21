@@ -379,6 +379,14 @@ struct AdvancedMenus: View {
             }
         }
         ChromeButton(icon: "plus.square.on.square", label: L("duplicate_selection"), enabled: hasSelection, id: "duplicate") { vm.selection.duplicate() }
+        // v56 aşama 6: Dönüştür paneli, yansıma, sıvılaştır
+        if vm.v56(.TRANSFORM_PANEL) {
+            ChromeButton(icon: "skew", label: L("v56_transform"), enabled: hasSelection, id: "v56_open_transform") { vm.openTransform() }
+        }
+        if vm.v56(.REFLECTION_LIQUIFY) {
+            ChromeButton(icon: "arrow.up.and.down.righttriangle.up.righttriangle.down", label: L("v56_reflection"), enabled: hasSelection, id: "v56_reflection") { vm.reflectSelection() }
+            ChromeButton(icon: "water.waves", label: L("v56_liquify"), id: "v56_liquify") { vm.startLiquify() }
+        }
         if vm.canUseClipboard() {
             // v56 2C-3 kes, kopyala, yapıştır (yapıştır pano doluyken her sayfada)
             ChromeButton(icon: "scissors", label: L("v56_clip_cut"), enabled: hasSelection, id: "clip_cut") { vm.clipboard.cut() }

@@ -91,6 +91,9 @@ final class EditorViewModel: ObservableObject, EditorHost {
     private(set) var pages: PageController!
     private(set) var guides: GuideController!
     private(set) var images: ImageController!
+    /// v56 aşama 6 Dönüştür paneli ve Sıvılaştır.
+    private(set) var transform: TransformController!
+    private(set) var liquify: LiquifyController!
     private(set) var v40: V40ExportController!
     private(set) var v45: V45NotesComicController!
     private(set) var formulas: FormulaController!
@@ -197,6 +200,14 @@ final class EditorViewModel: ObservableObject, EditorHost {
         pages = PageController(store, beforeChange: { [unowned self] in beforePageChange() }, onLimit: { [unowned self] in emit(.pageLimit($0)) })
         guides = GuideController(store, self, repo)
         images = ImageController(store, self, assets: deps.assets, images: deps.images)
+        transform = TransformController(
+            store,
+            loadSnap: { [unowned self] in UserDefaults.standard.string(forKey: "v56.snap.\(store.canvas?.kind.rawValue ?? "ART")") },
+            saveSnap: { [unowned self] v in UserDefaults.standard.set(v, forKey: "v56.snap.\(store.canvas?.kind.rawValue ?? "ART")") },
+            fitTarget: { [unowned self] x, y in
+                comicPanelRects().values.first { $0.contains(P(x, y)) }.map { [$0.left, $0.top, $0.right, $0.bottom] }
+            })
+        liquify = LiquifyController(store)
         v40 = V40ExportController(store, images: deps.images, repository: repo)
         v45 = V45NotesComicController(store, self, pages)
         formulas = FormulaController(store, self) { [unowned self] in brush }
@@ -674,6 +685,41 @@ final class EditorViewModel: ObservableObject, EditorHost {
         return true
     }
 
+    /// v56 Dönüştür panelini açar (seçim gerekir).
+    @discardableResult
+    func openTransform(_ kind: TransformKind = .UNIFORM) -> Bool {
+        guard v56(.TRANSFORM_PANEL) else { return false }
+        liquify.cancel()
+        return transform.open(kind)
+    }
+
+    /// v56 Yansıma: seçimin altına dikey çevrilmiş, dalgalı ve solan kopya (tek geri alma adımı).
+    @discardableResult
+    func reflectSelection() -> Bool {
+        guard let c = store.canvas else { return false }
+        let ids = store.selection
+        guard !ids.isEmpty, let b = ElementOps.selectionBounds(c.strokes, ids) else { return false }
+        let before = Set(c.strokes.map(\.id))
+        let out = Reflection.create(c.strokes, ids, b.left, b.top, b.right, b.bottom, gap: 4, newId: { _ in UUID().uuidString.lowercased() })
+        if out.count == c.strokes.count { return false }
+        store.commit(out, useArea: false)
+        store.select(Set(out.map(\.id).filter { !before.contains($0) }))
+        return true
+    }
+
+    /// v56 Sıvılaştır: seçili resim (yoksa seçim ya da etkin katman resme çevrilerek) ağla deforme edilir.
+    func startLiquify() {
+        guard v56(.REFLECTION_LIQUIFY), !liquify.isOpen, let c = store.canvas else { return }
+        transform.cancel()
+        let active = store.activeLayer
+        var ids = store.selection
+        if ids.isEmpty { ids = Set(c.strokes.filter { !$0.hidden && Layers.of($0, c.layers) == active }.map(\.id)) }
+        if ids.isEmpty { return }
+        let sel = c.strokes.filter { ids.contains($0.id) }
+        if sel.count == 1, sel[0].brushType == .IMAGE { liquify.begin(sel[0].id); return }
+        Task { if let id = await images.rasterize(ids) { liquify.begin(id) } }
+    }
+
     /// Katman menüsünden: o katman etkin yapılıp bütün sayfası dokuyla doldurulur.
     func textureFillLayer(_ layerId: String, _ textureId: String) {
         layers.setActive(layerId)
@@ -756,7 +802,11 @@ final class EditorViewModel: ObservableObject, EditorHost {
         return [-o.x / sc, -o.y / sc, (v.w - o.x) / sc, (v.h - o.y) / sc]
     }
 
-    func paste(anchor: P? = nil) { clipboard.paste(anchor: anchor, visible: anchor == nil ? visibleCanvasRect() : nil) }
+    func paste(anchor: P? = nil) {
+        clipboard.paste(anchor: anchor, visible: anchor == nil ? visibleCanvasRect() : nil)
+        // v56: yapıştırılan seçim Dönüştür panelinde açılır
+        if !store.selection.isEmpty { openTransform() }
+    }
 
     func lassoFill(_ points: [P]? = nil) {
         selection.lassoFill(points?.map { StrokePoint($0.x, $0.y) }, colorHex: brush.settings.colorHex, opacity: brush.settings.opacity)

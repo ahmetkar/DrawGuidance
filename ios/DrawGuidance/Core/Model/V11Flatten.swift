@@ -24,7 +24,7 @@ enum V11Flatten {
         if let w = s.warp {
             var corners: [StrokePoint]? = nil
             if let q = w.quad, q.count == 4 { corners = q }
-            else if let m = w.mesh, m.count == 16 { corners = [m[0], m[3], m[15], m[12]] }
+            else if let m = w.mesh, WarpMesh.sizeOf(m) > 0 { let n = WarpMesh.sizeOf(m); corners = [m[0], m[n - 1], m[n * n - 1], m[n * (n - 1)]] }
             s.warp = nil
             if s.brushType == .IMAGE, let corners { s.points = corners }
         }

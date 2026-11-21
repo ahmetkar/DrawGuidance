@@ -85,45 +85,54 @@ struct WaveSpec: Codable, Equatable {
     var ripple = false
     var fadeFrom: Float = 1
     var fadeTo: Float = 1
+    /// v56 aşama 6: dalga ve gradyanın başladığı ve bittiği y (tuval); eşitse elemanın kendi kutusu. Dalgacık merkezi x.
+    var top: Float = 0
+    var bottom: Float = 0
+    var cx: Float = 0
 
-    init(amplitude: Float, wavelength: Float, phase: Float = 0, ripple: Bool = false, fadeFrom: Float = 1, fadeTo: Float = 1) {
+    init(amplitude: Float, wavelength: Float, phase: Float = 0, ripple: Bool = false, fadeFrom: Float = 1, fadeTo: Float = 1,
+         top: Float = 0, bottom: Float = 0, cx: Float = 0) {
         self.amplitude = amplitude; self.wavelength = wavelength; self.phase = phase; self.ripple = ripple
-        self.fadeFrom = fadeFrom; self.fadeTo = fadeTo
+        self.fadeFrom = fadeFrom; self.fadeTo = fadeTo; self.top = top; self.bottom = bottom; self.cx = cx
     }
 
     init(from decoder: Decoder) throws {
         let c = try decoder.container(keyedBy: AnyKey.self)
         amplitude = try c.req("amplitude"); wavelength = try c.req("wavelength"); phase = c.v("phase", 0)
         ripple = c.v("ripple", false); fadeFrom = c.v("fadeFrom", 1); fadeTo = c.v("fadeTo", 1)
+        top = c.v("top", 0); bottom = c.v("bottom", 0); cx = c.v("cx", 0)
     }
 
     func encode(to encoder: Encoder) throws {
         var c = encoder.container(keyedBy: AnyKey.self)
         try c.r(amplitude, "amplitude"); try c.r(wavelength, "wavelength"); try c.e(phase, "phase", 0)
         try c.e(ripple, "ripple", false); try c.e(fadeFrom, "fadeFrom", 1); try c.e(fadeTo, "fadeTo", 1)
+        try c.e(top, "top", 0); try c.e(bottom, "bottom", 0); try c.e(cx, "cx", 0)
     }
 }
 
-/// v56 resim dönüşümleri: bozma (4 köşe), çarpıtma (4×4 ağ, satır satır), yansıma dalgası.
+/// v56 resim dönüşümleri: bozma (4 köşe), çarpıtma (n×n ağ, satır satır: 4×4, gelişmiş 6×6, sıvılaştır 17×17), yansıma
+/// dalgası, ara değerleme (0 en yakın, 1 çift doğrusal, 2 çift kübik).
 struct ImageWarp: Codable, Equatable {
     var quad: [StrokePoint]? = nil
     var mesh: [StrokePoint]? = nil
     var wave: WaveSpec? = nil
+    var filter: Int = 1
 
-    var isEmpty: Bool { quad == nil && mesh == nil && wave == nil }
+    var isEmpty: Bool { quad == nil && mesh == nil && wave == nil && filter == 1 }
 
-    init(quad: [StrokePoint]? = nil, mesh: [StrokePoint]? = nil, wave: WaveSpec? = nil) {
-        self.quad = quad; self.mesh = mesh; self.wave = wave
+    init(quad: [StrokePoint]? = nil, mesh: [StrokePoint]? = nil, wave: WaveSpec? = nil, filter: Int = 1) {
+        self.quad = quad; self.mesh = mesh; self.wave = wave; self.filter = filter
     }
 
     init(from decoder: Decoder) throws {
         let c = try decoder.container(keyedBy: AnyKey.self)
-        quad = c.o("quad"); mesh = c.o("mesh"); wave = c.o("wave")
+        quad = c.o("quad"); mesh = c.o("mesh"); wave = c.o("wave"); filter = c.v("filter", 1)
     }
 
     func encode(to encoder: Encoder) throws {
         var c = encoder.container(keyedBy: AnyKey.self)
-        try c.o(quad, "quad"); try c.o(mesh, "mesh"); try c.o(wave, "wave")
+        try c.o(quad, "quad"); try c.o(mesh, "mesh"); try c.o(wave, "wave"); try c.e(filter, "filter", 1)
     }
 }
 

@@ -39,7 +39,13 @@ enum ImageRenderer {
         c.saveGState()
         defer { c.restoreGState() }
         c.setAlpha(CGFloat(alpha) / 255)
-        c.interpolationQuality = .high
+        let filter = stroke.warp?.filter ?? 1
+        c.interpolationQuality = filter == 0 ? .none : .high
+        // v56 aşama 6: Çarpıtma ağı ya da yansıma dalgası varsa ağla
+        if let verts = WarpRenderer.verts(Array(stroke.points.prefix(4)), stroke.warp) {
+            WarpRenderer.drawMesh(c, image, verts: verts, filter: filter, key: stroke.assetId ?? "")
+            return
+        }
         draw(c, image, quad: q, key: stroke.assetId ?? "")
     }
 

@@ -247,6 +247,41 @@ final class ImageController: ObservableObject {
         }
     }
 
+    /// v56 aşama 6 Sıvılaştır için: elemanlar (görünen hâliyle) tek resme çevrilir, yerlerine tek geri alma adımıyla o resim
+    /// konur ve seçilir; resmin kimliği döner (Android `ImageController.rasterize`).
+    func rasterize(_ ids: Set<String>) async -> String? {
+        guard let c = store.canvas else { return nil }
+        let sel = c.strokes.filter { ids.contains($0.id) && !$0.hidden }
+        if sel.isEmpty { return nil }
+        guard let bounds = sel.compactMap({ StrokeRenderer.paintBounds($0) }).reduce(nil as CGRect?, { $0.map { a in a.union($1) } ?? $1 }) else { return nil }
+        let r = bounds.intersection(CGRect(x: 0, y: 0, width: CGFloat(c.width), height: CGFloat(c.height)))
+        if r.isNull || r.width < 1 || r.height < 1 { return nil }
+        let scale = min(1, 2048 / max(r.width, r.height))
+        let w = max(1, Int((r.width * scale).rounded(.up))), h = max(1, Int((r.height * scale).rounded(.up)))
+        let layers = c.layers
+        let image = await Task.detached(priority: .userInitiated) {
+            Bitmaps.draw(w, h) { g in
+                g.scaleBy(x: scale, y: scale)
+                g.translateBy(x: -r.minX, y: -r.minY)
+                StrokeRenderer.drawStrokeList(g, sel, layers: layers)
+            }
+        }.value
+        guard let png = PixelCodec.encode(image) else { return nil }
+        let assetId = assets.save(store.canvasLocalId, PreparedImage(bytes: png, mimeType: "image/png", width: w, height: h, image: image,
+                                                                     originalBytes: png.count, detailScore: 0))
+        CanvasImageCache.put(assetId, image)
+        guard let current = store.canvas else { return nil }
+        let first = max(0, current.strokes.firstIndex { ids.contains($0.id) } ?? 0)
+        let l = Float(r.minX), t = Float(r.minY), rr = Float(r.maxX), b = Float(r.maxY)
+        let stroke = Stroke(id: UUID().uuidString.lowercased(), points: Self.quad(l, t, rr, b), colorHex: "#000000", brushType: .IMAGE,
+                            sizePx: 1, opacity: 1, order: first, assetId: assetId, layerId: sel[0].layerId)
+        var rest = current.strokes.filter { !ids.contains($0.id) }
+        rest.insert(stroke, at: min(first, rest.count))
+        store.commit(rest, useArea: false)
+        store.select([stroke.id])
+        return stroke.id
+    }
+
     /// v23 arka plan resmi: kontrol edilir, tuvalin resim verisine eklenir; kimliği [onAdded]'a verilir.
     func importBackground(_ data: Data, onAdded: @escaping (String) -> Void) {
         let canvasId = store.canvasLocalId

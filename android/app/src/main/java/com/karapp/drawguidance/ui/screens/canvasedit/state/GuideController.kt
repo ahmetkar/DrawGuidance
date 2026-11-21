@@ -72,4 +72,22 @@ class GuideController(
         }
         setGuide(next, persist)
     }
+
+    /** v56 aşama 8 simetri: tür seçilir (null: kapalı); merkez ve açı önceki ayardan korunur. */
+    fun setSymmetry(kind: com.karapp.drawguidance.data.model.SymmetryKind?) {
+        val current = store.canvas.value ?: return
+        val old = current.guide.symmetry
+        val spec = when {
+            kind == null -> null
+            old != null -> old.copy(kind = kind, arms = if (kind != com.karapp.drawguidance.data.model.SymmetryKind.RADIAL) 2 else if (old.kind == kind) old.arms else 6)
+            else -> com.karapp.drawguidance.data.model.V56Symmetry.start(kind, current.width, current.height)
+        }
+        setGuide(current.guide.copy(symmetry = spec))
+    }
+
+    /** Simetri ayarı (kol sayısı, eksen, açı, canlı ayna); [persist] false: sürüklenirken. */
+    fun updateSymmetry(spec: com.karapp.drawguidance.data.model.SymmetrySpec, persist: Boolean = true) {
+        val current = store.canvas.value ?: return
+        setGuide(current.guide.copy(symmetry = spec), persist)
+    }
 }

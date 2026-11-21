@@ -1146,6 +1146,7 @@ enum class GuideKind { NONE, GRID, RULED, DOTS, PERSPECTIVE_1, PERSPECTIVE_2, PE
  * [kind] kılavuz çizgileri (kareli/çizgili/noktalı/izometrik), [perspective] kaçış noktası sayısı (0 = kapalı).
  * [spacing] tuval birimi; ufuk ve kaçış noktaları kağıdın 0..1 oranındadır.
  */
+@OptIn(ExperimentalSerializationApi::class)
 @Serializable
 data class GuideSpec(
     val kind: GuideKind = GuideKind.NONE,
@@ -1171,6 +1172,8 @@ data class GuideSpec(
     val yaw3d: Float = DEFAULT_YAW,
     val pitch3d: Float = DEFAULT_PITCH,
     val persp3d: Float = 0f,
+    /** v56 aşama 8 simetri kılavuzu (Kılavuzlar › Simetri; yoksa kapalı). Tuvalle kaydedilir, geçmişe girmez. */
+    @EncodeDefault(EncodeDefault.Mode.NEVER) val symmetry: SymmetrySpec? = null,
 ) {
     /** v9 kayıtlarında perspektif de [kind] içindeydi: ayrı alana taşınır. */
     fun normalized(): GuideSpec = when (kind) {
@@ -1180,7 +1183,7 @@ data class GuideSpec(
         else -> this
     }
 
-    val isEmpty: Boolean get() = kind == GuideKind.NONE && perspective == 0 && !draw3d
+    val isEmpty: Boolean get() = kind == GuideKind.NONE && perspective == 0 && !draw3d && symmetry == null
 
     /** v21 3B çizim modu açıksa yeni izlere yazılacak düzlem ve derinlik. */
     val draw3dSpec: Depth3D? get() = if (draw3d) Depth3D(plane3d, depth3d.coerceIn(0f, 1f)) else null

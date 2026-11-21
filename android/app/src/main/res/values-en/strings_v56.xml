@@ -202,4 +202,21 @@
     <string name="v56_light_layer">Light layer</string>
     <string name="v56_shadow_layer">Shadow layer</string>
     <string name="v56_glitter_brush">Glitter brush</string>
+    <string name="v56_symmetry">Symmetry</string>
+    <string name="v56_sym_off">Off</string>
+    <string name="v56_sym_vertical">Vertical</string>
+    <string name="v56_sym_horizontal">Horizontal</string>
+    <string name="v56_sym_quad">Quad</string>
+    <string name="v56_sym_radial">Radial</string>
+    <string name="v56_sym_live">Live mirror</string>
+    <string name="v56_sym_center">Center</string>
+    <string name="v56_sym_close">Turn off symmetry</string>
+    <string name="v56_sym_arms">Arms: %1$d</string>
+    <string name="v56_sym_angle">Angle: %1$d°</string>
+    <string name="v56_sym_cx">Center X</string>
+    <string name="v56_sym_cy">Center Y</string>
+    <string name="v56_pattern">Make pattern</string>
+    <string name="v56_pattern_gap">Spacing: %1$d</string>
+    <string name="v56_pattern_count">%1$d copies</string>
+    <string name="v56_help_pattern">Tiles the selected elements across the canvas in a grid.</string>
 </resources>

@@ -895,6 +895,37 @@ fun DrawingCanvas(
                 if (liveVisible) with(com.karapp.drawguidance.ui.drawing.LayerCompositor) {
                     withLayerLook(if (live.isEraser) null else layerOf(activeLayerId)) { drawIntoCanvas { live.drawTo(it.nativeCanvas) } }
                 }
+                // v56 aşama 8 simetri: canlı ayna (çizerken kopyalar) ve eksen kılavuzu
+                val symmetry = canvas.guide.symmetry?.takeIf { com.karapp.drawguidance.data.model.V56Flags.enabled(com.karapp.drawguidance.data.model.V56Flags.Feature.SYMMETRY, canvas.kind) }
+                if (symmetry != null) {
+                    if (liveVisible && !live.finished && symmetry.live) with(com.karapp.drawguidance.ui.drawing.LayerCompositor) {
+                        // Canlı çizgi ekran koordinatında: merkez ekrana çevrilir, doğrusal kısım aynı kalır
+                        val sx = offset.x + scale * symmetry.cx; val sy = offset.y + scale * symmetry.cy
+                        val matrices = com.karapp.drawguidance.data.model.V56Symmetry.transforms(symmetry).map { t ->
+                            android.graphics.Matrix().apply {
+                                setValues(floatArrayOf(t.a, t.b, sx - t.a * sx - t.b * sy, t.c, t.d, sy - t.c * sx - t.d * sy, 0f, 0f, 1f))
+                            }
+                        }
+                        withLayerLook(if (live.isEraser) null else layerOf(activeLayerId)) {
+                            drawIntoCanvas { c ->
+                                matrices.forEach { m -> c.nativeCanvas.save(); c.nativeCanvas.concat(m); live.drawTo(c.nativeCanvas); c.nativeCanvas.restore() }
+                            }
+                        }
+                    }
+                    if (mode == EditMode.DRAW || mode == EditMode.PEN || mode == EditMode.PAINT) {
+                        val len = (canvas.width + canvas.height).toFloat()
+                        fun scr(x: Float, y: Float) = Offset(offset.x + scale * x, offset.y + scale * y)
+                        clipRect(paper.left, paper.top, paper.right, paper.bottom) {
+                            com.karapp.drawguidance.data.model.V56Symmetry.axes(symmetry, len).forEach { a ->
+                                drawLine(
+                                    colors.accent.copy(alpha = 0.55f), scr(a[0], a[1]), scr(a[2], a[3]), strokeWidth = 2f,
+                                    pathEffect = androidx.compose.ui.graphics.PathEffect.dashPathEffect(floatArrayOf(14f, 9f), 0f),
+                                )
+                            }
+                        }
+                        drawCircle(colors.accent, 6f, scr(symmetry.cx, symmetry.cy))
+                    }
+                }
                 // v18 hareket tahmini: canlı çizginin ucundan tahmin edilen yere geçici kuyruk (kaydedilmez)
                 val prediction = predicted.value
                 if (liveVisible && !live.finished && !live.isEraser && prediction.isNotEmpty()) {

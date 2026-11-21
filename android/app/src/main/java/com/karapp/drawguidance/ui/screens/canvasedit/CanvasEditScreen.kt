@@ -1,5 +1,6 @@
 package com.karapp.drawguidance.ui.screens.canvasedit
 
+import androidx.compose.material.icons.filled.Apps
 import androidx.compose.material.icons.filled.AutoAwesome
 import androidx.compose.material.icons.filled.DarkMode
 import androidx.compose.material.icons.filled.WbSunny
@@ -531,6 +532,7 @@ fun CanvasEditScreen(
     // v56 aşama 6A Nesne menüsü (hizala ve dağıt, efektler, tekrarla)
     var objectMenuOpen by remember { mutableStateOf(false) }
     var colorAdjustOpen by remember { mutableStateOf(false) }
+    var patternOpen by remember { mutableStateOf(false) }
 
     val imageAddedText = stringResource(R.string.image_added)
     val erasedRemovedText = stringResource(R.string.erased_removed)
@@ -756,7 +758,7 @@ fun CanvasEditScreen(
     val notes = kind.isNotes
     val comic = kind == com.karapp.drawguidance.data.model.CanvasKind.COMIC
     // Ekle (+) menüsü: öğeler tek listede; seçilen öğe hatırlanır ve menüde etkin görünür
-    val addItems = listOfNotNull(
+    val addItems = (listOfNotNull(
         // v53 not almada hızlı yazı kutusu; v54 Ekle menüsünün en başında
         if (notes) com.karapp.drawguidance.ui.screens.canvasedit.components.AddMenuItem("textbox", stringResource(R.string.v53_quick_text), Icons.Filled.ShortText) { toggleQuickText() } else null,
         com.karapp.drawguidance.ui.screens.canvasedit.components.AddMenuItem("shape", stringResource(R.string.add_shape), Icons.Filled.Category) { viewModel.openShapePicker() },
@@ -798,10 +800,6 @@ fun CanvasEditScreen(
         com.karapp.drawguidance.ui.screens.canvasedit.components.AddMenuItem("guide", stringResource(R.string.add_guide), Icons.Filled.GridOn) { guideOpen = true },
         // v56 Ekle › Doku: etkin katmanın sayfası hazır dokuyla doldurulur
         if (viewModel.v56(com.karapp.drawguidance.data.model.V56Flags.Feature.GRAIN)) com.karapp.drawguidance.ui.screens.canvasedit.components.AddMenuItem("texture", stringResource(R.string.v56_add_texture), Icons.Filled.Texture) { textureFillTarget = "page" } else null,
-        // v56 aşama 7 hazır ayarlar: ışık katmanı, gölge katmanı, parıltı fırçası
-        if (viewModel.v56(com.karapp.drawguidance.data.model.V56Flags.Feature.PRESETS)) com.karapp.drawguidance.ui.screens.canvasedit.components.AddMenuItem("light_layer", stringResource(R.string.v56_light_layer), Icons.Filled.WbSunny) { viewModel.addPresetLayer(com.karapp.drawguidance.data.model.V56Presets.Kind.LIGHT) } else null,
-        if (viewModel.v56(com.karapp.drawguidance.data.model.V56Flags.Feature.PRESETS)) com.karapp.drawguidance.ui.screens.canvasedit.components.AddMenuItem("shadow_layer", stringResource(R.string.v56_shadow_layer), Icons.Filled.DarkMode) { viewModel.addPresetLayer(com.karapp.drawguidance.data.model.V56Presets.Kind.SHADOW) } else null,
-        if (viewModel.v56(com.karapp.drawguidance.data.model.V56Flags.Feature.PRESETS)) com.karapp.drawguidance.ui.screens.canvasedit.components.AddMenuItem("glitter_brush", stringResource(R.string.v56_glitter_brush), Icons.Filled.AutoAwesome) { viewModel.useGlitterBrush() } else null,
         // v25 "3B şekil ekle" ayrı seçenek (kendi simgesiyle); pencerede şekil seçilip "3B şekil ekle" düğmesiyle eklenir
         com.karapp.drawguidance.ui.screens.canvasedit.components.AddMenuItem("model3d", stringResource(R.string.add_model3d), Icons.Filled.ViewInAr) { models3dOpen = true },
         // v27 not tuvalinde perspektif çizgisi eklenmez, yalnız kılavuz çizgileri
@@ -813,7 +811,7 @@ fun CanvasEditScreen(
             if (comic || notes) imageSourceOpen = true
             else pickImage.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
         },
-    ).map { item -> item.copy(onClick = { viewModel.rememberAddItem(item.id); item.onClick() }) }
+    ) + com.karapp.drawguidance.ui.screens.canvasedit.components.v56PresetAddItems(viewModel)).map { item -> item.copy(onClick = { viewModel.rememberAddItem(item.id); item.onClick() }) }
         .let { items -> if (notes) com.karapp.drawguidance.ui.screens.canvasedit.components.notesFirst(items) { it.id } else items }
 
     // v18: üst menü moda göre değişir (Çiz: çizim araçları; Seç: kopyala/sil; Taşı: konum ve kaydırma; Ekle:
@@ -940,6 +938,8 @@ fun CanvasEditScreen(
             if (viewModel.v56(com.karapp.drawguidance.data.model.V56Flags.Feature.TRANSFORM_PANEL)) ToolItem(Icons.Filled.Transform, stringResource(R.string.v56_transform), { viewModel.openTransform() }, enabled = hasSelection, tag = "v56_open_transform") else null,
             if (viewModel.v56(com.karapp.drawguidance.data.model.V56Flags.Feature.REFLECTION_LIQUIFY)) ToolItem(Icons.Filled.Flip, stringResource(R.string.v56_reflection), { viewModel.reflectSelection() }, enabled = hasSelection, tag = "v56_reflection") else null,
             if (viewModel.v56(com.karapp.drawguidance.data.model.V56Flags.Feature.REFLECTION_LIQUIFY)) ToolItem(Icons.Filled.Waves, stringResource(R.string.v56_liquify), { viewModel.startLiquify() }, tag = "v56_liquify") else null,
+            // v56 aşama 8 "Desen yap": seçim tuval boyunca döşenir
+            if (viewModel.v56(com.karapp.drawguidance.data.model.V56Flags.Feature.SYMMETRY)) ToolItem(Icons.Filled.Apps, stringResource(R.string.v56_pattern), { patternOpen = true }, enabled = hasSelection, tag = "v56_pattern_open") else null,
             // v56 aşama 7 seçime renk ayarları (HSL, renk dengesi, eğriler)
             if (viewModel.v56(com.karapp.drawguidance.data.model.V56Flags.Feature.COLOR_ADJUST)) ToolItem(Icons.Filled.Palette, stringResource(R.string.v56_color_adjust), { colorAdjustOpen = true }, enabled = hasSelection, tag = "v56_color_adjust_open") else null,
             if (viewModel.v56(com.karapp.drawguidance.data.model.V56Flags.Feature.ADV_ALIGN) || viewModel.v56(com.karapp.drawguidance.data.model.V56Flags.Feature.ADV_EFFECTS)) ToolItem(Icons.Filled.Category, stringResource(R.string.v56_object_menu), { objectMenuOpen = true }, enabled = hasSelection, tag = "v56_object_menu_open") else null,
@@ -1161,6 +1161,7 @@ fun CanvasEditScreen(
         // v40 cetvel ve şekil kalıbı ayrı düğmeler (dokununca açılır, yeniden dokununca kapanır)
         add(com.karapp.drawguidance.ui.screens.canvasedit.components.SimpleTool("ruler", Icons.Filled.Straighten, rulerToolLabel, rulerSession == com.karapp.drawguidance.ui.screens.canvasedit.ruler.GuideSession.RULER, rulerActions.toggleRuler))
         add(com.karapp.drawguidance.ui.screens.canvasedit.components.SimpleTool("template", com.karapp.drawguidance.ui.screens.canvasedit.components.V44Icons.Template, templateToolLabel, rulerSession == com.karapp.drawguidance.ui.screens.canvasedit.ruler.GuideSession.TEMPLATE || rulerSession == com.karapp.drawguidance.ui.screens.canvasedit.ruler.GuideSession.TEMPLATE_PICK, rulerActions.toggleTemplate))
+        com.karapp.drawguidance.ui.screens.canvasedit.components.v56SymmetrySimpleTool(viewModel, current0)?.let { add(it) }
         // v37 basit çizimde (basit not dışında) çizim alanını genişletme: kenarlar sürüklenir; yeniden dokununca çizime dönülür
         if (!kind.isNotes) {
             // v48 Genişlet yalnız tuval seçiliyken (eleman seçili değilken) etkin
@@ -1560,6 +1561,7 @@ fun CanvasEditScreen(
             com.karapp.drawguidance.ui.screens.canvasedit.components.V56SelectionOverlay(viewModel, mode, canvasPick) { textureFillTarget = "area" }
             if (objectMenuOpen) com.karapp.drawguidance.ui.screens.canvasedit.components.V56ObjectMenu(viewModel) { objectMenuOpen = false }
             if (colorAdjustOpen) com.karapp.drawguidance.ui.screens.canvasedit.components.V56ColorAdjustDialog(viewModel) { colorAdjustOpen = false }
+            if (patternOpen) com.karapp.drawguidance.ui.screens.canvasedit.components.V56PatternDialog(viewModel) { patternOpen = false }
             // v56 aşama 6 Dönüştür paneli ve Sıvılaştır
             if (viewModel.transform.state.collectAsState().value != null) {
                 Box(Modifier.fillMaxSize()) {
@@ -2395,6 +2397,7 @@ fun CanvasEditScreen(
             )
             }
         }
+        com.karapp.drawguidance.ui.screens.canvasedit.components.V56SymmetryBottom(viewModel, current, mode)
         // Çizim alanının hemen altındaki sayfa şeridi (çalışma/not tuvali; v27 çizgi roman da)
         if (kind.paged) com.karapp.drawguidance.ui.screens.canvasedit.components.ToolHelpScope(toolHelp) {
             com.karapp.drawguidance.ui.screens.canvasedit.components.PageStrip(
@@ -2755,6 +2758,11 @@ fun CanvasEditScreen(
                 // v27 mevcut kılavuz ve perspektif çizgilerini temizleme (her tuval türünde)
                 canClear = g0 != null && (g0.kind != com.karapp.drawguidance.data.model.GuideKind.NONE || g0.perspective > 0),
                 onClear = { guideOpen = false; viewModel.clearGuides() },
+                extra = if (viewModel.v56(com.karapp.drawguidance.data.model.V56Flags.Feature.SYMMETRY)) ({
+                    com.karapp.drawguidance.ui.screens.canvasedit.components.V56SymmetryPicker(g0?.symmetry?.kind) { k ->
+                        guideOpen = false; viewModel.setSymmetry(k); if (k != null) viewModel.setMode(EditMode.DRAW)
+                    }
+                }) else null,
             )
         }
         if (perspectiveOpen) {

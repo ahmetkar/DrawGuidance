@@ -252,6 +252,7 @@ object ToolDescriptions {
         R.string.v56_liquify to R.string.v56_help_liquify,
         R.string.v56_object_menu to R.string.v56_help_object_menu,
         R.string.v56_color_adjust to R.string.v56_help_color_adjust,
+        R.string.v56_pattern to R.string.v56_help_pattern,
         R.string.v56_quick_color to R.string.v56_help_quick_color,
         R.string.v56_quick_pin to R.string.v56_help_quick_pin,
         R.string.v56_quick_unpin to R.string.v56_help_quick_unpin,

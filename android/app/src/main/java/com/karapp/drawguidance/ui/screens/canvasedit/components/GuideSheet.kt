@@ -33,8 +33,13 @@ import com.karapp.drawguidance.ui.components.NeuSheet
 /** Kılavuz çizgisi türü seçimi (ayrıntılı ayar yok: genel ayarlar çizim alanının altında). */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun GuideTypeSheet(selected: GuideKind, onPick: (GuideKind) -> Unit, onDismiss: () -> Unit, canClear: Boolean = false, onClear: () -> Unit = {}) {
+fun GuideTypeSheet(
+    selected: GuideKind, onPick: (GuideKind) -> Unit, onDismiss: () -> Unit, canClear: Boolean = false, onClear: () -> Unit = {},
+    /** v56 aşama 8: kılavuz türlerinin altında ek bölüm (simetri). */
+    extra: (@Composable () -> Unit)? = null,
+) {
     TypeSheet(
+        extra = extra,
         title = stringResource(R.string.guide_title),
         options = GuideSpec.GridKinds.map { it to guideLabel(it) },
         selected = selected,
@@ -64,7 +69,7 @@ fun PerspectiveTypeSheet(selected: Int, onPick: (Int) -> Unit, onDismiss: () -> 
 @Composable
 private fun <T> TypeSheet(
     title: String, options: List<Pair<T, String>>, selected: T, onPick: (T) -> Unit, onDismiss: () -> Unit,
-    canClear: Boolean = false, onClear: () -> Unit = {},
+    canClear: Boolean = false, onClear: () -> Unit = {}, extra: (@Composable () -> Unit)? = null,
 ) {
     val colors = NeuTheme.colors
     NeuSheet(onDismiss) {
@@ -81,6 +86,7 @@ private fun <T> TypeSheet(
                     if (row.size == 1) Spacer(Modifier.weight(1f))
                 }
             }
+            extra?.invoke()
             // v27 tuvaldeki mevcut kılavuz ve perspektif çizgilerinin hepsini kaldırır
             if (canClear) {
                 NeuButton(

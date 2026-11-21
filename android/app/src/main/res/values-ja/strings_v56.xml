@@ -202,4 +202,21 @@
     <string name="v56_light_layer">光レイヤー</string>
     <string name="v56_shadow_layer">影レイヤー</string>
     <string name="v56_glitter_brush">キラキラブラシ</string>
+    <string name="v56_symmetry">対称</string>
+    <string name="v56_sym_off">オフ</string>
+    <string name="v56_sym_vertical">縦</string>
+    <string name="v56_sym_horizontal">横</string>
+    <string name="v56_sym_quad">4方向</string>
+    <string name="v56_sym_radial">放射</string>
+    <string name="v56_sym_live">ライブミラー</string>
+    <string name="v56_sym_center">中央へ</string>
+    <string name="v56_sym_close">対称をオフ</string>
+    <string name="v56_sym_arms">分割数: %1$d</string>
+    <string name="v56_sym_angle">角度: %1$d°</string>
+    <string name="v56_sym_cx">中心 X</string>
+    <string name="v56_sym_cy">中心 Y</string>
+    <string name="v56_pattern">パターン作成</string>
+    <string name="v56_pattern_gap">間隔: %1$d</string>
+    <string name="v56_pattern_count">%1$d 個のコピー</string>
+    <string name="v56_help_pattern">選択した要素をキャンバス全体に格子状に並べます。</string>
 </resources>

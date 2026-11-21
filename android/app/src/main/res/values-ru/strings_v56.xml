@@ -202,4 +202,21 @@
     <string name="v56_light_layer">Слой света</string>
     <string name="v56_shadow_layer">Слой тени</string>
     <string name="v56_glitter_brush">Кисть блёсток</string>
+    <string name="v56_symmetry">Симметрия</string>
+    <string name="v56_sym_off">Выкл.</string>
+    <string name="v56_sym_vertical">Вертикальная</string>
+    <string name="v56_sym_horizontal">Горизонтальная</string>
+    <string name="v56_sym_quad">Четверная</string>
+    <string name="v56_sym_radial">Радиальная</string>
+    <string name="v56_sym_live">Живое зеркало</string>
+    <string name="v56_sym_center">По центру</string>
+    <string name="v56_sym_close">Выключить симметрию</string>
+    <string name="v56_sym_arms">Лучей: %1$d</string>
+    <string name="v56_sym_angle">Угол: %1$d°</string>
+    <string name="v56_sym_cx">Центр X</string>
+    <string name="v56_sym_cy">Центр Y</string>
+    <string name="v56_pattern">Сделать узор</string>
+    <string name="v56_pattern_gap">Интервал: %1$d</string>
+    <string name="v56_pattern_count">Копий: %1$d</string>
+    <string name="v56_help_pattern">Заполняет холст сеткой из выбранных элементов.</string>
 </resources>

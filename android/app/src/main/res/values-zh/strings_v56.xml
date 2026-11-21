@@ -202,4 +202,21 @@
     <string name="v56_light_layer">光照图层</string>
     <string name="v56_shadow_layer">阴影图层</string>
     <string name="v56_glitter_brush">闪光笔刷</string>
+    <string name="v56_symmetry">对称</string>
+    <string name="v56_sym_off">关闭</string>
+    <string name="v56_sym_vertical">垂直</string>
+    <string name="v56_sym_horizontal">水平</string>
+    <string name="v56_sym_quad">四向</string>
+    <string name="v56_sym_radial">径向</string>
+    <string name="v56_sym_live">实时镜像</string>
+    <string name="v56_sym_center">居中</string>
+    <string name="v56_sym_close">关闭对称</string>
+    <string name="v56_sym_arms">分支：%1$d</string>
+    <string name="v56_sym_angle">角度：%1$d°</string>
+    <string name="v56_sym_cx">中心 X</string>
+    <string name="v56_sym_cy">中心 Y</string>
+    <string name="v56_pattern">制作图案</string>
+    <string name="v56_pattern_gap">间距：%1$d</string>
+    <string name="v56_pattern_count">%1$d 个副本</string>
+    <string name="v56_help_pattern">将所选元素以网格方式铺满画布。</string>
 </resources>

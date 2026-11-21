@@ -87,6 +87,8 @@ data class SymmetrySpec(
     val cx: Float,
     val cy: Float,
     @EncodeDefault(EncodeDefault.Mode.NEVER) val angle: Float = 0f,
+    /** v56 aşama 8 canlı ayna: çizerken kopyalar da görünür (kapalıyken kopyalar bırakınca eklenir). */
+    @EncodeDefault(EncodeDefault.Mode.NEVER) val live: Boolean = true,
 )
 
 /** v56 belge düzeyindeki ek bilgiler (V11 içerikte JSON olarak). */

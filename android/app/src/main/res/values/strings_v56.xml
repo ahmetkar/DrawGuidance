@@ -202,4 +202,21 @@
     <string name="v56_light_layer">Işık katmanı</string>
     <string name="v56_shadow_layer">Gölge katmanı</string>
     <string name="v56_glitter_brush">Parıltı fırçası</string>
+    <string name="v56_symmetry">Simetri</string>
+    <string name="v56_sym_off">Kapalı</string>
+    <string name="v56_sym_vertical">Dikey</string>
+    <string name="v56_sym_horizontal">Yatay</string>
+    <string name="v56_sym_quad">Dörtlü</string>
+    <string name="v56_sym_radial">Radyal</string>
+    <string name="v56_sym_live">Canlı ayna</string>
+    <string name="v56_sym_center">Ortala</string>
+    <string name="v56_sym_close">Simetriyi kapat</string>
+    <string name="v56_sym_arms">Kol: %1$d</string>
+    <string name="v56_sym_angle">Açı: %1$d°</string>
+    <string name="v56_sym_cx">Merkez X</string>
+    <string name="v56_sym_cy">Merkez Y</string>
+    <string name="v56_pattern">Desen yap</string>
+    <string name="v56_pattern_gap">Aralık: %1$d</string>
+    <string name="v56_pattern_count">%1$d kopya</string>
+    <string name="v56_help_pattern">Seçili elemanları tuval boyunca ızgara halinde döşer.</string>
 </resources>

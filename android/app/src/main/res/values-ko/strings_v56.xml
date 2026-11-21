@@ -202,4 +202,21 @@
     <string name="v56_light_layer">빛 레이어</string>
     <string name="v56_shadow_layer">그림자 레이어</string>
     <string name="v56_glitter_brush">반짝이 브러시</string>
+    <string name="v56_symmetry">대칭</string>
+    <string name="v56_sym_off">끄기</string>
+    <string name="v56_sym_vertical">세로</string>
+    <string name="v56_sym_horizontal">가로</string>
+    <string name="v56_sym_quad">4분할</string>
+    <string name="v56_sym_radial">방사형</string>
+    <string name="v56_sym_live">실시간 미러</string>
+    <string name="v56_sym_center">가운데로</string>
+    <string name="v56_sym_close">대칭 끄기</string>
+    <string name="v56_sym_arms">팔: %1$d</string>
+    <string name="v56_sym_angle">각도: %1$d°</string>
+    <string name="v56_sym_cx">중심 X</string>
+    <string name="v56_sym_cy">중심 Y</string>
+    <string name="v56_pattern">패턴 만들기</string>
+    <string name="v56_pattern_gap">간격: %1$d</string>
+    <string name="v56_pattern_count">복사본 %1$d개</string>
+    <string name="v56_help_pattern">선택한 요소를 캔버스 전체에 격자로 배치합니다.</string>
 </resources>

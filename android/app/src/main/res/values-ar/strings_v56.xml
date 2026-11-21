@@ -202,4 +202,21 @@
     <string name="v56_light_layer">طبقة الضوء</string>
     <string name="v56_shadow_layer">طبقة الظل</string>
     <string name="v56_glitter_brush">فرشاة اللمعان</string>
+    <string name="v56_symmetry">التماثل</string>
+    <string name="v56_sym_off">إيقاف</string>
+    <string name="v56_sym_vertical">عمودي</string>
+    <string name="v56_sym_horizontal">أفقي</string>
+    <string name="v56_sym_quad">رباعي</string>
+    <string name="v56_sym_radial">شعاعي</string>
+    <string name="v56_sym_live">مرآة حية</string>
+    <string name="v56_sym_center">توسيط</string>
+    <string name="v56_sym_close">إيقاف التماثل</string>
+    <string name="v56_sym_arms">الأذرع: %1$d</string>
+    <string name="v56_sym_angle">الزاوية: %1$d°</string>
+    <string name="v56_sym_cx">المركز X</string>
+    <string name="v56_sym_cy">المركز Y</string>
+    <string name="v56_pattern">إنشاء نمط</string>
+    <string name="v56_pattern_gap">التباعد: %1$d</string>
+    <string name="v56_pattern_count">%1$d نسخة</string>
+    <string name="v56_help_pattern">يكرر العناصر المحددة على اللوحة في شبكة.</string>
 </resources>

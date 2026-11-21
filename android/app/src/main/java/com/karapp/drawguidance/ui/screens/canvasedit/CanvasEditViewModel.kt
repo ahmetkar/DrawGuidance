@@ -1586,6 +1586,35 @@ class CanvasEditViewModel(
     fun clearGuides() = guides.clearGuides()
     fun removePerspective() = guides.removePerspective()
     fun moveVanishingPoint(index: Int, fx: Float, fy: Float, persist: Boolean) = guides.moveVanishingPoint(index, fx, fy, persist)
+    /** v56 aşama 8 simetri kılavuzu. */
+    fun setSymmetry(kind: com.karapp.drawguidance.data.model.SymmetryKind?) = guides.setSymmetry(kind)
+    fun updateSymmetry(spec: com.karapp.drawguidance.data.model.SymmetrySpec, persist: Boolean = true) = guides.updateSymmetry(spec, persist)
+
+    /** v56 aşama 8 "Desen yap": seçili elemanlar [gap] aralıkla tuval boyunca döşenir (tek geri alma adımı). */
+    fun makePattern(gap: Float): Int {
+        val c = store.canvas.value ?: return 0
+        val sel = c.strokes.filter { it.id in store.selection && !it.hidden }
+        val b = selectionBoundsArray(sel) ?: return 0
+        val out = com.karapp.drawguidance.data.model.V56Symmetry.pattern(sel, b, c.width, c.height, gap) { java.util.UUID.randomUUID().toString() }
+        if (out.isEmpty()) return 0
+        val group = out.first().groupId
+        val strokes = c.strokes.map { if (it.id in store.selection && it.groupId == null) it.copy(groupId = group) else it } + out
+        store.commit(strokes, useArea = false)
+        return out.size
+    }
+
+    /** Desen önizlemesi için kopya sayısı. */
+    fun patternCount(gap: Float): Int {
+        val c = store.canvas.value ?: return 0
+        val b = selectionBoundsArray(c.strokes.filter { it.id in store.selection && !it.hidden }) ?: return 0
+        return com.karapp.drawguidance.data.model.V56Symmetry.patternCount(b, c.width, c.height, gap)
+    }
+
+    private fun selectionBoundsArray(sel: List<Stroke>): FloatArray? {
+        val r = sel.mapNotNull { com.karapp.drawguidance.ui.drawing.StrokeRenderer.paintBounds(it) }
+            .reduceOrNull { a, b -> androidx.compose.ui.geometry.Rect(minOf(a.left, b.left), minOf(a.top, b.top), maxOf(a.right, b.right), maxOf(a.bottom, b.bottom)) } ?: return null
+        return floatArrayOf(r.left, r.top, r.right, r.bottom)
+    }
 
     // --- Şekiller ---
 

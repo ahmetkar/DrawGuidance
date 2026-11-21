@@ -60,8 +60,12 @@ class DrawingController(
                 if (d == null) settings.params else (settings.params ?: com.karapp.drawguidance.data.model.BrushParams()).copy(depth3d = d)
             },
         )
+        // v56 aşama 8 simetri: kopyalar ayrı elemanlar olarak aynı adımda eklenir
+        val sym = current.guide.symmetry?.takeIf { com.karapp.drawguidance.data.model.V56Flags.enabled(com.karapp.drawguidance.data.model.V56Flags.Feature.SYMMETRY, current.kind) }
+        val copies = if (sym == null) emptyList() else com.karapp.drawguidance.data.model.V56Symmetry.copies(stroke, sym) { UUID.randomUUID().toString() }
         // Silgi yalnızca fırçayla çizilenleri (kendi katmanında) siler: şekil, diyagram, yazı, resim ve formül silinmez
-        store.commit(current.strokes + stroke)
+        store.commit(current.strokes + stroke + copies)
+        if (settings.brushType == BrushType.ERASER) copies.forEach { pruneAfterEraser(it) }
         if (settings.brushType == BrushType.ERASER) pruneAfterEraser(stroke)
         else host.onInk(stroke)
     }

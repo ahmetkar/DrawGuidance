@@ -69,6 +69,9 @@ class EditorPrefsStore(private val context: Context) {
     fun setQuickBrush(kind: String, text: String) = quickPrefs.edit().putString("lists.$kind", text).apply()
     fun quickCorner(kind: String): String? = quickPrefs.getString("corner.$kind", null)
     fun setQuickCorner(kind: String, corner: String) = quickPrefs.edit().putString("corner.$kind", corner).apply()
+    // v56 Dönüştür paneli yaslama ayarları (mod başına, SnapPrefs.encode)
+    fun transformSnap(kind: String): String? = quickPrefs.getString("snap.$kind", null)
+    fun setTransformSnap(kind: String, text: String) = quickPrefs.edit().putString("snap.$kind", text).apply()
 
     /** v29 silinen tuvalin ayarları da silinir. */
     fun clearCanvas(canvasId: String) {

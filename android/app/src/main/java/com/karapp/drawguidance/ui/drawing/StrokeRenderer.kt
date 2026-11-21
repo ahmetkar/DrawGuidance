@@ -93,6 +93,20 @@ object StrokeRenderer {
     }
 
     private fun DrawScope.drawClipped(stroke: Stroke, offset: Offset) {
+        // v56 yansıma: dalga (vektörde noktalar, resimde ağ) ve alfa gradyanı
+        val wave = stroke.warp?.wave
+        if (wave != null && WarpRenderer.hasWave(stroke)) {
+            val body = if (stroke.brushType == BrushType.IMAGE) stroke else WarpRenderer.displaced(stroke)
+            val b = paintBounds(stroke)
+            drawIntoCanvas { c ->
+                WarpRenderer.withFade(c.nativeCanvas, wave, (b?.top ?: 0f) + offset.y, (b?.bottom ?: 0f) + offset.y) { drawGrained(body, offset) }
+            }
+            return
+        }
+        drawGrained(stroke, offset)
+    }
+
+    private fun DrawScope.drawGrained(stroke: Stroke, offset: Offset) {
         // v56 gren: iz ara katmanda çizilip dokuyla çarpılır
         val grain = GrainRenderer.grainOf(stroke)
         if (grain != null && !stroke.brushType.isObject) {
@@ -412,6 +426,7 @@ object StrokeRenderer {
     private class PaintBounds(
         val points: List<com.karapp.drawguidance.data.model.StrokePoint>, val size: Float, val rect: Rect,
         val params: com.karapp.drawguidance.data.model.BrushParams? = null,
+        val warp: com.karapp.drawguidance.data.model.ImageWarp? = null,
     )
 
     private val paintBounds = object : android.util.LruCache<String, PaintBounds>(8192) {}
@@ -424,7 +439,7 @@ object StrokeRenderer {
     fun paintBounds(stroke: Stroke): Rect? {
         val pts = stroke.points
         if (pts.isEmpty()) return null
-        paintBounds.get(stroke.id)?.let { if (it.points === pts && it.size == stroke.sizePx && it.params == stroke.params) return it.rect }
+        paintBounds.get(stroke.id)?.let { if (it.points === pts && it.size == stroke.sizePx && it.params == stroke.params && it.warp == stroke.warp) return it.rect }
         var l = Float.MAX_VALUE; var t = Float.MAX_VALUE; var r = -Float.MAX_VALUE; var b = -Float.MAX_VALUE
         for (p in pts) {
             if (p.x < l) l = p.x
@@ -442,8 +457,11 @@ object StrokeRenderer {
                 // v21 3B çizim modunda katı gövde kabarma yönünde uzanır
                 Iso3D.extrudeReach(stroke.params?.depth3d, stroke.brushType.inkWidth(stroke.sizePx, stroke.strength))
         }
-        val rect = Rect(l - pad, t - pad, r + pad, b + pad)
-        paintBounds.put(stroke.id, PaintBounds(pts, stroke.sizePx, rect, stroke.params))
+        // v56 Çarpıtma ağı noktaları ve yansıma dalgası kutunun dışına taşabilir
+        stroke.warp?.mesh?.forEach { p -> if (p.x < l) l = p.x; if (p.x > r) r = p.x; if (p.y < t) t = p.y; if (p.y > b) b = p.y }
+        val wavePad = stroke.warp?.wave?.amplitude?.let { kotlin.math.abs(it) * 1.5f } ?: 0f
+        val rect = Rect(l - pad - wavePad, t - pad - wavePad, r + pad + wavePad, b + pad + wavePad)
+        paintBounds.put(stroke.id, PaintBounds(pts, stroke.sizePx, rect, stroke.params, stroke.warp))
         return rect
     }
 
@@ -539,6 +557,14 @@ object StrokeRenderer {
                 return@drawIntoCanvas
             }
             val bitmap = image.asAndroidBitmap()
+            val alphaW = (stroke.opacity.coerceIn(0f, 1f) * 255).toInt()
+            // v56 Çarpıtma ağı ve yansıma dalgası: ağ çizimi
+            val raw = FloatArray(8) { if (it % 2 == 0) stroke.points[it / 2].x else stroke.points[it / 2].y }
+            val verts = WarpRenderer.verts(raw, stroke.warp, offset.x, offset.y)
+            if (verts != null) {
+                WarpRenderer.drawMesh(native, bitmap, verts, alphaW, stroke.warp?.filter ?: 1)
+                return@drawIntoCanvas
+            }
             val src = floatArrayOf(0f, 0f, bitmap.width.toFloat(), 0f, bitmap.width.toFloat(), bitmap.height.toFloat(), 0f, bitmap.height.toFloat())
             val matrix = android.graphics.Matrix()
             if (!matrix.setPolyToPoly(src, 0, dst, 0, 4)) return@drawIntoCanvas
@@ -549,7 +575,9 @@ object StrokeRenderer {
                 com.karapp.drawguidance.ui.drawing.scene.HarmonyRenderer.draw(native, bitmap, stroke.assetId, harmony, matrix, alpha)
                 return@drawIntoCanvas
             }
-            val paint = android.graphics.Paint(android.graphics.Paint.FILTER_BITMAP_FLAG or android.graphics.Paint.ANTI_ALIAS_FLAG).apply {
+            // v56 ara değerleme: en yakın (0) süzgeçsiz
+            val flags = if (stroke.warp?.filter == 0) android.graphics.Paint.ANTI_ALIAS_FLAG else android.graphics.Paint.FILTER_BITMAP_FLAG or android.graphics.Paint.ANTI_ALIAS_FLAG
+            val paint = android.graphics.Paint(flags).apply {
                 this.alpha = alpha
             }
             native.drawBitmap(bitmap, matrix, paint)

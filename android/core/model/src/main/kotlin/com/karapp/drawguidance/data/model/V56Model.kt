@@ -51,11 +51,16 @@ data class WaveSpec(
     /** Yukarıdan aşağı alfa gradyanı (başlangıç ve bitiş opaklığı). */
     @EncodeDefault(EncodeDefault.Mode.NEVER) val fadeFrom: Float = 1f,
     @EncodeDefault(EncodeDefault.Mode.NEVER) val fadeTo: Float = 1f,
+    /** v56 aşama 6: dalga ve gradyanın başladığı ve bittiği y (tuval; yansımanın ekseni ve alt kenarı). Eşitse elemanın kendi kutusu. */
+    @EncodeDefault(EncodeDefault.Mode.NEVER) val top: Float = 0f,
+    @EncodeDefault(EncodeDefault.Mode.NEVER) val bottom: Float = 0f,
+    /** Dalgacığın merkezi x (tuval). */
+    @EncodeDefault(EncodeDefault.Mode.NEVER) val cx: Float = 0f,
 )
 
 /**
  * v56 resim dönüşümleri (asıl resim değişmez, sonradan düzenlenir): [quad] bozma (4 köşe, sol-üstten saat yönünde),
- * [mesh] çarpıtma (4×4 = 16 kontrol noktası, satır satır), [wave] yansıma dalgası. Noktalar tuval koordinatındadır.
+ * [mesh] çarpıtma (n×n kontrol noktası, satır satır: 4×4, gelişmiş 6×6, sıvılaştır 17×17), [wave] yansıma dalgası. Noktalar tuval koordinatındadır.
  */
 @OptIn(ExperimentalSerializationApi::class)
 @Serializable
@@ -63,8 +68,10 @@ data class ImageWarp(
     @EncodeDefault(EncodeDefault.Mode.NEVER) val quad: List<StrokePoint>? = null,
     @EncodeDefault(EncodeDefault.Mode.NEVER) val mesh: List<StrokePoint>? = null,
     @EncodeDefault(EncodeDefault.Mode.NEVER) val wave: WaveSpec? = null,
+    /** v56 aşama 6 resim ara değerlemesi: 0 en yakın, 1 çift doğrusal (öntanımlı), 2 çift kübik. */
+    @EncodeDefault(EncodeDefault.Mode.NEVER) val filter: Int = 1,
 ) {
-    val isEmpty: Boolean get() = quad == null && mesh == null && wave == null
+    val isEmpty: Boolean get() = quad == null && mesh == null && wave == null && filter == 1
 }
 
 /** v56 simetri türleri. */

@@ -30,7 +30,8 @@ object V11Flatten {
         if (layerAlpha < 1f) s = s.copy(opacity = s.opacity * layerAlpha)
         if (s.mask != null) s = s.copy(mask = null)
         s.warp?.let { w ->
-            val corners = w.quad?.takeIf { it.size == 4 } ?: w.mesh?.takeIf { it.size == 16 }?.let { m -> listOf(m[0], m[3], m[15], m[12]) }
+            val n = w.mesh?.let { com.karapp.drawguidance.data.model.WarpMesh.sizeOf(it) } ?: 0
+            val corners = w.quad?.takeIf { it.size == 4 } ?: w.mesh?.takeIf { n > 1 }?.let { m -> listOf(m[0], m[n - 1], m[n * n - 1], m[n * (n - 1)]) }
             s = s.copy(warp = null, points = if (s.brushType == BrushType.IMAGE && corners != null) corners else s.points)
         }
         s.params?.let { p -> if (p.grain != null || p.stampAssetId != null) s = s.copy(params = p.copy(grain = null, stampAssetId = null)) }

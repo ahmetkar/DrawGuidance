@@ -376,6 +376,7 @@ class CanvasEditViewModel(
     )
 
 
+
     // --- v51 geçici resim düzenleme tuvali (not almadan açılır; otomatik kayıt kapalı, Kaydet nota aktarır) ---
 
     private val tempSession = com.karapp.drawguidance.data.notes.TempCanvases.session(canvasLocalId)
@@ -438,6 +439,20 @@ class CanvasEditViewModel(
     private val pages = PageController(store, ::beforePageChange, onLimit = { emit(EditEvent.PageLimit(it)) })
     private val guides = GuideController(store, this, repository)
     private val images = ImageController(store, this, assetStore, imageImporter, imagesRepository)
+
+    // --- v56 aşama 6: Dönüştür paneli, yansıma, sıvılaştır ---
+    private fun kindKey(): String = store.canvas.value?.kind?.name ?: "ART"
+    val transform = com.karapp.drawguidance.ui.screens.canvasedit.state.TransformController(
+        store, loadSnap = { prefs.transformSnap(kindKey()) }, saveSnap = { prefs.setTransformSnap(kindKey(), it) },
+        fitTarget = { cx, cy ->
+            // Çizgi romanda seçimin bulunduğu panelin kutusu
+            if (store.canvas.value?.kind == com.karapp.drawguidance.data.model.CanvasKind.COMIC) {
+                comicPanelRects().values.firstOrNull { it.contains(androidx.compose.ui.geometry.Offset(cx, cy)) }
+                    ?.let { floatArrayOf(it.left, it.top, it.right, it.bottom) }
+            } else null
+        },
+    )
+    val liquify = com.karapp.drawguidance.ui.screens.canvasedit.state.LiquifyController(store)
     /** v52 foto düzenleme modu. */
     val photo = com.karapp.drawguidance.ui.screens.canvasedit.state.PhotoEditController(store, this, assetStore)
     /** v40 sayfa ayarları (numara, üst/alt bilgi) ve CBZ dışa aktarma. */
@@ -1104,6 +1119,44 @@ class CanvasEditViewModel(
         return true
     }
 
+    /** v56 Dönüştür panelini açar (seçim gerekir). */
+    fun openTransform(kind: com.karapp.drawguidance.data.model.TransformKind = com.karapp.drawguidance.data.model.TransformKind.UNIFORM): Boolean {
+        if (!v56(com.karapp.drawguidance.data.model.V56Flags.Feature.TRANSFORM_PANEL)) return false
+        liquify.cancel()
+        return transform.open(kind)
+    }
+
+    /** v56 Yansıma: seçimin altına dikey çevrilmiş, dalgalı ve solan kopya (tek geri alma adımı). */
+    fun reflectSelection(): Boolean {
+        val c = store.canvas.value ?: return false
+        val ids = store.selection
+        if (ids.isEmpty()) return false
+        val b = com.karapp.drawguidance.ui.screens.canvasedit.editor.ElementOps.selectionBounds(c.strokes, ids) ?: return false
+        val before = c.strokes.mapTo(HashSet()) { it.id }
+        val out = com.karapp.drawguidance.data.model.Reflection.create(c.strokes, ids, b.left, b.top, b.right, b.bottom, 4f, { java.util.UUID.randomUUID().toString() })
+        if (out.size == c.strokes.size) return false
+        store.commit(out, useArea = false)
+        store.select(out.filter { it.id !in before }.mapTo(HashSet()) { it.id })
+        return true
+    }
+
+    /**
+     * v56 Sıvılaştır: seçili resim (yoksa seçim ya da etkin katman resme çevrilerek) ağla deforme edilir.
+     */
+    fun startLiquify() {
+        if (!v56(com.karapp.drawguidance.data.model.V56Flags.Feature.REFLECTION_LIQUIFY) || liquify.isOpen) return
+        transform.cancel()
+        val c = store.canvas.value ?: return
+        val active = store.activeLayer.value
+        val ids = store.selection.ifEmpty {
+            c.strokes.filter { !it.hidden && com.karapp.drawguidance.data.model.Layers.of(it, c.layers) == active }.mapTo(HashSet()) { it.id }
+        }
+        if (ids.isEmpty()) return
+        val single = c.strokes.singleOrNull { it.id in ids }?.takeIf { it.brushType == BrushType.IMAGE }
+        if (single != null) { liquify.begin(single.id); return }
+        viewModelScope.launch { images.rasterize(ids)?.let { liquify.begin(it) } }
+    }
+
     /** Katman menüsünden: o katman etkin yapılıp bütün sayfası dokuyla doldurulur. */
     fun textureFillLayer(layerId: String, textureId: String) {
         setActiveLayer(layerId)
@@ -1259,7 +1312,11 @@ class CanvasEditViewModel(
     fun canUseClipboard(): Boolean = v56(com.karapp.drawguidance.data.model.V56Flags.Feature.CROSS_PAGE_PASTE)
     fun cutSelected() { clipboard.cut() }
     fun copySelected() { clipboard.copy() }
-    fun paste(anchor: Offset? = null, visible: FloatArray? = null) = clipboard.paste(anchor, visible)
+    fun paste(anchor: Offset? = null, visible: FloatArray? = null) {
+        clipboard.paste(anchor, visible)
+        // v56: yapıştırılan seçim Dönüştür panelinde açılır (planın 2A bölümü)
+        if (store.selection.isNotEmpty()) openTransform()
+    }
 
     /** v23 iki parmakla uzun basma: altındaki eleman seçilir (boş yerde seçim kalkar). */
     fun selectForContext(x: Float, y: Float, tolerance: Float): Boolean = selection.selectForContext(x, y, tolerance)

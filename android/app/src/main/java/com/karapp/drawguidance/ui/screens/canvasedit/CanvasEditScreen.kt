@@ -54,6 +54,8 @@ import androidx.compose.material.icons.filled.AddCircleOutline
 import androidx.compose.material.icons.filled.TouchApp
 import androidx.compose.material.icons.filled.LineWeight
 import androidx.compose.material.icons.filled.Waves
+import androidx.compose.material.icons.filled.Transform
+import androidx.compose.material.icons.filled.Flip
 import androidx.compose.material.icons.filled.AutoFixHigh
 import androidx.compose.material.icons.filled.Remove
 import androidx.compose.material.icons.filled.Add
@@ -923,6 +925,11 @@ fun CanvasEditScreen(
             if (viewModel.v56(com.karapp.drawguidance.data.model.V56Flags.Feature.LASSO_FILL)) ToolItem(Icons.Filled.FormatColorFill, stringResource(R.string.v56_element_lasso_fill), { viewModel.toggleCanvasPick(com.karapp.drawguidance.ui.screens.canvasedit.components.CanvasPick.LASSO_FILL) }, selected = canvasPick == com.karapp.drawguidance.ui.screens.canvasedit.components.CanvasPick.LASSO_FILL, tag = "select_lasso_fill") else null,
         ) + listOf(
             ToolItem(Icons.Filled.ContentCopy, duplicateText, viewModel::duplicateSelected, enabled = hasSelection),
+        ) + listOfNotNull(
+            // v56 aşama 6: Dönüştür paneli, yansıma, sıvılaştır
+            if (viewModel.v56(com.karapp.drawguidance.data.model.V56Flags.Feature.TRANSFORM_PANEL)) ToolItem(Icons.Filled.Transform, stringResource(R.string.v56_transform), { viewModel.openTransform() }, enabled = hasSelection, tag = "v56_open_transform") else null,
+            if (viewModel.v56(com.karapp.drawguidance.data.model.V56Flags.Feature.REFLECTION_LIQUIFY)) ToolItem(Icons.Filled.Flip, stringResource(R.string.v56_reflection), { viewModel.reflectSelection() }, enabled = hasSelection, tag = "v56_reflection") else null,
+            if (viewModel.v56(com.karapp.drawguidance.data.model.V56Flags.Feature.REFLECTION_LIQUIFY)) ToolItem(Icons.Filled.Waves, stringResource(R.string.v56_liquify), { viewModel.startLiquify() }, tag = "v56_liquify") else null,
         ) + (if (clipboardOn) listOf(
             ToolItem(Icons.Filled.ContentCut, stringResource(R.string.v56_clip_cut), { viewModel.cutSelected() }, enabled = hasSelection, tag = "clip_cut"),
             ToolItem(Icons.Filled.CopyAll, stringResource(R.string.v56_clip_copy), { viewModel.copySelected() }, enabled = hasSelection, tag = "clip_copy"),
@@ -1538,6 +1545,19 @@ fun CanvasEditScreen(
             if (kids && mode == EditMode.PAINT) com.karapp.drawguidance.ui.screens.canvasedit.components.KidsPaintOverlay(viewModel, viewport)
             // v56 seçim alanı çubuğu ve sihirli değnek ayarları
             com.karapp.drawguidance.ui.screens.canvasedit.components.V56SelectionOverlay(viewModel, mode, canvasPick) { textureFillTarget = "area" }
+            // v56 aşama 6 Dönüştür paneli ve Sıvılaştır
+            if (viewModel.transform.state.collectAsState().value != null) {
+                Box(Modifier.fillMaxSize()) {
+                    com.karapp.drawguidance.ui.screens.canvasedit.components.V56TransformOverlay(viewModel.transform, viewport)
+                    com.karapp.drawguidance.ui.screens.canvasedit.components.V56TransformPanel(viewModel.transform, Modifier.align(Alignment.BottomCenter))
+                }
+            }
+            if (viewModel.liquify.target.collectAsState().value != null) {
+                Box(Modifier.fillMaxSize()) {
+                    com.karapp.drawguidance.ui.screens.canvasedit.components.V56LiquifyOverlay(viewModel.liquify, viewport)
+                    com.karapp.drawguidance.ui.screens.canvasedit.components.V56LiquifyBar(viewModel.liquify, Modifier.align(Alignment.BottomCenter))
+                }
+            }
             textureFillTarget?.let { target ->
                 com.karapp.drawguidance.ui.screens.canvasedit.components.TexturePickerDialog(
                     stringResource(if (target == "area") R.string.v56_texture_fill else R.string.v56_texture_fill_layer),

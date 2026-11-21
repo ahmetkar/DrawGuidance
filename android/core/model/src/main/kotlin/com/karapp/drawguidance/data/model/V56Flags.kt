@@ -39,7 +39,8 @@ object V56Flags {
             CanvasKind.NOTES, CanvasKind.SIMPLE_NOTES -> setOf(
                 Feature.LIVE_FIX, Feature.LIVE_APPROVAL, Feature.CROSS_PAGE_PASTE, Feature.EXPORT_SVG_PSD_DXF, Feature.EYEDROPPER_LOUPE,
             )
-            CanvasKind.KIDS -> setOf(Feature.SYMMETRY)
+            // 2D-5: damlalığın canlı renk dairesi çocuk modunda da var (daha büyük halka)
+            CanvasKind.KIDS -> setOf(Feature.SYMMETRY, Feature.EYEDROPPER_LOUPE)
         }
         return base - off
     }

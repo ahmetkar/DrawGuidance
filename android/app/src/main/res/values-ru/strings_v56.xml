@@ -66,4 +66,17 @@
     <string name="v56_help_clip_mask_release">Снимает обтравочную маску; элементы возвращаются в обычный вид.</string>
     <string name="v56_help_clip_cut">Переносит выделенные элементы в буфер и убирает их со страницы.</string>
     <string name="v56_help_clip_copy">Копирует выделенные элементы в буфер; их можно вставить на другую страницу или холст.</string>
+    <string name="v56_quick_brush_a11y">Быстрый выбор кисти, текущая: %1$s</string>
+    <string name="v56_quick_inside_selection">Внутри выделения</string>
+    <string name="v56_quick_pin">Закрепить</string>
+    <string name="v56_quick_unpin">Открепить</string>
+    <string name="v56_quick_fav_full">Можно закрепить не больше 6 кистей</string>
+    <string name="v56_quick_size">Размер</string>
+    <string name="v56_quick_opacity">Непрозрачность</string>
+    <string name="v56_quick_color">Цвет</string>
+    <string name="v56_quick_all_brushes">Все кисти</string>
+    <string name="v56_help_quick_all">Открывает окно со всеми кистями.</string>
+    <string name="v56_help_quick_color">Открывает выбор цвета; пипеткой в нём можно взять цвет с холста.</string>
+    <string name="v56_help_quick_pin">Закрепляет кисть в быстрой полосе (до 6). Коснитесь, чтобы выбрать.</string>
+    <string name="v56_help_quick_unpin">Убирает кисть из закреплённых. Коснитесь, чтобы выбрать.</string>
 </resources>

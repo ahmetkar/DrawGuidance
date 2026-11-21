@@ -66,4 +66,17 @@
     <string name="v56_help_clip_mask_release">Kırpma maskesini kaldırır; öğeler eski hâline döner.</string>
     <string name="v56_help_clip_cut">Seçili öğeleri panoya alır ve sayfadan kaldırır.</string>
     <string name="v56_help_clip_copy">Seçili öğeleri panoya kopyalar; başka sayfa ya da tuvale yapıştırabilirsin.</string>
+    <string name="v56_quick_brush_a11y">Hızlı fırça seçici, etkin: %1$s</string>
+    <string name="v56_quick_inside_selection">Seçim içinde</string>
+    <string name="v56_quick_pin">Sabitle</string>
+    <string name="v56_quick_unpin">Kaldır</string>
+    <string name="v56_quick_fav_full">En çok 6 fırça sabitlenebilir</string>
+    <string name="v56_quick_size">Boyut</string>
+    <string name="v56_quick_opacity">Opaklık</string>
+    <string name="v56_quick_color">Renk</string>
+    <string name="v56_quick_all_brushes">Tüm fırçalar</string>
+    <string name="v56_help_quick_all">Bütün fırçaların olduğu fırça penceresini açar.</string>
+    <string name="v56_help_quick_color">Renk seçici penceresini açar; penceredeki damlalıkla tuvalden renk alabilirsin.</string>
+    <string name="v56_help_quick_pin">Fırçayı hızlı şeritte sabitler (en çok 6). Dokununca fırça seçilir.</string>
+    <string name="v56_help_quick_unpin">Fırçayı sabitlenenlerden kaldırır. Dokununca fırça seçilir.</string>
 </resources>

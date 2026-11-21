@@ -243,6 +243,11 @@ object ToolDescriptions {
         R.string.v56_clip_mask_release to R.string.v56_help_clip_mask_release,
         R.string.v56_clip_cut to R.string.v56_help_clip_cut,
         R.string.v56_clip_copy to R.string.v56_help_clip_copy,
+        // v56 hızlı fırça seçici
+        R.string.v56_quick_all_brushes to R.string.v56_help_quick_all,
+        R.string.v56_quick_color to R.string.v56_help_quick_color,
+        R.string.v56_quick_pin to R.string.v56_help_quick_pin,
+        R.string.v56_quick_unpin to R.string.v56_help_quick_unpin,
     )
 
     /** Kaynak olmayan sabit adlar (Döndür ve Ölçekle mod çubuğundaki adım düğmeleri). */

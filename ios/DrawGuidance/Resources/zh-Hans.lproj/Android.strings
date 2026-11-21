@@ -3680,6 +3680,10 @@
 "v56_help_magic_wand" = "选择与所点元素相似的元素(颜色、描边或外观)。用下方滑条调整容差。";
 "v56_help_paint_inside" = "将所选内容设为选区;新笔画只画在其内部。";
 "v56_help_paste" = "将剪切或复制的元素粘贴到此页;可跨页面和画布使用。";
+"v56_help_quick_all" = "打开包含所有画笔的画笔窗口。";
+"v56_help_quick_color" = "打开颜色选择器;可用其中的吸管从画布取色。";
+"v56_help_quick_pin" = "将画笔固定到快速栏(最多 6 支)。点按即可选用。";
+"v56_help_quick_unpin" = "取消固定该画笔。点按即可选用。";
 "v56_help_select_all" = "选择页面上的所有元素。";
 "v56_help_select_invert" = "选择未选中的元素,并取消已选中的。";
 "v56_layer_alpha_lock" = "锁定透明度";
@@ -3697,6 +3701,15 @@
 "v56_magic_wand" = "魔棒";
 "v56_paint_inside" = "在选区内绘画";
 "v56_practice_reward_nofill" = "当前没有可播放的广告。已为你解锁该练习。";
+"v56_quick_all_brushes" = "所有画笔";
+"v56_quick_brush_a11y" = "快速画笔选择器,当前: %1$@";
+"v56_quick_color" = "颜色";
+"v56_quick_fav_full" = "最多可固定 6 支画笔";
+"v56_quick_inside_selection" = "选区内";
+"v56_quick_opacity" = "不透明度";
+"v56_quick_pin" = "固定";
+"v56_quick_size" = "大小";
+"v56_quick_unpin" = "取消固定";
 "v56_select_all" = "全选";
 "v56_select_invert" = "反选";
 "v56_share_flattened" = "%1$@ 使用的是旧版本：图层模式、蒙版和颗粒等新功能已简化后发送";

@@ -63,6 +63,13 @@ class EditorPrefsStore(private val context: Context) {
      */
     fun canvas(canvasId: String): CanvasPrefs = CanvasPrefs(canvasPrefs, canvasId, json)
 
+    // v56 hızlı fırça seçici: mod başına son kullanılanlar ve favoriler (QuickBrushLists.encode) ve düğmenin köşesi
+    private val quickPrefs by lazy { context.getSharedPreferences("brush_quick", Context.MODE_PRIVATE) }
+    fun quickBrush(kind: String): String? = quickPrefs.getString("lists.$kind", null)
+    fun setQuickBrush(kind: String, text: String) = quickPrefs.edit().putString("lists.$kind", text).apply()
+    fun quickCorner(kind: String): String? = quickPrefs.getString("corner.$kind", null)
+    fun setQuickCorner(kind: String, corner: String) = quickPrefs.edit().putString("corner.$kind", corner).apply()
+
     /** v29 silinen tuvalin ayarları da silinir. */
     fun clearCanvas(canvasId: String) {
         val prefix = "$canvasId/"

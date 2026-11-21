@@ -66,4 +66,17 @@
     <string name="v56_help_clip_mask_release">클리핑 마스크를 해제하고 요소를 원래대로 돌립니다.</string>
     <string name="v56_help_clip_cut">선택한 요소를 클립보드로 옮기고 페이지에서 지웁니다.</string>
     <string name="v56_help_clip_copy">선택한 요소를 클립보드에 복사합니다. 다른 페이지나 캔버스에 붙여넣을 수 있습니다.</string>
+    <string name="v56_quick_brush_a11y">빠른 브러시 선택, 사용 중: %1$s</string>
+    <string name="v56_quick_inside_selection">선택 영역 안</string>
+    <string name="v56_quick_pin">고정</string>
+    <string name="v56_quick_unpin">고정 해제</string>
+    <string name="v56_quick_fav_full">최대 6개까지 고정할 수 있습니다</string>
+    <string name="v56_quick_size">크기</string>
+    <string name="v56_quick_opacity">불투명도</string>
+    <string name="v56_quick_color">색</string>
+    <string name="v56_quick_all_brushes">모든 브러시</string>
+    <string name="v56_help_quick_all">모든 브러시가 있는 브러시 창을 엽니다.</string>
+    <string name="v56_help_quick_color">색 선택 창을 엽니다. 스포이트로 캔버스에서 색을 가져올 수 있습니다.</string>
+    <string name="v56_help_quick_pin">브러시를 빠른 줄에 고정합니다(최대 6개). 탭하면 선택됩니다.</string>
+    <string name="v56_help_quick_unpin">고정을 해제합니다. 탭하면 선택됩니다.</string>
 </resources>

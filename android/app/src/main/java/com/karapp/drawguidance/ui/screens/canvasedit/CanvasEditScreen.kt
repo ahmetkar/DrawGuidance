@@ -333,6 +333,8 @@ fun CanvasEditScreen(
     val diagramTheme by viewModel.diagramTheme.collectAsState()
     var partStyleOpen by remember { mutableStateOf(false) }
     var regionColorOpen by remember { mutableStateOf(false) }
+    // v56 (2D-5) hızlı fırçanın renk düğmesinden açılan renk penceresi; penceredeki damlalıktan sonra yeniden açılır
+    var quickColorOpen by remember { mutableStateOf(false) }
     // v17: çizim alanında açılan menü (iki parmak uzun basma → bağlam menüsü, Ekle modunda dokunma → buraya ekle)
     // v47 Ekle modunda tuvale dokunulan yer: son seçilen eklenecek oraya konur (eski "buraya ekle" menüsü kaldırıldı)
     var addTap by remember { mutableStateOf<Offset?>(null) }
@@ -703,6 +705,10 @@ fun CanvasEditScreen(
             onPenGrab = viewModel::penGrab,
             canvasPick = { viewModel.canvasPick.value },
             onEyedrop = { viewModel.eyedrop(it) },
+            onEyedropHover = viewModel::eyedropHover,
+            eyedropLoupe = viewModel::eyedropLoupeOn,
+            onTwoFingerTap = { viewModel.quickSwap() },
+            onDrawingChanged = viewModel::drawingChanged,
             onRectSelect = viewModel::rectSelect,
             onLassoSelect = viewModel::lassoSelect,
             onMagicWand = viewModel::magicWand,
@@ -1524,6 +1530,14 @@ fun CanvasEditScreen(
             if (kids && mode == EditMode.PAINT) com.karapp.drawguidance.ui.screens.canvasedit.components.KidsPaintOverlay(viewModel, viewport)
             // v56 seçim alanı çubuğu ve sihirli değnek ayarları
             com.karapp.drawguidance.ui.screens.canvasedit.components.V56SelectionOverlay(viewModel, mode, canvasPick)
+            // v56 damlalığın canlı renk dairesi
+            val loupe by viewModel.loupe.collectAsState()
+            com.karapp.drawguidance.ui.screens.canvasedit.components.EyedropperLoupe(
+                screen = loupe?.let { viewport.toScreen(it.point) },
+                hex = loupe?.hex,
+                previousHex = loupe?.previous ?: brush.colorHex,
+                kids = kids,
+            )
             // v45 parametreli şeklin tutamakları
             if (mode == EditMode.SHAPE_EDIT && shapeTool == ShapeTool.PARAMS) com.karapp.drawguidance.ui.screens.canvasedit.components.ParamHandlesLayer(viewModel, selectedShape, viewport)
             com.karapp.drawguidance.ui.screens.canvasedit.ruler.RulerLayer(viewModel, viewport, rulerActions, kind)
@@ -1718,12 +1732,39 @@ fun CanvasEditScreen(
             // (kalem kullanılınca parmak kaydırır; dokununca parmakla çizim açılır/kapanır)
             val stylus by com.karapp.drawguidance.platform.Stylus.state.collectAsState()
             val fingerPans by com.karapp.drawguidance.platform.Stylus.fingerPans.collectAsState()
+            // v56 hızlı fırça seçici (Resim ve Basit resim): fırça göstergesinin yerine köşedeki düğme ve şerit
+            val quickOn = viewModel.v56(com.karapp.drawguidance.data.model.V56Flags.Feature.QUICK_BRUSH)
+            if (mode == EditMode.DRAW && quickOn) com.karapp.drawguidance.ui.screens.canvasedit.components.ToolHelpScope(toolHelp) {
+                val quickLists by viewModel.quickBrush.lists.collectAsState()
+                val quickOpen by viewModel.quickBrush.open.collectAsState()
+                val quickCorner by viewModel.quickBrush.corner.collectAsState()
+                val drawingNow by viewModel.drawingNow.collectAsState()
+                val areaNow by viewModel.area.collectAsState()
+                com.karapp.drawguidance.ui.screens.canvasedit.components.QuickBrushOverlay(
+                    brushType = brush.brushType, colorHex = brush.colorHex, sizePx = brush.sizePx, opacity = brush.opacity,
+                    lists = quickLists, open = quickOpen, corner = quickCorner, drawing = drawingNow,
+                    pen = viewModel.penPoint.collectAsState().value?.let { viewport.toScreen(it) },
+                    insideSelection = areaNow != null,
+                    showColor = viewModel.v56(com.karapp.drawguidance.data.model.V56Flags.Feature.QUICK_BRUSH_COLOR),
+                    movable = wide,
+                    onToggle = viewModel.quickBrush::toggle,
+                    onSelect = viewModel::quickSelect,
+                    onToggleFavorite = { t -> if (!viewModel.quickBrush.toggleFavorite(t)) android.widget.Toast.makeText(context, context.getString(R.string.v56_quick_fav_full), android.widget.Toast.LENGTH_SHORT).show() },
+                    onColor = { quickColorOpen = true },
+                    onSize = viewModel::updateBrushSize,
+                    onOpacity = viewModel::updateBrushOpacity,
+                    onAllBrushes = { viewModel.quickBrush.setOpen(false); viewModel.openBrushPicker() },
+                    onEraser = viewModel::toggleEraser,
+                    onCorner = viewModel.quickBrush::setCorner,
+                    modifier = Modifier.fillMaxSize().then(railAvoid),
+                )
+            }
             if (mode == EditMode.DRAW) com.karapp.drawguidance.ui.screens.canvasedit.components.ToolHelpScope(toolHelp) {
                 Column(
-                    Modifier.align(Alignment.TopStart).padding(start = 16.dp, top = 4.dp, end = 104.dp),
+                    Modifier.align(Alignment.TopStart).padding(start = if (quickOn) 72.dp else 16.dp, top = 4.dp, end = 104.dp),
                     verticalArrangement = Arrangement.spacedBy(8.dp),
                 ) {
-                    BrushIndicator(
+                    if (!quickOn) BrushIndicator(
                         brushType = brush.brushType,
                         colorHex = brush.colorHex,
                         sizePx = brush.sizePx,
@@ -2689,6 +2730,22 @@ fun CanvasEditScreen(
                 colorHex = remember(selectedIds, colorSheet) { viewModel.selectedInkColor(text) },
                 onColorChange = { if (text) viewModel.recolorSelected(it) else viewModel.recolorSelectedInk(it) },
                 onDismiss = { inkColorOpen = false; colorSheet = null; viewModel.endCoalesce() },
+            )
+        }
+        // v56 penceredeki damlalıkla renk alındı (ya da vazgeçildi): pencere yeniden açılır
+        val reopenColor by viewModel.reopenColorSheet.collectAsState()
+        androidx.compose.runtime.LaunchedEffect(reopenColor, canvasPick) {
+            if (reopenColor && canvasPick != com.karapp.drawguidance.ui.screens.canvasedit.components.CanvasPick.EYEDROPPER) {
+                viewModel.colorSheetReopened()
+                quickColorOpen = true
+            }
+        }
+        if (quickColorOpen) {
+            com.karapp.drawguidance.ui.screens.canvasedit.components.ColorPickSheet(
+                initialColorHex = brush.colorHex,
+                onColorChange = viewModel::updateBrushColor,
+                onDismiss = { quickColorOpen = false },
+                onEyedropper = { quickColorOpen = false; viewModel.eyedropFromColorSheet() },
             )
         }
         if (regionColorOpen && mode == EditMode.SHAPE_EDIT) {

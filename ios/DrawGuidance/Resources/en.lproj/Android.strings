@@ -3680,6 +3680,10 @@
 "v56_help_magic_wand" = "Selects elements similar to the one you tap (color, stroke or appearance). Set the tolerance with the bar below.";
 "v56_help_paint_inside" = "Turns the selection into a selection area; new strokes paint only inside it.";
 "v56_help_paste" = "Pastes cut or copied elements onto this page; works across pages and canvases.";
+"v56_help_quick_all" = "Opens the brush window with every brush.";
+"v56_help_quick_color" = "Opens the color picker; use its eyedropper to pick a color from the canvas.";
+"v56_help_quick_pin" = "Pins the brush to the quick strip (up to 6). Tap to select the brush.";
+"v56_help_quick_unpin" = "Removes the brush from the pinned ones. Tap to select the brush.";
 "v56_help_select_all" = "Selects every element on the page.";
 "v56_help_select_invert" = "Selects what is not selected and deselects the rest.";
 "v56_layer_alpha_lock" = "Alpha lock";
@@ -3697,6 +3701,15 @@
 "v56_magic_wand" = "Magic wand";
 "v56_paint_inside" = "Paint inside selection";
 "v56_practice_reward_nofill" = "No ad is available right now. The practice has been unlocked for you.";
+"v56_quick_all_brushes" = "All brushes";
+"v56_quick_brush_a11y" = "Quick brush picker, active: %1$@";
+"v56_quick_color" = "Color";
+"v56_quick_fav_full" = "You can pin up to 6 brushes";
+"v56_quick_inside_selection" = "Inside selection";
+"v56_quick_opacity" = "Opacity";
+"v56_quick_pin" = "Pin";
+"v56_quick_size" = "Size";
+"v56_quick_unpin" = "Unpin";
 "v56_select_all" = "Select all";
 "v56_select_invert" = "Invert selection";
 "v56_share_flattened" = "%1$@ uses an older version: new features such as layer modes, masks and grain were simplified";

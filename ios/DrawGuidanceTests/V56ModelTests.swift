@@ -89,7 +89,7 @@ final class V56ModelTests: XCTestCase {
         XCTAssertTrue(V56Flags.enabled(.QUICK_BRUSH, .SIMPLE_ART))
         XCTAssertFalse(V56Flags.enabled(.QUICK_BRUSH, .COMIC))
         XCTAssertFalse(V56Flags.enabled(.QUICK_BRUSH, .NOTES))
-        XCTAssertEqual(V56Flags.features(.KIDS), [.SYMMETRY])
+        XCTAssertEqual(V56Flags.features(.KIDS), [.SYMMETRY, .EYEDROPPER_LOUPE])
         XCTAssertTrue(V56Flags.enabled(.EXPORT_SVG_PSD_DXF, .NOTES))
         XCTAssertFalse(V56Flags.enabled(.EXPORT_SVG_PSD_DXF, .KIDS))
         XCTAssertFalse(V56Flags.enabled(.LAYER_BLEND, .NOTES))

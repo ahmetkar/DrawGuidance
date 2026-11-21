@@ -66,4 +66,17 @@
     <string name="v56_help_clip_mask_release">يزيل قناع القص؛ تعود العناصر كما كانت.</string>
     <string name="v56_help_clip_cut">ينقل العناصر المحددة إلى الحافظة ويزيلها من الصفحة.</string>
     <string name="v56_help_clip_copy">ينسخ العناصر المحددة إلى الحافظة؛ يمكنك لصقها في صفحة أو لوحة أخرى.</string>
+    <string name="v56_quick_brush_a11y">منتقي الفرشاة السريع، النشطة: %1$s</string>
+    <string name="v56_quick_inside_selection">داخل التحديد</string>
+    <string name="v56_quick_pin">تثبيت</string>
+    <string name="v56_quick_unpin">إلغاء التثبيت</string>
+    <string name="v56_quick_fav_full">يمكن تثبيت 6 فرش كحد أقصى</string>
+    <string name="v56_quick_size">الحجم</string>
+    <string name="v56_quick_opacity">العتامة</string>
+    <string name="v56_quick_color">اللون</string>
+    <string name="v56_quick_all_brushes">كل الفرش</string>
+    <string name="v56_help_quick_all">يفتح نافذة الفرش التي تضم كل الفرش.</string>
+    <string name="v56_help_quick_color">يفتح منتقي الألوان؛ استخدم القطارة فيه لأخذ لون من اللوحة.</string>
+    <string name="v56_help_quick_pin">يثبّت الفرشاة في الشريط السريع (6 كحد أقصى). المس لاختيارها.</string>
+    <string name="v56_help_quick_unpin">يزيل الفرشاة من المثبتة. المس لاختيارها.</string>
 </resources>

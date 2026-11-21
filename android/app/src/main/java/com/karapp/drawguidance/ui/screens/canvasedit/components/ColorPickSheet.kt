@@ -3,6 +3,7 @@ package com.karapp.drawguidance.ui.screens.canvasedit.components
 import com.karapp.drawguidance.ui.components.portraitFill
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.filled.OpenWith
+import androidx.compose.material.icons.filled.Colorize
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -49,6 +50,8 @@ fun ColorPickSheet(
     /** v27 gradyan dolgu (null verilirse yalnız renk seçici). */
     initialGradient: com.karapp.drawguidance.data.model.GradientSpec? = null,
     onGradientChange: ((com.karapp.drawguidance.data.model.GradientSpec?) -> Unit)? = null,
+    /** v56 (2D-5) üst satırda damlalık: pencere kapanır, tuvalden renk alınınca yeniden açılır. */
+    onEyedropper: (() -> Unit)? = null,
 ) {
     val colors = NeuTheme.colors
     var colorHex by remember { mutableStateOf(initialColorHex.uppercase()) }
@@ -64,7 +67,14 @@ fun ColorPickSheet(
                 .padding(bottom = 22.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
-            Text(stringResource(R.string.pick_color_title), style = MaterialTheme.typography.headlineSmall)
+            if (onEyedropper == null) Text(stringResource(R.string.pick_color_title), style = MaterialTheme.typography.headlineSmall)
+            else androidx.compose.foundation.layout.Row(Modifier.fillMaxWidth(), verticalAlignment = androidx.compose.ui.Alignment.CenterVertically) {
+                Text(stringResource(R.string.pick_color_title), style = MaterialTheme.typography.headlineSmall, modifier = Modifier.weight(1f))
+                com.karapp.drawguidance.ui.components.NeuIconButton(
+                    androidx.compose.material.icons.Icons.Filled.Colorize, stringResource(R.string.v43_eyedropper), onEyedropper,
+                    modifier = Modifier.testTag("color_pick_eyedropper"),
+                )
+            }
             if (onGradientChange != null) {
                 androidx.compose.foundation.layout.Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                     com.karapp.drawguidance.ui.components.NeuChip(stringResource(R.string.fill_tab_color), !gradientTab, onClick = { gradientTab = false }, modifier = Modifier.testTag("fill_tab_color"))

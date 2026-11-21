@@ -370,6 +370,12 @@ class CanvasEditViewModel(
     /** v29 bu tuvalin kendi son ayarları (renk, fırça, yazı biçimi, şekil dolgusu, Ekle menüsü). */
     private val canvasPrefs = prefs.canvas(canvasLocalId)
 
+    /** v56 hızlı fırça seçicinin son kullanılanları, favorileri ve köşesi (mod başına). */
+    val quickBrush = com.karapp.drawguidance.ui.screens.canvasedit.state.QuickBrushStore(
+        load = prefs::quickBrush, save = prefs::setQuickBrush, loadCorner = prefs::quickCorner, saveCorner = prefs::setQuickCorner,
+    )
+
+
     // --- v51 geçici resim düzenleme tuvali (not almadan açılır; otomatik kayıt kapalı, Kaydet nota aktarır) ---
 
     private val tempSession = com.karapp.drawguidance.data.notes.TempCanvases.session(canvasLocalId)
@@ -555,6 +561,9 @@ class CanvasEditViewModel(
                 // Son seçilen fırça, renk ve yazı biçimi hatırlanır (v29: bu tuvalde seçilenler)
                 val last = canvasPrefs.lastBrush?.let { n -> BrushType.entries.firstOrNull { it.name == n } }
                 brush.restore(loaded.kind, last, canvasPrefs.lastColor)
+                // v56 hızlı fırça seçici: bu modun son kullanılanları ve favorileri
+                quickBrush.bind(loaded.kind)
+                if (com.karapp.drawguidance.data.model.V56Flags.enabled(com.karapp.drawguidance.data.model.V56Flags.Feature.QUICK_BRUSH, loaded.kind)) quickBrush.used(brush.settings.value.brushType)
                 texts.adaptTo(loaded.width, loaded.height)
                 canvasPrefs.lastText?.let { (spec, size) -> texts.restore(spec, size.takeIf { it > 0f }) }
                 formulas.adaptTo(loaded.width, loaded.height)
@@ -979,7 +988,63 @@ class CanvasEditViewModel(
     fun selectBrush(type: BrushType) {
         brush.select(type)
         if (type != BrushType.ERASER) canvasPrefs.lastBrush = type.name
+        if (v56(com.karapp.drawguidance.data.model.V56Flags.Feature.QUICK_BRUSH)) quickBrush.used(type)
     }
+
+    // --- v56 hızlı fırça seçici (2) ve damlalığın canlı renk dairesi (2D-5) ---
+
+    /** Şeritten fırça seçimi (şerit açık kalır; çizmeye başlayınca kapanır). */
+    fun quickSelect(type: BrushType) = selectBrush(type)
+
+    /** İki parmakla dokunma: son iki fırça arasında geçiş. */
+    fun quickSwap(): Boolean {
+        if (!v56(com.karapp.drawguidance.data.model.V56Flags.Feature.QUICK_BRUSH) || !_mode.value.allowsDrawTools) return false
+        val prev = quickBrush.lists.value.previous(brush.settings.value.brushType) ?: return false
+        selectBrush(prev)
+        return true
+    }
+
+    /** Çizim sürüyor mu (hızlı fırça şeridi kapanır, düğme saydamlaşır). */
+    private val _drawingNow = MutableStateFlow(false)
+    val drawingNow: StateFlow<Boolean> = _drawingNow.asStateFlow()
+    fun drawingChanged(active: Boolean) {
+        _drawingNow.value = active
+        if (active) quickBrush.setOpen(false) else _penPoint.value = null
+    }
+
+    /** Canlı renk dairesi: tuvaldeki nokta, altındaki renk ve önceki (fırça) rengi. */
+    data class Loupe(val point: Offset, val hex: String?, val previous: String, val inside: Boolean)
+    private val _loupe = MutableStateFlow<Loupe?>(null)
+    val loupe: StateFlow<Loupe?> = _loupe.asStateFlow()
+    private var loupeSampleAt: Offset? = null
+
+    fun eyedropLoupeOn(): Boolean = v56(com.karapp.drawguidance.data.model.V56Flags.Feature.EYEDROPPER_LOUPE)
+
+    /** Damlalık sürüklenirken (null: bırakıldı ya da iptal). Renk her harekette alınır (2 px'ten az kıpırdamada değil). */
+    fun eyedropHover(point: Offset?) {
+        if (point == null || !eyedropLoupeOn()) { _loupe.value = null; loupeSampleAt = null; return }
+        val c = store.canvas.value ?: return
+        val inside = com.karapp.drawguidance.data.model.EyedropLoupe.inside(point.x, point.y, c.width.toFloat(), c.height.toFloat())
+        val prev = _loupe.value
+        val last = loupeSampleAt
+        val hex = if (prev != null && last != null && (last - point).getDistance() < 2f) prev.hex
+        else if (!inside) null
+        else runCatching { com.karapp.drawguidance.ui.drawing.ColorSampler.sample(c, point.x, point.y) }.getOrNull().also { loupeSampleAt = point }
+        _loupe.value = Loupe(point, hex, prev?.previous ?: brush.settings.value.colorHex, inside)
+    }
+
+    /** Renk penceresindeki damlalıktan açıldıysa renk alınınca pencere yeniden açılır. */
+    private val _reopenColorSheet = MutableStateFlow(false)
+    val reopenColorSheet: StateFlow<Boolean> = _reopenColorSheet.asStateFlow()
+
+    fun eyedropFromColorSheet() {
+        _reopenColorSheet.value = true
+        if (_canvasPick.value != com.karapp.drawguidance.ui.screens.canvasedit.components.CanvasPick.EYEDROPPER) {
+            toggleCanvasPick(com.karapp.drawguidance.ui.screens.canvasedit.components.CanvasPick.EYEDROPPER)
+        }
+    }
+
+    fun colorSheetReopened() { _reopenColorSheet.value = false }
     fun toggleEraser() = brush.toggleEraser()
     fun updateBrushSize(sizePx: Float) = brush.updateSize(sizePx)
     fun updateBrushColor(colorHex: String) {
@@ -1010,6 +1075,10 @@ class CanvasEditViewModel(
     fun eyedrop(point: Offset): String? {
         val c = store.canvas.value ?: return null
         _canvasPick.value = com.karapp.drawguidance.ui.screens.canvasedit.components.CanvasPick.NONE
+        _loupe.value = null
+        loupeSampleAt = null
+        // v56 parmak sayfanın dışında bırakıldıysa iptal (renk değişmez)
+        if (eyedropLoupeOn() && !com.karapp.drawguidance.data.model.EyedropLoupe.inside(point.x, point.y, c.width.toFloat(), c.height.toFloat())) return null
         val hex = runCatching { com.karapp.drawguidance.ui.drawing.ColorSampler.sample(c, point.x, point.y) }.getOrNull() ?: return null
         updateBrushColor(hex)
         // v45 boyamada (kova ve boya fırçası) alınan renk boyanın rengi de olur
@@ -1054,7 +1123,15 @@ class CanvasEditViewModel(
         extraBufferCapacity = 1, onBufferOverflow = kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST,
     )
     val inkProgress: kotlinx.coroutines.flow.SharedFlow<InkProgress> = _inkProgress
-    fun onStrokeProgress(strokeId: String, points: List<StrokePoint>) { _inkProgress.tryEmit(InkProgress(strokeId, points)) }
+    fun onStrokeProgress(strokeId: String, points: List<StrokePoint>) {
+        _inkProgress.tryEmit(InkProgress(strokeId, points))
+        // v56 kalem hızlı fırça düğmesinin üstünden geçerse düğme kenara kayar
+        points.lastOrNull()?.let { _penPoint.value = Offset(it.x, it.y) }
+    }
+
+    private val _penPoint = MutableStateFlow<Offset?>(null)
+    /** v56 çizilmekte olan çizginin son noktası (tuval koordinatı; çizim bitince null). */
+    val penPoint: StateFlow<Offset?> = _penPoint.asStateFlow()
 
     fun onStrokeFinished(points: List<StrokePoint>, strokeId: String? = null, penEraser: Boolean = false) =
         drawing.onStrokeFinished(points, strokeId, penEraser)

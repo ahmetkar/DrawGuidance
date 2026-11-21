@@ -66,4 +66,17 @@
     <string name="v56_help_clip_mask_release">Removes the clipping mask; elements return to normal.</string>
     <string name="v56_help_clip_cut">Moves the selected elements to the clipboard and removes them from the page.</string>
     <string name="v56_help_clip_copy">Copies the selected elements to the clipboard; paste them on another page or canvas.</string>
+    <string name="v56_quick_brush_a11y">Quick brush picker, active: %1$s</string>
+    <string name="v56_quick_inside_selection">Inside selection</string>
+    <string name="v56_quick_pin">Pin</string>
+    <string name="v56_quick_unpin">Unpin</string>
+    <string name="v56_quick_fav_full">You can pin up to 6 brushes</string>
+    <string name="v56_quick_size">Size</string>
+    <string name="v56_quick_opacity">Opacity</string>
+    <string name="v56_quick_color">Color</string>
+    <string name="v56_quick_all_brushes">All brushes</string>
+    <string name="v56_help_quick_all">Opens the brush window with every brush.</string>
+    <string name="v56_help_quick_color">Opens the color picker; use its eyedropper to pick a color from the canvas.</string>
+    <string name="v56_help_quick_pin">Pins the brush to the quick strip (up to 6). Tap to select the brush.</string>
+    <string name="v56_help_quick_unpin">Removes the brush from the pinned ones. Tap to select the brush.</string>
 </resources>

@@ -3680,6 +3680,10 @@
 "v56_help_magic_wand" = "Dokunduğun öğeye benzeyen öğeleri seçer (renk, kontur ya da görünüm). Tolerans alttaki çubukla ayarlanır.";
 "v56_help_paint_inside" = "Seçili öğelerin alanını seçim alanı yapar; yeni çizgiler yalnız içine boyanır.";
 "v56_help_paste" = "Kesilen ya da kopyalanan öğeleri bu sayfaya yapıştırır; başka sayfa ve tuvallerde de çalışır.";
+"v56_help_quick_all" = "Bütün fırçaların olduğu fırça penceresini açar.";
+"v56_help_quick_color" = "Renk seçici penceresini açar; penceredeki damlalıkla tuvalden renk alabilirsin.";
+"v56_help_quick_pin" = "Fırçayı hızlı şeritte sabitler (en çok 6). Dokununca fırça seçilir.";
+"v56_help_quick_unpin" = "Fırçayı sabitlenenlerden kaldırır. Dokununca fırça seçilir.";
 "v56_help_select_all" = "Sayfadaki bütün öğeleri seçer.";
 "v56_help_select_invert" = "Seçili olmayanları seçer, seçilileri bırakır.";
 "v56_layer_alpha_lock" = "Alfa kilidi";
@@ -3697,6 +3701,15 @@
 "v56_magic_wand" = "Sihirli değnek";
 "v56_paint_inside" = "Seçimin içine boya";
 "v56_practice_reward_nofill" = "Şu an gösterilecek reklam bulunamadı. Alıştırma senin için açıldı.";
+"v56_quick_all_brushes" = "Tüm fırçalar";
+"v56_quick_brush_a11y" = "Hızlı fırça seçici, etkin: %1$@";
+"v56_quick_color" = "Renk";
+"v56_quick_fav_full" = "En çok 6 fırça sabitlenebilir";
+"v56_quick_inside_selection" = "Seçim içinde";
+"v56_quick_opacity" = "Opaklık";
+"v56_quick_pin" = "Sabitle";
+"v56_quick_size" = "Boyut";
+"v56_quick_unpin" = "Kaldır";
 "v56_select_all" = "Tümünü seç";
 "v56_select_invert" = "Seçimi ters çevir";
 "v56_share_flattened" = "%1$@ eski sürüm kullanıyor: katman modları, maske ve gren gibi yeni özellikler sadeleştirilerek gönderildi";

@@ -92,7 +92,7 @@ class V56ModelTest {
         assertTrue(V56Flags.enabled(V56Flags.Feature.QUICK_BRUSH, CanvasKind.SIMPLE_ART))
         assertFalse(V56Flags.enabled(V56Flags.Feature.QUICK_BRUSH, CanvasKind.COMIC))
         assertFalse(V56Flags.enabled(V56Flags.Feature.QUICK_BRUSH, CanvasKind.NOTES))
-        assertEquals(setOf(V56Flags.Feature.SYMMETRY), V56Flags.features(CanvasKind.KIDS))
+        assertEquals(setOf(V56Flags.Feature.SYMMETRY, V56Flags.Feature.EYEDROPPER_LOUPE), V56Flags.features(CanvasKind.KIDS))
         assertTrue(V56Flags.enabled(V56Flags.Feature.EXPORT_SVG_PSD_DXF, CanvasKind.NOTES))
         assertFalse(V56Flags.enabled(V56Flags.Feature.EXPORT_SVG_PSD_DXF, CanvasKind.KIDS))
         assertFalse(V56Flags.enabled(V56Flags.Feature.LAYER_BLEND, CanvasKind.NOTES))

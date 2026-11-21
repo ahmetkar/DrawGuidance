@@ -183,6 +183,13 @@ class CanvasActions(
     /** v43 damlalık ve alanla seçim. */
     val canvasPick: () -> CanvasPick = { CanvasPick.NONE },
     val onEyedrop: (Offset) -> Unit = {},
+    /** v56 damlalık sürüklenirken canlı renk dairesi (null: bitti); [eyedropLoupe] açıksa parmak balonu gösterilmez. */
+    val onEyedropHover: (Offset?) -> Unit = {},
+    val eyedropLoupe: () -> Boolean = { false },
+    /** v56 hızlı fırça: iki parmakla kısa dokunma (Çiz modunda; son iki fırça arasında geçiş). */
+    val onTwoFingerTap: () -> Unit = {},
+    /** v56 çizim başladı / bitti (hızlı fırça şeridi kapanır, düğme saydamlaşır). */
+    val onDrawingChanged: (Boolean) -> Unit = {},
     val onRectSelect: (Offset, Offset) -> Unit = { _, _ -> },
     val onLassoSelect: (List<Offset>) -> Unit = {},
     /** v56 sihirli değnek: dokunulan elemana benzeyenler seçilir. */
@@ -552,6 +559,9 @@ fun DrawingCanvas(
                         var twoFingerCentroid = Offset.Zero
                         var twoFingerMoved = 0f
                         var twoFingerZoom = 1f
+                        // v56 iki parmakla kısa dokunma adayı (kıpırdamadan ve uzun basma süresinden önce kalkarsa)
+                        var twoFingerTap = false
+                        var drawingSignaled = false
                         // v20 üç parmak: yana kaydırınca geri al / yinele (hareket başına bir kez)
                         var threeFinger = false
                         var threeStart = Offset.Zero
@@ -582,6 +592,7 @@ fun DrawingCanvas(
                                 if (twoFingerPending) {
                                     // İki parmak basılı ve kıpırdamadı: bağlam menüsü (parmak kalkana kadar başka iş yok)
                                     twoFingerPending = false
+                                    twoFingerTap = false
                                     haptics.performHapticFeedback(androidx.compose.ui.hapticfeedback.HapticFeedbackType.LongPress)
                                     currentActions.onContextMenu(twoFingerCentroid, viewport.toCanvas(twoFingerCentroid))
                                     longPressed = true
@@ -633,6 +644,7 @@ fun DrawingCanvas(
                                 if (!threeFinger) {
                                     threeFinger = true
                                     twoFingerPending = false
+                                    twoFingerTap = false
                                     if (dragging && !panOnly) tool.cancel(ctx)
                                     if (multiTouch) viewport.settle()
                                     multiTouch = true
@@ -655,6 +667,7 @@ fun DrawingCanvas(
                                     // Tek parmak henüz sürüklemediyse iki parmakla uzun basma sayılabilir
                                     if (!dragging && pressed.size == 2 && centroid != Offset.Unspecified) {
                                         twoFingerPending = true
+                                        twoFingerTap = true
                                         twoFingerStart = lastUptime
                                         twoFingerCentroid = centroid
                                         twoFingerMoved = 0f
@@ -666,7 +679,7 @@ fun DrawingCanvas(
                                 if (twoFingerPending) {
                                     twoFingerMoved += pan.getDistance()
                                     twoFingerZoom *= zoom
-                                    if (twoFingerMoved > slop || kotlin.math.abs(twoFingerZoom - 1f) > 0.08f) twoFingerPending = false
+                                    if (twoFingerMoved > slop || kotlin.math.abs(twoFingerZoom - 1f) > 0.08f) { twoFingerPending = false; twoFingerTap = false }
                                 }
                                 viewport.panBy(pan)
                                 if (centroid != Offset.Unspecified) viewport.zoomBy(zoom, centroid)
@@ -676,6 +689,7 @@ fun DrawingCanvas(
                                 if (!dragging && (change.position - start).getDistance() > slop) {
                                     dragging = true
                                     panOnly = !tool.begin(ctx)
+                                    if (!panOnly && tool is DrawTool) { drawingSignaled = true; currentActions.onDrawingChanged(true) }
                                     dragTo(change.position, change.position - start)
                                 } else if (dragging) {
                                     // v18: çizerken ara noktalar da (hızlı çizgide köşeler oluşmasın)
@@ -690,10 +704,14 @@ fun DrawingCanvas(
                             }
                         }
 
+                        if (drawingSignaled) currentActions.onDrawingChanged(false)
                         when {
                             threeFinger -> Unit
                             longPressed -> if (multiTouch) viewport.settle()
-                            multiTouch -> viewport.settle()
+                            multiTouch -> {
+                                viewport.settle()
+                                if (twoFingerTap && mode == EditMode.DRAW && upTime - twoFingerStart < 300L) currentActions.onTwoFingerTap()
+                            }
                             dragging && panOnly -> viewport.settle()
                             dragging -> tool.end(ctx, previewState?.takeIf { it.strokes === base.strokes }?.preview)
                             else -> tool.tap(ctx, viewport.toCanvas(start), upTime)

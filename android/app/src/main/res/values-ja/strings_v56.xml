@@ -66,4 +66,17 @@
     <string name="v56_help_clip_mask_release">クリッピングマスクを解除し、要素を元に戻します。</string>
     <string name="v56_help_clip_cut">選択要素をクリップボードに移し、ページから削除します。</string>
     <string name="v56_help_clip_copy">選択要素をクリップボードにコピーします。別のページやキャンバスに貼り付けられます。</string>
+    <string name="v56_quick_brush_a11y">クイックブラシ、使用中: %1$s</string>
+    <string name="v56_quick_inside_selection">選択範囲内</string>
+    <string name="v56_quick_pin">ピン留め</string>
+    <string name="v56_quick_unpin">ピン解除</string>
+    <string name="v56_quick_fav_full">ピン留めできるのは6本までです</string>
+    <string name="v56_quick_size">サイズ</string>
+    <string name="v56_quick_opacity">不透明度</string>
+    <string name="v56_quick_color">色</string>
+    <string name="v56_quick_all_brushes">すべてのブラシ</string>
+    <string name="v56_help_quick_all">すべてのブラシがあるブラシ画面を開きます。</string>
+    <string name="v56_help_quick_color">カラーピッカーを開きます。スポイトでキャンバスから色を取れます。</string>
+    <string name="v56_help_quick_pin">ブラシをクイック列にピン留めします(最大6本)。タップで選択。</string>
+    <string name="v56_help_quick_unpin">ピン留めを解除します。タップで選択。</string>
 </resources>

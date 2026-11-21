@@ -3680,6 +3680,10 @@
 "v56_help_magic_wand" = "탭한 요소와 비슷한 요소(색, 윤곽선, 모양)를 선택합니다. 허용 범위는 아래 막대로 조절합니다.";
 "v56_help_paint_inside" = "선택한 요소를 선택 영역으로 만듭니다. 새 선은 그 안에만 그려집니다.";
 "v56_help_paste" = "잘라내거나 복사한 요소를 이 페이지에 붙여넣습니다. 다른 페이지와 캔버스에서도 됩니다.";
+"v56_help_quick_all" = "모든 브러시가 있는 브러시 창을 엽니다.";
+"v56_help_quick_color" = "색 선택 창을 엽니다. 스포이트로 캔버스에서 색을 가져올 수 있습니다.";
+"v56_help_quick_pin" = "브러시를 빠른 줄에 고정합니다(최대 6개). 탭하면 선택됩니다.";
+"v56_help_quick_unpin" = "고정을 해제합니다. 탭하면 선택됩니다.";
 "v56_help_select_all" = "페이지의 모든 요소를 선택합니다.";
 "v56_help_select_invert" = "선택되지 않은 요소를 선택하고 나머지는 해제합니다.";
 "v56_layer_alpha_lock" = "알파 잠금";
@@ -3697,6 +3701,15 @@
 "v56_magic_wand" = "자동 선택 도구";
 "v56_paint_inside" = "선택 영역 안에 그리기";
 "v56_practice_reward_nofill" = "지금 표시할 광고가 없습니다. 연습이 열렸습니다.";
+"v56_quick_all_brushes" = "모든 브러시";
+"v56_quick_brush_a11y" = "빠른 브러시 선택, 사용 중: %1$@";
+"v56_quick_color" = "색";
+"v56_quick_fav_full" = "최대 6개까지 고정할 수 있습니다";
+"v56_quick_inside_selection" = "선택 영역 안";
+"v56_quick_opacity" = "불투명도";
+"v56_quick_pin" = "고정";
+"v56_quick_size" = "크기";
+"v56_quick_unpin" = "고정 해제";
 "v56_select_all" = "모두 선택";
 "v56_select_invert" = "선택 반전";
 "v56_share_flattened" = "%1$@은(는) 이전 버전을 사용합니다. 레이어 모드, 마스크, 그레인 같은 새 기능은 단순화되어 전송되었습니다";

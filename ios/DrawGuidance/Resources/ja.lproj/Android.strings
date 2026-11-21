@@ -3680,6 +3680,10 @@
 "v56_help_magic_wand" = "タップした要素に似た要素(色・線・外観)を選択します。許容値は下のバーで調整します。";
 "v56_help_paint_inside" = "選択範囲を描画エリアにします。新しい線はその内側だけに描かれます。";
 "v56_help_paste" = "切り取り・コピーした要素をこのページに貼り付けます。ページやキャンバスをまたいで使えます。";
+"v56_help_quick_all" = "すべてのブラシがあるブラシ画面を開きます。";
+"v56_help_quick_color" = "カラーピッカーを開きます。スポイトでキャンバスから色を取れます。";
+"v56_help_quick_pin" = "ブラシをクイック列にピン留めします(最大6本)。タップで選択。";
+"v56_help_quick_unpin" = "ピン留めを解除します。タップで選択。";
 "v56_help_select_all" = "ページ上のすべての要素を選択します。";
 "v56_help_select_invert" = "選択されていない要素を選択し、選択中の要素を解除します。";
 "v56_layer_alpha_lock" = "透明部分をロック";
@@ -3697,6 +3701,15 @@
 "v56_magic_wand" = "自動選択";
 "v56_paint_inside" = "選択範囲内に描画";
 "v56_practice_reward_nofill" = "現在表示できる広告がありません。練習をロック解除しました。";
+"v56_quick_all_brushes" = "すべてのブラシ";
+"v56_quick_brush_a11y" = "クイックブラシ、使用中: %1$@";
+"v56_quick_color" = "色";
+"v56_quick_fav_full" = "ピン留めできるのは6本までです";
+"v56_quick_inside_selection" = "選択範囲内";
+"v56_quick_opacity" = "不透明度";
+"v56_quick_pin" = "ピン留め";
+"v56_quick_size" = "サイズ";
+"v56_quick_unpin" = "ピン解除";
 "v56_select_all" = "すべて選択";
 "v56_select_invert" = "選択範囲を反転";
 "v56_share_flattened" = "%1$@ は古いバージョンです。レイヤーモード、マスク、グレインなどの新機能は簡略化して送信されました";

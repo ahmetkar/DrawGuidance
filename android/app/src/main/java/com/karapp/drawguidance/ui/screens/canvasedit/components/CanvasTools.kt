@@ -460,10 +460,20 @@ internal class EditPickTool : CanvasTool() {
 /** v43 damlalık: dokunulan (ya da parmağın kalktığı) yerin rengi fırça rengi olur; çizim yapılmaz. */
 internal class EyedropperTool : CanvasTool() {
     private var last = Offset.Zero
-    override fun begin(ctx: GestureContext): Boolean { last = ctx.startCanvas; ctx.setFinger(ctx.start); return true }
-    override fun move(ctx: GestureContext, position: Offset, point: Offset) { last = point; ctx.setFinger(position) }
+    private var loupe = false
+    override fun begin(ctx: GestureContext): Boolean {
+        last = ctx.startCanvas
+        // v56 canlı renk dairesi: parmak balonu yerine altındaki rengi gösteren halka
+        loupe = ctx.actions.eyedropLoupe()
+        if (loupe) ctx.actions.onEyedropHover(last) else ctx.setFinger(ctx.start)
+        return true
+    }
+    override fun move(ctx: GestureContext, position: Offset, point: Offset) {
+        last = point
+        if (loupe) ctx.actions.onEyedropHover(point) else ctx.setFinger(position)
+    }
     override fun end(ctx: GestureContext, preview: Preview?) { ctx.setFinger(null); ctx.actions.onEyedrop(last) }
-    override fun cancel(ctx: GestureContext) = ctx.setFinger(null)
+    override fun cancel(ctx: GestureContext) { ctx.setFinger(null); ctx.actions.onEyedropHover(null) }
     override fun tap(ctx: GestureContext, point: Offset, upTime: Long) = ctx.actions.onEyedrop(point)
 }
 

@@ -33,7 +33,7 @@ enum V56Flags {
         case .SIMPLE_ART: base = drawing.union([.QUICK_BRUSH, .QUICK_BRUSH_COLOR])
         case .COMIC: base = drawing
         case .NOTES, .SIMPLE_NOTES: base = [.LIVE_FIX, .LIVE_APPROVAL, .CROSS_PAGE_PASTE, .EXPORT_SVG_PSD_DXF, .EYEDROPPER_LOUPE]
-        case .KIDS: base = [.SYMMETRY]
+        case .KIDS: base = [.SYMMETRY, .EYEDROPPER_LOUPE] // 2D-5: çocukta da canlı renk dairesi
         }
         return base.subtracting(off)
     }

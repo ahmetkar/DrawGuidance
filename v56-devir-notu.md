@@ -15,7 +15,7 @@ Plan 2A ve 2E'deki K2 maddeleri: hızlı fırça seçici, renk butonu, damlalık
 (üst/dikey orta/alt; kâğıda/seçime/ana nesneye göre). Yapıştırınca Dönüştür panelinin açılması da K2'de.
 
 ## Testler / derleme
-- Android tam birim test takımı: çalışıyor (sonuç K1 raporunda). Derleme hatasız.
+- Android tam birim test takımı: 1085 test; K1'in bozduğu 8 test düzeltildi (yeni düğmelerin yardım metinleri, "Kopyala" ad çakışması → pano düğmesi "Panoya al", fırça kategorisi testi). Kalan düşenler K1'den önce de düşüyordu (v55 tabanında aynı 9 test: V13GalleryShots, V23Model3DCanvas, V25CanvasAdd3D, V34I18nTables, V37KidsMascot, V39GatingUi, V40RulerUi, V40Security, V46NewCharacters) ya da sunucu/ağ ister (CanvasFlow, V33Backend, V40Android10). V25Model3DViewModelTest toplu koşuda düştü, tek başına 6/6 geçti. Derleme hatasız.
 - iOS: Swift testleri yazıldı; ortamda Swift derleyicisi yok. Ahmet'in kararı: duraklarda derleme/CI yok, bütün
   duraklar bitince derleme Ahmet'te.
 

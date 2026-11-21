@@ -35,7 +35,7 @@ Son güncelleme: 2026-11-20, K1 durağı.
 
 ## Testler (K1)
 
-- Android: tam birim test takımı çalışıyor (sonuç K1 raporunda). Yeni: `V56ModelTest`, `V56LayerCompositeTest`, `V56SelectionTest`,
+- Android: tam birim test takımı 1085 test; K1'in bozduğu 8 test düzeltildi (yeni düğmelerin yardım metinleri, "Kopyala" ad çakışması → pano düğmesi "Panoya al", fırça kategorisi testi). Kalan düşenler K1'den önce de düşüyordu (v55 tabanında aynı 9 test: V13GalleryShots, V23Model3DCanvas, V25CanvasAdd3D, V34I18nTables, V37KidsMascot, V39GatingUi, V40RulerUi, V40Security, V46NewCharacters) ya da sunucu/ağ ister (CanvasFlow, V33Backend, V40Android10). V25Model3DViewModelTest toplu koşuda düştü, tek başına 6/6 geçti. Yeni: `V56ModelTest`, `V56LayerCompositeTest`, `V56SelectionTest`,
   `V56ClipboardTest` 5/5, `V56LiveDiffTest` 2/2, `ShareProtocolTest` 4/4. Derleme hatasız.
 - iOS: aynı adlı Swift testleri yazıldı (`V56ModelTests`, `V56LayerTests`, `V56SelectionTests`, `V56ClipboardTests`,
   `V56LiveDiffTests`). Buradaki ortamda Swift derleyicisi yok; duraklarda CI çalıştırılmadı (Ahmet'in kararı).

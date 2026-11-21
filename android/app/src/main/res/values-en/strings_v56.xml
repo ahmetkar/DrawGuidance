@@ -405,4 +405,20 @@
     <string name="sk3_rename_layer">Rename layer</string>
     <string name="sk3_delete_layer">Delete layer</string>
     <string name="sk3_open_from_canvas">Draw in 3D</string>
+    <string name="sk3_wide">Paint on surface</string>
+    <string name="sk3_fill">Fill</string>
+    <string name="sk3_glow">Glow</string>
+    <string name="sk3_style_soft">Soft</string>
+    <string name="sk3_style_toon">Toon</string>
+    <string name="sk3_style_lines">Lines only</string>
+    <string name="sk3_add_to_canvas">Add to canvas</string>
+    <string name="sk3_pick_canvas">Add to which canvas?</string>
+    <string name="sk3_no_canvas">No canvases yet</string>
+    <string name="sk3_video">Turntable video</string>
+    <string name="sk3_video_hint">The camera circles your drawing once.</string>
+    <string name="sk3_video_format">Format</string>
+    <string name="sk3_video_speed">Speed</string>
+    <string name="sk3_video_start">Save</string>
+    <string name="sk3_video_saved">Video saved to the gallery</string>
+    <string name="sk3_video_share">Share video</string>
 </resources>

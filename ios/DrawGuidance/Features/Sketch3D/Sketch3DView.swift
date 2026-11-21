@@ -13,13 +13,18 @@ struct Sketch3DView: View {
     @State private var exportOpen = false
     @State private var exitAsk = false
     @State private var toast: String?
+    @State private var videoOpen = false
+    @State private var shareURL: URL?
     var onBack: (() -> Void)?
+    /// v56 aşama 12 tuvalden açıldıysa "Tuvale ekle": PNG tuvale verilir, ekran kapanır.
+    var onAddToCanvas: ((Data) -> Void)?
 
     enum Panel: String, Identifiable { case layers, props; var id: String { rawValue } }
 
-    init(repository: Model3DRepository?, modelId: String?, initialName: String? = nil, onBack: (() -> Void)? = nil) {
+    init(repository: Model3DRepository?, modelId: String?, initialName: String? = nil, onBack: (() -> Void)? = nil, onAddToCanvas: ((Data) -> Void)? = nil) {
         _vm = StateObject(wrappedValue: Sketch3DModel(repository: repository, modelId: modelId, initialName: initialName))
         self.onBack = onBack
+        self.onAddToCanvas = onAddToCanvas
     }
 
     /// Testler ve önizleme için hazır modelle.
@@ -70,6 +75,8 @@ struct Sketch3DView: View {
             .accessibilityIdentifier("sketch3d_panel")
         }
         .sheet(isPresented: $exportOpen) { ImageExportSheet3(vm: vm) }
+        .sheet(isPresented: $videoOpen) { VideoSheet3(vm: vm) }
+        .sheet(item: Binding(get: { shareURL.map { ShareItem3(url: $0) } }, set: { shareURL = $0?.url })) { item in ShareSheet(items: [item.url]) }
         .alert(L("model3d_rename"), isPresented: $renaming) {
             TextField(L("model3d_name"), text: $nameText)
             Button(L("cancel_button"), role: .cancel) {}
@@ -92,6 +99,10 @@ struct Sketch3DView: View {
             case .saved(let name): show(L("model3d_saved", name))
             case .exit: leave()
             case .message(let m): show(m)
+            case .videoSaved(let url):
+                videoOpen = false
+                OrbitVideo.save(url) { ok in Task { @MainActor in if ok { show(L("sk3_video_saved")) } } }
+                shareURL = url
             }
         }
     }
@@ -131,6 +142,12 @@ struct Sketch3DView: View {
                 Button(L("model3d_save_as")) { nameText = vm.model?.name ?? ""; savingAs = true }
                 Button(L("model3d_fit")) { vm.fitView() }
                 Button(L("model3d_export_image")) { exportOpen = true }.accessibilityIdentifier("sketch3d_export_image")
+                if let add = onAddToCanvas {
+                    Button(L("sk3_add_to_canvas")) {
+                        Task { if let png = await vm.canvasImage() { if vm.dirty { vm.save() }; add(png) } }
+                    }.accessibilityIdentifier("sketch3d_add_to_canvas")
+                }
+                Button(L("sk3_video")) { videoOpen = true }.accessibilityIdentifier("sketch3d_video")
             } label: { Image(systemName: "ellipsis.circle").frame(width: 38, height: 40) }
                 .accessibilityLabel(L("more_options"))
         }
@@ -147,6 +164,8 @@ struct Sketch3DView: View {
                 tool(L("sk3_pen"), "pencil", vm.tool == .PEN && vm.brush == .PEN, "sketch3d_brush_pen") { vm.setBrush(.PEN) }
                 tool(L("sk3_ink"), "pencil.tip", vm.tool == .PEN && vm.brush == .INK, "sketch3d_brush_ink") { vm.setBrush(.INK) }
                 tool(L("sk3_marker"), "highlighter", vm.tool == .PEN && vm.brush == .MARKER, "sketch3d_brush_marker") { vm.setBrush(.MARKER) }
+                tool(L("sk3_wide"), "paintbrush.pointed", vm.tool == .PEN && vm.brush == .WIDE, "sketch3d_brush_wide") { vm.setBrush(.WIDE) }
+                tool(L("sk3_fill"), "drop.fill", vm.tool == .FILL, "sketch3d_fill") { vm.setTool(.FILL) }
                 tool(L("sk3_eraser"), "eraser", vm.tool == .ERASER, "sketch3d_eraser") { vm.setTool(.ERASER) }
                 ColorRow3(selected: vm.color) { vm.setColor($0) }.frame(maxWidth: 260)
             case .PLANE:
@@ -167,6 +186,9 @@ struct Sketch3DView: View {
                 tool(L("sk3_select_all"), "checkmark.circle", false, "sketch3d_select_all") { vm.selectAll() }
                 tool(L("sk3_duplicate"), "plus.square.on.square", false, "sketch3d_duplicate") { vm.duplicateSelected() }
                 tool(L("sk3_flip"), "arrow.left.and.right.square", false, "sketch3d_flip") { vm.flipSelected() }
+                let selParts = vm.model?.parts.filter { vm.selection.contains($0.id) } ?? []
+                let glowing = !selParts.isEmpty && selParts.allSatisfy { $0.material.kind == .GLOW }
+                tool(L("sk3_glow"), "sparkles", glowing, "sketch3d_glow") { vm.materialSelected(glowing ? .PLASTIC : .GLOW) }
                 tool(L("sk3_ground"), "arrow.down.to.line", false, "sketch3d_ground") { vm.dropSelectedToGround() }
                 tool(L("sk3_delete"), "trash", false, "sketch3d_delete") { vm.deleteSelected() }
             case .ADD:
@@ -175,6 +197,9 @@ struct Sketch3DView: View {
                     tool(L(item.1), item.2, false, "sketch3d_add_\(item.3)") { vm.addPrimitive(item.0) }
                 }
             case .VIEW:
+                ForEach([(RenderStyle.SOFT, "sk3_style_soft"), (RenderStyle.TOON, "sk3_style_toon"), (RenderStyle.LINES, "sk3_style_lines")], id: \.0) { item in
+                    Chip3(L(item.1), vm.style == item.0) { vm.setStyle(item.0) }.accessibilityIdentifier("sketch3d_style_\(item.0)")
+                }
                 tool(L("sk3_iso"), "cube.transparent", false, "sketch3d_view_iso") { vm.presetView(0) }
                 tool(L("sk3_plane_front"), "square", false, "sketch3d_view_front") { vm.presetView(1) }
                 tool(L("sk3_plane_side"), "square.righthalf.filled", false, "sketch3d_view_side") { vm.presetView(2) }
@@ -305,4 +330,50 @@ struct PropsPanel3: View {
 extension View {
     /// iOS 16+: alt sayfa orta ve tam yükseklikte açılır.
     func presentationDetentsCompat() -> some View { presentationDetents([.medium, .large]) }
+}
+
+private struct ShareItem3: Identifiable { let url: URL; var id: String { url.path } }
+
+/// v56 aşama 13 dönen video: biçim (MP4 1080p / GIF), hız ve ilerleme (Android `VideoDialog`).
+struct VideoSheet3: View {
+    @ObservedObject var vm: Sketch3DModel
+    @Environment(\.dismiss) private var dismiss
+    @State private var gif = false
+    @State private var speed: Float = 1
+
+    var body: some View {
+        NavigationStack {
+            Form {
+                Text(L("sk3_video_hint")).font(.callout)
+                Section(L("sk3_video_format")) {
+                    Picker(L("sk3_video_format"), selection: $gif) {
+                        Text("MP4 1080p").tag(false)
+                        Text("GIF").tag(true)
+                    }.pickerStyle(.segmented).accessibilityIdentifier("sketch3d_video_format")
+                }
+                Section(L("sk3_video_speed")) {
+                    Picker(L("sk3_video_speed"), selection: $speed) {
+                        Text("0.5×").tag(Float(0.5))
+                        Text("1×").tag(Float(1))
+                        Text("2×").tag(Float(2))
+                    }.pickerStyle(.segmented).accessibilityIdentifier("sketch3d_video_speed")
+                }
+                if let p = vm.videoProgress {
+                    ProgressView(value: Double(p)).accessibilityIdentifier("sketch3d_video_progress")
+                }
+            }
+            .disabled(vm.videoProgress != nil)
+            .navigationTitle(L("sk3_video"))
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) { Button(L("cancel_button")) { dismiss() }.disabled(vm.videoProgress != nil) }
+                ToolbarItem(placement: .confirmationAction) {
+                    Button(L("sk3_video_start")) {
+                        vm.exportVideo(gif: gif, speed: speed, outDir: FileManager.default.temporaryDirectory.appendingPathComponent("sketch3d-video"))
+                    }.disabled(vm.videoProgress != nil).accessibilityIdentifier("sketch3d_video_start")
+                }
+            }
+        }
+        .accessibilityIdentifier("sketch3d_video_sheet")
+    }
 }

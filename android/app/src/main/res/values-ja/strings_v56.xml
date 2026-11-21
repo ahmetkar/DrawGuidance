@@ -405,4 +405,20 @@
     <string name="sk3_rename_layer">レイヤー名を変更</string>
     <string name="sk3_delete_layer">レイヤーを削除</string>
     <string name="sk3_open_from_canvas">3Dで描く</string>
+    <string name="sk3_wide">面に塗る</string>
+    <string name="sk3_fill">塗りつぶし</string>
+    <string name="sk3_glow">発光</string>
+    <string name="sk3_style_soft">ソフト</string>
+    <string name="sk3_style_toon">トゥーン</string>
+    <string name="sk3_style_lines">線のみ</string>
+    <string name="sk3_add_to_canvas">キャンバスに追加</string>
+    <string name="sk3_pick_canvas">どのキャンバスに追加しますか?</string>
+    <string name="sk3_no_canvas">まだキャンバスがありません</string>
+    <string name="sk3_video">回転動画</string>
+    <string name="sk3_video_hint">カメラが作品の周りを1周します。</string>
+    <string name="sk3_video_format">形式</string>
+    <string name="sk3_video_speed">速度</string>
+    <string name="sk3_video_start">保存</string>
+    <string name="sk3_video_saved">動画をギャラリーに保存しました</string>
+    <string name="sk3_video_share">動画を共有</string>
 </resources>

@@ -405,4 +405,20 @@
     <string name="sk3_rename_layer">إعادة تسمية الطبقة</string>
     <string name="sk3_delete_layer">حذف الطبقة</string>
     <string name="sk3_open_from_canvas">ارسم ثلاثي الأبعاد</string>
+    <string name="sk3_wide">الطلاء على السطح</string>
+    <string name="sk3_fill">تعبئة</string>
+    <string name="sk3_glow">توهج</string>
+    <string name="sk3_style_soft">ناعم</string>
+    <string name="sk3_style_toon">كرتوني</string>
+    <string name="sk3_style_lines">خطوط فقط</string>
+    <string name="sk3_add_to_canvas">أضف إلى اللوحة</string>
+    <string name="sk3_pick_canvas">إلى أي لوحة تتم الإضافة؟</string>
+    <string name="sk3_no_canvas">لا توجد لوحات بعد</string>
+    <string name="sk3_video">فيديو دوّار</string>
+    <string name="sk3_video_hint">تدور الكاميرا حول رسمك مرة واحدة.</string>
+    <string name="sk3_video_format">التنسيق</string>
+    <string name="sk3_video_speed">السرعة</string>
+    <string name="sk3_video_start">حفظ</string>
+    <string name="sk3_video_saved">تم حفظ الفيديو في المعرض</string>
+    <string name="sk3_video_share">مشاركة الفيديو</string>
 </resources>

@@ -29,7 +29,7 @@ struct Sketch3DViewport: View {
                 if let m = shown {
                     if vm.gpu {
                         Metal3DView(model: m, selected: vm.selection.filter { id in m.parts.contains { $0.id == id } },
-                                    clear: Color(uiColor: .systemBackground), tick: vm.renderTick, onFail: { vm.gpuFailed() })
+                                    clear: Color(uiColor: .systemBackground), tick: vm.renderTick, style: vm.style, onFail: { vm.gpuFailed() })
                     } else if let img = image {
                         Image(decorative: img, scale: 1).resizable().interpolation(.low).frame(width: geo.size.width, height: geo.size.height)
                     }
@@ -57,10 +57,11 @@ struct Sketch3DViewport: View {
         let interacting: Bool
         let tick: Int
         let gpu: Bool
+        let style: Int
     }
 
     private func renderKey(_ m: Model3D?) -> RenderKey {
-        RenderKey(model: m, selection: vm.selection, size: size, interacting: interacting, tick: vm.renderTick, gpu: vm.gpu)
+        RenderKey(model: m, selection: vm.selection, size: size, interacting: interacting, tick: vm.renderTick, gpu: vm.gpu, style: vm.style)
     }
 
     private func renderSoftware(_ shown: Model3D?) async {
@@ -71,11 +72,12 @@ struct Sketch3DViewport: View {
         let sel = vm.selection
         let busy = interacting
         let tex = vm.textures
+        let st = vm.style
         let img = await Task.detached(priority: .userInitiated) { () -> CGImage? in
             let f = Renderer3D.render(m, View3.editor(m.camera, w, h),
                                       RenderOptions(textures: { tex.cached($0) }, supersample: busy ? 1 : 2, bilinear: !busy,
                                                     shadow: busy ? false : nil, selectedPart: sel.first { id in m.parts.contains { $0.id == id } },
-                                                    selectedParts: sel))
+                                                    selectedParts: sel, style: st))
             return Bitmaps.image(argb: f.color, w, h)
         }.value
         if !Task.isCancelled { image = img }
@@ -93,7 +95,13 @@ struct Sketch3DViewport: View {
                 var p = Path()
                 p.move(to: drawPath[0])
                 for q in drawPath.dropFirst() { p.addLine(to: q) }
-                ctx.stroke(p, with: .color(Color(argb: vm.color)), style: StrokeStyle(lineWidth: CGFloat(vm.size), lineCap: .round, lineJoin: .round))
+                if vm.tool == .FILL {
+                    p.closeSubpath()
+                    ctx.fill(p, with: .color(Color(argb: vm.color).opacity(0.3)))
+                    ctx.stroke(p, with: .color(Color(argb: vm.color)), lineWidth: 2)
+                } else {
+                    ctx.stroke(p, with: .color(Color(argb: vm.color)), style: StrokeStyle(lineWidth: CGFloat(vm.size), lineCap: .round, lineJoin: .round))
+                }
             }
             if let e = eraserAt {
                 let r = CGFloat(vm.eraserSize)
@@ -192,7 +200,7 @@ struct Sketch3DViewport: View {
         interacting = true
         drawPath = []
         let x = Float(t.point.x), y = Float(t.point.y)
-        if g.drawing && g.tool == .PEN { addPoint(t.point, t.stylus ? Float(t.pressure) : 1) }
+        if g.drawing && (g.tool == .PEN || g.tool == .FILL) { addPoint(t.point, t.stylus ? Float(t.pressure) : 1) }
         if g.drawing && g.tool == .ERASER { vm.beginErase(); vm.eraseAt(x, y, vm.eraserSize); eraserAt = t.point }
         if m == .PLANE, let v = vm.currentView() {
             let s = v.project(vm.plane.origin)
@@ -272,6 +280,8 @@ struct Sketch3DViewport: View {
                 drawPath = [CGPoint(x: CGFloat(g.xy[0]), y: CGFloat(g.xy[1])), p]
                 g.xy += [Float(p.x), Float(p.y)]; g.pressures.append(1)
             }
+        } else if g.drawing && g.tool == .FILL {
+            addPoint(p, 1)
         } else if g.drawing && g.tool == .ERASER {
             vm.eraseAt(Float(p.x), Float(p.y), vm.eraserSize)
             eraserAt = p
@@ -295,6 +305,10 @@ struct Sketch3DViewport: View {
             case .SELECT: vm.tapSelect(x, y, Self.RADIUS)
             default: break
             }
+        }
+        // v56 aşama 12 dolgu: dokunma kapalı çizginin içini, sürükleme kementi doldurur
+        if g.drawing && g.tool == .FILL && !g.multi {
+            if !g.moved { vm.fillAt(Float(g.start.x), Float(g.start.y)) } else { vm.fillLasso(g.xy) }
         }
         if g.drawing && g.tool == .PEN && !g.multi && g.xy.count >= 4 {
             let anyStylus = g.pressures.contains { $0 != 1 }

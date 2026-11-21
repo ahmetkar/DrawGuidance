@@ -112,7 +112,7 @@ final class MetalRenderer3 {
 
     /// Modelin ekran köşeleri: cisimler düz gölgeli üçgenler, çizgiler kalınlıklı şeritler. [selected] cisimler vurgulanır.
     static func build(_ model: Model3D, _ view: View3, selected: Set<String> = [], highlight: Int32 = Int32(bitPattern: 0xFF2F_80ED),
-                      lineScale: Float = 1) -> Scene {
+                      lineScale: Float = 1, style: Int = RenderStyle.SOFT) -> Scene {
         var sc = Scene()
         let w = Float(max(view.width, 1)), h = Float(max(view.height, 1))
         let light = model.scene.light
@@ -136,8 +136,10 @@ final class MetalRenderer3 {
                 t.normal(fn[3 * f], fn[3 * f + 1], fn[3 * f + 2], &out, 0)
                 let n = V3(out[0], out[1], out[2])
                 let lambert = abs(n.dot(ldir))
-                let shade = ambient + (1 - ambient) * lambert * light.intensity
-                var (r, g, b, _) = rgba(mat.color)
+                let shade0 = ambient + (1 - ambient) * lambert * light.intensity
+                // v56 aşama 12 toon: ışık üç banda yuvarlanır; sadece çizgi: yüzeyler beyaz
+                let shade = style == RenderStyle.TOON ? RenderStyle.toonBand(shade0) : shade0
+                var (r, g, b, _) = style == RenderStyle.LINES && mat.kind != .GLOW ? (Float(1) / max(shade, 0.05), Float(1) / max(shade, 0.05), Float(1) / max(shade, 0.05), Float(1)) : rgba(mat.color)
                 if isSel { let (hr, hg, hb, _) = rgba(highlight); r = r * 0.6 + hr * 0.4; g = g * 0.6 + hg * 0.4; b = b * 0.6 + hb * 0.4 }
                 let glow = mat.kind == .GLOW
                 let k: Float = glow ? 1.05 : shade
@@ -162,6 +164,8 @@ final class MetalRenderer3 {
                 }
             }
         }
+
+        if style != RenderStyle.SOFT { sc.opaque += inkEdges(model, view, lineScale: lineScale, depth: depth) }
 
         for st in model.strokes where st.count > 0 {
             let (r, g, b, _) = rgba(st.color)
@@ -215,6 +219,59 @@ final class MetalRenderer3 {
         return sc
     }
 
+    /// v56 aşama 12 toon ve sadece çizgi tarzının mürekkep kenarları: açık kenarlar, keskin kıvrımlar ve siluet
+    /// (komşu yüzlerden biri ekrana dönük, öteki değil) ekranda kalınlıklı şerit olarak, yüzeylerin biraz önünde.
+    static func inkEdges(_ model: Model3D, _ view: View3, lineScale: Float, depth: (Float) -> Float) -> [Float] {
+        var out: [Float] = []
+        let w = Float(max(view.width, 1)), h = Float(max(view.height, 1))
+        let (ir, ig, ib, _) = rgba(Int32(bitPattern: RenderStyle.INK))
+        let half = max(0.8, 1.1 * lineScale)
+        var s = [Float](repeating: 0, count: 4)
+        for part in model.parts where part.visible {
+            let t = Transform3.of(part)
+            let mesh = part.mesh
+            let n = mesh.pos.count / 3
+            var scr = [Float](repeating: 0, count: n * 4)
+            for i in 0..<n {
+                let p = t.apply(mesh.vertex(i))
+                view.project(p.x, p.y, p.z, &s)
+                scr[4 * i] = s[0]; scr[4 * i + 1] = s[1]; scr[4 * i + 2] = depth(s[2]) - 0.0012; scr[4 * i + 3] = s[3]
+            }
+            // Yüzün ekrana dönüklüğü: izdüşen ilk üçgenin dolanım yönü
+            func front(_ f: Int) -> Bool {
+                let face = mesh.faces[f], tri = mesh.triangles[f]
+                guard tri.count >= 3 else { return true }
+                let a = face[tri[0]], b = face[tri[1]], c = face[tri[2]]
+                let cross = (scr[4 * b] - scr[4 * a]) * (scr[4 * c + 1] - scr[4 * a + 1]) - (scr[4 * b + 1] - scr[4 * a + 1]) * (scr[4 * c] - scr[4 * a])
+                return cross < 0
+            }
+            let fn = mesh.faceNormals
+            let e = mesh.edges
+            var i = 0
+            while i + 3 < e.count {
+                let va = e[i], vb = e[i + 1], f1 = e[i + 2], f2 = e[i + 3]
+                i += 4
+                var draw = f2 < 0
+                if !draw {
+                    let dot = fn[3 * f1] * fn[3 * f2] + fn[3 * f1 + 1] * fn[3 * f2 + 1] + fn[3 * f1 + 2] * fn[3 * f2 + 2]
+                    draw = front(f1) != front(f2) || (dot < 0.82 && (!part.smooth || dot < 0.7))
+                }
+                guard draw, scr[4 * va + 3] > 0, scr[4 * vb + 3] > 0 else { continue }
+                let ax = scr[4 * va], ay = scr[4 * va + 1], az = scr[4 * va + 2]
+                let bx = scr[4 * vb], by = scr[4 * vb + 1], bz = scr[4 * vb + 2]
+                let dx = bx - ax, dy = by - ay
+                let len = (dx * dx + dy * dy).squareRoot()
+                guard len > 1e-4 else { continue }
+                let nx = -dy / len * half, ny = dx / len * half
+                func v(_ x: Float, _ y: Float, _ z: Float) -> [Float] { [x / w * 2 - 1, 1 - y / h * 2, z, ir, ig, ib, 1] }
+                let a1 = v(ax + nx, ay + ny, az), a2 = v(ax - nx, ay - ny, az), b1 = v(bx + nx, by + ny, bz), b2 = v(bx - nx, by - ny, bz)
+                out += a1; out += a2; out += b1
+                out += a2; out += b2; out += b1
+            }
+        }
+        return out
+    }
+
     /// ARGB tamsayıdan 0…1 bileşenler.
     static func rgba(_ c: Int32) -> (Float, Float, Float, Float) {
         let u = UInt32(bitPattern: c)
@@ -228,12 +285,14 @@ struct Metal3DView: UIViewRepresentable {
     let selected: Set<String>
     let clear: Color
     let tick: Int
+    var style: Int = RenderStyle.SOFT
     let onFail: () -> Void
 
     final class Coordinator: NSObject, MTKViewDelegate {
         var renderer: MetalRenderer3?
         var model: Model3D?
         var selected: Set<String> = []
+        var style = RenderStyle.SOFT
         var clear = MTLClearColor(red: 1, green: 1, blue: 1, alpha: 1)
         var onFail: (() -> Void)?
         private var failed = false
@@ -246,7 +305,7 @@ struct Metal3DView: UIViewRepresentable {
             guard w > 0, h > 0 else { return }
             // Çizici ekran noktasında çalışır; çizim yüzeyi piksel: ölçek görünüm ölçeğiyle aynı oranda büyür
             let v = View3.editor(m.camera, w, h)
-            var sc = MetalRenderer3.build(m, v, selected: selected, lineScale: 1)
+            var sc = MetalRenderer3.build(m, v, selected: selected, lineScale: 1, style: style)
             if m.scene.background == 0 { sc.clear = clear }
             if !r.draw(sc, in: view) {
                 failed = true
@@ -283,6 +342,7 @@ struct Metal3DView: UIViewRepresentable {
         let c = context.coordinator
         c.model = model
         c.selected = selected
+        c.style = style
         c.onFail = onFail
         let ui = UIColor(clear).resolvedColor(with: v.traitCollection)
         var r: CGFloat = 1, g: CGFloat = 1, b: CGFloat = 1, a: CGFloat = 1

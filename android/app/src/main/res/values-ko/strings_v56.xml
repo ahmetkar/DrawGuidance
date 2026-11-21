@@ -405,4 +405,20 @@
     <string name="sk3_rename_layer">레이어 이름 바꾸기</string>
     <string name="sk3_delete_layer">레이어 삭제</string>
     <string name="sk3_open_from_canvas">3D로 그리기</string>
+    <string name="sk3_wide">표면에 칠하기</string>
+    <string name="sk3_fill">채우기</string>
+    <string name="sk3_glow">발광</string>
+    <string name="sk3_style_soft">부드럽게</string>
+    <string name="sk3_style_toon">툰</string>
+    <string name="sk3_style_lines">선만</string>
+    <string name="sk3_add_to_canvas">캔버스에 추가</string>
+    <string name="sk3_pick_canvas">어느 캔버스에 추가할까요?</string>
+    <string name="sk3_no_canvas">아직 캔버스가 없습니다</string>
+    <string name="sk3_video">회전 동영상</string>
+    <string name="sk3_video_hint">카메라가 그림 주위를 한 바퀴 돕니다.</string>
+    <string name="sk3_video_format">형식</string>
+    <string name="sk3_video_speed">속도</string>
+    <string name="sk3_video_start">저장</string>
+    <string name="sk3_video_saved">동영상을 갤러리에 저장했습니다</string>
+    <string name="sk3_video_share">동영상 공유</string>
 </resources>

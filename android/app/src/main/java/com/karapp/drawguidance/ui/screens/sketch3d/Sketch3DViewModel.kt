@@ -15,6 +15,8 @@ import com.karapp.drawguidance.content.model3d.PlaneSnap
 import com.karapp.drawguidance.content.model3d.PrimitiveKind
 import com.karapp.drawguidance.content.model3d.RenderOptions
 import com.karapp.drawguidance.content.model3d.Renderer
+import com.karapp.drawguidance.content.model3d.RenderStyle
+import com.karapp.drawguidance.content.model3d.Sketch3Fill
 import com.karapp.drawguidance.content.model3d.SceneSettings
 import com.karapp.drawguidance.content.model3d.Stroke3
 import com.karapp.drawguidance.content.model3d.V3
@@ -48,7 +50,7 @@ import kotlin.math.sqrt
 enum class SketchMode { DRAW, PLANE, SELECT, ADD, VIEW }
 
 /** Çiz modunun araçları. */
-enum class SketchTool { PEN, ERASER }
+enum class SketchTool { PEN, ERASER, FILL }
 
 /** Seç modunda sürüklemenin yaptığı (Dönüştür panelinin kipleri). */
 enum class SketchXform { MOVE, ROTATE, SCALE }
@@ -58,6 +60,10 @@ sealed interface SketchEvent {
     data class Saved(val name: String) : SketchEvent
     data object Exit : SketchEvent
     data class Message(val text: String) : SketchEvent
+    /** v56 aşama 13 dönen video kaydedildi ([uri] galeri ya da dosya; [file] paylaşım için). */
+    data class VideoSaved(val uri: String?, val file: java.io.File, val mime: String) : SketchEvent
+    /** v56 aşama 12 resim tuvale bırakıldı; ekran o tuvale geçer. */
+    data class AddedToCanvas(val canvasId: String) : SketchEvent
 }
 
 /**
@@ -132,6 +138,14 @@ class Sketch3DViewModel(
 
     private val _events = MutableSharedFlow<SketchEvent>(extraBufferCapacity = 4)
     val events: SharedFlow<SketchEvent> = _events
+
+    /** v56 aşama 12 görünüm stili ([RenderStyle]: yumuşak, toon, sadece çizgi). Kayda girmez. */
+    private val _style = MutableStateFlow(RenderStyle.SOFT)
+    val style: StateFlow<Int> = _style.asStateFlow()
+
+    /** v56 aşama 13 video dışa aktarma ilerlemesi (0..1; null: çalışmıyor). */
+    private val _videoProgress = MutableStateFlow<Float?>(null)
+    val videoProgress: StateFlow<Float?> = _videoProgress.asStateFlow()
 
     /** Doku yüklenince sahne yeniden çizilsin diye artar. */
     private val _renderTick = MutableStateFlow(0)
@@ -246,6 +260,7 @@ class Sketch3DViewModel(
         _mode.value = m
     }
     fun setTool(t: SketchTool) { _tool.value = t; _mode.value = SketchMode.DRAW }
+    fun setStyle(st: Int) { _style.value = st.coerceIn(RenderStyle.SOFT, RenderStyle.LINES) }
     fun setBrush(b: Brush3D) { _brush.value = b; _tool.value = SketchTool.PEN; _mode.value = SketchMode.DRAW }
     fun setColor(c: Int) { _color.value = c }
     fun setSize(px: Float) { _size.value = px.coerceIn(1f, 80f) }
@@ -411,6 +426,7 @@ class Sketch3DViewModel(
         val m = _model.value ?: return null
         val view = currentView() ?: return null
         if (xy.size < 4 || !layerWritable()) return null
+        if (_brush.value == Brush3D.WIDE && !straight) paintSurface(m, view, xy, pressures)?.let { return it }
         val src = if (straight) floatArrayOf(xy[0], xy[1], xy[xy.size - 2], xy[xy.size - 1]) else smooth(xy)
         val n = src.size / 2
         val pts = FloatArray(n * 3)
@@ -426,11 +442,82 @@ class Sketch3DViewModel(
         val press = pressures?.takeIf { !straight && it.size * 2 == xy.size }?.let { resample(it, count) }
         val widths = widthsFor(b, count, press)
         val opacity = when (b) { Brush3D.MARKER -> min(_opacity.value, 0.6f); else -> _opacity.value }
-        val w = _size.value * (if (b == Brush3D.MARKER) 1.8f else 1f) * pixelToWorld()
+        val w = _size.value * (when (b) { Brush3D.MARKER -> 1.8f; Brush3D.WIDE -> WIDE_SCALE; else -> 1f }) * pixelToWorld()
         val id = UUID.randomUUID().toString()
         val stroke = Stroke3(id, world, _color.value, w, System.currentTimeMillis(), widths, opacity, b.ordinal, _plane.value.id, _activeLayer.value)
         commit(m.copy(strokes = m.strokes + stroke))
         return id
+    }
+
+    /**
+     * v56 aşama 13 yüzeye boya: GENİŞ fırçanın izi cisimlerin yüzeyine düşürülür (yüzeyi ıskalayan yerde bölünür).
+     * Hiç yüzeye değmezse null (çizgi düzleme çizilir). Dönen kimlik ilk parçanınki; tek geri alma adımı.
+     */
+    private fun paintSurface(m: Model3D, view: View3, xy: FloatArray, pressures: FloatArray?): String? {
+        val visible = m.visibleLayers()
+        if (visible.parts.none { it.visible }) return null
+        val src = smooth(xy)
+        val segs = com.karapp.drawguidance.content.model3d.SurfacePaint.cast(visible, view, src)
+        if (segs.isEmpty()) return null
+        val now = System.currentTimeMillis()
+        val added = segs.map { (pts, _) ->
+            val mid = pts.size / 3 / 2
+            val depth = view.project(V3(pts[3 * mid], pts[3 * mid + 1], pts[3 * mid + 2])).let { if (it[3] > 0f) it[3] else 1f }
+            val w = _size.value * WIDE_SCALE / (view.scale * depth)
+            Stroke3(UUID.randomUUID().toString(), pts, _color.value, w, now, null, min(_opacity.value, 0.9f), Brush3D.WIDE.ordinal, SURFACE_PLANE, _activeLayer.value)
+        }
+        commit(m.copy(strokes = m.strokes + added))
+        return added.first().id
+    }
+
+    // ------------------------------------------------------------------------------------------ dolgu
+
+    /**
+     * v56 aşama 12 dolgu (dokunma): dokunulan yeri ekranda çevreleyen kapalı çizgi (en öndeki) seçili renkle doldurulur.
+     * Dolgu ayrı bir düz cisimdir ("fill-"); seçilir, taşınır, silinir. Bulunamazsa ipucu verilir.
+     */
+    fun fillAt(x: Float, y: Float): String? {
+        val m = _model.value ?: return null
+        val view = currentView() ?: return null
+        if (!layerWritable()) return null
+        val s = FloatArray(4)
+        var best: Stroke3? = null; var bestArea = Float.MAX_VALUE
+        for (st in m.strokes) {
+            if (m.layerHidden(st.layer) || st.count < 3 || !Sketch3Fill.isClosed(st.points, st.width)) continue
+            val poly = FloatArray(st.count * 2)
+            var ok = true
+            for (i in 0 until st.count) {
+                view.project(st.points[3 * i], st.points[3 * i + 1], st.points[3 * i + 2], s)
+                if (s[3] <= 0f) { ok = false; break }
+                poly[2 * i] = s[0]; poly[2 * i + 1] = s[1]
+            }
+            if (!ok || !Sketch3Fill.inside(poly, x, y)) continue
+            // İç içe halkalarda en küçüğü (dokunulana en yakın) doldurulur
+            val a = Sketch3Fill.screenArea(poly)
+            if (a < bestArea) { bestArea = a; best = st }
+        }
+        val loop = best ?: run { message(MSG_FILL_NONE); return null }
+        val part = Sketch3Fill.fromLoop(loop.points, UUID.randomUUID().toString(), _color.value, _opacity.value, _activeLayer.value, FILL_NAME)
+            ?: run { message(MSG_FILL_NONE); return null }
+        commit(m.copy(parts = m.parts + part))
+        return part.id
+    }
+
+    /** v56 aşama 12 kement dolgu: ekranda çizilen kapalı iz çizim düzlemine düşürülüp doldurulur. */
+    fun fillLasso(xy: FloatArray): String? {
+        val m = _model.value ?: return null
+        val view = currentView() ?: return null
+        if (xy.size < 6 || !layerWritable()) return null
+        if (Sketch3Fill.screenArea(xy) < MIN_LASSO_AREA) { message(MSG_FILL_NONE); return null }
+        val pts = ArrayList<Float>(xy.size / 2 * 3)
+        for (i in 0 until xy.size / 2) {
+            val p = PlaneSnap.project(_plane.value, view, xy[2 * i], xy[2 * i + 1]) ?: continue
+            pts += p.x; pts += p.y; pts += p.z
+        }
+        val part = Sketch3Fill.fromLoop(pts.toFloatArray(), UUID.randomUUID().toString(), _color.value, _opacity.value, _activeLayer.value, FILL_NAME)
+            ?: run { message(MSG_FILL_NONE); return null }
+        commit(m.copy(parts = m.parts + part))
+        return part.id
     }
 
     /** Hafif yumuşatma (3 noktalı ortalama, uçlar korunur). */
@@ -501,7 +588,13 @@ class Sketch3DViewModel(
                 i = j
             }
         }
-        if (changed) commit(m.copy(strokes = out))
+        // v56 aşama 12: silgi dokunduğu dolguyu da kaldırır
+        var parts = m.parts
+        Pick3.pick(m.visibleLayers(), view, x, y)?.let { hit ->
+            val p = m.parts.getOrNull(hit.part)
+            if (p != null && Sketch3Fill.isFill(p) && !m.layerLocked(p.layer)) { parts = m.parts - p; changed = true }
+        }
+        if (changed) commit(m.copy(strokes = out, parts = parts))
     }
 
     fun endErase() { if (erasing) { erasing = false; endLive() } }
@@ -662,6 +755,14 @@ class Sketch3DViewModel(
     }
 
     /** Seçimin rengi (çizgi rengi, cisim malzemesi). */
+    /** v56 aşama 12 seçili cisimlerin malzemesi (Parlayan: GLOW, Mat, Plastik, Metal, Cam). */
+    fun materialSelected(kind: com.karapp.drawguidance.content.model3d.MaterialKind) {
+        val m = _model.value ?: return
+        val sel = _selection.value
+        if (m.parts.none { it.id in sel }) return
+        commit(m.copy(parts = m.parts.map { if (it.id in sel) it.copy(material = it.material.copy(kind = kind)) else it }))
+    }
+
     fun colorSelected(c: Int) {
         val m = _model.value ?: return
         val sel = _selection.value
@@ -789,7 +890,7 @@ class Sketch3DViewModel(
                     View3(m.camera, w, h, ref.scale * k, w / 2f, h / 2f)
                 }
             }
-            val f = Renderer.render(mm, view, RenderOptions(textures = textures::cached, supersample = ss, ground = e.ground, shadow = e.shadow, background = bg))
+            val f = Renderer.render(mm, view, RenderOptions(textures = textures::cached, supersample = ss, ground = e.ground, shadow = e.shadow, background = bg, style = _style.value))
             android.graphics.Bitmap.createBitmap(f.color, w, h, android.graphics.Bitmap.Config.ARGB_8888)
         }
     }
@@ -807,6 +908,75 @@ class Sketch3DViewModel(
     }
 
     override fun message(text: String) { _events.tryEmit(SketchEvent.Message(text)) }
+
+    // ------------------------------------------------------------------------------------------ tuvale ekle
+
+    /**
+     * v56 aşama 12 "Tuvale ekle": çizim saydam arka planla PNG olarak çizilir ve [canvasId] tuvaline bırakılır; tuval
+     * açılınca sayfanın ortasına resim elemanı olarak eklenir.
+     */
+    fun addToCanvas(canvasId: String, side: Int = CANVAS_SIDE) {
+        viewModelScope.launch {
+            val e = ImageExport(size = side, background = 0, ground = false, shadow = false, fit = true, edges = _model.value?.scene?.edges ?: true)
+            val bmp = renderImage(e) ?: return@launch
+            val bytes = withContext(Dispatchers.IO) {
+                java.io.ByteArrayOutputStream().also { bmp.compress(android.graphics.Bitmap.CompressFormat.PNG, 100, it) }.toByteArray()
+            }
+            bmp.recycle()
+            com.karapp.drawguidance.data.clipboard.CanvasImageInbox.post(canvasId, bytes)
+            _events.emit(SketchEvent.AddedToCanvas(canvasId))
+        }
+    }
+
+    // ------------------------------------------------------------------------------------------ dönen video
+
+    /**
+     * v56 aşama 13 dönen video: kamera modelin çevresinde bir tur atar. [gif] true ise 480 px GIF (saf Kotlin), değilse
+     * 1080p 30 fps MP4 (MediaCodec). [speed] 0.5/1/2. Dosya [outDir]'e yazılır, galeriye de kopyalanır.
+     */
+    fun exportVideo(gif: Boolean, speed: Float, outDir: java.io.File, context: android.content.Context? = null) {
+        if (_videoProgress.value != null) return
+        val m0 = _model.value ?: return
+        val m = m0.visibleLayers()
+        _videoProgress.value = 0f
+        viewModelScope.launch {
+            try {
+                textures.preload(m.parts.flatMap { p -> listOfNotNull(p.material.texture) + p.faceMaterials.values.mapNotNull { it.texture } }.toSet())
+                val fps = if (gif) GIF_FPS else MP4_FPS
+                val n = com.karapp.drawguidance.content.model3d.OrbitTrack.frameCount(fps, speed)
+                val cams = com.karapp.drawguidance.content.model3d.OrbitTrack.cameras(m.camera, n)
+                val (w, h) = if (gif) GIF_SIDE to GIF_SIDE * 3 / 4 else MP4_W to MP4_H
+                val bg = m.scene.background.takeIf { it != 0 } ?: -1
+                val mm = m.copy(scene = m.scene.copy(background = bg))
+                val view0 = View3.fit(mm, m.camera, w, h, 0.08f)
+                fun frame(i: Int): IntArray {
+                    val v = View3(cams[i], w, h, view0.scale, view0.centerX, view0.centerY)
+                    return Renderer.render(mm, v, RenderOptions(textures = textures::cached, supersample = 1, background = bg, style = _style.value)).color
+                }
+                val safe = m0.name.replace(Regex("[^\\p{L}\\p{N} _-]"), "").ifBlank { "3d" }.take(40)
+                outDir.mkdirs()
+                val file = java.io.File(outDir, "$safe-${System.currentTimeMillis()}.${if (gif) "gif" else "mp4"}")
+                withContext(Dispatchers.Default) {
+                    if (gif) {
+                        val g = com.karapp.drawguidance.content.model3d.GifWriter(w, h, delayCs = 100 / fps)
+                        for (i in 0 until n) { g.addFrame(frame(i)); _videoProgress.value = (i + 1f) / n }
+                        file.writeBytes(g.finish())
+                    } else {
+                        OrbitMp4.encode(file, w, h, fps, n) { i -> frame(i).also { _videoProgress.value = (i + 1f) / n } }
+                    }
+                }
+                val mime = if (gif) "image/gif" else "video/mp4"
+                val uri = context?.let { withContext(Dispatchers.IO) { OrbitMp4.publish(it, file, mime) } }
+                _events.emit(SketchEvent.VideoSaved(uri, file, mime))
+            } catch (t: Throwable) {
+                if (t is kotlinx.coroutines.CancellationException) throw t
+                com.karapp.drawguidance.diagnostics.AppLog.e("Sketch3D", "Video yazılamadı", t, userVisible = false)
+                message(MSG_VIDEO_FAILED)
+            } finally {
+                _videoProgress.value = null
+            }
+        }
+    }
 
     /** Ekran noktaları arası uzaklık (testler). */
     internal fun screenDistance(a: V3, b: V3): Float {
@@ -827,5 +997,18 @@ class Sketch3DViewModel(
         const val MSG_LAYER_LOCKED = "Katman kilitli"
         const val MSG_LAYER_HIDDEN = "Katman gizli"
         const val GPU_FALLBACK = "Ekran kartı çizimi açılamadı; yazılımla çiziliyor"
+        const val MSG_FILL_NONE = "Doldurmak için kapalı bir çizginin içine dokunun ya da bir alan çizin"
+        const val MSG_VIDEO_FAILED = "Video kaydedilemedi"
+        const val FILL_NAME = "Dolgu"
+        const val SURFACE_PLANE = "surface"
+        /** GENİŞ fırçanın kalınlık katı. */
+        const val WIDE_SCALE = 2.6f
+        private const val MIN_LASSO_AREA = 400f
+        const val CANVAS_SIDE = 1024
+        const val GIF_SIDE = 480
+        const val GIF_FPS = 20
+        const val MP4_W = 1920
+        const val MP4_H = 1080
+        const val MP4_FPS = 30
     }
 }

@@ -33,11 +33,11 @@ object Routes {
     const val SHARE_LIVE = "share_live"
     const val LIVE = "live/{localId}"
     fun live(localId: String) = "live/$localId"
-    const val MODEL_EDIT = "model3dEdit?modelId={modelId}&name={name}"
+    const val MODEL_EDIT = "model3dEdit?modelId={modelId}&name={name}&canvas={canvas}"
     fun canvasEdit(localId: String) = "canvasEdit/$localId"
     /** v33 [name]: yeni 3B şeklin adı (ana sayfadaki 3B tuval oluşturma). v56 aşama 10: tuvalden açılmaz (canvasId/strokeId yok). */
-    fun modelEdit(modelId: String?, name: String? = null) =
-        "model3dEdit?modelId=${modelId.orEmpty()}&name=${android.net.Uri.encode(name.orEmpty())}"
+    fun modelEdit(modelId: String?, name: String? = null, canvas: String? = null) =
+        "model3dEdit?modelId=${modelId.orEmpty()}&name=${android.net.Uri.encode(name.orEmpty())}&canvas=${canvas.orEmpty()}"
 }
 
 @Composable
@@ -116,6 +116,7 @@ fun DrawGuidanceNavGraph(
             arguments = listOf(
                 androidx.navigation.navArgument("modelId") { type = androidx.navigation.NavType.StringType; defaultValue = "" },
                 androidx.navigation.navArgument("name") { type = androidx.navigation.NavType.StringType; defaultValue = "" },
+                androidx.navigation.navArgument("canvas") { type = androidx.navigation.NavType.StringType; defaultValue = "" },
             ),
         ) { entry ->
             fun arg(name: String) = entry.arguments?.getString(name)?.ifEmpty { null }
@@ -127,6 +128,9 @@ fun DrawGuidanceNavGraph(
                     modelId = arg("modelId"),
                     initialName = arg("name"),
                     onBack = { navController.popBackStack() },
+                    // v56 aşama 12 "Tuvale ekle": kaynak tuval ya da seçilen tuval
+                    sourceCanvas = arg("canvas"),
+                    onOpenCanvas = { id -> navController.navigate(Routes.canvasEdit(id)) { popUpTo(Routes.MODEL_EDIT) { inclusive = true } } },
                 )
                 }
             }
@@ -192,7 +196,7 @@ fun DrawGuidanceNavGraph(
                     onOpenShare = { navController.navigate(Routes.SHARE) },
                     onOpenLiveShare = { navController.navigate(Routes.SHARE_LIVE) },
                     // v56 aşama 11 Diğer menüsünden "3B çiz": yeni 3B Çizim modu
-                    onOpenSketch3D = { navController.navigate(Routes.modelEdit(null)) },
+                    onOpenSketch3D = { navController.navigate(Routes.modelEdit(null, canvas = localId)) },
                     // v51 notta resim düzenleme: geçici basit resim tuvali (kaydedince ya da çıkınca nota dönülür)
                     onOpenCanvas = { id -> navController.navigate(Routes.canvasEdit(id)) },
                     // v51 yeni alıştırma yeni tuvalde: eski düzenleyici yığından çıkar

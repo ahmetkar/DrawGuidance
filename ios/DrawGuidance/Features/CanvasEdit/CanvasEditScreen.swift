@@ -188,7 +188,8 @@ struct CanvasEditScreen: View {
             case .live: NavigationStack { ShareView(mode: .live).toolbar { ToolbarItem(placement: .cancellationAction) { Button(L("close")) { sheet = nil } } } }
             case .helpers: DrawHelpersSheet(helpers: vm.helpers)
             // v56 aşama 11 Diğer menüsünden "3B çiz": yeni 3B Çizim (kaydedilmemiş iş kaybolmasın diye kaydırarak kapanmaz)
-            case .sketch3d: NavigationStack { Sketch3DView(repository: vm.deps.models3d, modelId: nil, onBack: { sheet = nil }) }
+            case .sketch3d: NavigationStack { Sketch3DView(repository: vm.deps.models3d, modelId: nil, onBack: { sheet = nil },
+                                                        onAddToCanvas: { png in sheet = nil; vm.insert3DImage(png) }) }
                 .interactiveDismissDisabled()
             }
         }

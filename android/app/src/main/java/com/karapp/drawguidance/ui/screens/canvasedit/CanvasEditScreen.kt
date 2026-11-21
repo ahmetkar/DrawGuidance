@@ -128,6 +128,7 @@ import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.LaunchedEffect
+import androidx.lifecycle.repeatOnLifecycle
 import kotlinx.coroutines.launch
 import androidx.compose.ui.geometry.Offset
 import com.karapp.drawguidance.data.images.ImageIssue
@@ -390,6 +391,12 @@ fun CanvasEditScreen(
     // v19: durum sıfırlanınca yeniden başlayan LaunchedEffect bildirimi iptal etmesin diye ekranın kapsamında gösterilir
     val snackbarScope = androidx.compose.runtime.rememberCoroutineScope()
     val saveFailedText = stringResource(R.string.image_save_failed)
+    // v56 aşama 12: 3B Çizim'den "Tuvale ekle" ile gelen resim (tuval yüklenince ve ekrana dönülünce)
+    val inboxLifecycle = androidx.lifecycle.compose.LocalLifecycleOwner.current
+    LaunchedEffect(canvas != null) {
+        if (canvas == null) return@LaunchedEffect
+        inboxLifecycle.repeatOnLifecycle(androidx.lifecycle.Lifecycle.State.RESUMED) { viewModel.takeInboxImage() }
+    }
     LaunchedEffect(imageSave) {
         if (imageSave == ImageSaveState.Failed) {
             viewModel.dismissImageSave()

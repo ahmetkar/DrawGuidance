@@ -57,6 +57,11 @@ import androidx.compose.material.icons.filled.Tune
 import androidx.compose.material.icons.filled.VerticalAlignBottom
 import androidx.compose.material.icons.filled.ViewInAr
 import androidx.compose.material.icons.filled.Visibility
+import androidx.compose.material.icons.filled.AddPhotoAlternate
+import androidx.compose.material.icons.filled.Videocam
+import androidx.compose.material.icons.filled.FormatPaint
+import androidx.compose.material.icons.filled.FormatColorFill
+import androidx.compose.material.icons.filled.AutoAwesome
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material.icons.filled.WbSunny
 import androidx.compose.material.icons.filled.ZoomOutMap
@@ -120,6 +125,10 @@ fun Sketch3DScreen(
     modelId: String?,
     onBack: () -> Unit,
     initialName: String? = null,
+    /** v56 aşama 12 tuvalin Diğer menüsünden açıldıysa o tuval ("Tuvale ekle" doğrudan ona döner). */
+    sourceCanvas: String? = null,
+    /** "Tuvale ekle" ile başka bir tuval seçilince o tuvali açar. */
+    onOpenCanvas: (String) -> Unit = {},
     vm: Sketch3DViewModel = koinViewModel(key = "sketch3d-$modelId") { parametersOf(modelId ?: "", initialName ?: "") },
 ) {
     val colors = NeuTheme.colors
@@ -132,6 +141,11 @@ fun Sketch3DScreen(
     var savingAs by remember { mutableStateOf(false) }
     var menu by remember { mutableStateOf(false) }
     var imageExport by remember { mutableStateOf(false) }
+    var canvasPick by remember { mutableStateOf(false) }
+    var videoSheet by remember { mutableStateOf(false) }
+    val context = androidx.compose.ui.platform.LocalContext.current
+    val videoSavedText = stringResource(R.string.sk3_video_saved)
+    val shareTitle = stringResource(R.string.sk3_video_share)
     var message by remember { mutableStateOf<String?>(null) }
     val savedText = stringResource(R.string.model3d_saved)
 
@@ -141,6 +155,16 @@ fun Sketch3DScreen(
                 is SketchEvent.Saved -> message = savedText.format(e.name)
                 SketchEvent.Exit -> onBack()
                 is SketchEvent.Message -> message = e.text
+                is SketchEvent.AddedToCanvas -> if (e.canvasId == sourceCanvas) { if (dirty) vm.save(); onBack() } else { if (dirty) vm.save(); onOpenCanvas(e.canvasId) }
+                is SketchEvent.VideoSaved -> {
+                    message = videoSavedText
+                    runCatching {
+                        val uri = androidx.core.content.FileProvider.getUriForFile(context, "${context.packageName}.fileprovider", e.file)
+                        val send = android.content.Intent(android.content.Intent.ACTION_SEND).setType(e.mime)
+                            .putExtra(android.content.Intent.EXTRA_STREAM, uri).addFlags(android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                        context.startActivity(android.content.Intent.createChooser(send, shareTitle).addFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK))
+                    }
+                }
             }
         }
     }
@@ -167,6 +191,15 @@ fun Sketch3DScreen(
                         DropdownMenuItem(
                             text = { Text(stringResource(R.string.model3d_export_image)) }, leadingIcon = { Icon(Icons.Filled.Image, null) },
                             onClick = { menu = false; imageExport = true }, modifier = Modifier.testTag("sketch3d_export_image"),
+                        )
+                        DropdownMenuItem(
+                            text = { Text(stringResource(R.string.sk3_add_to_canvas)) }, leadingIcon = { Icon(Icons.Filled.AddPhotoAlternate, null) },
+                            onClick = { menu = false; if (sourceCanvas != null) vm.addToCanvas(sourceCanvas) else canvasPick = true },
+                            modifier = Modifier.testTag("sketch3d_add_to_canvas"),
+                        )
+                        DropdownMenuItem(
+                            text = { Text(stringResource(R.string.sk3_video)) }, leadingIcon = { Icon(Icons.Filled.Videocam, null) },
+                            onClick = { menu = false; videoSheet = true }, modifier = Modifier.testTag("sketch3d_video"),
                         )
                     }
                 }
@@ -230,6 +263,10 @@ fun Sketch3DScreen(
         )
     }
     if (imageExport) ImageExportSheet(vm) { imageExport = false }
+    if (canvasPick) CanvasPickDialog(onPick = { id -> canvasPick = false; vm.addToCanvas(id) }, onDismiss = { canvasPick = false })
+    if (videoSheet) VideoDialog(vm, onStart = { gif, speed ->
+        vm.exportVideo(gif, speed, java.io.File(context.cacheDir, "models3d/video"), context.applicationContext)
+    }, onDismiss = { videoSheet = false })
     com.karapp.drawguidance.ui.components.LoadingOverlay(visible = model == null, message = stringResource(R.string.loading_model))
 }
 
@@ -393,6 +430,8 @@ private fun DrawTools(vm: Sketch3DViewModel) {
     Pill(Icons.Filled.Create, stringResource(R.string.sk3_pen), { vm.setBrush(Brush3D.PEN) }, selected = pen && brush == Brush3D.PEN, tag = "sketch3d_brush_pen")
     Pill(Icons.Filled.Edit, stringResource(R.string.sk3_ink), { vm.setBrush(Brush3D.INK) }, selected = pen && brush == Brush3D.INK, tag = "sketch3d_brush_ink")
     Pill(Icons.Filled.Brush, stringResource(R.string.sk3_marker), { vm.setBrush(Brush3D.MARKER) }, selected = pen && brush == Brush3D.MARKER, tag = "sketch3d_brush_marker")
+    Pill(Icons.Filled.FormatPaint, stringResource(R.string.sk3_wide), { vm.setBrush(Brush3D.WIDE) }, selected = pen && brush == Brush3D.WIDE, tag = "sketch3d_brush_wide")
+    Pill(Icons.Filled.FormatColorFill, stringResource(R.string.sk3_fill), { vm.setTool(SketchTool.FILL) }, selected = tool == SketchTool.FILL, tag = "sketch3d_fill")
     Pill(Icons.Filled.AutoFixNormal, stringResource(R.string.sk3_eraser), { vm.setTool(SketchTool.ERASER) }, selected = tool == SketchTool.ERASER, tag = "sketch3d_eraser")
     Pill(Icons.Filled.Delete, stringResource(R.string.sk3_clear), vm::clearDrawings, danger = true)
 }
@@ -422,6 +461,14 @@ private fun SelectTools(vm: Sketch3DViewModel) {
         Pill(Icons.Filled.RotateRight, stringResource(R.string.sk3_snap), { vm.rotateSelected(PlaneSnap.STEP_DEG) }, enabled = sel.isNotEmpty(), tag = "sketch3d_rotate_step")
     }
     Pill(Icons.Filled.Flip, stringResource(R.string.sk3_flip), vm::flipSelected, enabled = sel.isNotEmpty())
+    val model by vm.model.collectAsState()
+    val selParts = model?.parts?.filter { it.id in sel }.orEmpty()
+    val glowing = selParts.isNotEmpty() && selParts.all { it.material.kind == com.karapp.drawguidance.content.model3d.MaterialKind.GLOW }
+    Pill(
+        Icons.Filled.AutoAwesome, stringResource(R.string.sk3_glow),
+        { vm.materialSelected(if (glowing) com.karapp.drawguidance.content.model3d.MaterialKind.PLASTIC else com.karapp.drawguidance.content.model3d.MaterialKind.GLOW) },
+        enabled = selParts.isNotEmpty(), selected = glowing, tag = "sketch3d_glow",
+    )
     Pill(Icons.Filled.ContentCopy, stringResource(R.string.sk3_duplicate), vm::duplicateSelected, enabled = sel.isNotEmpty(), tag = "sketch3d_duplicate")
     Pill(Icons.Filled.VerticalAlignBottom, stringResource(R.string.sk3_ground), vm::dropSelectedToGround, enabled = sel.isNotEmpty())
     Pill(Icons.Filled.SelectAll, stringResource(R.string.sk3_select_all), vm::selectAll)
@@ -442,6 +489,12 @@ private fun ViewTools(vm: Sketch3DViewModel) {
     val scene = model?.scene ?: return
     val cam = model?.camera ?: return
     var lightOpen by remember { mutableStateOf(false) }
+    val style by vm.style.collectAsState()
+    listOf(
+        com.karapp.drawguidance.content.model3d.RenderStyle.SOFT to R.string.sk3_style_soft,
+        com.karapp.drawguidance.content.model3d.RenderStyle.TOON to R.string.sk3_style_toon,
+        com.karapp.drawguidance.content.model3d.RenderStyle.LINES to R.string.sk3_style_lines,
+    ).forEach { (st, label) -> Pill(null, stringResource(label), { vm.setStyle(st) }, selected = style == st, tag = "sketch3d_style_$st") }
     Pill(Icons.Filled.WbSunny, stringResource(R.string.sk3_light_dir), { lightOpen = !lightOpen }, selected = lightOpen, tag = "sketch3d_light")
     Pill(null, stringResource(R.string.sk3_shadow), { vm.setScene(scene.copy(shadow = !scene.shadow)) }, selected = scene.shadow, tag = "sketch3d_shadow")
     Pill(null, stringResource(R.string.sk3_ambient), { vm.setScene(scene.copy(light = scene.light.copy(ambient = if (scene.light.ambient > 0.3f) 0.15f else 0.38f))) }, selected = scene.light.ambient > 0.3f)
@@ -467,6 +520,73 @@ private fun ViewTools(vm: Sketch3DViewModel) {
             NeuSlider(scene.light.pitch, { vm.setScene(scene.copy(light = scene.light.copy(pitch = it))) }, 5f..89f)
         }
     }
+}
+
+// --------------------------------------------------------------------------------------------------- tuvale ekle / video
+
+/** v56 aşama 12 "Tuvale ekle": hedef tuval seçimi (çocuk tuvalleri hariç, en son değişen önce). */
+@Composable
+private fun CanvasPickDialog(onPick: (String) -> Unit, onDismiss: () -> Unit) {
+    val repo = org.koin.compose.koinInject<com.karapp.drawguidance.data.repository.CanvasRepository>()
+    val canvases by remember(repo) { repo.observeCanvases() }.collectAsState(initial = null)
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        containerColor = NeuTheme.colors.background,
+        title = { Text(stringResource(R.string.sk3_pick_canvas)) },
+        text = {
+            val list = canvases?.filter { it.kind != com.karapp.drawguidance.data.model.CanvasKind.KIDS }?.sortedByDescending { it.updatedAt }
+            when {
+                list == null -> Text(stringResource(R.string.loading_model))
+                list.isEmpty() -> Text(stringResource(R.string.sk3_no_canvas))
+                else -> Column(Modifier.heightIn(max = 360.dp).verticalScroll(rememberScrollState()).testTag("sketch3d_canvas_list")) {
+                    list.forEach { c ->
+                        Text(
+                            c.name, maxLines = 1, overflow = TextOverflow.Ellipsis,
+                            modifier = Modifier.fillMaxWidth().clip(NeuPillShape).clickable { onPick(c.localId) }.padding(horizontal = 12.dp, vertical = 12.dp)
+                                .testTag("sketch3d_canvas_${c.localId}"),
+                        )
+                    }
+                }
+            }
+        },
+        confirmButton = {},
+        dismissButton = { TextButton(onClick = onDismiss) { Text(stringResource(R.string.cancel_button)) } },
+    )
+}
+
+/** v56 aşama 13 dönen video: biçim (MP4 1080p / GIF), hız ve ilerleme. */
+@Composable
+private fun VideoDialog(vm: Sketch3DViewModel, onStart: (Boolean, Float) -> Unit, onDismiss: () -> Unit) {
+    val progress by vm.videoProgress.collectAsState()
+    var gif by remember { mutableStateOf(false) }
+    var speed by remember { mutableStateOf(1f) }
+    AlertDialog(
+        onDismissRequest = { if (progress == null) onDismiss() },
+        containerColor = NeuTheme.colors.background,
+        title = { Text(stringResource(R.string.sk3_video)) },
+        text = {
+            Column(Modifier.testTag("sketch3d_video_sheet")) {
+                Text(stringResource(R.string.sk3_video_hint), style = MaterialTheme.typography.bodyMedium)
+                Label(stringResource(R.string.sk3_video_format))
+                Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                    Pill(null, "MP4 1080p", { gif = false }, selected = !gif, enabled = progress == null, tag = "sketch3d_video_mp4")
+                    Pill(null, "GIF", { gif = true }, selected = gif, enabled = progress == null, tag = "sketch3d_video_gif")
+                }
+                Label(stringResource(R.string.sk3_video_speed))
+                Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                    listOf(0.5f, 1f, 2f).forEach { sp -> Pill(null, "${if (sp == 0.5f) "0.5" else sp.toInt().toString()}×", { speed = sp }, selected = speed == sp, enabled = progress == null, tag = "sketch3d_video_speed_$sp") }
+                }
+                progress?.let { p ->
+                    Spacer(Modifier.height(12.dp))
+                    androidx.compose.material3.LinearProgressIndicator(progress = { p }, modifier = Modifier.fillMaxWidth().testTag("sketch3d_video_progress"))
+                }
+            }
+        },
+        confirmButton = {
+            TextButton(onClick = { onStart(gif, speed) }, enabled = progress == null, modifier = Modifier.testTag("sketch3d_video_start")) { Text(stringResource(R.string.sk3_video_start)) }
+        },
+        dismissButton = { TextButton(onClick = onDismiss, enabled = progress == null) { Text(stringResource(R.string.cancel_button)) } },
+    )
 }
 
 /** Araç satırında düğme: simge ve kısa ad. */

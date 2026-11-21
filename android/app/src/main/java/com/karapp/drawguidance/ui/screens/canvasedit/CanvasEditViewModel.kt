@@ -2531,6 +2531,13 @@ class CanvasEditViewModel(
         images.insertAssetImage(prop.file, fraction, center)
     }
 
+    /** v56 aşama 12: 3B Çizim ekranından "Tuvale ekle" ile bırakılan resim varsa sayfanın ortasına eklenir. */
+    fun takeInboxImage() {
+        val current = canvas.value ?: return
+        val bytes = com.karapp.drawguidance.data.clipboard.CanvasImageInbox.take(canvasLocalId) ?: return
+        images.insertPngBytes(bytes, 0.5f, androidx.compose.ui.geometry.Offset(current.width / 2f, current.height / 2f))
+    }
+
     /** v43 inmiş paketten resim (şekil, diyalog kutusu, diyagram): uzun kenarı sayfanın kısa kenarının ~%30'u. */
     fun insertPackImage(file: java.io.File, w: Int, h: Int) {
         val current = canvas.value ?: return

@@ -54,8 +54,13 @@ uniform sampler2D uTex;
 uniform float uSelected;
 uniform vec3 uHighlight;
 uniform vec4 uGradColor;
+uniform float uStyle;
 varying float vG;
 void main() {
+    if (uStyle > 1.5) {
+        gl_FragColor = uSelected > 0.5 ? vec4(0.86, 0.92, 1.0, 1.0) : vec4(1.0, 1.0, 1.0, 1.0);
+        return;
+    }
     vec3 n = normalize(vN);
     float ndv = dot(n, uT);
     if (ndv < 0.0) n = -n;
@@ -71,10 +76,12 @@ void main() {
     float diff = max(0.0, ndl) * uIntensity * (1.0 - uAmbient * 0.5);
     float metal = (uKind > 1.5 && uKind < 2.5) ? 1.0 : 0.0;
     float lit = amb + diff * mix(1.0, 0.75, metal);
+    if (uStyle > 0.5) lit = lit < 0.42 ? 0.5 : (lit < 0.78 ? 0.78 : 1.0);
     vec3 col = base * lit * (0.6 + 0.4 * uLightColor);
     if (uSpec > 0.0 && ndl > 0.0) {
         float ndh = max(0.0, dot(n, uH));
         float s = uSpec * pow(ndh, uExp) * uIntensity;
+        if (uStyle > 0.5) s = s > 0.35 ? 0.35 : 0.0;
         col += mix(s * uLightColor, s * (0.3 + 0.7 * base), metal);
     }
     if (metal > 0.5) {

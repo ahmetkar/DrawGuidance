@@ -475,6 +475,19 @@ class ImageController(
         _import.value = null
     }
 
+    /** v56 aşama 12 3B Çizim'den "Tuvale ekle" ile gelen PNG: sayfanın ortasına, kısa kenarın [heightFraction] katı. */
+    fun insertPngBytes(bytes: ByteArray, heightFraction: Float, center: Offset) {
+        host.scope.launch {
+            val image = kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.IO) {
+                runCatching {
+                    val bmp = android.graphics.BitmapFactory.decodeByteArray(bytes, 0, bytes.size) ?: return@runCatching null
+                    PreparedImage(bytes, "image/png", bmp.width, bmp.height, bmp, bytes.size, 0f)
+                }.getOrNull()
+            } ?: return@launch
+            addImage(image, center, heightFraction)
+        }
+    }
+
     /**
      * v40 hazır karakter çeşidi ([path]: uygulamadaki WebP): resim elemanı olarak eklenir; boyu sayfanın kısa kenarının
      * [heightFraction] katı (sayfaya sığacak kadar). Resim G/Ç iş parçacığında okunur ve çözülür.

@@ -41,6 +41,8 @@ class GlOptions(
     val ground: Boolean? = null,
     val shadow: Boolean? = null,
     val edges: Boolean? = null,
+    /** v56 3B Çizim görünüm tarzı (`RenderStyle`): toon ve sadece çizgide yüzeyler bantlı/beyaz, kenarlar mürekkep. */
+    val style: Int = com.karapp.drawguidance.content.model3d.RenderStyle.SOFT,
 )
 
 /** Son karenin sayaçları (başarım göstergesi ve testler). */
@@ -262,7 +264,7 @@ class GlRenderer3(private val gl: GlApi, private val shadowSize: Int = 256) {
         if ((opt.shadow ?: scene.shadow) && parts.isNotEmpty() && L.y >= 0.08f) drawShadow(parts, view, viewProj, groundY, L, light.intensity, framebuffer)
         drawSurfaces(parts, view, viewProj, model, opt, transparent = false)
         if (model.strokes.isNotEmpty()) drawStrokes(model.strokes, view, viewProj, extent)
-        val showEdges = opt.edges ?: scene.edges
+        val showEdges = (opt.edges ?: scene.edges) || opt.style != com.karapp.drawguidance.content.model3d.RenderStyle.SOFT
         if (showEdges || opt.selected.isNotEmpty()) drawEdges(parts, view, viewProj, scene.edgeColor, showEdges, extent, opt)
         drawSurfaces(parts, view, viewProj, model, opt, transparent = true)
 
@@ -311,6 +313,7 @@ class GlRenderer3(private val gl: GlApi, private val shadowSize: Int = 256) {
         gl.uniform3f(p.u("uLightColor"), (light.color shr 16 and 0xFF) / 255f, (light.color shr 8 and 0xFF) / 255f, (light.color and 0xFF) / 255f)
         gl.uniform1f(p.u("uAmbient"), light.ambient)
         gl.uniform1f(p.u("uIntensity"), light.intensity)
+        gl.uniform1f(p.u("uStyle"), opt.style.toFloat())
         val hl = opt.highlight
         gl.uniform3f(p.u("uHighlight"), (hl shr 16 and 0xFF) / 255f, (hl shr 8 and 0xFF) / 255f, (hl and 0xFF) / 255f)
         gl.uniform1i(p.u("uTex"), 0)
@@ -676,8 +679,9 @@ class GlRenderer3(private val gl: GlApi, private val shadowSize: Int = 256) {
             gl.uniformMatrix4(p.u("uModel"), pd.model)
             gl.uniformMatrix3(p.u("uNormal"), pd.normal)
             gl.uniform1f(p.u("uWire"), if (selected && opt.wireframe) 1f else 0f)
-            gl.uniform1f(p.u("uWidth"), (if (selected) 1.8f else 1.1f) * opt.lineScale)
-            if (selected) color(p, opt.highlight, 1f) else color(p, edgeColor, 0xB0 / 255f)
+            val ink = opt.style != com.karapp.drawguidance.content.model3d.RenderStyle.SOFT
+            gl.uniform1f(p.u("uWidth"), (if (selected) 1.8f else if (ink) 2.2f else 1.1f) * opt.lineScale)
+            if (selected) color(p, opt.highlight, 1f) else if (ink) color(p, com.karapp.drawguidance.content.model3d.RenderStyle.INK, 1f) else color(p, edgeColor, 0xB0 / 255f)
             draw(GL.TRIANGLES, 0, e.count)
         }
         gl.depthMask(true)

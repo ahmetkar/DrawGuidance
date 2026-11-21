@@ -1,5 +1,6 @@
 import CoreGraphics
 import Foundation
+import ImageIO
 
 /// Resimler: tuvale resim ekleme (kontrol, onay), resim filtreleri/efektleri, tuvali resim, PDF, CMYK ve CBZ olarak
 /// kaydetme (Android `ImageController`).
@@ -359,6 +360,13 @@ final class ImageController: ObservableObject {
         guard let data = PixelCodec.encode(cropped, jpeg: opaque, quality: quality) else { return nil }
         return PreparedImage(bytes: data, mimeType: opaque ? "image/jpeg" : "image/png", width: cropped.width, height: cropped.height, image: cropped,
                              originalBytes: bytes.count, detailScore: 0)
+    }
+
+    /// v56 aşama 12 3B Çizim'den "Tuvale ekle" ile gelen PNG: boyu sayfanın kısa kenarının [heightFraction] katı.
+    func insertPngData(_ data: Data, heightFraction: Float, center: P) {
+        guard let src = CGImageSourceCreateWithData(data as CFData, nil), let img = CGImageSourceCreateImageAtIndex(src, 0, nil) else { return }
+        addImage(PreparedImage(bytes: data, mimeType: "image/png", width: img.width, height: img.height, image: img, originalBytes: data.count, detailScore: 0),
+                 center, heightFraction: heightFraction)
     }
 
     /// v40 hazır karakter çeşidi: resim elemanı olarak eklenir; boyu sayfanın kısa kenarının [heightFraction] katı.

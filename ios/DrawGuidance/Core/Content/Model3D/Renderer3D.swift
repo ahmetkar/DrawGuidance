@@ -13,6 +13,20 @@ struct RenderOptions {
     var selectedParts: Set<String> = []
     var wireframe: Bool = false
     var highlight: UInt32 = 0xFF2F_80ED
+    /// v56 3B Çizim görünüm tarzı ([RenderStyle]): yumuşak, toon (bantlı ışık + mürekkep kenar), sadece çizgi.
+    var style: Int = RenderStyle.SOFT
+}
+
+/// v56 3B Çizim görünüm tarzları (Android `RenderStyle`).
+enum RenderStyle {
+    static let SOFT = 0
+    static let TOON = 1
+    static let LINES = 2
+    /// Mürekkep kenarı rengi.
+    static let INK: UInt32 = 0xFF1E_2328
+
+    /// Toon ışık bantları: koyu, orta, aydınlık.
+    static func toonBand(_ lit: Float) -> Float { lit < 0.42 ? 0.5 : (lit < 0.78 ? 0.78 : 1) }
 }
 
 /// Çizilmiş kare (Android `Frame`): ARGB, derinlik, parça (+1; çizgide −(sıra+1)), yüz.
@@ -200,7 +214,7 @@ enum Renderer3D {
             if opt.shadow ?? scene.shadow { drawShadow() }
             for p in prepared { drawPart(p, false) }
             drawStrokes()
-            if scene.edges || opt.selectedPart != nil || !opt.selectedParts.isEmpty { drawEdges() }
+            if scene.edges || opt.style != RenderStyle.SOFT || opt.selectedPart != nil || !opt.selectedParts.isEmpty { drawEdges() }
             drawTransparent()
         }
 
@@ -381,7 +395,7 @@ enum Renderer3D {
                 let facing = facingViewer(p, f, nx, ny, nz)
                 if p.cull && !facing && !transparentPass { continue }
                 let selectedFace = opt.selectedPart == p.part.id && opt.selectedFaces.contains(f)
-                let shader = Shader(mat, opt.textures, opt.bilinear, selectedFace, opt.highlight)
+                let shader = Shader(mat, opt.textures, opt.bilinear, selectedFace, opt.highlight, opt.style)
                 let uv = p.uv[f]
                 let corners = p.corners?[f]
                 let tris = triangles[f]
@@ -549,13 +563,14 @@ enum Renderer3D {
 
         func drawEdges() {
             var a = [Float](repeating: 0, count: 4), b = a
-            let edgeW = Float(q) * 1.1, selW = Float(q) * 1.8
+            let ink = opt.style != RenderStyle.SOFT
+            let edgeW = Float(q) * (ink ? 2.2 : 1.1), selW = Float(q) * 1.8
             for p in prepared {
                 let selected = opt.selectedPart == p.part.id || opt.selectedParts.contains(p.part.id)
-                if !scene.edges && !selected { continue }
+                if !scene.edges && !ink && !selected { continue }
                 let m = p.part.mesh
                 let e = m.edges, fn = m.faceNormals
-                let col: UInt32 = selected ? opt.highlight : (UInt32(bitPattern: scene.edgeColor) & 0x00FF_FFFF) | (0xB0 << 24)
+                let col: UInt32 = selected ? opt.highlight : (ink ? RenderStyle.INK : (UInt32(bitPattern: scene.edgeColor) & 0x00FF_FFFF) | (0xB0 << 24))
                 var i = 0
                 while i < e.count {
                     let va = e[i], vb = e[i + 1], f1 = e[i + 2], f2 = e[i + 3]
@@ -714,6 +729,7 @@ enum Renderer3D {
     fileprivate final class Shader {
         let mat: Material
         let bilinear: Bool, selected: Bool, highlight: UInt32
+        let style: Int
         let tex: Texture?
         let cr: Float, cg: Float, cb: Float
         let grad: UInt32?
@@ -721,8 +737,8 @@ enum Renderer3D {
         let specStrength: Float
         let lut: [Float]
 
-        init(_ mat: Material, _ textures: (String) -> Texture?, _ bilinear: Bool, _ selected: Bool, _ highlight: UInt32) {
-            self.mat = mat; self.bilinear = bilinear; self.selected = selected; self.highlight = highlight
+        init(_ mat: Material, _ textures: (String) -> Texture?, _ bilinear: Bool, _ selected: Bool, _ highlight: UInt32, _ style: Int = RenderStyle.SOFT) {
+            self.mat = mat; self.bilinear = bilinear; self.selected = selected; self.highlight = highlight; self.style = style
             tex = mat.gradient != nil ? nil : mat.texture.flatMap(textures)
             let c = UInt32(bitPattern: mat.color)
             cr = Float((c >> 16) & 0xFF) / 255; cg = Float((c >> 8) & 0xFF) / 255; cb = Float(c & 0xFF) / 255
@@ -751,18 +767,22 @@ enum Renderer3D {
                 br = cr + (gr - cr) * k; bg = cg + (gg - cg) * k; bb = cb + (gb - cb) * k
             } else { br = cr; bg = cg; bb = cb }
             if mat.kind == .GLOW { return pack(br * 1.08, bg * 1.08, bb * 1.08, mat.opacity) }
+            // v56 sadece çizgi: yüzeyler kâğıt beyazı
+            if style == RenderStyle.LINES { return selected ? pack(0.86, 0.92, 1, 1) : pack(1, 1, 1, 1) }
             let light = r.light
             let ndl = nx * r.L.x + ny * r.L.y + nz * r.L.z
             let amb = light.ambient * (0.82 + 0.18 * ny)
             let diff = max(0, ndl) * light.intensity * (1 - light.ambient * 0.5)
             let metal = mat.kind == .METAL
-            let lit = amb + diff * (metal ? 0.75 : 1)
+            let lit0 = amb + diff * (metal ? 0.75 : 1)
+            let lit = style == RenderStyle.TOON ? RenderStyle.toonBand(lit0) : lit0
             var or = br * lit * (0.6 + 0.4 * r.lightR)
             var og = bg * lit * (0.6 + 0.4 * r.lightG)
             var ob = bb * lit * (0.6 + 0.4 * r.lightB)
             if specStrength > 0 && ndl > 0 {
                 let ndh = max(0, nx * r.H.x + ny * r.H.y + nz * r.H.z)
-                let s = specStrength * lut[Renderer3D.ktIntF(ndh * 255).coerceIn(0, 255)] * light.intensity
+                let s0 = specStrength * lut[Renderer3D.ktIntF(ndh * 255).coerceIn(0, 255)] * light.intensity
+                let s = style == RenderStyle.TOON ? (s0 > 0.35 ? 0.35 : 0) : s0
                 if metal { or += s * (0.3 + 0.7 * br); og += s * (0.3 + 0.7 * bg); ob += s * (0.3 + 0.7 * bb) }
                 else { or += s * r.lightR; og += s * r.lightG; ob += s * r.lightB }
             }

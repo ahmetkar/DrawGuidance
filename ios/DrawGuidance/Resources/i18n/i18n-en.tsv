@@ -3318,3 +3318,6 @@ Katman kilitli	The layer is locked
 Katman gizli	The layer is hidden
 Ekran kartı çizimi açılamadı; yazılımla çiziliyor	GPU drawing could not start; using software drawing
 Yeni 3B çizim	New 3D drawing
+Doldurmak için kapalı bir çizginin içine dokunun ya da bir alan çizin	Tap inside a closed line or draw an area to fill
+Video kaydedilemedi	Could not save the video
+Dolgu	Fill

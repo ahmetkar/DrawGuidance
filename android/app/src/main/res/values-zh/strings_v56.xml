@@ -405,4 +405,20 @@
     <string name="sk3_rename_layer">重命名图层</string>
     <string name="sk3_delete_layer">删除图层</string>
     <string name="sk3_open_from_canvas">3D 绘制</string>
+    <string name="sk3_wide">表面上色</string>
+    <string name="sk3_fill">填充</string>
+    <string name="sk3_glow">发光</string>
+    <string name="sk3_style_soft">柔和</string>
+    <string name="sk3_style_toon">卡通</string>
+    <string name="sk3_style_lines">仅线条</string>
+    <string name="sk3_add_to_canvas">添加到画布</string>
+    <string name="sk3_pick_canvas">添加到哪个画布?</string>
+    <string name="sk3_no_canvas">还没有画布</string>
+    <string name="sk3_video">旋转视频</string>
+    <string name="sk3_video_hint">镜头绕作品旋转一圈。</string>
+    <string name="sk3_video_format">格式</string>
+    <string name="sk3_video_speed">速度</string>
+    <string name="sk3_video_start">保存</string>
+    <string name="sk3_video_saved">视频已保存到图库</string>
+    <string name="sk3_video_share">分享视频</string>
 </resources>

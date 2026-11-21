@@ -64,7 +64,7 @@ import kotlinx.coroutines.withContext
 import kotlin.math.max
 import kotlin.math.min
 
-private data class SketchRender(val model: Model3D?, val selection: Set<String>, val size: IntSize, val interacting: Boolean, val quality: Int, val tick: Int)
+private data class SketchRender(val model: Model3D?, val selection: Set<String>, val size: IntSize, val interacting: Boolean, val quality: Int, val tick: Int, val style: Int = 0)
 
 /**
  * v56 3B Çizim sahnesi: model ekran kartıyla ([Model3DGlView]) ya da yazılım çizicisiyle çizilir; üstte görünür çizim
@@ -87,6 +87,7 @@ fun Sketch3DViewport(vm: Sketch3DViewModel, model: Model3D?, modifier: Modifier 
     val color by vm.color.collectAsState()
     val sizePx by vm.size.collectAsState()
     val eraserDp by vm.eraserSize.collectAsState()
+    val style by vm.style.collectAsState()
     var size by remember { mutableStateOf(IntSize.Zero) }
     var interacting by remember { mutableStateOf(false) }
     val drawPath = remember { mutableStateListOf<Offset>() }
@@ -100,12 +101,12 @@ fun Sketch3DViewport(vm: Sketch3DViewModel, model: Model3D?, modifier: Modifier 
 
     Box(modifier.fillMaxSize().onSizeChanged { size = it; vm.setViewport(it.width, it.height) }) {
         if (gpu && shown != null) {
-            GpuSketch(vm, shown, selection, quality, tick, bgColor)
+            GpuSketch(vm, shown, selection, quality, tick, bgColor, style)
         } else {
             var image by remember { mutableStateOf<ImageBitmap?>(null) }
             LaunchedEffect(vm) {
-                combine(vm.model, vm.selection, vm.renderTick, snapshotFlow { Triple(size, interacting, quality) }) { m, sel, tk, si ->
-                    SketchRender(m?.visibleLayers(), sel, si.first, si.second, si.third, tk)
+                combine(vm.model, vm.selection, combine(vm.renderTick, vm.style) { a, b -> a to b }, snapshotFlow { Triple(size, interacting, quality) }) { m, sel, tk, si ->
+                    SketchRender(m?.visibleLayers(), sel, si.first, si.second, si.third, tk.first, tk.second)
                 }.collectLatest { req ->
                     val m = req.model ?: return@collectLatest
                     if (req.size.width <= 0 || req.size.height <= 0) return@collectLatest
@@ -127,6 +128,7 @@ fun Sketch3DViewport(vm: Sketch3DViewModel, model: Model3D?, modifier: Modifier 
                                 shadow = if (req.interacting) false else null,
                                 selectedParts = req.selection,
                                 selectedPart = req.selection.firstOrNull { id -> m.parts.any { it.id == id } },
+                                style = req.style,
                             ),
                         )
                         Bitmap.createBitmap(frame.color, w, h, Bitmap.Config.ARGB_8888).asImageBitmap()
@@ -175,7 +177,8 @@ fun Sketch3DViewport(vm: Sketch3DViewModel, model: Model3D?, modifier: Modifier 
                             xy += p.x; xy += p.y; pressures += pressure
                             drawPath += p
                         }
-                        if (drawing && t == SketchTool.PEN) addPoint(start, down.pressure)
+                        val tracing = t == SketchTool.PEN || t == SketchTool.FILL
+                        if (drawing && tracing) addPoint(start, down.pressure)
                         if (drawing && t == SketchTool.ERASER) { vm.beginErase(); vm.eraseAt(start.x, start.y, eraserR); eraserAt = start }
                         // Düzlem modunda düzlemin merkez tutamacından başlayan sürükleme düzlemi kaydırır
                         val grabbedPlane = m == SketchMode.PLANE && vm.currentView()?.let { v ->
@@ -236,6 +239,7 @@ fun Sketch3DViewport(vm: Sketch3DViewModel, model: Model3D?, modifier: Modifier 
                                     SketchXform.ROTATE -> vm.rotateSelected(d.x * 0.5f)
                                     SketchXform.SCALE -> vm.scaleSelected(kotlin.math.exp((d.x - d.y) / 260f))
                                 }
+                                drawing && t == SketchTool.FILL -> addPoint(c.position, 1f)
                                 drawing && t == SketchTool.PEN -> if (!straight) addPoint(c.position, if (c.type == PointerType.Stylus) c.pressure else 1f)
                                     else { drawPath.clear(); drawPath += Offset(xy[0], xy[1]); drawPath += c.position; xy += c.position.x; xy += c.position.y; pressures += 1f }
                                 drawing && t == SketchTool.ERASER -> { vm.eraseAt(c.position.x, c.position.y, eraserR); eraserAt = c.position }
@@ -253,6 +257,8 @@ fun Sketch3DViewport(vm: Sketch3DViewModel, model: Model3D?, modifier: Modifier 
                             SketchMode.SELECT -> vm.tapSelect(start.x, start.y, radius)
                             else -> {}
                         }
+                        // v56 aşama 12 dolgu: dokunma kapalı çizginin içini, sürükleme kementi doldurur
+                        if (drawing && t == SketchTool.FILL && !multi) { if (!moved) vm.fillAt(start.x, start.y) else vm.fillLasso(xy.toFloatArray()) }
                         if (drawing && t == SketchTool.PEN && !multi && xy.size >= 4) {
                             val anyStylus = pressures.any { it != 1f }
                             vm.finishStroke(xy.toFloatArray(), if (anyStylus) pressures.toFloatArray() else null, straight)
@@ -267,7 +273,11 @@ fun Sketch3DViewport(vm: Sketch3DViewModel, model: Model3D?, modifier: Modifier 
             if (selection.isNotEmpty()) drawSelectedStrokes(m, view, selection, colors.accent)
             if (drawPath.size >= 2) {
                 val path = Path().apply { moveTo(drawPath[0].x, drawPath[0].y); for (i in 1 until drawPath.size) lineTo(drawPath[i].x, drawPath[i].y) }
-                drawPath(path, Color(color), style = Stroke(width = sizePx, cap = StrokeCap.Round, join = StrokeJoin.Round))
+                if (tool == SketchTool.FILL) {
+                    path.close()
+                    drawPath(path, Color(color), alpha = 0.3f)
+                    drawPath(path, Color(color), style = Stroke(width = 2.dp.toPx()))
+                } else drawPath(path, Color(color), style = Stroke(width = sizePx, cap = StrokeCap.Round, join = StrokeJoin.Round))
             }
             eraserAt?.let { p ->
                 val r = eraserDp.dp.toPx()
@@ -324,7 +334,7 @@ private fun DrawScope.drawSelectedStrokes(m: Model3D, view: View3, selection: Se
 }
 
 @Composable
-private fun GpuSketch(vm: Sketch3DViewModel, model: Model3D, selection: Set<String>, quality: Int, tick: Int, clear: Color) {
+private fun GpuSketch(vm: Sketch3DViewModel, model: Model3D, selection: Set<String>, quality: Int, tick: Int, clear: Color, style: Int) {
     val density = LocalDensity.current.density
     val lifecycle = LocalLifecycleOwner.current.lifecycle
     val samples = when (quality) { Model3DPrefs.QUALITY_HIGH -> 4; Model3DPrefs.QUALITY_BALANCED -> 2; else -> 0 }
@@ -344,6 +354,7 @@ private fun GpuSketch(vm: Sketch3DViewModel, model: Model3D, selection: Set<Stri
                             selected = selection.filter { id -> model.parts.any { it.id == id } }.toSet(),
                             primary = selection.firstOrNull { id -> model.parts.any { it.id == id } },
                             lineScale = max(1f, density * 0.6f) * scale,
+                            style = style,
                         ),
                     ),
                 )

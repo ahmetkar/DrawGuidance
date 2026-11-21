@@ -31,7 +31,26 @@ class RenderOptions(
     val selectedParts: Set<String> = emptySet(),
     val wireframe: Boolean = false,
     val highlight: Int = 0xFF2F80ED.toInt(),
+    /** v56 3B Çizim görünüm tarzı ([RenderStyle] sırası): yumuşak, toon (bantlı ışık + mürekkep kenar), sadece çizgi. */
+    val style: Int = RenderStyle.SOFT,
 )
+
+/** v56 3B Çizim görünüm tarzları (Görünüm modu). */
+object RenderStyle {
+    const val SOFT = 0
+    const val TOON = 1
+    const val LINES = 2
+
+    /** Toon ışık bantları: koyu, orta, aydınlık. */
+    fun toonBand(lit: Float): Float = when {
+        lit < 0.42f -> 0.5f
+        lit < 0.78f -> 0.78f
+        else -> 1f
+    }
+
+    /** Mürekkep kenarı rengi (toon ve sadece çizgi tarzında koyu ve opak). */
+    const val INK = 0xFF1E2328.toInt()
+}
 
 /**
  * Çizilmiş kare: [color] ARGB (önçarpımsız), [depth] kamera derinliği (yoksa −∞), [part] parça sırası + 1 (çizgide
@@ -225,7 +244,7 @@ object Renderer {
             if (opt.shadow ?: scene.shadow) drawShadow()
             for (p in prepared) drawPart(p, transparentPass = false)
             drawStrokes()
-            if (scene.edges || opt.selectedPart != null || opt.selectedParts.isNotEmpty()) drawEdges()
+            if (scene.edges || opt.style != RenderStyle.SOFT || opt.selectedPart != null || opt.selectedParts.isNotEmpty()) drawEdges()
             drawTransparent()
         }
 
@@ -413,7 +432,7 @@ object Renderer {
                 val facing = facingViewer(p, f, nx, ny, nz)
                 if (p.cull && !facing && !transparentPass) continue
                 val selectedFace = opt.selectedPart == p.part.id && f in opt.selectedFaces
-                val shader = Shader(mat, opt.textures, opt.bilinear, selectedFace, opt.highlight)
+                val shader = Shader(mat, opt.textures, opt.bilinear, selectedFace, opt.highlight, opt.style)
                 val uv = p.uv[f]
                 val corners = p.corners?.get(f)
                 val tris = m.triangles[f]
@@ -578,15 +597,16 @@ object Renderer {
 
         fun drawEdges() {
             val a = FloatArray(4); val b = FloatArray(4)
-            val edgeW = q * 1.1f
+            val ink = opt.style != RenderStyle.SOFT
+            val edgeW = q * (if (ink) 2.2f else 1.1f)
             val selW = q * 1.8f
             for (p in prepared) {
                 val selected = opt.selectedPart == p.part.id || p.part.id in opt.selectedParts
-                if (!scene.edges && !selected) continue
+                if (!scene.edges && !ink && !selected) continue
                 val m = p.part.mesh
                 val e = m.edges
                 val fn = m.faceNormals
-                val col = if (selected) opt.highlight else (scene.edgeColor and 0x00FFFFFF) or (0xB0 shl 24)
+                val col = if (selected) opt.highlight else if (ink) RenderStyle.INK else (scene.edgeColor and 0x00FFFFFF) or (0xB0 shl 24)
                 var i = 0
                 while (i < e.size) {
                     val va = e[i]; val vb = e[i + 1]; val f1 = e[i + 2]; val f2 = e[i + 3]
@@ -759,6 +779,7 @@ object Renderer {
         val bilinear: Boolean,
         val selected: Boolean,
         val highlight: Int,
+        val style: Int = RenderStyle.SOFT,
     ) {
         // v27 gradyanlı malzemede doku yok; v koordinatı gradyan konumu (0..1)
         val tex: Texture? = if (mat.gradient != null) null else mat.texture?.let { textures(it) }
@@ -792,18 +813,23 @@ object Renderer {
                 br = cr + (gr - cr) * k; bg = cg + (gg - cg) * k; bb = cb + (gb - cb) * k
             } else { br = cr; bg = cg; bb = cb }
             if (mat.kind == MaterialKind.GLOW) return pack(br * 1.08f, bg * 1.08f, bb * 1.08f, mat.opacity)
+            // v56 sadece çizgi: yüzeyler kâğıt beyazı (kenarlar mürekkeple çizilir)
+            if (style == RenderStyle.LINES) return if (selected) pack(0.86f, 0.92f, 1f, 1f) else pack(1f, 1f, 1f, 1f)
             val light = r.light
             val ndl = nx * r.L.x + ny * r.L.y + nz * r.L.z
             val amb = light.ambient * (0.82f + 0.18f * ny)
             val diff = max(0f, ndl) * light.intensity * (1f - light.ambient * 0.5f)
             val metal = mat.kind == MaterialKind.METAL
-            val lit = (amb + diff * (if (metal) 0.75f else 1f))
+            val lit0 = (amb + diff * (if (metal) 0.75f else 1f))
+            // v56 toon: ışık üç banda yuvarlanır, parlama keskin tek leke
+            val lit = if (style == RenderStyle.TOON) RenderStyle.toonBand(lit0) else lit0
             var or = br * lit * (0.6f + 0.4f * r.lightR)
             var og = bg * lit * (0.6f + 0.4f * r.lightG)
             var ob = bb * lit * (0.6f + 0.4f * r.lightB)
             if (specStrength > 0f && ndl > 0f) {
                 val ndh = max(0f, nx * r.H.x + ny * r.H.y + nz * r.H.z)
-                val s = specStrength * lut[(ndh * 255f).toInt().coerceIn(0, 255)] * light.intensity
+                val s0 = specStrength * lut[(ndh * 255f).toInt().coerceIn(0, 255)] * light.intensity
+                val s = if (style == RenderStyle.TOON) (if (s0 > 0.35f) 0.35f else 0f) else s0
                 if (metal) { or += s * (0.3f + 0.7f * br); og += s * (0.3f + 0.7f * bg); ob += s * (0.3f + 0.7f * bb) }
                 else { or += s * r.lightR; og += s * r.lightG; ob += s * r.lightB }
             }

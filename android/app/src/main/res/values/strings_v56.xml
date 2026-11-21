@@ -405,4 +405,20 @@
     <string name="sk3_rename_layer">Katmanı yeniden adlandır</string>
     <string name="sk3_delete_layer">Katmanı sil</string>
     <string name="sk3_open_from_canvas">3B çiz</string>
+    <string name="sk3_wide">Yüzeye boya</string>
+    <string name="sk3_fill">Doldur</string>
+    <string name="sk3_glow">Parlat</string>
+    <string name="sk3_style_soft">Yumuşak</string>
+    <string name="sk3_style_toon">Toon</string>
+    <string name="sk3_style_lines">Sadece çizgi</string>
+    <string name="sk3_add_to_canvas">Tuvale ekle</string>
+    <string name="sk3_pick_canvas">Hangi tuvale eklensin?</string>
+    <string name="sk3_no_canvas">Henüz tuval yok</string>
+    <string name="sk3_video">Dönen video</string>
+    <string name="sk3_video_hint">Kamera çiziminizin çevresinde bir tur atar.</string>
+    <string name="sk3_video_format">Biçim</string>
+    <string name="sk3_video_speed">Hız</string>
+    <string name="sk3_video_start">Kaydet</string>
+    <string name="sk3_video_saved">Video galeriye kaydedildi</string>
+    <string name="sk3_video_share">Videoyu paylaş</string>
 </resources>

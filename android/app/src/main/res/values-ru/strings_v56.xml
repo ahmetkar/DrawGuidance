@@ -405,4 +405,20 @@
     <string name="sk3_rename_layer">Переименовать слой</string>
     <string name="sk3_delete_layer">Удалить слой</string>
     <string name="sk3_open_from_canvas">Рисовать в 3D</string>
+    <string name="sk3_wide">Краска по поверхности</string>
+    <string name="sk3_fill">Заливка</string>
+    <string name="sk3_glow">Свечение</string>
+    <string name="sk3_style_soft">Мягкий</string>
+    <string name="sk3_style_toon">Мультяшный</string>
+    <string name="sk3_style_lines">Только линии</string>
+    <string name="sk3_add_to_canvas">Добавить на холст</string>
+    <string name="sk3_pick_canvas">На какой холст добавить?</string>
+    <string name="sk3_no_canvas">Холстов пока нет</string>
+    <string name="sk3_video">Видео с вращением</string>
+    <string name="sk3_video_hint">Камера облетает рисунок один раз.</string>
+    <string name="sk3_video_format">Формат</string>
+    <string name="sk3_video_speed">Скорость</string>
+    <string name="sk3_video_start">Сохранить</string>
+    <string name="sk3_video_saved">Видео сохранено в галерею</string>
+    <string name="sk3_video_share">Поделиться видео</string>
 </resources>

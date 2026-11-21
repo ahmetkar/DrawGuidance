@@ -1778,6 +1778,12 @@ final class EditorViewModel: ObservableObject, EditorHost {
         images.insertAssetImage(prop.file, heightFraction: longSide * Float(prop.h) / Float(max(prop.w, prop.h, 1)), center: center)
     }
 
+    /// v56 aşama 12 3B Çizim'den "Tuvale ekle": resim sayfanın ortasına (ya da "buraya ekle" noktasına).
+    func insert3DImage(_ png: Data) {
+        guard let center = centerOrAnchor() else { return }
+        images.insertPngData(png, heightFraction: 0.5, center: center)
+    }
+
     func insertPackImage(_ path: String, _ w: Int, _ h: Int) {
         guard let center = centerOrAnchor() else { return }
         images.insertAssetImage(path, heightFraction: 0.30 * Float(max(h, 1)) / Float(max(w, h, 1)), center: center)

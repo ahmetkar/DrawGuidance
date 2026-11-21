@@ -6,7 +6,7 @@ import SwiftUI
 enum SketchMode: String, CaseIterable { case DRAW, PLANE, SELECT, ADD, VIEW }
 
 /// Çiz modunun araçları.
-enum SketchTool { case PEN, ERASER }
+enum SketchTool { case PEN, ERASER, FILL }
 
 /// Seç modunda sürüklemenin yaptığı.
 enum SketchXform: CaseIterable { case MOVE, ROTATE, SCALE }
@@ -16,6 +16,8 @@ enum SketchEvent: Equatable {
     case saved(String)
     case exit
     case message(String)
+    /// v56 aşama 13 dönen video yazıldı (paylaşım için dosya).
+    case videoSaved(URL)
 }
 
 /// v56 3B Çizim ekranının modeli (Android `Sketch3DViewModel`): eskiz (çizgiler, cisimler, katmanlar, son düzlem), mod
@@ -35,6 +37,18 @@ final class Sketch3DModel: ObservableObject {
     static let MSG_LAYER_LOCKED = "Katman kilitli"
     static let MSG_LAYER_HIDDEN = "Katman gizli"
     static let GPU_FALLBACK = "Ekran kartı çizimi açılamadı; yazılımla çiziliyor"
+    static let MSG_FILL_NONE = "Doldurmak için kapalı bir çizginin içine dokunun ya da bir alan çizin"
+    static let MSG_VIDEO_FAILED = "Video kaydedilemedi"
+    static let FILL_NAME = "Dolgu"
+    static let SURFACE_PLANE = "surface"
+    static let WIDE_SCALE: Float = 2.6
+    static let MIN_LASSO_AREA: Float = 400
+    static let CANVAS_SIDE = 1024
+    static let GIF_SIDE = 480
+    static let GIF_FPS = 20
+    static let MP4_W = 1920
+    static let MP4_H = 1080
+    static let MP4_FPS = 30
 
     @Published private(set) var model: Model3D?
     @Published private(set) var mode: SketchMode = .DRAW
@@ -59,6 +73,10 @@ final class Sketch3DModel: ObservableObject {
     @Published private(set) var gpu = true
     @Published var event: SketchEvent?
     @Published private(set) var renderTick = 0
+    /// v56 aşama 12 görünüm stili ([RenderStyle]); kayda girmez.
+    @Published private(set) var style = RenderStyle.SOFT
+    /// v56 aşama 13 video ilerlemesi (0…1; nil: çalışmıyor).
+    @Published private(set) var videoProgress: Float?
 
     let repository: Model3DRepository?
     let textures: TextureRepository
@@ -174,6 +192,7 @@ final class Sketch3DModel: ObservableObject {
         mode = m
     }
     func setTool(_ t: SketchTool) { tool = t; mode = .DRAW }
+    func setStyle(_ st: Int) { style = st.coerceIn(RenderStyle.SOFT, RenderStyle.LINES) }
     func setBrush(_ b: Brush3D) { brush = b; tool = .PEN; mode = .DRAW }
     func setColor(_ c: Int32) { color = c }
     func setSize(_ px: Float) { size = px.coerceIn(1, 80) }
@@ -341,6 +360,7 @@ final class Sketch3DModel: ObservableObject {
     @discardableResult
     func finishStroke(_ xy: [Float], _ pressures: [Float]?, straight: Bool) -> String? {
         guard let m = model, let view = currentView(), xy.count >= 4, layerWritable() else { return nil }
+        if brush == .WIDE && !straight, let id = paintSurface(m, view, xy) { return id }
         let src = straight ? [xy[0], xy[1], xy[xy.count - 2], xy[xy.count - 1]] : Self.smooth(xy)
         let n = src.count / 2
         var world: [Float] = []
@@ -356,7 +376,7 @@ final class Sketch3DModel: ObservableObject {
         if let pr = pressures, !straight, pr.count * 2 == xy.count { press = Self.resample(pr, count) }
         let widths = Self.widthsFor(b, count, press)
         let op = b == .MARKER ? min(opacity, 0.6) : opacity
-        let w = size * (b == .MARKER ? 1.8 : 1) * pixelToWorld()
+        let w = size * (b == .MARKER ? 1.8 : (b == .WIDE ? Self.WIDE_SCALE : 1)) * pixelToWorld()
         let id = UUID().uuidString.lowercased()
         let stroke = Stroke3(id, world, color, w, time: Int64(Date().timeIntervalSince1970 * 1000), widths: widths, opacity: op,
                              brush: b.rawValue, plane: plane.id, layer: activeLayer)
@@ -364,6 +384,75 @@ final class Sketch3DModel: ObservableObject {
         next.strokes.append(stroke)
         commit(next)
         return id
+    }
+
+    /// v56 aşama 13 yüzeye boya: GENİŞ fırçanın izi cisimlerin yüzeyine düşürülür; hiç değmezse nil (düzleme çizilir).
+    private func paintSurface(_ m: Model3D, _ view: View3, _ xy: [Float]) -> String? {
+        let visible = m.visibleLayers()
+        guard visible.parts.contains(where: { $0.visible }) else { return nil }
+        let segs = SurfacePaint.cast(visible, view, Self.smooth(xy))
+        guard !segs.isEmpty else { return nil }
+        let now = Int64(Date().timeIntervalSince1970 * 1000)
+        let added: [Stroke3] = segs.map { seg in
+            let pts = seg.0
+            let mid = pts.count / 3 / 2
+            let pr = view.project(V3(pts[3 * mid], pts[3 * mid + 1], pts[3 * mid + 2]))
+            let depth = pr[3] > 0 ? pr[3] : 1
+            let w = size * Self.WIDE_SCALE / (view.scale * depth)
+            return Stroke3(UUID().uuidString.lowercased(), pts, color, w, time: now, widths: nil, opacity: min(opacity, 0.9),
+                           brush: Brush3D.WIDE.rawValue, plane: Self.SURFACE_PLANE, layer: activeLayer)
+        }
+        var next = m
+        next.strokes += added
+        commit(next)
+        return added.first?.id
+    }
+
+    // MARK: dolgu
+
+    /// v56 aşama 12 dolgu (dokunma): dokunulan yeri ekranda çevreleyen en küçük kapalı çizgi doldurulur.
+    @discardableResult
+    func fillAt(_ x: Float, _ y: Float) -> String? {
+        guard let m = model, let view = currentView(), layerWritable() else { return nil }
+        var s = [Float](repeating: 0, count: 4)
+        var best: Stroke3?
+        var bestArea = Float.greatestFiniteMagnitude
+        for st in m.strokes {
+            if m.layerHidden(st.layer) || st.count < 3 || !Sketch3Fill.isClosed(st.points, st.width) { continue }
+            var poly = [Float](repeating: 0, count: st.count * 2)
+            var ok = true
+            for i in 0..<st.count {
+                view.project(st.points[3 * i], st.points[3 * i + 1], st.points[3 * i + 2], &s)
+                if s[3] <= 0 { ok = false; break }
+                poly[2 * i] = s[0]; poly[2 * i + 1] = s[1]
+            }
+            if !ok || !Sketch3Fill.inside(poly, x, y) { continue }
+            let a = Sketch3Fill.screenArea(poly)
+            if a < bestArea { bestArea = a; best = st }
+        }
+        guard let loop = best, let part = Sketch3Fill.fromLoop(loop.points, UUID().uuidString.lowercased(), color, opacity: opacity, layer: activeLayer, name: Self.FILL_NAME) else {
+            message(Self.MSG_FILL_NONE); return nil
+        }
+        var next = m
+        next.parts.append(part)
+        commit(next)
+        return part.id
+    }
+
+    /// v56 aşama 12 kement dolgu: ekranda çizilen kapalı iz çizim düzlemine düşürülüp doldurulur.
+    @discardableResult
+    func fillLasso(_ xy: [Float]) -> String? {
+        guard let m = model, let view = currentView(), xy.count >= 6, layerWritable() else { return nil }
+        if Sketch3Fill.screenArea(xy) < Self.MIN_LASSO_AREA { message(Self.MSG_FILL_NONE); return nil }
+        var pts: [Float] = []
+        for i in 0..<(xy.count / 2) { if let p = PlaneSnap.project(plane, view, xy[2 * i], xy[2 * i + 1]) { pts += [p.x, p.y, p.z] } }
+        guard let part = Sketch3Fill.fromLoop(pts, UUID().uuidString.lowercased(), color, opacity: opacity, layer: activeLayer, name: Self.FILL_NAME) else {
+            message(Self.MSG_FILL_NONE); return nil
+        }
+        var next = m
+        next.parts.append(part)
+        commit(next)
+        return part.id
     }
 
     /// Hafif yumuşatma (3 noktalı ortalama, uçlar korunur).
@@ -435,7 +524,13 @@ final class Sketch3DModel: ObservableObject {
                 i = j
             }
         }
-        if changed { var next = m; next.strokes = out; commit(next) }
+        // v56 aşama 12: silgi dokunduğu dolguyu da kaldırır
+        var parts = m.parts
+        if let hit = Pick3.pick(m.visibleLayers(), view, x, y), hit.part < m.parts.count {
+            let p = m.parts[hit.part]
+            if Sketch3Fill.isFill(p) && !m.layerLocked(p.layer) { parts.remove(at: hit.part); changed = true }
+        }
+        if changed { var next = m; next.strokes = out; next.parts = parts; commit(next) }
     }
 
     func endErase() { if erasing { erasing = false; endLive() } }
@@ -609,6 +704,15 @@ final class Sketch3DModel: ObservableObject {
     }
 
     /// Seçimin rengi (çizgi rengi, cisim malzemesi).
+    /// v56 aşama 12 seçili cisimlerin malzeme türü (Parlat: GLOW).
+    func materialSelected(_ kind: MaterialKind) {
+        guard var m = model else { return }
+        let sel = selection
+        guard m.parts.contains(where: { sel.contains($0.id) }) else { return }
+        m.parts = m.parts.map { p in var q = p; if sel.contains(p.id) { q.material.kind = kind }; return q }
+        commit(m)
+    }
+
     func colorSelected(_ c: Int32) {
         guard var m = model, !selection.isEmpty else { return }
         let sel = selection
@@ -732,6 +836,7 @@ final class Sketch3DModel: ObservableObject {
         let h = e.aspect >= 1 ? max(16, Int(Float(long) / e.aspect)) : long
         let ref = currentView()
         let tex = textures
+        let st = style
         return await Task.detached(priority: .userInitiated) { () -> CGImage? in
             tex.preload(TextureRepository.ids(m))
             let maxSs = Int((Double(Budget3D.exportPixels) / Double(w * h)).squareRoot()).coerceIn(1, 3)
@@ -744,9 +849,59 @@ final class Sketch3DModel: ObservableObject {
                 let k = min(Float(w) / Float(ref.width), Float(h) / Float(ref.height))
                 view = View3(m.camera, w, h, ref.scale * k, Float(w) / 2, Float(h) / 2)
             } else { view = View3.editor(m.camera, w, h) }
-            let f = Renderer3D.render(mm, view, RenderOptions(textures: { tex.cached($0) }, supersample: ss, ground: e.ground, shadow: e.shadow, background: UInt32(bitPattern: bg)))
+            let f = Renderer3D.render(mm, view, RenderOptions(textures: { tex.cached($0) }, supersample: ss, ground: e.ground, shadow: e.shadow, background: UInt32(bitPattern: bg), style: st))
             return Bitmaps.image(argb: f.color, w, h)
         }.value
+    }
+
+    // MARK: tuvale ekle
+
+    /// v56 aşama 12 "Tuvale ekle": çizim saydam arka planla PNG olarak çizilir.
+    func canvasImage(side: Int = CANVAS_SIDE) async -> Data? {
+        let e = ImageExport(size: side, background: 0, ground: false, shadow: false, edges: model?.scene.edges ?? true, fit: true)
+        guard let img = await renderImage(e) else { return nil }
+        return try? ImageExporter.encode(img, .PNG, 100)
+    }
+
+    // MARK: dönen video
+
+    /// v56 aşama 13 dönen video: kamera bir tur atar. [gif] 480 px GIF, değilse 1080p 30 fps MP4 (AVAssetWriter).
+    /// Dosya [outDir]'e yazılır; [onDone] dosya adresiyle çağrılır (paylaşım/Fotoğraflar).
+    func exportVideo(gif: Bool, speed: Float, outDir: URL) {
+        guard videoProgress == nil, let m0 = model else { return }
+        let m = m0.visibleLayers()
+        videoProgress = 0
+        let tex = textures
+        let st = style
+        let name = String(m0.name.unicodeScalars.filter { CharacterSet.alphanumerics.contains($0) || $0 == " " || $0 == "-" || $0 == "_" }.prefix(40))
+        let fps = gif ? Self.GIF_FPS : Self.MP4_FPS
+        let (w, h) = gif ? (Self.GIF_SIDE, Self.GIF_SIDE * 3 / 4) : (Self.MP4_W, Self.MP4_H)
+        Task {
+            let n = OrbitTrack.frameCount(fps, speed)
+            let url = outDir.appendingPathComponent("\(name.isEmpty ? "3d" : name)-\(Int(Date().timeIntervalSince1970 * 1000)).\(gif ? "gif" : "mp4")")
+            let ok: Bool = await Task.detached(priority: .userInitiated) { [weak self] () -> Bool in
+                tex.preload(TextureRepository.ids(m))
+                let cams = OrbitTrack.cameras(m.camera, n)
+                let bg: Int32 = m.scene.background != 0 ? m.scene.background : -1
+                var mm = m
+                mm.scene.background = bg
+                let v0 = View3.fit(mm, m.camera, w, h, 0.08)
+                func frame(_ i: Int) -> [UInt32] {
+                    let v = View3(cams[i], w, h, v0.scale, v0.centerX, v0.centerY)
+                    return Renderer3D.render(mm, v, RenderOptions(textures: { tex.cached($0) }, supersample: 1, background: UInt32(bitPattern: bg), style: st)).color
+                }
+                func progress(_ i: Int) { let p = Float(i + 1) / Float(n); Task { @MainActor in self?.videoProgress = p } }
+                try? FileManager.default.createDirectory(at: outDir, withIntermediateDirectories: true)
+                if gif {
+                    let g = GifWriter(w, h, delayCs: 100 / fps)
+                    for i in 0..<n { g.addFrame(frame(i)); progress(i) }
+                    return (try? g.finish().write(to: url)) != nil
+                }
+                return OrbitVideo.writeMp4(url, w, h, fps, n) { i in let f = frame(i); progress(i); return f }
+            }.value
+            videoProgress = nil
+            if ok { event = .videoSaved(url) } else { message(Self.MSG_VIDEO_FAILED) }
+        }
     }
 
     /// Ekran noktaları arası uzaklık (testler).

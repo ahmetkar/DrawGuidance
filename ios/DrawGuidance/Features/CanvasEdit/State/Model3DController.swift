@@ -111,7 +111,7 @@ final class Model3DController: ObservableObject {
             let img = Bitmaps.image(argb: px, w, h)
             guard let png = PixelCodec.encode(img) else { return nil }
             return (PreparedImage(bytes: png, mimeType: "image/png", width: w, height: h, image: img, originalBytes: png.count, detailScore: 0),
-                    Model3DStore.encode(model))
+                    Model3DStore.encodeShape(model))
         }.value
         guard let (image, data) = rendered else { return }
         let assetId = assets.save(store.canvasLocalId, image)

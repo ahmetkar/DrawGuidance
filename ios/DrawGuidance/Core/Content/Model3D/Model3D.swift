@@ -99,14 +99,17 @@ struct Part {
     var uv: UvMode = .BOX
     var visible: Bool = true
     var group: String? = nil
-    var brush: BrushSource? = nil
+    /// v56 kilitli cisim (eski 3B Şekillerim kaydından çevrilen parça): taşınır, üstüne çizilir, ağı düzenlenmez.
+    var locked: Bool = false
+    /// v56 3B katmanı ([Model3D.layers] kimliği; nil: ilk katman).
+    var layer: String? = nil
 
     init(_ id: String, _ name: String, _ mesh: Mesh, _ primitive: PrimitiveSpec?, position: V3 = .ZERO, rotation: V3 = .ZERO,
          scale: V3 = .ONE, material: Material = Material(), faceMaterials: [Int: Material] = [:], smooth: Bool = false,
-         uv: UvMode = .BOX, visible: Bool = true, group: String? = nil, brush: BrushSource? = nil) {
+         uv: UvMode = .BOX, visible: Bool = true, group: String? = nil, locked: Bool = false, layer: String? = nil) {
         self.id = id; self.name = name; self.mesh = mesh; self.primitive = primitive; self.position = position
         self.rotation = rotation; self.scale = scale; self.material = material; self.faceMaterials = faceMaterials
-        self.smooth = smooth; self.uv = uv; self.visible = visible; self.group = group; self.brush = brush
+        self.smooth = smooth; self.uv = uv; self.visible = visible; self.group = group; self.locked = locked; self.layer = layer
     }
 
     func materialOf(_ face: Int) -> Material { faceMaterials[face] ?? material }
@@ -114,18 +117,74 @@ struct Part {
 
 struct Group3: Hashable { var id: String; var name: String }
 
-/// 3B düzleme çizilmiş çizgi.
+/// 3B düzleme çizilmiş çizgi. v56: nokta kalınlıkları (basınç), örtücülük, fırça, düzlem ve katman.
 struct Stroke3: Equatable {
     let id: String
     let points: [Float]
     let color: Int32
     let width: Float
     var time: Int64 = 0
-    init(_ id: String, _ points: [Float], _ color: Int32, _ width: Float, time: Int64 = 0) {
+    /// v56 nokta başına kalınlık çarpanı (nil: düz kalınlık). Boyu [count] olur.
+    var widths: [Float]? = nil
+    var opacity: Float = 1
+    /// v56 fırça türü ([Brush3D] sırası).
+    var brush: Int = 0
+    var plane: String? = nil
+    var layer: String? = nil
+
+    init(_ id: String, _ points: [Float], _ color: Int32, _ width: Float, time: Int64 = 0, widths: [Float]? = nil,
+         opacity: Float = 1, brush: Int = 0, plane: String? = nil, layer: String? = nil) {
         self.id = id; self.points = points; self.color = color; self.width = width; self.time = time
+        self.widths = widths; self.opacity = opacity; self.brush = brush; self.plane = plane; self.layer = layer
     }
     var count: Int { points.count / 3 }
-    static func == (a: Stroke3, b: Stroke3) -> Bool { a.id == b.id && a.color == b.color && a.width == b.width && a.points == b.points }
+
+    /// [i]. noktanın kalınlığı (dünya birimi).
+    func widthAt(_ i: Int) -> Float {
+        guard let w = widths, i >= 0, i < w.count else { return width }
+        return width * w[i]
+    }
+
+    func copy(points: [Float]? = nil, color: Int32? = nil, width: Float? = nil, widths: [Float]?? = nil, opacity: Float? = nil,
+              layer: String?? = nil, id: String? = nil) -> Stroke3 {
+        Stroke3(id ?? self.id, points ?? self.points, color ?? self.color, width ?? self.width, time: time,
+                widths: widths ?? self.widths, opacity: opacity ?? self.opacity, brush: brush, plane: plane, layer: layer ?? self.layer)
+    }
+
+    static func == (a: Stroke3, b: Stroke3) -> Bool {
+        a.id == b.id && a.color == b.color && a.width == b.width && a.points == b.points && a.widths == b.widths &&
+            a.opacity == b.opacity && a.brush == b.brush && a.plane == b.plane && a.layer == b.layer
+    }
+}
+
+/// v56 3B Çizim fırçaları (kalem, mürekkep, markör, geniş boya).
+enum Brush3D: Int, CaseIterable { case PEN, INK, MARKER, WIDE }
+
+/// v56 3B katmanı: ad, görünür, kilitli.
+struct Layer3: Hashable {
+    var id: String
+    var name: String
+    var visible: Bool = true
+    var locked: Bool = false
+    init(_ id: String, _ name: String, visible: Bool = true, locked: Bool = false) {
+        self.id = id; self.name = name; self.visible = visible; self.locked = locked
+    }
+}
+
+/// v56 çizim düzlemi: merkez [origin], düzlem içindeki birim eksenler [u] (sağ) ve [v] (yukarı). Normal u × v'dir.
+struct Plane3: Hashable {
+    var origin: V3
+    var u: V3
+    var v: V3
+    var id: String = "front"
+    init(_ origin: V3, _ u: V3, _ v: V3, id: String = "front") { self.origin = origin; self.u = u; self.v = v; self.id = id }
+
+    var normal: V3 { u.cross(v).normalized() }
+
+    /// Dünya noktasının düzlemdeki (u, v) koordinatı.
+    func local(_ p: V3) -> (Float, Float) { let d = p - origin; return (d.dot(u), d.dot(v)) }
+
+    func world(_ a: Float, _ b: Float) -> V3 { origin + u * a + v * b }
 }
 
 struct Light: Equatable {
@@ -167,14 +226,40 @@ struct Model3D {
     var scene = SceneSettings()
     var camera = Camera3()
     var groups: [Group3] = []
+    /// v56 3B katmanları (boşsa tek örtük katman).
+    var layers: [Layer3] = []
+    /// v56 son kullanılan çizim düzlemi (nil: ön düzlem).
+    var plane: Plane3? = nil
 
     init(_ id: String, _ name: String, _ parts: [Part], strokes: [Stroke3] = [], scene: SceneSettings = SceneSettings(),
-         camera: Camera3 = Camera3(), groups: [Group3] = []) {
+         camera: Camera3 = Camera3(), groups: [Group3] = [], layers: [Layer3] = [], plane: Plane3? = nil) {
         self.id = id; self.name = name; self.parts = parts; self.strokes = strokes; self.scene = scene
-        self.camera = camera; self.groups = groups
+        self.camera = camera; self.groups = groups; self.layers = layers; self.plane = plane
     }
 
     var isEmpty: Bool { !parts.contains { $0.visible } && strokes.isEmpty }
+
+    private func layerOf(_ id: String?) -> Layer3? {
+        let key = id ?? layers.first?.id
+        return layers.first { $0.id == key }
+    }
+
+    /// v56 görünmez ya da kilitli katman.
+    func layerHidden(_ id: String?) -> Bool { layerOf(id)?.visible == false }
+    func layerLocked(_ id: String?) -> Bool { layerOf(id)?.locked == true }
+
+    /// v56 çizimde görünenler: gizli katmanlardaki parça ve çizgiler çıkarılır.
+    func visibleLayers() -> Model3D {
+        if !layers.contains(where: { !$0.visible }) { return self }
+        var c = self
+        c.parts = parts.map { p in
+            var q = p
+            if layerHidden(p.layer) { q.visible = false }
+            return q
+        }
+        c.strokes = strokes.filter { !layerHidden($0.layer) }
+        return c
+    }
 
     func part(_ id: String) -> Part? { parts.first { $0.id == id } }
 

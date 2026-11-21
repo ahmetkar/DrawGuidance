@@ -190,6 +190,10 @@ struct EditorHeaderBar: View {
             }
             Button { sheet = .background } label: { Label(L("add_background"), systemImage: "photo.on.rectangle") }
                 .accessibilityIdentifier("background_menu_item")
+            if kind != .KIDS {
+                Button { sheet = .sketch3d } label: { Label(L("sk3_open_from_canvas"), systemImage: "cube") }
+                    .accessibilityIdentifier("sketch3d_menu_item")
+            }
             Divider()
             Button { sheet = .share } label: { Label(L("v52_share_send_title"), systemImage: "square.and.arrow.up") }
                 .accessibilityIdentifier("share_menu_item")

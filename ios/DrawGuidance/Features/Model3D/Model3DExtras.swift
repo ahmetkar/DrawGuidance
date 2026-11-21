@@ -90,7 +90,7 @@ struct CatalogGrid3: View {
 /// v25 3B şekli resim olarak dışa aktarma: boyut, oran, arka plan, zemin, gölge, kenar, açı, biçim, yumuşatma; ayarlar
 /// değiştikçe önizleme yenilenir. "Kaydet" Fotoğraflar'a yazar, "Paylaş" paylaşım penceresini açar.
 struct ImageExportSheet3: View {
-    @ObservedObject var vm: Model3DEditorModel
+    @ObservedObject var vm: Sketch3DModel
     @Environment(\.dismiss) private var dismiss
     @State private var e = ImageExport(size: min(1080, Budget3D.exportMaxSide))
     @State private var preview: CGImage?
@@ -257,7 +257,7 @@ struct Model3DListView: View {
                     .accessibilityIdentifier("models3d_new")
             }
         }
-        .navigationDestinationCompat(item: $open) { o in Model3DEditorView(repository: repository, modelId: o.modelId).toolbar(.hidden, for: .tabBar) }
+        .navigationDestinationCompat(item: $open) { o in Sketch3DView(repository: repository, modelId: o.modelId).toolbar(.hidden, for: .tabBar) }
         .alert(deleting.map { L("model3d_delete_title", $0.name) } ?? "", isPresented: Binding(get: { deleting != nil }, set: { if !$0 { deleting = nil } })) {
             Button(L("delete_button"), role: .destructive) { if let d = deleting { repository.delete([d.id]) }; deleting = nil }
             Button(L("cancel_button"), role: .cancel) { deleting = nil }

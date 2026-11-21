@@ -1,15 +1,23 @@
 import Foundation
 
-/// v24 3B modellerin saklama biçimi: GLB (`Gltf3`; düzenleme bilgileri "extras"ta). v23'ün "D3" ikili biçimi
-/// (`Model3DCodec`) yalnız okunur (eski kayıtlar ve tuvallerdeki eski 3B şekiller).
+/// v56 3B çizimlerin saklama biçimi: kompakt **D3 v2** (`Model3DCodec`). Eski kayıtlar GLB'dir (`Gltf3`; düzenleme
+/// bilgileri "extras"ta); okunurken çevrilir ([fromLegacy]: parçalar kilitli cisim olur). Tuvaldeki 3B şeklin verisi
+/// eski sürümlerle uyum için GLB olarak yazılır ([encodeShape]). Android `Model3DStore` ile aynı.
 enum Model3DStore {
 
     static let MIME = Gltf3.MIME
 
-    /// Eski (v23) tuval 3B şekil verisinin türü.
-    static let LEGACY_MIME = "application/x-dg-model3d"
+    /// v56 3B çizimin (D3 v2) türü.
+    static let SKETCH_MIME = "application/x-dg-model3d"
 
-    static func encode(_ model: Model3D) -> Data { Data(Gltf3.write(model)) }
+    /// Eski (v23) tuval 3B şekil verisinin türü.
+    static let LEGACY_MIME = SKETCH_MIME
+
+    /// 3B çizim kaydı (D3 v2).
+    static func encode(_ model: Model3D) -> Data { Model3DCodec.encode(model) }
+
+    /// Tuvaldeki 3B şeklin verisi (GLB; eski sürümler de okur).
+    static func encodeShape(_ model: Model3D) -> Data { Data(Gltf3.write(model)) }
 
     static func decode(_ data: Data) throws -> Model3D {
         let bytes = [UInt8](data)
@@ -20,6 +28,20 @@ enum Model3DStore {
         return try Model3DCodec.decode(data)
     }
 
-    /// Veri eski biçimde mi (yeniden yazılmalı).
-    static func isLegacy(_ data: Data) -> Bool { !Gltf3.isGlb(data) }
+    /// Veri eski biçimde mi (GLB ya da D3 v1; 3B Çizim'de açılınca çevrilir).
+    static func isLegacy(_ data: Data) -> Bool {
+        if Gltf3.isGlb(data) { return true }
+        return data.count > 2 && data[data.startIndex + 2] < 2
+    }
+
+    /// v56 eski 3B Şekillerim kaydının çevrilmesi: modelleme parçaları kilitli cisim olur; hazır cisimler cisim kalır.
+    static func fromLegacy(_ model: Model3D) -> Model3D {
+        var c = model
+        c.parts = model.parts.map { p in
+            var q = p
+            if p.primitive == nil { q.locked = true }
+            return q
+        }
+        return c
+    }
 }

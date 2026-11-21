@@ -236,7 +236,6 @@ enum Gltf3 {
             }
             m += [("smooth", .b(p.smooth)), ("uv", .s("\(p.uv)")), ("visible", .b(p.visible))]
             if let g = p.group { m.append(("group", .s(g))) }
-            if let b = p.brush { m.append(("brush", brushJson(b))) }
             m.append(("poly", .i(polyView)))
             return .obj(m)
         }
@@ -351,36 +350,6 @@ enum Gltf3 {
             ("camera", .obj([("yaw", .f(c.yaw)), ("pitch", .f(c.pitch)), ("persp", .f(c.persp)), ("zoom", .f(c.zoom)), ("target", v3(c.target))])),
             ("groups", .arr(model.groups.map { .arr([.s($0.id), .s($0.name)]) })),
         ])
-    }
-
-    /// v26 fırça kaynağı (parçanın yerel uzayında iz ve ayarlar).
-    private static func brushJson(_ b: BrushSource) -> JV {
-        let sp = b.spec
-        var m: [(String, JV)] = [("kind", .s("\(sp.kind)")), ("w", .f(sp.width)), ("h", .f(sp.height)), ("bulge", .f(sp.bulge)), ("taper", .f(sp.taper)),
-                                 ("smooth", .f(sp.smoothing)), ("pressure", .b(sp.pressure)), ("sides", .i(sp.sides)), ("max", .i(sp.maxSamples)),
-                                 ("pts", .arr(b.points.map { .f($0) }))]
-        if let pr = b.pressures { m.append(("prs", .arr(pr.map { .f($0) }))) }
-        m += [("n", v3(b.normal)), ("up", v3(b.up))]
-        if let c = b.closed { m.append(("closed", .b(c))) }
-        if let a = b.axis { m.append(("axis", v3(a))) }
-        m.append(("t", .l(b.time)))
-        if let g = b.sig { m.append(("sig", .arr([.i(g.vertices), .i(g.faces), .d(g.sum)]))) }
-        return .obj(m)
-    }
-
-    private static func brushFrom(_ o: JV) -> BrushSource? {
-        guard let kind = Brush3Kind.allCases.first(where: { "\($0)" == o["kind"]?.str }) else { return nil }
-        guard let pts = o["pts"]?.floats, pts.count >= 6, pts.count % 3 == 0 else { return nil }
-        func vec(_ key: String) -> V3? { guard let f = o[key]?.floats, f.count == 3 else { return nil }; return V3(f[0], f[1], f[2]) }
-        func fl(_ k: String) -> Float? { o[k].flatMap { $0.isPrimitive ? $0.float : nil } }
-        func ii(_ k: String) -> Int? { o[k].flatMap { $0.isPrimitive ? $0.int : nil } }
-        let spec = BrushShapeSpec(kind: kind, width: fl("w") ?? 0.05, height: fl("h") ?? 0.5, bulge: fl("bulge") ?? 0.8, taper: fl("taper") ?? 0.3,
-                                  smoothing: fl("smooth") ?? 0.4, pressure: o["pressure"]?.bool ?? true, sides: ii("sides") ?? 10, maxSamples: ii("max") ?? 160)
-        var sig: MeshSig? = nil
-        if let a = o["sig"]?.array, a.count == 3, let v = a[0].int, let f = a[1].int, let s = a[2].double { sig = MeshSig(vertices: v, faces: f, sum: s) }
-        let prs = o["prs"]?.floats.flatMap { $0.count == pts.count / 3 ? $0 : nil }
-        return BrushSource(spec, pts, prs, vec("n") ?? .UP, vec("up") ?? V3(0, 0, -1), closed: o["closed"]?.bool, axis: vec("axis"),
-                           time: o["t"]?.long ?? 0, sig: sig)
     }
 
     /// Euler (derece; önce X, sonra Y, sonra Z) → dördey (x, y, z, w).
@@ -578,7 +547,7 @@ enum Gltf3 {
                 position: vec("position", .ZERO), rotation: vec("rotation", .ZERO), scale: vec("scale", .ONE),
                 material: mat, faceMaterials: faceMats, smooth: ex["smooth"]?.bool ?? false,
                 uv: UvMode.allCases.first { "\($0)" == ex["uv"]?.str } ?? .BOX, visible: ex["visible"]?.bool ?? true,
-                group: ex["group"]?.str, brush: ex["brush"].flatMap { $0.object != nil ? brushFrom($0) : nil }))
+                group: ex["group"]?.str))
         }
         let sc = dg["scene"].flatMap { $0.object != nil ? $0 : nil }
         let l = sc?["light"].flatMap { $0.object != nil ? $0 : nil }

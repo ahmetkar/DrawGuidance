@@ -187,6 +187,9 @@ struct CanvasEditScreen: View {
             case .share: NavigationStack { ShareView(mode: .send).toolbar { ToolbarItem(placement: .cancellationAction) { Button(L("close")) { sheet = nil } } } }
             case .live: NavigationStack { ShareView(mode: .live).toolbar { ToolbarItem(placement: .cancellationAction) { Button(L("close")) { sheet = nil } } } }
             case .helpers: DrawHelpersSheet(helpers: vm.helpers)
+            // v56 aşama 11 Diğer menüsünden "3B çiz": yeni 3B Çizim (kaydedilmemiş iş kaybolmasın diye kaydırarak kapanmaz)
+            case .sketch3d: NavigationStack { Sketch3DView(repository: vm.deps.models3d, modelId: nil, onBack: { sheet = nil }) }
+                .interactiveDismissDisabled()
             }
         }
         .sheet(isPresented: Binding(get: { vm.loaded && vm.diagrams.isPickerOpen }, set: { if !$0 { vm.closeDiagramPicker() } })) {
@@ -314,7 +317,7 @@ private struct TutorialOfferHost: View {
 }
 
 enum EditorSheet: String, Identifiable {
-    case save, guide, background, share, live, helpers
+    case save, guide, background, share, live, helpers, sketch3d
     var id: String { rawValue }
 }
 

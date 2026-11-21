@@ -187,8 +187,9 @@ struct Model3DInfo: Identifiable, Equatable {
     var thumbURL: URL
 }
 
-/// v23 3B şekillerin deposu (Android `Model3DRepository`): her model `<kimlik>.glb` (dokular kimlikle), üst bilgisi
-/// `<kimlik>.json` ve küçük resmi `<kimlik>.png` olarak saklanır. Örnek modeller ilk açılışta eklenir.
+/// v23 3B şekillerin deposu (Android `Model3DRepository`): üst bilgi `<kimlik>.json`, küçük resim `<kimlik>.png`.
+/// v56 3B Çizim: veri `<kimlik>.d3` (D3 v2); eski `<kimlik>.glb` kayıtları bir kez çevrilir ([migrateToSketch]:
+/// modelleme parçaları kilitli cisim olur), asıl GLB bir sürüm boyunca `models3d-backup/` altında saklanır.
 @MainActor
 final class Model3DRepository: ObservableObject {
     static let USER = "user", SAMPLE = "sample"
@@ -213,6 +214,41 @@ final class Model3DRepository: ObservableObject {
 
     private func url(_ id: String, _ ext: String) -> URL { dir.appendingPathComponent("\(id).\(ext)") }
 
+    /// v56 kaydın veri dosyası: D3 v2 (`.d3`); çevrilmemiş eski kayıtta `.glb`.
+    private func dataURL(_ id: String) -> URL {
+        let d3 = url(id, "d3")
+        return FileManager.default.fileExists(atPath: d3.path) ? d3 : url(id, "glb")
+    }
+
+    static let FORMAT_SKETCH = 3
+
+    private var backupDir: URL { dir.deletingLastPathComponent().appendingPathComponent("models3d-backup", isDirectory: true) }
+
+    /// v56: eski (GLB ya da D3 v1) kayıtları bir kez D3 v2'ye çevirir; parçalar kilitli cisim olur. Asıl veri
+    /// `models3d-backup/<kimlik>.glb` olarak saklanır (zaman ve küçük resim korunur).
+    func migrateToSketch() async {
+        if defaults.integer(forKey: "m3d.format") >= Self.FORMAT_SKETCH { return }
+        let dir = self.dir, backup = backupDir
+        await Task.detached(priority: .utility) {
+            let files = (try? FileManager.default.contentsOfDirectory(at: dir, includingPropertiesForKeys: nil)) ?? []
+            for f in files where f.pathExtension == "glb" {
+                let id = f.deletingPathExtension().lastPathComponent
+                guard let d = try? Data(contentsOf: f), Model3DStore.isLegacy(d), var m = try? Model3DStore.decode(d) else { continue }
+                m.id = id
+                let metaURL = dir.appendingPathComponent("\(id).json")
+                if let md = try? Data(contentsOf: metaURL), let meta = try? JSONDecoder().decode(Meta.self, from: md) { m.name = meta.name }
+                try? FileManager.default.createDirectory(at: backup, withIntermediateDirectories: true)
+                let safe = id.replacingOccurrences(of: "[^A-Za-z0-9._-]", with: "_", options: .regularExpression)
+                try? d.write(to: backup.appendingPathComponent("\(safe).glb"), options: .atomic)
+                do {
+                    try Model3DStore.encode(Model3DStore.fromLegacy(m)).write(to: dir.appendingPathComponent("\(id).d3"), options: .atomic)
+                    try? FileManager.default.removeItem(at: f)
+                } catch { continue }
+            }
+        }.value
+        defaults.set(Self.FORMAT_SKETCH, forKey: "m3d.format")
+    }
+
     func reload() {
         let files = (try? FileManager.default.contentsOfDirectory(at: dir, includingPropertiesForKeys: nil)) ?? []
         var list: [Model3DInfo] = []
@@ -227,6 +263,7 @@ final class Model3DRepository: ObservableObject {
 
     /// Örnek modelleri bir kez ekler (arka planda çizilen küçük resimlerle).
     func warmUp() async {
+        await migrateToSketch()
         if defaults.integer(forKey: "m3d.samples") >= Samples3D.VERSION { return }
         let existing = Set(models.filter { $0.source == Self.SAMPLE }.map(\.id))
         let now = Self.nowMs()
@@ -238,16 +275,17 @@ final class Model3DRepository: ObservableObject {
     }
 
     func load(_ id: String) async -> Model3D? {
-        let u = url(id, "glb"), meta = meta(id)
+        let u = dataURL(id), meta = meta(id)
         return await Task.detached(priority: .userInitiated) { () -> Model3D? in
             guard let d = try? Data(contentsOf: u), var m = try? Model3DStore.decode(d) else { return nil }
+            if Model3DStore.isLegacy(d) { m = Model3DStore.fromLegacy(m) }
             m.id = id
             if let meta { m.name = meta.name }
             return m
         }.value
     }
 
-    func bytes(_ id: String) -> Data? { try? Data(contentsOf: url(id, "glb")) }
+    func bytes(_ id: String) -> Data? { try? Data(contentsOf: dataURL(id)) }
 
     private func meta(_ id: String) -> Meta? {
         guard let d = try? Data(contentsOf: url(id, "json")) else { return nil }
@@ -280,16 +318,16 @@ final class Model3DRepository: ObservableObject {
     }
 
     func delete(_ ids: [String]) {
-        for id in ids { for e in ["glb", "json", "png"] { try? FileManager.default.removeItem(at: url(id, e)) } }
+        for id in ids { for e in ["d3", "glb", "json", "png"] { try? FileManager.default.removeItem(at: url(id, e)) } }
         reload()
     }
 
     private func upsert(_ model: Model3D, _ source: String, _ created: Int64, _ updated: Int64) async {
         let tex = textures
-        let glb = url(model.id, "glb"), png = url(model.id, "png"), js = url(model.id, "json")
+        let d3 = url(model.id, "d3"), oldGlb = url(model.id, "glb"), png = url(model.id, "png"), js = url(model.id, "json")
         let meta = Meta(id: model.id, name: model.name, createdAt: created, updatedAt: updated, source: source)
         await Task.detached(priority: .utility) {
-            try? Model3DStore.encode(model).write(to: glb, options: .atomic)
+            if (try? Model3DStore.encode(model).write(to: d3, options: .atomic)) != nil { try? FileManager.default.removeItem(at: oldGlb) }
             if let img = Self.render(model, Self.THUMB, Self.THUMB, tex), let d = PixelCodec.encode(img) { try? d.write(to: png, options: .atomic) }
             if let d = try? JSONEncoder().encode(meta) { try? d.write(to: js, options: .atomic) }
         }.value
@@ -303,22 +341,13 @@ final class Model3DRepository: ObservableObject {
         return m
     }
 
-    /// Başka programın glTF/GLB dosyasını içe aktarır (kaydetmez); dokular saklanır.
+    /// Başka programın glTF/GLB dosyasını içe aktarır (kaydetmez; tuvale 3B şekil eklemede); dokular saklanır.
     func importGlb(_ data: [UInt8], _ name: String, _ maxTriangles: Int) async throws -> GltfImport {
         let tex = textures
         return try await Task.detached(priority: .userInitiated) {
             let r = try Gltf3.importModel(data, name, maxTriangles, { b, _ in PixelCodec.decode(b) })
             for t in r.textures { tex.saveImported(t.id, t.texture) }
             return r
-        }.value
-    }
-
-    /// Dokular gömülü GLB.
-    func exportGlb(_ model: Model3D) async -> [UInt8] {
-        let tex = textures
-        return await Task.detached(priority: .userInitiated) {
-            tex.preload(TextureRepository.ids(model))
-            return Gltf3.write(model, GltfWriteOptions(embedTextures: true, textures: { tex.cached($0) }))
         }.value
     }
 

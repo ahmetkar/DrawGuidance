@@ -105,7 +105,7 @@ private struct HomeTab: View {
                 onOpen(CanvasCreator.create(r, store: store))
             }
         }
-        .fullScreenCover(isPresented: $new3d) { NavigationStack { Model3DEditorView(repository: models3d, modelId: nil) } }
+        .fullScreenCover(isPresented: $new3d) { NavigationStack { Sketch3DView(repository: models3d, modelId: nil) } }
         #if DEBUG
         // CI açılış tanısı: `-dgOpenNew ART` ile açılışta yeni tuval doğrudan düzenleyicide açılır
         .task {

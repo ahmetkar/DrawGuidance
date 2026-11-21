@@ -13,8 +13,12 @@ final class DrawingController {
         self.store = store; self.host = host; self.brush = brush
     }
 
+    /// v56 aşama 9C bıçak: açıkken çizilen çizgi iz eklemez, kesme çizgisi olur.
+    var knife: (([StrokePoint]) -> Bool)?
+
     func onStrokeFinished(_ points: [StrokePoint], strokeId: String? = nil, penEraser: Bool = false) {
         if points.isEmpty { return }
+        if !penEraser, let knife, knife(points) { return }
         guard let current = store.canvas else { return }
         if let active = current.layers.first(where: { $0.id == store.activeLayer }), !active.visible || active.locked {
             host.emit(.layerLocked)

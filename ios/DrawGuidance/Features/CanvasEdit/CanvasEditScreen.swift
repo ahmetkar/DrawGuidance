@@ -58,6 +58,8 @@ struct CanvasEditScreen: View {
                         .sheet(isPresented: $vm.patternOpen) { V56PatternSheet(vm: vm) }
                     // v56 aşama 8 simetri çubuğu (Çiz modlarında)
                     V56SymmetryOverlay(vm: vm, store: vm.store)
+                    // v56 aşama 9C bıçak, şekil oluşturucu ve düğüm türü çubukları
+                    V56PathOverlay(vm: vm, shapes: vm.shapes)
                     if let b = vm.placingLocation {
                         LocationPlaceOverlay(background: b, panels: vm.comicPanelRects(), viewport: vm.viewport,
                                              onPlace: { vm.placeLocation($0) }, onCancel: { vm.placingLocation = nil })

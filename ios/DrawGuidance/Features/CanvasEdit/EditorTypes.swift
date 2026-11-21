@@ -187,7 +187,7 @@ struct PartStyle: Equatable {
 }
 
 /// Şekil düzenlemede sürüklemenin yaptığı iş.
-enum ShapeDrag { case NONE, NODES, CONNECT, EDGE, BEND, TURN, HANDLE }
+enum ShapeDrag { case NONE, NODES, CONNECT, EDGE, BEND, TURN, HANDLE, BEZIER }
 
 /// Yeni yazıların yazı tipi ayarları.
 struct TextSettings: Equatable {

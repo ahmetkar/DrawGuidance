@@ -311,7 +311,10 @@ final class ShapeController: ObservableObject {
         if same ?? (paths == g.paths) { setSelection(sel, stroke); return }
         guard let current = store.canvas else { return }
         if !VectorEdit.drawable(paths) { removeShape(current, stroke); return }
-        guard let edited = ShapeFactory.fromEditable(stroke, refreshRegions(stroke, paths)) else { return }
+        guard var edited = ShapeFactory.fromEditable(stroke, refreshRegions(stroke, paths)) else { return }
+        // v56: görünüm, bağlı kopya ve maske korunur; efektler düğüm düzenlemesinde kalıcı olur
+        if var st = stroke.style2 { st.effects = []; st.effectBase = nil; edited.style2 = st.isDefault ? nil : st } else { edited.style2 = nil }
+        edited.cloneOf = stroke.cloneOf; edited.`repeat` = stroke.`repeat`; edited.mask = stroke.mask
         store.commit(current.strokes.map { s in s.id == stroke.id ? reordered(edited, s.order) : s })
         store.select([stroke.id])
         setSelection(sel, edited)
@@ -714,6 +717,15 @@ final class ShapeController: ObservableObject {
         let sel = vector
         switch tool {
         case .NODES, .ADD_NODE:
+            // v56 aşama 9C: tek seçili düğümün tutamağından sürükleme eğriyi değiştirir
+            if bezierOn(), let id = singleNode(g, sel) {
+                let hs = VectorEdit.nodeHandles(g, id)
+                if let hit = hs.indices.min(by: { (hs[$0] - point).distance < (hs[$1] - point).distance }),
+                   (hs[hit] - point).distance <= tolerance * Self.NODE_HIT, (hs[hit] - g.nodes[id].point).distance > 1 {
+                    dragNodes = [id]; dragHandle = hit
+                    return .BEZIER
+                }
+            }
             guard let node = g.nodeAt(point, tolerance * Self.NODE_HIT) else { return .NONE }
             let selected = selectedNodeIds(g, sel)
             if selected.contains(node.id) { dragNodes = selected } else {
@@ -781,9 +793,124 @@ final class ShapeController: ObservableObject {
             let (paths, at, _) = anchor(graphOf(base), to, tolerance, exclude: start)
             guard let connected = VectorEdit.connect(VectorEdit.graph(paths), start, at, style: withLineStyle) else { return nil }
             return (connected, VectorSelection(nodes: [at], linkFrom: at))
+        case .BEZIER:
+            guard let id = dragNodes.first, let paths = bezierDrag(g, id, dragHandle, to) else { return nil }
+            return (paths, VectorSelection(nodes: [g.nodes[id].point]))
         case .NONE, .HANDLE:
             return nil
         }
+    }
+
+    // MARK: v56 aşama 9C düğüm türü, Bezier tutamakları, yolu uzat
+
+    private var dragHandle = -1
+    /// Tutamak sürüklenirken karşı tutamak aynalansın mı (yumuşak düğüm).
+    @Published private(set) var smoothNodes = true
+
+    func bezierOn() -> Bool { store.canvas.map { V56Flags.enabled(.ADV_NODES, $0.kind) } ?? false }
+
+    private func singleNode(_ g: VectorEdit.Graph, _ sel: VectorSelection) -> Int? {
+        let ids = selectedNodeIds(g, sel)
+        return ids.count == 1 ? ids.first : nil
+    }
+
+    /// Seçili tek düğümün tutamakları (yoksa boş): (düğüm, tutamak).
+    func selectedHandles() -> [(P, P)] {
+        guard bezierOn(), tool == .NODES, let stroke = selectedShape else { return [] }
+        let g = graphOf(stroke)
+        guard let id = singleNode(g, vector) else { return [] }
+        let p = g.nodes[id].point
+        return VectorEdit.nodeHandles(g, id).map { (p, $0) }
+    }
+
+    private func unit(_ v: P) -> P { let l = v.distance; return l < 1e-3 ? v : v / l }
+
+    /// Bir tutamağı [to] noktasına taşır; yumuşak düğümde karşı tutamak aynı doğruya gelir.
+    private func bezierDrag(_ g: VectorEdit.Graph, _ id: Int, _ handle: Int, _ to: P) -> [EditablePath]? {
+        let edges = VectorEdit.nodeEdges(g, id)
+        guard edges.indices.contains(handle) else { return nil }
+        let (e, atStart) = edges[handle]
+        let node = g.nodes[id].point
+        let far = VectorEdit.handleOf(e, atStart: !atStart)
+        var paths = atStart ? VectorEdit.bezierEdge(g, e, to, far) : VectorEdit.bezierEdge(g, e, far, to)
+        if smoothNodes && edges.count == 2 {
+            let (e2, start2) = edges[1 - handle]
+            let other = start2 ? e2.points[e2.points.count - 1] : e2.points[0]
+            let g2 = graphOf(paths)
+            guard let ne = g2.edgeBetween(node, other) else { return paths }
+            let atStart2 = (ne.start - node).distance < 0.5
+            let len2 = max((VectorEdit.handleOf(e2, atStart: start2) - node).distance, 1)
+            let d = node - to
+            let dl = d.distance
+            if dl > 1e-3 {
+                let h2 = node + d / dl * len2
+                let far2 = VectorEdit.handleOf(ne, atStart: !atStart2)
+                paths = atStart2 ? VectorEdit.bezierEdge(g2, ne, h2, far2) : VectorEdit.bezierEdge(g2, ne, far2, h2)
+            }
+        }
+        return paths
+    }
+
+    /// Seçili düğümü yumuşak (tutamaklar aynı doğruda) ya da köşe (çizgiler düğüme düz gelir) yapar.
+    func setNodeSmooth(_ smooth: Bool) {
+        smoothNodes = smooth
+        guard let stroke = selectedShape else { return }
+        let g = graphOf(stroke)
+        let ids = selectedNodeIds(g)
+        if ids.isEmpty { return }
+        var paths = g.paths
+        var graph = g
+        for id0 in ids {
+            let node = g.nodes[id0].point
+            guard let nid = graph.nodeNear(node)?.id else { continue }
+            let edges = VectorEdit.nodeEdges(graph, nid)
+            if edges.isEmpty { continue }
+            if smooth && edges.count == 2 {
+                let h1 = VectorEdit.handleOf(edges[0].0, atStart: edges[0].1), h2 = VectorEdit.handleOf(edges[1].0, atStart: edges[1].1)
+                let d1 = unit(h1 - node), d2 = unit(h2 - node)
+                let dd = d1 - d2
+                let dir = dd.distance < 1e-3 ? P(1, 0) : dd / dd.distance
+                let targets = [node + dir * (h1 - node).distance, node - dir * (h2 - node).distance]
+                for (k, (e0, start0)) in edges.enumerated() {
+                    let other = start0 ? e0.end : e0.start
+                    guard let e = graph.edgeBetween(node, other) else { continue }
+                    let st = (e.start - node).distance < 0.5
+                    let far = VectorEdit.handleOf(e, atStart: !st)
+                    paths = st ? VectorEdit.bezierEdge(graph, e, targets[k], far) : VectorEdit.bezierEdge(graph, e, far, targets[k])
+                    graph = graphOf(paths)
+                }
+            } else if !smooth {
+                for (e0, start0) in edges {
+                    let other = start0 ? e0.end : e0.start
+                    guard let e = graph.edgeBetween(node, other) else { continue }
+                    let st = (e.start - node).distance < 0.5
+                    let far = VectorEdit.handleOf(e, atStart: !st)
+                    let straight = node + (other - node) / 3
+                    paths = st ? VectorEdit.bezierEdge(graph, e, straight, far) : VectorEdit.bezierEdge(graph, e, far, straight)
+                    graph = graphOf(paths)
+                }
+            }
+        }
+        if paths != g.paths { commitPaths(stroke, g, paths, vector) }
+    }
+
+    /// Seçili uç düğümden yolu uzatır: Çizgi çiz aracı o düğümden başlar.
+    @discardableResult
+    func extendFromSelectedNode() -> Bool {
+        guard let stroke = selectedShape else { return false }
+        let g = graphOf(stroke)
+        guard let id = singleNode(g, vector), g.degree(id) == 1 else { return false }
+        let p = g.nodes[id].point
+        selectTool(.CONNECT)
+        setSelection(VectorSelection(nodes: [p], linkFrom: p), stroke)
+        return true
+    }
+
+    /// Seçili tek düğüm bir uç mu (yol uzatılabilir).
+    func selectedNodeIsEnd() -> Bool {
+        guard let stroke = selectedShape else { return false }
+        let g = graphOf(stroke)
+        return singleNode(g, vector).map { g.degree($0) == 1 } ?? false
     }
 
     private func rotated(_ e: VectorEdit.Edge, _ degrees: Float) -> (P, P) {

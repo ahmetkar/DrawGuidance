@@ -661,6 +661,31 @@ final class EditorCanvasView: UIView {
            let edited = ap?.editedStroke ?? c.strokes.first(where: { selected.contains($0.id) && $0.shape != nil }) {
             drawVectorEditing(g, VectorEdit.graph(edited, coarse: c.kind.simple), vm.shapes.tool, v, scale, dragging: ap?.editedStroke != nil)
         }
+        // v56 aşama 9C: seçili düğümün Bezier tutamakları ve şekil oluşturucu bölgeleri
+        if mode == .SHAPE_EDIT {
+            let px = CGFloat(1 / scale)
+            for (node, handle) in vm.selectedHandles() {
+                g.setStrokeColor(accent.cgColor); g.setLineWidth(1.2 * px)
+                g.move(to: node.cg); g.addLine(to: handle.cg); g.strokePath()
+                let r = 5 * px
+                let rect = CGRect(x: handle.cg.x - r, y: handle.cg.y - r, width: r * 2, height: r * 2)
+                g.setFillColor(UIColor.white.cgColor); g.fillEllipse(in: rect)
+                g.setLineWidth(1.5 * px); g.strokeEllipse(in: rect)
+            }
+        }
+        if let b = vm.shapeBuilder {
+            for (i, rings) in b.regions.enumerated() {
+                let path = CGMutablePath()
+                for ring in rings where ring.count >= 3 {
+                    path.move(to: ring[0].cg); for p in ring.dropFirst() { path.addLine(to: p.cg) }; path.closeSubpath()
+                }
+                let marked = b.remove.contains(i) || b.merge.contains(i)
+                let color: UIColor = b.remove.contains(i) ? .systemRed : b.merge.contains(i) ? accent : .gray
+                g.addPath(path); g.setFillColor(color.withAlphaComponent(marked ? 0.35 : 0.08).cgColor); g.fillPath(using: .evenOdd)
+                g.addPath(path); g.setStrokeColor(color.withAlphaComponent(0.9).cgColor); g.setLineWidth(CGFloat(1 / scale))
+                g.setLineDash(phase: 0, lengths: [CGFloat(4 / scale), CGFloat(3 / scale)]); g.strokePath(); g.setLineDash(phase: 0, lengths: [])
+            }
+        }
         if mode == .PEN { drawPenPath(g, scale) }
         if let parts = overlay.correction?.filter({ $0.count >= 2 }), !parts.isEmpty {
             let path = CGMutablePath()

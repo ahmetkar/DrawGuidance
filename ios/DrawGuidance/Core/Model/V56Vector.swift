@@ -49,11 +49,14 @@ struct VectorStyle: Codable, Equatable {
     var fills: [PaintLayer] = []
     var strokes: [PaintLayer] = []
     var opacityMask: [Stroke]? = nil
+    /// v56 aşama 9C değiştirilebilir efektler ve efektlerden önceki geometri.
+    var effects: [VectorEffect] = []
+    var effectBase: EffectBase? = nil
 
     init() {}
 
     var isDefault: Bool { self == VectorStyle() }
-    var hasShapeOptions: Bool { var c = self; c.blend = .NORMAL; c.opacityMask = nil; return c != VectorStyle() }
+    var hasShapeOptions: Bool { var c = self; c.blend = .NORMAL; c.opacityMask = nil; c.effects = []; c.effectBase = nil; return c != VectorStyle() }
 
     init(from decoder: Decoder) throws {
         let c = try decoder.container(keyedBy: AnyKey.self)
@@ -62,6 +65,7 @@ struct VectorStyle: Codable, Equatable {
         dash = c.o("dash"); arrowStart = c.v("arrowStart", d.arrowStart); arrowEnd = c.v("arrowEnd", d.arrowEnd)
         patternId = c.o("patternId"); patternScale = c.v("patternScale", d.patternScale); freeGradient = c.o("freeGradient")
         blend = c.v("blend", d.blend); fills = c.v("fills", []); strokes = c.v("strokes", []); opacityMask = c.o("opacityMask")
+        effects = c.v("effects", []); effectBase = c.o("effectBase")
     }
 
     func encode(to encoder: Encoder) throws {
@@ -71,6 +75,49 @@ struct VectorStyle: Codable, Equatable {
         try c.o(dash, "dash"); try c.e(arrowStart, "arrowStart", d.arrowStart); try c.e(arrowEnd, "arrowEnd", d.arrowEnd)
         try c.o(patternId, "patternId"); try c.e(patternScale, "patternScale", d.patternScale); try c.o(freeGradient, "freeGradient")
         try c.e(blend, "blend", d.blend); try c.e(fills, "fills", []); try c.e(strokes, "strokes", []); try c.o(opacityMask, "opacityMask")
+        try c.e(effects, "effects", []); try c.o(effectBase, "effectBase")
+    }
+}
+
+/// v56 aşama 9C efekt türleri ve efekt (Android `VectorEffect`).
+enum EffectKind: String, KotlinEnum { case OFFSET, BEND, ROUGHEN, ZIGZAG, WAVE; static var fallback: EffectKind { .OFFSET } }
+
+struct VectorEffect: Codable, Equatable {
+    var kind: EffectKind
+    var amount: Float = 0
+    var size: Float = 8
+    var detail: Float = 6
+    var seed = 1
+
+    init(_ kind: EffectKind, amount: Float = 0, size: Float = 8, detail: Float = 6, seed: Int = 1) {
+        self.kind = kind; self.amount = amount; self.size = size; self.detail = detail; self.seed = seed
+    }
+
+    init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: AnyKey.self)
+        kind = try c.req("kind"); amount = c.v("amount", 0); size = c.v("size", 8); detail = c.v("detail", 6); seed = c.v("seed", 1)
+    }
+
+    func encode(to encoder: Encoder) throws {
+        var c = encoder.container(keyedBy: AnyKey.self)
+        try c.r(kind, "kind"); try c.e(amount, "amount", 0); try c.e(size, "size", 8); try c.e(detail, "detail", 6); try c.e(seed, "seed", 1)
+    }
+}
+
+struct EffectBase: Codable, Equatable {
+    var points: [StrokePoint]
+    var counts: [Int]? = nil
+
+    init(points: [StrokePoint], counts: [Int]? = nil) { self.points = points; self.counts = counts }
+
+    init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: AnyKey.self)
+        points = try c.req("points"); counts = c.o("counts")
+    }
+
+    func encode(to encoder: Encoder) throws {
+        var c = encoder.container(keyedBy: AnyKey.self)
+        try c.r(points, "points"); try c.o(counts, "counts")
     }
 }
 
@@ -231,8 +278,9 @@ enum V56Vector {
     }
 
     static func mapStyle(_ style: VectorStyle?, _ f: (StrokePoint) -> StrokePoint) -> VectorStyle? {
-        guard var st = style, let masks = st.opacityMask else { return style }
-        st.opacityMask = masks.map { var m = $0; m.points = m.points.map(f); m.clip = m.clip?.map(f); return m }
+        guard var st = style, st.opacityMask != nil || st.effectBase != nil else { return style }
+        st.opacityMask = st.opacityMask?.map { var m = $0; m.points = m.points.map(f); m.clip = m.clip?.map(f); return m }
+        if var b = st.effectBase { b.points = b.points.map(f); st.effectBase = b }
         return st
     }
 

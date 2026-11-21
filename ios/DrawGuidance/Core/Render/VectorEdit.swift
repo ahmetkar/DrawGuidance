@@ -350,6 +350,39 @@ enum VectorEdit {
 
     static func straighten(_ g: Graph, _ edge: Edge) -> [EditablePath] { replaceInner(g, edge, []) }
 
+    // MARK: v56 aşama 9C Bezier tutamakları ve düğüm türü
+
+    /// Düğüme bağlı çizgiler ve düğüm çizginin başında mı.
+    static func nodeEdges(_ g: Graph, _ node: Int) -> [(Edge, Bool)] {
+        g.edges.filter { $0.a == node || $0.b == node }.map { ($0, $0.a == node) }
+    }
+
+    /// Çizginin bir ucundaki tutamak: ilk ara noktaya doğru, çizgi uzunluğunun üçte biri.
+    static func handleOf(_ e: Edge, atStart: Bool) -> P {
+        let pts: [P] = atStart ? e.points : e.points.reversed()
+        let n = pts[0]
+        let toward = pts.count > 2 ? pts[1] : pts[pts.count - 1]
+        let d = toward - n
+        let len = d.distance
+        let l3 = e.length() / 3
+        return len < 1e-4 ? n : n + d / len * l3
+    }
+
+    /// Düğümün tutamakları (her bağlı çizgi için).
+    static func nodeHandles(_ g: Graph, _ node: Int) -> [P] { nodeEdges(g, node).map { handleOf($0.0, atStart: $0.1) } }
+
+    /// Çizgiyi iki uç tutamağıyla kübik Bezier eğrisi yapar.
+    static func bezierEdge(_ g: Graph, _ e: Edge, _ hStart: P, _ hEnd: P) -> [EditablePath] {
+        let a = e.start, b = e.end
+        let approx = (hStart - a).distance + (hEnd - hStart).distance + (b - hEnd).distance
+        let steps = min(max(Int(approx / 4), 8), 96)
+        let inner = (1..<steps).map { i -> P in
+            let t = Float(i) / Float(steps), u = 1 - t
+            return a * (u * u * u) + hStart * (3 * u * u * t) + hEnd * (3 * u * t * t) + b * (t * t * t)
+        }
+        return replaceInner(g, e, inner)
+    }
+
     static func rotateEdge(_ g: Graph, _ edge: Edge, _ degrees: Float) -> [EditablePath] {
         if edge.a == edge.b || abs(degrees) < 1e-4 { return g.paths }
         let pivot = (edge.start + edge.end) / 2

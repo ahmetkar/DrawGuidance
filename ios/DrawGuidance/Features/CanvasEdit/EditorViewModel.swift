@@ -545,6 +545,9 @@ final class EditorViewModel: ObservableObject, EditorHost {
         if mode != .EDIT_PICK { pendingSceneTool = nil }
         if mode != from { scene.endAll() }
         if mode != .PAINT { paintBrush = false; kidsBrush.cancel() }
+        // v56 aşama 9C bıçak yalnız Çiz'de, şekil oluşturucu yalnız Seç'te
+        if mode != .DRAW && knife { stopKnife() }
+        if mode != .SELECT && shapeBuilder != nil { cancelShapeBuilder() }
         self.mode = mode
         if mode != .DRAW && mode != .TEXT && panel != .BRUSH { panel = nil }
     }
@@ -779,6 +782,144 @@ final class EditorViewModel: ObservableObject, EditorHost {
 
     @discardableResult
     func repeatTransform(duplicate: Bool) -> Bool { transform.applyLast(duplicate: duplicate) }
+
+    // MARK: v56 aşama 9C yol işlemleri, bıçak, efektler, şekil oluşturucu
+
+    @discardableResult
+    private func pathCommit(_ out: [Stroke]?, selectNew: Bool = true) -> Bool {
+        guard let c = store.canvas, let out, out != c.strokes else { return false }
+        let before = Set(c.strokes.map(\.id))
+        store.commit(out, useArea: false)
+        if selectNew {
+            let fresh = Set(out.filter { !before.contains($0.id) }.map(\.id))
+            store.select(fresh.isEmpty ? store.selection.filter { id in out.contains { $0.id == id } } : fresh)
+        }
+        return true
+    }
+
+    /// Seçimde yol işlemine girebilen eleman sayısı.
+    func pathOperableCount() -> Int { store.canvas?.strokes.filter { store.selection.contains($0.id) && V56PathOps.operable($0) }.count ?? 0 }
+
+    @discardableResult
+    func pathOp(_ op: V56PathOps.PathOp) -> Bool {
+        guard let c = store.canvas else { return false }
+        return pathCommit(V56PathOps.apply(c.strokes, store.selection, op, newId: newId))
+    }
+
+    @discardableResult func outlineStroke() -> Bool { store.canvas.map { pathCommit(V56PathOps.outlineStroke($0.strokes, store.selection, newId: newId)) } ?? false }
+    @discardableResult func separatePaths() -> Bool { store.canvas.map { pathCommit(V56PathOps.separate($0.strokes, store.selection, newId: newId)) } ?? false }
+    @discardableResult func closeSelectedPaths() -> Bool { store.canvas.map { pathCommit(V56PathOps.closePaths($0.strokes, store.selection), selectNew: false) } ?? false }
+    @discardableResult func reverseSelectedPaths() -> Bool { store.canvas.map { pathCommit(V56PathOps.reversePaths($0.strokes, store.selection), selectNew: false) } ?? false }
+    @discardableResult func envelopeDistort() -> Bool { store.canvas.map { pathCommit(V56PathOps.envelope($0.strokes, store.selection), selectNew: false) } ?? false }
+
+    /// Seçimin efektleri (ilk efekt uygulanabilir elemanın).
+    func selectedEffects() -> [VectorEffect] {
+        store.canvas?.strokes.first { store.selection.contains($0.id) && V56PathOps.effectable($0) }?.style2?.effects ?? []
+    }
+
+    func canApplyEffects() -> Bool { store.canvas?.strokes.contains { store.selection.contains($0.id) && V56PathOps.effectable($0) } == true }
+
+    private func effected(_ strokes: [Stroke], _ effects: [VectorEffect]) -> [Stroke] {
+        strokes.map { s in store.selection.contains(s.id) && V56PathOps.effectable(s) ? V56PathOps.withEffects(s, effects) : s }
+    }
+
+    /// Efekt önizlemesi (geçmişe girmez).
+    func previewEffects(_ effects: [VectorEffect]) {
+        guard let base = (store.inPreview ? store.endPreview() : store.canvas) else { return }
+        store.previewStrokes(effected(base.strokes, effects))
+    }
+
+    func cancelEffectsPreview() { store.endPreview() }
+
+    /// Efektleri uygular (tek geri alma adımı; liste boşsa efektler kaldırılır).
+    func applyEffects(_ effects: [VectorEffect]) {
+        store.endPreview()
+        guard let c = store.canvas else { return }
+        let out = effected(c.strokes, effects)
+        if out != c.strokes { store.commit(out, useArea: false) }
+    }
+
+    /// Bıçak açık mı (çizilen çizgi kesme çizgisi olur).
+    @Published private(set) var knife = false
+    private var knifeIds: Set<String> = []
+
+    /// Bıçağı açar: Çiz modunda çizilen her çizgi seçili (yoksa kilitsiz katmanlardaki tüm) şekilleri keser.
+    func startKnife() {
+        knifeIds = store.selection
+        knife = true
+        setMode(.DRAW)
+        drawing.knife = { [weak self] pts in self?.applyKnife(pts); return true }
+    }
+
+    func stopKnife() { knife = false; drawing.knife = nil; knifeIds = [] }
+
+    @discardableResult
+    func applyKnife(_ points: [StrokePoint]) -> Bool {
+        guard let c = store.canvas else { return false }
+        let locked = Set(c.layers.filter { $0.locked || !$0.visible }.map(\.id))
+        let ids = knifeIds.filter { id in c.strokes.contains { $0.id == id } }
+        guard let out = V56PathOps.knife(c.strokes, ids, points, newId: newId, locked: locked) else { return false }
+        let before = Set(c.strokes.map(\.id))
+        store.commit(out, useArea: false)
+        // Kesilen parçalar sonraki kesimlere de açık kalır
+        if !knifeIds.isEmpty { knifeIds = knifeIds.filter { id in out.contains { $0.id == id } }.union(out.filter { !before.contains($0.id) }.map(\.id)) }
+        return true
+    }
+
+    /// Şekil oluşturucu durumu: bölgeler (tuval koordinatı), birleşecekler (sırayla), silinecekler.
+    struct ShapeBuilderUi: Equatable { var regions: [[[P]]]; var merge: [Int] = []; var remove: Set<Int> = [] }
+
+    @Published private(set) var shapeBuilder: ShapeBuilderUi?
+    private var builderIds: Set<String> = []
+    private var builderRegions: [V56PathOps.Region] = []
+
+    /// Şekil oluşturucuyu açar (seçimde en az iki yol işlemine girebilen eleman).
+    @discardableResult
+    func startShapeBuilder() -> Bool {
+        guard let c = store.canvas else { return false }
+        let sel = c.strokes.filter { store.selection.contains($0.id) && V56PathOps.operable($0) }
+        if sel.count < 2 { return false }
+        builderIds = Set(sel.map(\.id))
+        builderRegions = V56PathOps.builderRegions(sel)
+        shapeBuilder = ShapeBuilderUi(regions: builderRegions.map { r in r.rings.map { ring in ring.map { P(Float($0.x), Float($0.y)) } } })
+        setMode(.SELECT)
+        return true
+    }
+
+    /// Dokunuş: bölge birleşecekler listesine girer/çıkar; [remove] true: bölge silinecek olarak işaretlenir.
+    @discardableResult
+    func shapeBuilderTap(_ x: Float, _ y: Float, remove: Bool = false) -> Bool {
+        guard var b = shapeBuilder else { return false }
+        let i = V56PathOps.regionAt(builderRegions, x, y)
+        if i < 0 { return true }
+        if remove {
+            if b.remove.contains(i) { b.remove.remove(i) } else { b.remove.insert(i) }
+            b.merge.removeAll { $0 == i }
+        } else {
+            if b.merge.contains(i) { b.merge.removeAll { $0 == i } } else { b.merge.append(i) }
+            b.remove.remove(i)
+        }
+        shapeBuilder = b
+        return true
+    }
+
+    @discardableResult
+    func applyShapeBuilder() -> Bool {
+        guard let b = shapeBuilder else { return false }
+        shapeBuilder = nil
+        guard let c = store.canvas else { return false }
+        return pathCommit(V56PathOps.build(c.strokes, builderIds, merge: b.merge, remove: b.remove, newId: newId))
+    }
+
+    func cancelShapeBuilder() { shapeBuilder = nil }
+
+    /// Düğüm türü ve Bezier tutamakları (şekil düzenleme, Noktalar aracı).
+    func selectedHandles() -> [(P, P)] { shapes.selectedHandles() }
+    func setNodeSmooth(_ smooth: Bool) { shapes.setNodeSmooth(smooth) }
+    var smoothNodes: Bool { shapes.smoothNodes }
+    @discardableResult func extendFromSelectedNode() -> Bool { shapes.extendFromSelectedNode() }
+    func selectedNodeIsEnd() -> Bool { shapes.selectedNodeIsEnd() }
+    func bezierOn() -> Bool { shapes.bezierOn() }
 
     // MARK: v56 aşama 7: katman çoğalt/birleştir, renk ayarları, hazır ayarlar
 
@@ -1069,12 +1210,16 @@ final class EditorViewModel: ObservableObject, EditorHost {
     func v56(_ feature: V56Flags.Feature) -> Bool { V56Flags.enabled(feature, store.canvas?.kind ?? .ART) }
 
     func selectAt(_ x: Float, _ y: Float, tolerance: Float) -> Bool {
+        // v56 aşama 9C şekil oluşturucu açıkken dokunuş bölge seçer
+        if shapeBuilder != nil { return shapeBuilderTap(x, y) }
         // v56 2E grup içindeyken dokunuş yalnız o elemanı seçer (gruptan dışarı dokununca çıkılır)
         if v56(.ADV_SELECTION), let r = selection.selectInGroupAt(x, y, tolerance: tolerance) { return r }
         return selection.selectAt(x, y, tolerance: tolerance)
     }
 
     func deselectAt(_ x: Float, _ y: Float, tolerance: Float) -> Bool {
+        // v56 aşama 9C şekil oluşturucu: çift dokunuş bölgeyi silinecek yapar
+        if shapeBuilder != nil { return shapeBuilderTap(x, y, remove: true) }
         // v56 2E gruplu elemana çift dokunuş grubun içine girer
         if v56(.ADV_SELECTION) && selection.enterGroupAt(x, y, tolerance: tolerance) { return true }
         return selection.deselectAt(x, y, tolerance: tolerance)

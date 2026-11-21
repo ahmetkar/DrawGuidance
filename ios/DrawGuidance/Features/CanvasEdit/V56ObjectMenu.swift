@@ -56,8 +56,13 @@ struct V56ObjectMenu: View {
                             if vm.v56(.REFLECTION_LIQUIFY) {
                                 chip(L("v56_reflection"), id: "v56_fx_reflection") { vm.reflectSelection(); dismiss() }
                             }
+                            // v56 aşama 9C: değiştirilebilir efektler ve zarf bozma
+                            V56EffectChips(vm: vm) { dismiss() }
                         }
                     }
+                    // v56 aşama 9C: yol işlemleri ve yol düzenle
+                    V56PathfinderSection(vm: vm) { dismiss() }
+                    V56PathEditSection(vm: vm) { dismiss() }
                     if vm.v56(.ADV_TRANSFORM) || vm.v56(.ADV_REPEAT) {
                         Text(L("v56_repeat_title")).font(.subheadline.weight(.semibold))
                         if vm.v56(.ADV_TRANSFORM) {

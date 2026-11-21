@@ -5,6 +5,15 @@ import Foundation
 enum StrokeRenderer {
     /// Tek çizim: kırpma dörtgeni varsa içinde.
     static func drawStroke(_ c: CGContext, _ stroke: Stroke) {
+        // v56 2E nesne karışım modu ve opaklık maskesi: eleman saydamlık katmanında
+        if let st = stroke.style2, st.blend != .NORMAL || !(st.opacityMask ?? []).isEmpty {
+            V56VectorPaint.withStyled(c, stroke, st) { drawStrokeBody(c, stroke) }
+            return
+        }
+        drawStrokeBody(c, stroke)
+    }
+
+    private static func drawStrokeBody(_ c: CGContext, _ stroke: Stroke) {
         // v56 aşama 6 yansıma: vektör noktaları dalgayla kayar (resimde ağ kayar), gradyan katmanla uygulanır
         if WarpRenderer.hasWave(stroke), let w = stroke.warp?.wave {
             let s = stroke.brushType == .IMAGE ? stroke : WarpRenderer.displaced(stroke)

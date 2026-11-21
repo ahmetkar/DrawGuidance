@@ -907,6 +907,107 @@ final class EditorViewModel: ObservableObject, EditorHost {
         return V56Symmetry.patternCount(b, c.width, c.height, gap)
     }
 
+    // MARK: v56 aşama 8A (2E görünüm, bağlı kopya, opaklık maskesi, Tekrarla)
+
+    private func newId() -> String { UUID().uuidString.lowercased() }
+
+    func selectedVectorStyle() -> VectorStyle {
+        store.canvas?.strokes.first { store.selection.contains($0.id) }?.style2 ?? VectorStyle()
+    }
+
+    /// Seçili elemanlara 2E görünüm değişikliği ([coalesce]: kaydırırken tek geri alma adımı).
+    func updateVectorStyle(coalesce: String? = nil, _ change: (VectorStyle) -> VectorStyle) {
+        guard let c = store.canvas, !store.selection.isEmpty else { return }
+        var changed = false
+        let out = c.strokes.map { s -> Stroke in
+            guard store.selection.contains(s.id) else { return s }
+            let n = change(s.style2 ?? VectorStyle())
+            let next: VectorStyle? = n.isDefault ? nil : n
+            if next == s.style2 { return s }
+            changed = true
+            var o = s; o.style2 = next; return o
+        }
+        if changed { store.commit(out, coalesce: coalesce.map { "v2-\($0)" }, useArea: false) }
+    }
+
+    @discardableResult
+    func cloneSelection() -> Int {
+        guard let c = store.canvas else { return 0 }
+        let out = V56Vector.clone(c.strokes, store.selection, 24, 24, newId: newId)
+        let added = out.dropFirst(c.strokes.count)
+        if added.isEmpty { return 0 }
+        store.commit(out, useArea: false)
+        store.select(Set(added.map(\.id)))
+        return added.count
+    }
+
+    func selectionHasClone() -> Bool { store.canvas?.strokes.contains { store.selection.contains($0.id) && $0.cloneOf != nil } == true }
+
+    func unlinkClones() {
+        guard let c = store.canvas else { return }
+        let out = V56Vector.unlink(c.strokes, store.selection)
+        if out != c.strokes { store.commit(out, useArea: false) }
+    }
+
+    func selectedRepeat() -> RepeatSpec? { store.canvas.flatMap { V56Vector.repeatOf($0.strokes, store.selection) } }
+
+    private func repeatSources(_ strokes: [Stroke]) -> Set<String> {
+        var byId: [String: Stroke] = [:]; for s in strokes { byId[s.id] = s }
+        return Set(store.selection.compactMap { id in byId[id].map { s in (s.cloneOf?.repeat == true ? s.cloneOf?.source : nil) ?? s.id } })
+    }
+
+    func previewRepeat(_ spec: RepeatSpec) {
+        guard let base = (store.inPreview ? store.endPreview() : store.canvas) else { return }
+        let (out, _) = V56Vector.repeat(base.strokes, repeatSources(base.strokes), spec, newId: newId)
+        store.previewStrokes(out)
+    }
+
+    func cancelRepeatPreview() { _ = store.endPreview() }
+
+    @discardableResult
+    func applyRepeat(_ spec: RepeatSpec) -> Int {
+        _ = store.endPreview()
+        guard let c = store.canvas else { return 0 }
+        let sources = repeatSources(c.strokes)
+        let (out, n) = V56Vector.repeat(c.strokes, sources, spec, newId: newId)
+        if n == 0 { return 0 }
+        store.commit(out, useArea: false)
+        store.select(sources)
+        return n
+    }
+
+    func removeRepeat() {
+        _ = store.endPreview()
+        guard let c = store.canvas else { return }
+        let out = V56Vector.removeRepeat(c.strokes, store.selection)
+        if out != c.strokes {
+            store.commit(out, useArea: false)
+            let ids = Set(out.map(\.id))
+            store.select(store.selection.filter { ids.contains($0) })
+        }
+    }
+
+    @discardableResult
+    func makeOpacityMask() -> Bool {
+        guard let c = store.canvas else { return false }
+        let out = V56Vector.makeOpacityMask(c.strokes, store.selection)
+        if out == c.strokes { return false }
+        store.commit(out, useArea: false)
+        let ids = Set(out.map(\.id))
+        store.select(store.selection.filter { ids.contains($0) })
+        return true
+    }
+
+    func selectionHasOpacityMask() -> Bool {
+        store.canvas?.strokes.contains { store.selection.contains($0.id) && !($0.style2?.opacityMask ?? []).isEmpty } == true
+    }
+
+    func releaseOpacityMask() {
+        guard let c = store.canvas else { return }
+        let out = V56Vector.releaseOpacityMask(c.strokes, store.selection)
+        if out != c.strokes { store.commit(out, useArea: false) }
+    }
+
     private func usePresetBrush(_ p: V56Presets.LayerPreset) {
         brush.select(p.brush)
         updateBrushColor(p.colorHex)

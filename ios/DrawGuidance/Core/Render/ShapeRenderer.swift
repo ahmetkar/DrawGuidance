@@ -203,6 +203,7 @@ enum ShapeRenderer {
         let alpha: Float = coverage ? 1 : min(max(stroke.opacity, 0), 1)
         let style = spec.style
         let baseWidth = max(0.2, style.strokeWidth)
+        let v = stroke.style2.flatMap { $0.hasShapeOptions ? $0 : nil }
         for item in cached.items {
             let ink = (item.stroke != nil && item.stroke != INK) ? item.stroke! : style.strokeColorHex
             if item.fill {
@@ -216,6 +217,9 @@ enum ShapeRenderer {
                         ctx.setAlpha(CGFloat(alpha255(opacity * alpha * item.alpha)) / 255)
                         Gradients.fill(ctx, g, l: cached.left, t: cached.top, r: cached.right, b: cached.bottom)
                         ctx.restoreGState()
+                    } else if !coverage, item.ownFill == nil, let fg = v?.freeGradient, fg.count >= 2 {
+                        // v56 2E serbest gradyan (kontrol noktaları; şeklin kutusuna göre)
+                        V56VectorPaint.fillFreeGradient(ctx, item.path, fg, l: cached.left, t: cached.top, r: cached.right, b: cached.bottom, alpha: opacity * alpha * item.alpha)
                     } else {
                         let c = coverage ? ArgbColor.black : ArgbColor.hex(hex!)
                         ctx.setFillColor(ArgbColor.cgColor(c, alpha: alpha255(coverage ? 1 : opacity * alpha * item.alpha)))
@@ -223,6 +227,7 @@ enum ShapeRenderer {
                         ctx.fillPath()
                     }
                 }
+                if !coverage, item.ownFill == nil, let v { V56VectorPaint.drawFillExtras(ctx, item.path, v, colorHex: hex ?? ink, alpha: alpha * item.alpha) }
                 // v53 çizgi roman ekran tonu / deseni: dolgunun üstünde, parçanın kapalı alanına kırpılarak
                 if !coverage, item.ownFill == nil, let tone = style.tone {
                     ToneRenderer.draw(ctx, clip: item.path, tone, l: cached.left, t: cached.top, r: cached.right, b: cached.bottom, alpha: alpha * item.alpha)
@@ -243,10 +248,27 @@ enum ShapeRenderer {
             } else {
                 ctx.setLineDash(phase: 0, lengths: [])
             }
-            ctx.addPath(item.path)
-            ctx.strokePath()
+            guard let v else { ctx.addPath(item.path); ctx.strokePath(); continue }
+            // v56 2E kontur: uç/köşe biçimi, tire dizisi, hiza (kapalı yolda iç/dış) ve alttaki ek konturlar
+            V56VectorPaint.styleStroke(ctx, v)
+            V56VectorPaint.withAlign(ctx, item.path, closed: item.fill, v.align) { k in
+                if !coverage {
+                    for extra in v.strokes {
+                        ctx.saveGState()
+                        ctx.setLineWidth(CGFloat(max(0.2, extra.width)) * k)
+                        ctx.setStrokeColor(ArgbColor.cgColor(ArgbColor.hex(extra.colorHex), alpha: alpha255(min(max(extra.opacity, 0), 1) * alpha * item.alpha)))
+                        ctx.addPath(item.path); ctx.strokePath()
+                        ctx.restoreGState()
+                    }
+                }
+                ctx.setLineWidth(CGFloat(max(0.2, width)) * k)
+                ctx.addPath(item.path); ctx.strokePath()
+            }
         }
         ctx.setLineDash(phase: 0, lengths: [])
+        if let v, v.arrowStart != .NONE || v.arrowEnd != .NONE {
+            V56VectorPaint.drawArrows(ctx, stroke, spec, v, width: baseWidth, color: coverage ? ArgbColor.black : ArgbColor.hex(style.strokeColorHex), alpha: alpha)
+        }
         drawLabels(ctx, stroke, spec, alpha: alpha, coverage: coverage)
     }
 

@@ -426,6 +426,7 @@ enum TransformOps {
             if nonAffine && st.brushType.isQuad { skipped.insert(st.id); return st }
             o.points = st.points.map { mp($0) }
             o.clip = st.clip?.map { mp($0) }
+            o.style2 = V56Vector.mapStyle(st.style2) { mp($0) }
             if !st.brushType.isQuad { o.sizePx = (st.sizePx * wf).coerceIn(0.5, 2000) }
             if var spec = st.shape {
                 spec.style.strokeWidth = (spec.style.strokeWidth * wf).coerceIn(0.2, 400)
@@ -543,7 +544,7 @@ enum Reflection {
         let copies = sel.enumerated().map { (i, s) -> Stroke in
             var c = s
             c.id = newId(s); c.order = strokes.count + i; c.groupId = s.groupId.map { "\($0)-r" }
-            c.points = s.points.map(m); c.clip = s.clip?.map(m)
+            c.points = s.points.map(m); c.clip = s.clip?.map(m); c.style2 = V56Vector.mapStyle(s.style2, m)
             if var mk = s.mask { mk.points = mk.points.map(m); c.mask = mk }
             var w = s.warp ?? ImageWarp()
             w.wave = spec; w.mesh = s.warp?.mesh?.map(m); w.quad = s.warp?.quad?.map(m)

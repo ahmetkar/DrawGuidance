@@ -298,6 +298,8 @@ final class SelectionController {
             c.order = current.strokes.count + i
             c.points = s.points.map(moved)
             c.clip = s.clip?.map(moved)
+            c.style2 = V56Vector.mapStyle(s.style2, moved)
+            c.repeat = nil
             return c
         }
         store.commit(current.strokes + copies)

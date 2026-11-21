@@ -58,12 +58,16 @@ struct V56ObjectMenu: View {
                             }
                         }
                     }
-                    if vm.v56(.ADV_TRANSFORM) {
+                    if vm.v56(.ADV_TRANSFORM) || vm.v56(.ADV_REPEAT) {
                         Text(L("v56_repeat_title")).font(.subheadline.weight(.semibold))
-                        row {
-                            chip(L("v56_tf_repeat"), id: "v56_obj_repeat") { vm.repeatTransform(duplicate: false) }
-                            chip(L("v56_tf_duplicate"), id: "v56_obj_duplicate") { vm.repeatTransform(duplicate: true) }
+                        if vm.v56(.ADV_TRANSFORM) {
+                            row {
+                                chip(L("v56_tf_repeat"), id: "v56_obj_repeat") { vm.repeatTransform(duplicate: false) }
+                                chip(L("v56_tf_duplicate"), id: "v56_obj_duplicate") { vm.repeatTransform(duplicate: true) }
+                            }
                         }
+                        // v56 aşama 8A canlı tekrar
+                        if vm.v56(.ADV_REPEAT) { V56RepeatSection(vm: vm) }
                     }
                 }
                 .padding()

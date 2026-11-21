@@ -67,6 +67,7 @@ enum ElementClip {
             c.layerId = nil
             c.points = s.points.map(moved)
             c.clip = s.clip?.map(moved)
+            c.style2 = V56Vector.mapStyle(s.style2, moved)
             if var m = s.mask {
                 m.points = m.points.map(moved)
                 if let src = m.source { m.source = ids[src] ?? src }

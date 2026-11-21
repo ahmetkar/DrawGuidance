@@ -79,7 +79,7 @@ enum V56Arrange {
         if dx == 0 && dy == 0 { return s }
         func m(_ p: StrokePoint) -> StrokePoint { p.at(p.x + dx, p.y + dy) }
         var o = s
-        o.points = s.points.map(m); o.clip = s.clip?.map(m)
+        o.points = s.points.map(m); o.clip = s.clip?.map(m); o.style2 = V56Vector.mapStyle(s.style2, m)
         if var mk = s.mask { mk.points = mk.points.map(m); o.mask = mk }
         if var w = s.warp {
             w.mesh = w.mesh?.map(m); w.quad = w.quad?.map(m)

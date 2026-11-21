@@ -25,6 +25,8 @@ enum ContentCodec {
     private static let VERSION_V11: UInt8 = 11
     private static let EXT3_MASK = 1
     private static let EXT3_WARP = 2
+    /// v56 2E: görünüm, bağlı kopya ve tekrar (JSON, `StrokeExtras2`).
+    private static let EXT3_V2 = 4
     private static let LAYER_ALPHA_LOCK = 1
     private static let LAYER_CLIP_BELOW = 2
     /// En yeni içerik sürümü (paylaşımda karşı tarafa bildirilir).
@@ -233,7 +235,7 @@ enum ContentCodec {
     /// v56 seçim maskesi, resim dönüşümü, gren, resimden fırça ya da kement dolgu.
     static func needsV11(_ s: Stroke) -> Bool {
         s.brushType == .LASSO_FILL || s.mask != nil || (s.warp.map { !$0.isEmpty } ?? false) ||
-            s.params?.grain != nil || s.params?.stampAssetId != nil
+            s.params?.grain != nil || s.params?.stampAssetId != nil || s.style2 != nil || s.cloneOf != nil || s.repeat != nil
     }
 
     private static func needsV9(_ s: Stroke) -> Bool { s.brushType == .TEXT && s.text?.path != nil }
@@ -289,9 +291,11 @@ enum ContentCodec {
         if v11 {
             let mask = s.mask
             let warp = s.warp.flatMap { $0.isEmpty ? nil : $0 }
-            w.byte((mask != nil ? EXT3_MASK : 0) | (warp != nil ? EXT3_WARP : 0))
+            let ext2 = StrokeExtras2.of(s)
+            w.byte((mask != nil ? EXT3_MASK : 0) | (warp != nil ? EXT3_WARP : 0) | (ext2 != nil ? EXT3_V2 : 0))
             if let mask { w.string(json(mask)) }
             if let warp { w.string(json(warp)) }
+            if let ext2 { w.string(json(ext2)) }
         }
     }
 
@@ -451,6 +455,7 @@ enum ContentCodec {
             let ext3 = try r.byte()
             if ext3 & EXT3_MASK != 0, let m = fromJson(ClipMask.self, try r.string()) { out.mask = m }
             if ext3 & EXT3_WARP != 0, let wp = fromJson(ImageWarp.self, try r.string()) { out.warp = wp }
+            if ext3 & EXT3_V2 != 0, let x = fromJson(StrokeExtras2.self, try r.string()) { out.style2 = x.style2; out.cloneOf = x.cloneOf; out.repeat = x.repeat }
         }
         if let paragraph, out.text != nil { out.text!.paragraph = paragraph }
         if let layer { out.layerId = layer }

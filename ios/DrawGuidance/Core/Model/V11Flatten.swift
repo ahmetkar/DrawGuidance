@@ -21,6 +21,8 @@ enum V11Flatten {
         var s = s0
         if layerAlpha < 1 { s.opacity = s.opacity * layerAlpha }
         s.mask = nil
+        // 2E görünüm, bağlı kopya ve tekrar kalkar (kopyalar sıradan eleman olarak kalır)
+        s.style2 = nil; s.cloneOf = nil; s.repeat = nil
         if let w = s.warp {
             var corners: [StrokePoint]? = nil
             if let q = w.quad, q.count == 4 { corners = q }

@@ -395,8 +395,22 @@ struct AdvancedMenus: View {
         if vm.v56(.SYMMETRY) {
             ChromeButton(icon: "square.grid.3x3.fill", label: L("v56_pattern"), enabled: hasSelection, id: "v56_pattern_open") { vm.patternOpen = true }
         }
-        if vm.v56(.ADV_ALIGN) || vm.v56(.ADV_EFFECTS) {
+        if vm.v56(.ADV_ALIGN) || vm.v56(.ADV_EFFECTS) || vm.v56(.ADV_REPEAT) {
             ChromeButton(icon: "square.on.circle", label: L("v56_object_menu"), enabled: hasSelection, id: "v56_object_menu_open") { vm.objectMenuOpen = true }
+        }
+        // v56 aşama 8A bağlı kopya ve opaklık maskesi
+        if vm.v56(.ADV_REPEAT) {
+            ChromeButton(icon: "square.on.square.dashed", label: L("v56_clone"), enabled: hasSelection, id: "v56_clone") { _ = vm.cloneSelection() }
+            if hasSelection && vm.selectionHasClone() {
+                ChromeButton(icon: "link.badge.plus", label: L("v56_unlink"), id: "v56_unlink") { vm.unlinkClones() }
+            }
+        }
+        if vm.v56(.ADV_APPEARANCE) {
+            if hasSelection && vm.selectionHasOpacityMask() {
+                ChromeButton(icon: "circle.lefthalf.filled", label: L("v56_release_mask"), id: "v56_release_mask") { vm.releaseOpacityMask() }
+            } else {
+                ChromeButton(icon: "circle.lefthalf.filled", label: L("v56_opacity_mask"), enabled: vm.store.selection.count >= 2, id: "v56_opacity_mask") { _ = vm.makeOpacityMask() }
+            }
         }
         if vm.canUseClipboard() {
             // v56 2C-3 kes, kopyala, yapıştır (yapıştır pano doluyken her sayfada)

@@ -175,7 +175,9 @@ final class EditorStore: ObservableObject {
         let known = Set(current.strokes.map(\.id))
         // v56 seçim alanı varken yeni fırça izleri alanla kırpılır (yapıştırılanlar hariç)
         let masked = useArea ? V56Selection.applyArea(known, updated, area) : updated
-        let placed = markAlphaLocked(current.strokes, placeNewInActiveLayer(current.strokes, masked, current.layers), current.layers)
+        let placed0 = markAlphaLocked(current.strokes, placeNewInActiveLayer(current.strokes, masked, current.layers), current.layers)
+        // v56 2E bağlı kopyalar: kaynak değişince kopyalar güncellenir
+        let placed = V56Vector.sync(current.strokes, placed0)
         var pages = current.pages
         if pages.indices.contains(current.currentPage) { pages[current.currentPage] = placed } else { pages.append(placed) }
         commit(pages: pages, width: current.width, height: current.height, background: current.backgroundColorHex, coalesce: coalesce)
@@ -275,7 +277,7 @@ final class EditorStore: ObservableObject {
         previewBase = base
         var pages = base.pages
         guard pages.indices.contains(base.currentPage) else { return }
-        pages[base.currentPage] = strokes
+        pages[base.currentPage] = V56Vector.sync(base.strokes, strokes)
         var c = base; c.pages = pages
         canvas = c
         visualVersion += 1

@@ -570,6 +570,10 @@ struct Stroke: Codable, Equatable, Identifiable {
     /// v56 seçim maskesi ve resim dönüşümleri (JSON'a yazılmaz; içerik biçiminde V11 ek bayrağıyla).
     var mask: ClipMask? = nil
     var warp: ImageWarp? = nil
+    /// v56 2E görünüm, bağlı kopya ve canlı tekrar (JSON'a yazılmaz; içerik biçiminde V11 ek bayrağıyla).
+    var style2: VectorStyle? = nil
+    var cloneOf: CloneLink? = nil
+    var `repeat`: RepeatSpec? = nil
 
     init(id: String, points: [StrokePoint], colorHex: String, brushType: BrushType, sizePx: Float, opacity: Float,
          order: Int, groupId: String? = nil, assetId: String? = nil, flow: Float = 1, strength: Float = 1,

@@ -519,6 +519,8 @@ struct SelectionProperties: View {
                 ColorRow(hex: first?.colorHex ?? "#1E1E1E", id: "prop_color") { vm.style.recolorSelected($0) }
             }
         }
+        // v56 aşama 8A gelişmiş görünüm (yalnız Resim)
+        if vm.v56(.ADV_APPEARANCE) { V56AppearanceView(vm: vm, store: store, shape: kind == .SHAPE) }
         if vm.canEditSelection() {
             Button { _ = vm.editSelection() } label: {
                 Label(L("v53_edit_selected"), systemImage: "slider.horizontal.3").frame(maxWidth: .infinity)

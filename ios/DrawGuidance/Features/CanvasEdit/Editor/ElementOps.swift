@@ -179,6 +179,7 @@ enum ElementOps {
             var c = stroke
             c.points = stroke.points.map { $0.moved(pivot.x + ($0.x - pivot.x) * fx, pivot.y + ($0.y - pivot.y) * fy) }
             c.clip = stroke.clip?.map { point(pivot.x + ($0.x - pivot.x) * fx, pivot.y + ($0.y - pivot.y) * fy) }
+            c.style2 = V56Vector.mapStyle(stroke.style2) { $0.moved(pivot.x + ($0.x - pivot.x) * fx, pivot.y + ($0.y - pivot.y) * fy) }
             if stroke.brushType != .IMAGE { c.sizePx = (stroke.sizePx * widthFactor).coerceIn(0.5, 2000) }
             if var spec = stroke.shape {
                 spec.style.strokeWidth = (spec.style.strokeWidth * widthFactor).coerceIn(0.2, 400)
@@ -509,6 +510,7 @@ enum ElementOps {
             var c = s
             c.points = s.points.map(f)
             c.clip = s.clip?.map(f)
+            c.style2 = V56Vector.mapStyle(s.style2, f)
             return c
         }
     }

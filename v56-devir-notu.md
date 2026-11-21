@@ -32,9 +32,9 @@ kapat/ters çevir/uzat, bıçak, konturu yola çevir, efektler (öteleme, zarf, 
 
 ## PC teslimi
 - K3'te PC bağlı değildi: dosyalar doğrudan yazılmadı. `v56/K3/DrawGuidance-v56-K3-degisen.zip` K2'den bu yana
-  değişen dosyaları içerir (PC'ye kopyalanıp eskileri `_eski_v5556-K3-oncesi\` altına alınmalı).
+  değişen dosyaları içerir (PC'ye kopyalanıp eskileri `_eski_v55\v56-K3-oncesi\` altına alınmalı).
   `DrawGuidance-v56-K3-toplam.zip` v55 tabanından bu yana birikimli (K2 zip'i uygulanmadıysa bunu kullanın).
-- Önceki yedekler: `_eski_v5556-K1-oncesi\`, `_eski_v5556-K2-oncesi\`.
+- Önceki yedekler: `_eski_v55\v56-K1-oncesi\`, `_eski_v55\v56-K2-oncesi\`.
 
 ## Açık konular
 - AdMob onayı ve app-ads.txt kontrolü (Ahmet).

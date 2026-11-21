@@ -3664,7 +3664,7 @@
 "v56_blend_screen" = "スクリーン";
 "v56_blend_soft_light" = "ソフトライト";
 "v56_clip_copied" = "クリップボードにコピーしました";
-"v56_clip_copy" = "コピー";
+"v56_clip_copy" = "クリップへコピー";
 "v56_clip_cut" = "切り取り";
 "v56_clip_mask_make" = "クリッピングマスクを作成";
 "v56_clip_mask_release" = "クリッピングマスクを解除";
@@ -3672,6 +3672,16 @@
 "v56_clip_pasted" = "貼り付けました";
 "v56_element_lasso_fill" = "なげなわ塗り";
 "v56_group_entered" = "グループ内: 外側をタップで終了";
+"v56_help_clip_copy" = "選択要素をクリップボードにコピーします。別のページやキャンバスに貼り付けられます。";
+"v56_help_clip_cut" = "選択要素をクリップボードに移し、ページから削除します。";
+"v56_help_clip_mask_make" = "一番上の選択要素の形で、その下の選択要素を切り抜きます。";
+"v56_help_clip_mask_release" = "クリッピングマスクを解除し、要素を元に戻します。";
+"v56_help_lasso_fill" = "指で範囲を描くと、現在の色で塗りつぶされます。";
+"v56_help_magic_wand" = "タップした要素に似た要素(色・線・外観)を選択します。許容値は下のバーで調整します。";
+"v56_help_paint_inside" = "選択範囲を描画エリアにします。新しい線はその内側だけに描かれます。";
+"v56_help_paste" = "切り取り・コピーした要素をこのページに貼り付けます。ページやキャンバスをまたいで使えます。";
+"v56_help_select_all" = "ページ上のすべての要素を選択します。";
+"v56_help_select_invert" = "選択されていない要素を選択し、選択中の要素を解除します。";
 "v56_layer_alpha_lock" = "透明部分をロック";
 "v56_layer_blend" = "描画モード";
 "v56_layer_clip" = "下のレイヤーでクリップ";

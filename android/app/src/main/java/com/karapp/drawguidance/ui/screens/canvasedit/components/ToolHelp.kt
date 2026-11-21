@@ -232,6 +232,17 @@ object ToolDescriptions {
         R.string.v53_patterns to R.string.v53_help_patterns,
         R.string.v53_tones to R.string.v53_help_tones,
         R.string.effects_tab_lines to R.string.v53_help_lines,
+        // v56 seçim araçları ve pano
+        R.string.v56_magic_wand to R.string.v56_help_magic_wand,
+        R.string.v56_element_lasso_fill to R.string.v56_help_lasso_fill,
+        R.string.v56_clip_paste to R.string.v56_help_paste,
+        R.string.v56_select_all to R.string.v56_help_select_all,
+        R.string.v56_select_invert to R.string.v56_help_select_invert,
+        R.string.v56_paint_inside to R.string.v56_help_paint_inside,
+        R.string.v56_clip_mask_make to R.string.v56_help_clip_mask_make,
+        R.string.v56_clip_mask_release to R.string.v56_help_clip_mask_release,
+        R.string.v56_clip_cut to R.string.v56_help_clip_cut,
+        R.string.v56_clip_copy to R.string.v56_help_clip_copy,
     )
 
     /** Kaynak olmayan sabit adlar (Döndür ve Ölçekle mod çubuğundaki adım düğmeleri). */

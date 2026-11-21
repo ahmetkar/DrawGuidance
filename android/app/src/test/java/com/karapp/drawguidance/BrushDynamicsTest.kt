@@ -78,8 +78,8 @@ class BrushDynamicsTest {
     }
 
     @Test fun everyBrushBelongsToExactlyOneCategoryAndEraserIsNotInThePicker() {
-        // Fırça olmayan eleman türleri (silgi, resim, yazı, vektör şekil, diyagram) seçicide yoktur
-        val drawable = BrushType.entries.filter { !it.isObject && it != BrushType.ERASER }
+        // Fırça olmayan eleman türleri (silgi, resim, yazı, vektör şekil, diyagram, v56 kement dolgu) seçicide yoktur
+        val drawable = BrushType.entries.filter { !it.isObject && it != BrushType.ERASER && it != BrushType.LASSO_FILL } // v56 kement dolgu fırça değil, seçim aracı
         // Her fırça, tuval türü başına en çok bir kategoride (v15: nokta izi ve 3B fırça iki türde de var)
         drawable.forEach { type ->
             assertTrue("$type bir kategoride olmalı", BrushCategory.entries.any { type in it.brushes })

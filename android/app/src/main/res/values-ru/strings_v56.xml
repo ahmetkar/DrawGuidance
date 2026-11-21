@@ -56,4 +56,14 @@
     <string name="v56_clip_paste">Вставить</string>
     <string name="v56_clip_copied">Скопировано в буфер</string>
     <string name="v56_clip_pasted">Вставлено</string>
+    <string name="v56_help_magic_wand">Выделяет элементы, похожие на тот, которого вы коснулись (цвет, обводка или вид). Допуск задаётся полосой внизу.</string>
+    <string name="v56_help_lasso_fill">Обведите область пальцем — она заполнится текущим цветом.</string>
+    <string name="v56_help_paste">Вставляет вырезанные или скопированные элементы на эту страницу; работает между страницами и холстами.</string>
+    <string name="v56_help_select_all">Выделяет все элементы на странице.</string>
+    <string name="v56_help_select_invert">Выделяет невыделенное и снимает выделение с остального.</string>
+    <string name="v56_help_paint_inside">Превращает выделение в область; новые штрихи рисуются только внутри неё.</string>
+    <string name="v56_help_clip_mask_make">Верхний выделенный элемент обрезает выделенные элементы под ним.</string>
+    <string name="v56_help_clip_mask_release">Снимает обтравочную маску; элементы возвращаются в обычный вид.</string>
+    <string name="v56_help_clip_cut">Переносит выделенные элементы в буфер и убирает их со страницы.</string>
+    <string name="v56_help_clip_copy">Копирует выделенные элементы в буфер; их можно вставить на другую страницу или холст.</string>
 </resources>

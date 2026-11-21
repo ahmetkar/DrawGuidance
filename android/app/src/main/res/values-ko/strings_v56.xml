@@ -56,4 +56,14 @@
     <string name="v56_clip_paste">붙여넣기</string>
     <string name="v56_clip_copied">클립보드에 복사됨</string>
     <string name="v56_clip_pasted">붙여넣었습니다</string>
+    <string name="v56_help_magic_wand">탭한 요소와 비슷한 요소(색, 윤곽선, 모양)를 선택합니다. 허용 범위는 아래 막대로 조절합니다.</string>
+    <string name="v56_help_lasso_fill">손가락으로 영역을 그리면 현재 색으로 채워집니다.</string>
+    <string name="v56_help_paste">잘라내거나 복사한 요소를 이 페이지에 붙여넣습니다. 다른 페이지와 캔버스에서도 됩니다.</string>
+    <string name="v56_help_select_all">페이지의 모든 요소를 선택합니다.</string>
+    <string name="v56_help_select_invert">선택되지 않은 요소를 선택하고 나머지는 해제합니다.</string>
+    <string name="v56_help_paint_inside">선택한 요소를 선택 영역으로 만듭니다. 새 선은 그 안에만 그려집니다.</string>
+    <string name="v56_help_clip_mask_make">맨 위 선택 요소의 모양으로 아래 선택 요소를 잘라냅니다.</string>
+    <string name="v56_help_clip_mask_release">클리핑 마스크를 해제하고 요소를 원래대로 돌립니다.</string>
+    <string name="v56_help_clip_cut">선택한 요소를 클립보드로 옮기고 페이지에서 지웁니다.</string>
+    <string name="v56_help_clip_copy">선택한 요소를 클립보드에 복사합니다. 다른 페이지나 캔버스에 붙여넣을 수 있습니다.</string>
 </resources>

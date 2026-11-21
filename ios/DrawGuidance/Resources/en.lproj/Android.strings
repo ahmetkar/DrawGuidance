@@ -3672,6 +3672,16 @@
 "v56_clip_pasted" = "Pasted";
 "v56_element_lasso_fill" = "Lasso fill";
 "v56_group_entered" = "Inside group: tap outside to exit";
+"v56_help_clip_copy" = "Copies the selected elements to the clipboard; paste them on another page or canvas.";
+"v56_help_clip_cut" = "Moves the selected elements to the clipboard and removes them from the page.";
+"v56_help_clip_mask_make" = "The top selected element clips the selected elements beneath it.";
+"v56_help_clip_mask_release" = "Removes the clipping mask; elements return to normal.";
+"v56_help_lasso_fill" = "Draw an area with your finger; it is filled with the current color.";
+"v56_help_magic_wand" = "Selects elements similar to the one you tap (color, stroke or appearance). Set the tolerance with the bar below.";
+"v56_help_paint_inside" = "Turns the selection into a selection area; new strokes paint only inside it.";
+"v56_help_paste" = "Pastes cut or copied elements onto this page; works across pages and canvases.";
+"v56_help_select_all" = "Selects every element on the page.";
+"v56_help_select_invert" = "Selects what is not selected and deselects the rest.";
 "v56_layer_alpha_lock" = "Alpha lock";
 "v56_layer_blend" = "Blend mode";
 "v56_layer_clip" = "Clip to below";

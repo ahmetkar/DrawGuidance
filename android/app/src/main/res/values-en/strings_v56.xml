@@ -56,4 +56,14 @@
     <string name="v56_clip_paste">Paste</string>
     <string name="v56_clip_copied">Copied to clipboard</string>
     <string name="v56_clip_pasted">Pasted</string>
+    <string name="v56_help_magic_wand">Selects elements similar to the one you tap (color, stroke or appearance). Set the tolerance with the bar below.</string>
+    <string name="v56_help_lasso_fill">Draw an area with your finger; it is filled with the current color.</string>
+    <string name="v56_help_paste">Pastes cut or copied elements onto this page; works across pages and canvases.</string>
+    <string name="v56_help_select_all">Selects every element on the page.</string>
+    <string name="v56_help_select_invert">Selects what is not selected and deselects the rest.</string>
+    <string name="v56_help_paint_inside">Turns the selection into a selection area; new strokes paint only inside it.</string>
+    <string name="v56_help_clip_mask_make">The top selected element clips the selected elements beneath it.</string>
+    <string name="v56_help_clip_mask_release">Removes the clipping mask; elements return to normal.</string>
+    <string name="v56_help_clip_cut">Moves the selected elements to the clipboard and removes them from the page.</string>
+    <string name="v56_help_clip_copy">Copies the selected elements to the clipboard; paste them on another page or canvas.</string>
 </resources>

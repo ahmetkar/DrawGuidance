@@ -52,8 +52,18 @@
     <string name="v56_area_clear">移除选区</string>
     <string name="v56_group_entered">在组内：点按外部退出</string>
     <string name="v56_clip_cut">剪切</string>
-    <string name="v56_clip_copy">复制</string>
+    <string name="v56_clip_copy">复制到剪贴板</string>
     <string name="v56_clip_paste">粘贴</string>
     <string name="v56_clip_copied">已复制到剪贴板</string>
     <string name="v56_clip_pasted">已粘贴</string>
+    <string name="v56_help_magic_wand">选择与所点元素相似的元素(颜色、描边或外观)。用下方滑条调整容差。</string>
+    <string name="v56_help_lasso_fill">用手指圈出一个区域,将以当前颜色填充。</string>
+    <string name="v56_help_paste">将剪切或复制的元素粘贴到此页;可跨页面和画布使用。</string>
+    <string name="v56_help_select_all">选择页面上的所有元素。</string>
+    <string name="v56_help_select_invert">选择未选中的元素,并取消已选中的。</string>
+    <string name="v56_help_paint_inside">将所选内容设为选区;新笔画只画在其内部。</string>
+    <string name="v56_help_clip_mask_make">用最上层所选元素的轮廓裁剪其下方的所选元素。</string>
+    <string name="v56_help_clip_mask_release">释放剪切蒙版,元素恢复原状。</string>
+    <string name="v56_help_clip_cut">将所选元素移到剪贴板并从页面删除。</string>
+    <string name="v56_help_clip_copy">将所选元素复制到剪贴板;可粘贴到其他页面或画布。</string>
 </resources>

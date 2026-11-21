@@ -52,8 +52,18 @@
     <string name="v56_area_clear">إزالة المنطقة</string>
     <string name="v56_group_entered">داخل المجموعة: انقر خارجها للخروج</string>
     <string name="v56_clip_cut">قص</string>
-    <string name="v56_clip_copy">نسخ</string>
+    <string name="v56_clip_copy">نسخ للحافظة</string>
     <string name="v56_clip_paste">لصق</string>
     <string name="v56_clip_copied">تم النسخ إلى الحافظة</string>
     <string name="v56_clip_pasted">تم اللصق</string>
+    <string name="v56_help_magic_wand">يحدد العناصر المشابهة للعنصر الذي تلمسه (اللون أو الحد أو المظهر). اضبط التفاوت من الشريط بالأسفل.</string>
+    <string name="v56_help_lasso_fill">ارسم منطقة بإصبعك؛ ستُملأ باللون الحالي.</string>
+    <string name="v56_help_paste">يلصق العناصر المقصوصة أو المنسوخة في هذه الصفحة؛ يعمل بين الصفحات واللوحات.</string>
+    <string name="v56_help_select_all">يحدد كل العناصر في الصفحة.</string>
+    <string name="v56_help_select_invert">يحدد غير المحدد ويلغي تحديد الباقي.</string>
+    <string name="v56_help_paint_inside">يحوّل التحديد إلى منطقة تحديد؛ ترسم الخطوط الجديدة داخلها فقط.</string>
+    <string name="v56_help_clip_mask_make">يقص العنصر المحدد العلوي العناصر المحددة أسفله.</string>
+    <string name="v56_help_clip_mask_release">يزيل قناع القص؛ تعود العناصر كما كانت.</string>
+    <string name="v56_help_clip_cut">ينقل العناصر المحددة إلى الحافظة ويزيلها من الصفحة.</string>
+    <string name="v56_help_clip_copy">ينسخ العناصر المحددة إلى الحافظة؛ يمكنك لصقها في صفحة أو لوحة أخرى.</string>
 </resources>

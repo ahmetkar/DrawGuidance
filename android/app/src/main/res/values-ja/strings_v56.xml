@@ -52,8 +52,18 @@
     <string name="v56_area_clear">範囲を解除</string>
     <string name="v56_group_entered">グループ内: 外側をタップで終了</string>
     <string name="v56_clip_cut">切り取り</string>
-    <string name="v56_clip_copy">コピー</string>
+    <string name="v56_clip_copy">クリップへコピー</string>
     <string name="v56_clip_paste">貼り付け</string>
     <string name="v56_clip_copied">クリップボードにコピーしました</string>
     <string name="v56_clip_pasted">貼り付けました</string>
+    <string name="v56_help_magic_wand">タップした要素に似た要素(色・線・外観)を選択します。許容値は下のバーで調整します。</string>
+    <string name="v56_help_lasso_fill">指で範囲を描くと、現在の色で塗りつぶされます。</string>
+    <string name="v56_help_paste">切り取り・コピーした要素をこのページに貼り付けます。ページやキャンバスをまたいで使えます。</string>
+    <string name="v56_help_select_all">ページ上のすべての要素を選択します。</string>
+    <string name="v56_help_select_invert">選択されていない要素を選択し、選択中の要素を解除します。</string>
+    <string name="v56_help_paint_inside">選択範囲を描画エリアにします。新しい線はその内側だけに描かれます。</string>
+    <string name="v56_help_clip_mask_make">一番上の選択要素の形で、その下の選択要素を切り抜きます。</string>
+    <string name="v56_help_clip_mask_release">クリッピングマスクを解除し、要素を元に戻します。</string>
+    <string name="v56_help_clip_cut">選択要素をクリップボードに移し、ページから削除します。</string>
+    <string name="v56_help_clip_copy">選択要素をクリップボードにコピーします。別のページやキャンバスに貼り付けられます。</string>
 </resources>

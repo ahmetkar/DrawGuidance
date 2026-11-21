@@ -200,6 +200,7 @@ object ElementOps {
             else stroke.copy(
                 points = stroke.points.map { it.moved(pivot.x + (it.x - pivot.x) * fx, pivot.y + (it.y - pivot.y) * fy) },
                 clip = stroke.clip?.map { point(pivot.x + (it.x - pivot.x) * fx, pivot.y + (it.y - pivot.y) * fy) },
+                style2 = com.karapp.drawguidance.data.model.V56Vector.mapStyle(stroke.style2) { it.moved(pivot.x + (it.x - pivot.x) * fx, pivot.y + (it.y - pivot.y) * fy) },
                 sizePx = if (stroke.brushType == BrushType.IMAGE) stroke.sizePx else (stroke.sizePx * widthFactor).coerceIn(0.5f, 2000f),
                 shape = stroke.shape?.let { spec ->
                     spec.copy(style = spec.style.copy(
@@ -518,7 +519,7 @@ object ElementOps {
     private inline fun transformPoints(strokes: List<Stroke>, ids: Set<String>, crossinline f: (StrokePoint) -> StrokePoint): List<Stroke> =
         strokes.map { stroke ->
             if (stroke.id !in ids) stroke
-            else stroke.copy(points = stroke.points.map { f(it) }, clip = stroke.clip?.map { f(it) })
+            else stroke.copy(points = stroke.points.map { f(it) }, clip = stroke.clip?.map { f(it) }, style2 = com.karapp.drawguidance.data.model.V56Vector.mapStyle(stroke.style2) { f(it) })
         }
 
     // --- Geometri ---

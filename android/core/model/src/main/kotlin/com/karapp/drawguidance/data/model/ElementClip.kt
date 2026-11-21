@@ -84,6 +84,7 @@ object ElementClip {
                 layerId = null,
                 points = s.points.map(::moved),
                 clip = s.clip?.map(::moved),
+                style2 = V56Vector.mapStyle(s.style2, ::moved),
                 mask = mask,
             )
             if (assets.isNotEmpty()) {

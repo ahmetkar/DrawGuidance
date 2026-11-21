@@ -942,8 +942,8 @@ fun CanvasEditScreen(
             if (viewModel.v56(com.karapp.drawguidance.data.model.V56Flags.Feature.SYMMETRY)) ToolItem(Icons.Filled.Apps, stringResource(R.string.v56_pattern), { patternOpen = true }, enabled = hasSelection, tag = "v56_pattern_open") else null,
             // v56 aşama 7 seçime renk ayarları (HSL, renk dengesi, eğriler)
             if (viewModel.v56(com.karapp.drawguidance.data.model.V56Flags.Feature.COLOR_ADJUST)) ToolItem(Icons.Filled.Palette, stringResource(R.string.v56_color_adjust), { colorAdjustOpen = true }, enabled = hasSelection, tag = "v56_color_adjust_open") else null,
-            if (viewModel.v56(com.karapp.drawguidance.data.model.V56Flags.Feature.ADV_ALIGN) || viewModel.v56(com.karapp.drawguidance.data.model.V56Flags.Feature.ADV_EFFECTS)) ToolItem(Icons.Filled.Category, stringResource(R.string.v56_object_menu), { objectMenuOpen = true }, enabled = hasSelection, tag = "v56_object_menu_open") else null,
-        ) + (if (clipboardOn) listOf(
+            if (viewModel.v56(com.karapp.drawguidance.data.model.V56Flags.Feature.ADV_ALIGN) || viewModel.v56(com.karapp.drawguidance.data.model.V56Flags.Feature.ADV_EFFECTS) || viewModel.v56(com.karapp.drawguidance.data.model.V56Flags.Feature.ADV_REPEAT)) ToolItem(Icons.Filled.Category, stringResource(R.string.v56_object_menu), { objectMenuOpen = true }, enabled = hasSelection, tag = "v56_object_menu_open") else null,
+        ) + com.karapp.drawguidance.ui.screens.canvasedit.components.v56ObjectToolItems(viewModel, hasSelection, selectedIds.size) + (if (clipboardOn) listOf(
             ToolItem(Icons.Filled.ContentCut, stringResource(R.string.v56_clip_cut), { viewModel.cutSelected() }, enabled = hasSelection, tag = "clip_cut"),
             ToolItem(Icons.Filled.CopyAll, stringResource(R.string.v56_clip_copy), { viewModel.copySelected() }, enabled = hasSelection, tag = "clip_copy"),
             ToolItem(Icons.Filled.ContentPaste, stringResource(R.string.v56_clip_paste), { viewModel.paste(visible = visibleRect()) }, enabled = clipboardNow != null, tag = "clip_paste"),
@@ -2320,6 +2320,8 @@ fun CanvasEditScreen(
                                                     onGraphChange = viewModel::updateGraphSpec,
                                                     onAlign = viewModel::alignSelection,
                                                 )
+                                                // v56 aşama 8A gelişmiş görünüm (yalnız Resim)
+                                                com.karapp.drawguidance.ui.screens.canvasedit.components.V56AppearanceSection(viewModel, shape = hasStyleTarget && !openEnded, selectionKey = selectedIds to canvas?.strokes)
                                             }
                                             // v29 tek yazı biçimi alanı: yazı tipi, renk ve kenarlık, efektler, kutu ve yer (her ayar bir kez)
                                             if (selectedTexts.isNotEmpty()) {

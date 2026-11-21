@@ -80,12 +80,14 @@ fun V56ObjectMenu(viewModel: CanvasEditViewModel, onDismiss: () -> Unit) {
                         }
                     }
                 }
-                if (viewModel.v56(V56Flags.Feature.ADV_TRANSFORM)) {
+                if (viewModel.v56(V56Flags.Feature.ADV_TRANSFORM) || viewModel.v56(V56Flags.Feature.ADV_REPEAT)) {
                     Text(stringResource(R.string.v56_repeat_title), style = MaterialTheme.typography.titleSmall)
-                    row {
+                    if (viewModel.v56(V56Flags.Feature.ADV_TRANSFORM)) row {
                         NeuChip(stringResource(R.string.v56_tf_repeat), false, { viewModel.repeatTransform(false) }, Modifier.testTag("v56_obj_repeat"))
                         NeuChip(stringResource(R.string.v56_tf_duplicate), false, { viewModel.repeatTransform(true) }, Modifier.testTag("v56_obj_duplicate"))
                     }
+                    // v56 aşama 8A canlı tekrar: doğrusal, ızgara, dairesel, aynalı, adımla çoğalt
+                    V56RepeatSection(viewModel)
                 }
             }
         },

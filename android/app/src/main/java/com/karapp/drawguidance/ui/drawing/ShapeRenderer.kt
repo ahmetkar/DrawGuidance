@@ -229,6 +229,7 @@ object ShapeRenderer {
         val alpha = if (coverage) 1f else stroke.opacity.coerceIn(0f, 1f)
         val style = spec.style
         val baseWidth = max(0.2f, style.strokeWidth)
+        val v = stroke.style2?.takeIf { it.hasShapeOptions }
         cached.items.forEach { item ->
             val ink = item.stroke?.takeIf { it != INK } ?: style.strokeColorHex
             // Dolgu: parçanın kendi rengi ("@ink": kenar rengi), yoksa şeklin dolgusu
@@ -247,9 +248,16 @@ object ShapeRenderer {
                         paint.color = 0xFFFFFFFF.toInt()
                         paint.alpha = (opacity * alpha * item.alpha * 255).toInt()
                     }
+                    // v56 2E serbest gradyan (kontrol noktaları; şeklin kutusuna göre)
+                    if (!coverage && item.ownFill == null && (v?.freeGradient?.size ?: 0) >= 2) {
+                        paint.shader = V56VectorPaint.freeGradientShader(v!!.freeGradient!!, cached.left, cached.top, cached.right, cached.bottom)
+                        paint.color = 0xFFFFFFFF.toInt()
+                        paint.alpha = (opacity * alpha * item.alpha * 255).toInt()
+                    }
                     canvas.drawPath(item.path, paint)
                     paint.shader = null
                 }
+                if (!coverage && item.ownFill == null && v != null) V56VectorPaint.drawFillExtras(canvas, item.path, v, hex ?: ink, alpha * item.alpha)
                 // v53 çizgi roman ekran tonu / deseni: dolgunun üstünde, parçanın kapalı alanına kırpılarak
                 if (!coverage && item.ownFill == null) style.tone?.let {
                     ToneRenderer.draw(canvas, item.path, it, cached.left, cached.top, cached.right, cached.bottom, alpha * item.alpha)
@@ -270,7 +278,26 @@ object ShapeRenderer {
                 item.dashed -> max(width * 3f, 9f).let { DashPathEffect(floatArrayOf(it, it * 0.7f), 0f) }
                 else -> null
             }
-            canvas.drawPath(item.path, paint)
+            if (v == null) { canvas.drawPath(item.path, paint); return@forEach }
+            // v56 2E kontur: uç/köşe biçimi, tire dizisi, hiza (kapalı yolda iç/dış) ve alttaki ek konturlar
+            V56VectorPaint.styleStroke(paint, v)
+            V56VectorPaint.withAlign(canvas, item.path, item.fill, v.align, paint) { k ->
+                if (!coverage) v.strokes.forEach { extra ->
+                    val p2 = Paint(paint)
+                    p2.strokeWidth = max(0.2f, extra.width) * k
+                    p2.color = hexToColor(extra.colorHex).toArgb()
+                    p2.alpha = (extra.opacity.coerceIn(0f, 1f) * alpha * item.alpha * 255).toInt()
+                    canvas.drawPath(item.path, p2)
+                }
+                val w0 = paint.strokeWidth
+                paint.strokeWidth = w0 * k
+                canvas.drawPath(item.path, paint)
+                paint.strokeWidth = w0
+            }
+        }
+        if (v != null && (v.arrowStart != com.karapp.drawguidance.data.model.ArrowKind.NONE || v.arrowEnd != com.karapp.drawguidance.data.model.ArrowKind.NONE)) {
+            val inkColor = if (coverage) 0xFF000000.toInt() else hexToColor(style.strokeColorHex).toArgb()
+            V56VectorPaint.drawArrows(canvas, stroke, spec, v, baseWidth, inkColor, alpha)
         }
         paint.pathEffect = null
         drawLabels(canvas, stroke, spec, alpha, coverage)

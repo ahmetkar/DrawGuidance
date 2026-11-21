@@ -48,6 +48,39 @@ object StrokeRenderer {
      * Elemana kırpma uygulanmışsa yalnızca kırpma dörtgeninin içi çizilir.
      */
     fun DrawScope.drawStroke(stroke: Stroke, offset: Offset = Offset.Zero) {
+        // v56 2E nesne karışım modu ve opaklık maskesi: eleman ara katmanda
+        val st = stroke.style2
+        if (st != null && (st.blend != com.karapp.drawguidance.data.model.LayerBlend.NORMAL || !st.opacityMask.isNullOrEmpty())) {
+            drawStyled(stroke, offset, st); return
+        }
+        drawStrokeBody(stroke, offset)
+    }
+
+    private val luminanceToAlpha = androidx.compose.ui.graphics.ColorFilter.colorMatrix(androidx.compose.ui.graphics.ColorMatrix(floatArrayOf(
+        0f, 0f, 0f, 0f, 0f,
+        0f, 0f, 0f, 0f, 0f,
+        0f, 0f, 0f, 0f, 0f,
+        0.2126f, 0.7152f, 0.0722f, 0f, 0f,
+    )))
+
+    private fun DrawScope.drawStyled(stroke: Stroke, offset: Offset, st: com.karapp.drawguidance.data.model.VectorStyle) {
+        val bounds = Rect(-1e6f, -1e6f, 1e6f, 1e6f)
+        drawIntoCanvas { it.saveLayer(bounds, Paint().apply { blendMode = LayerCompositor.blendMode(st.blend) }) }
+        drawStrokeBody(stroke, offset)
+        val masks = st.opacityMask
+        if (!masks.isNullOrEmpty()) {
+            // Maske siyah zeminde çizilir; parlaklığı alfa olur ve DstIn ile elemanı keser
+            drawIntoCanvas { c ->
+                c.saveLayer(bounds, Paint().apply { blendMode = androidx.compose.ui.graphics.BlendMode.DstIn; colorFilter = luminanceToAlpha })
+                c.nativeCanvas.drawColor(android.graphics.Color.BLACK)
+            }
+            masks.forEach { drawStroke(it.copy(style2 = it.style2?.copy(opacityMask = null)), offset) }
+            drawIntoCanvas { it.restore() }
+        }
+        drawIntoCanvas { it.restore() }
+    }
+
+    private fun DrawScope.drawStrokeBody(stroke: Stroke, offset: Offset) {
         val mask = stroke.mask
         if (mask != null && mask.points.size >= 3) { drawMasked(stroke, offset, mask); return }
         drawClipped(stroke, offset)

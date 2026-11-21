@@ -1644,6 +1644,104 @@ class CanvasEditViewModel(
         canvasPrefs.shapeFill = hex
     }
     fun updateShapeStyle(style: ShapeStyle) = shapes.updateShapeStyle(style)
+
+    // ---------------------------------------------------------------- v56 aşama 8A (2E görünüm, bağlı kopya, maske, Tekrarla)
+
+    private fun newId() = java.util.UUID.randomUUID().toString()
+
+    /** Seçili elemanların 2E görünümü (ilk seçili; yoksa öntanımlı). */
+    fun selectedVectorStyle(): com.karapp.drawguidance.data.model.VectorStyle {
+        val c = store.canvas.value ?: return com.karapp.drawguidance.data.model.VectorStyle()
+        return c.strokes.firstOrNull { it.id in store.selection }?.style2 ?: com.karapp.drawguidance.data.model.VectorStyle()
+    }
+
+    /** Seçili elemanlara 2E görünüm değişikliği ([coalesce]: kaydırırken tek geri alma adımı). */
+    fun updateVectorStyle(coalesce: String? = null, change: (com.karapp.drawguidance.data.model.VectorStyle) -> com.karapp.drawguidance.data.model.VectorStyle) {
+        val c = store.canvas.value ?: return
+        val ids = store.selection
+        if (ids.isEmpty()) return
+        var changed = false
+        val out = c.strokes.map { s ->
+            if (s.id !in ids) return@map s
+            val next = change(s.style2 ?: com.karapp.drawguidance.data.model.VectorStyle()).takeUnless { it.isDefault }
+            if (next == s.style2) s else { changed = true; s.copy(style2 = next) }
+        }
+        if (changed) store.commit(out, coalesce = coalesce?.let { "v2-$it" }, useArea = false)
+    }
+
+    /** Bağlı kopya (kaynak değişince güncellenir); kopyalar seçilir. */
+    fun cloneSelection(): Int {
+        val c = store.canvas.value ?: return 0
+        val out = com.karapp.drawguidance.data.model.V56Vector.clone(c.strokes, store.selection, 24f, 24f, ::newId)
+        val added = out.drop(c.strokes.size)
+        if (added.isEmpty()) return 0
+        store.commit(out, useArea = false)
+        store.select(added.map { it.id }.toSet())
+        return added.size
+    }
+
+    fun selectionHasClone(): Boolean = store.canvas.value?.strokes?.any { it.id in store.selection && it.cloneOf != null } == true
+
+    fun unlinkClones() {
+        val c = store.canvas.value ?: return
+        val out = com.karapp.drawguidance.data.model.V56Vector.unlink(c.strokes, store.selection)
+        if (out != c.strokes) store.commit(out, useArea = false)
+    }
+
+    /** Seçimdeki tekrar ayarı (kaynaktan ya da kopyadan). */
+    fun selectedRepeat(): com.karapp.drawguidance.data.model.RepeatSpec? =
+        store.canvas.value?.let { com.karapp.drawguidance.data.model.V56Vector.repeatOf(it.strokes, store.selection) }
+
+    private fun repeatSources(strokes: List<Stroke>): Set<String> {
+        val byId = strokes.associateBy { it.id }
+        return store.selection.mapNotNull { id -> byId[id]?.let { s -> s.cloneOf?.takeIf { it.repeat }?.source ?: s.id } }.toSet()
+    }
+
+    /** Tekrar önizlemesi (geçmişe girmez). */
+    fun previewRepeat(spec: com.karapp.drawguidance.data.model.RepeatSpec) {
+        val base = (if (store.inPreview) store.endPreview() else store.canvas.value) ?: return
+        val (out, _) = com.karapp.drawguidance.data.model.V56Vector.repeat(base.strokes, repeatSources(base.strokes), spec, ::newId)
+        store.previewStrokes(out)
+    }
+
+    fun cancelRepeatPreview() { store.endPreview() }
+
+    /** Tekrarı uygular (tek geri alma adımı). Dönen: kopya sayısı. */
+    fun applyRepeat(spec: com.karapp.drawguidance.data.model.RepeatSpec): Int {
+        store.endPreview()
+        val c = store.canvas.value ?: return 0
+        val sources = repeatSources(c.strokes)
+        val (out, n) = com.karapp.drawguidance.data.model.V56Vector.repeat(c.strokes, sources, spec, ::newId)
+        if (n == 0) return 0
+        store.commit(out, useArea = false)
+        store.select(sources)
+        return n
+    }
+
+    fun removeRepeat() {
+        store.endPreview()
+        val c = store.canvas.value ?: return
+        val out = com.karapp.drawguidance.data.model.V56Vector.removeRepeat(c.strokes, store.selection)
+        if (out != c.strokes) { store.commit(out, useArea = false); store.select(store.selection.filter { id -> out.any { it.id == id } }.toSet()) }
+    }
+
+    /** Opaklık maskesi: seçimdeki en üstteki nesne alttakilerin maskesi olur. */
+    fun makeOpacityMask(): Boolean {
+        val c = store.canvas.value ?: return false
+        val out = com.karapp.drawguidance.data.model.V56Vector.makeOpacityMask(c.strokes, store.selection)
+        if (out == c.strokes) return false
+        store.commit(out, useArea = false)
+        store.select(store.selection.filter { id -> out.any { it.id == id } }.toSet())
+        return true
+    }
+
+    fun selectionHasOpacityMask(): Boolean = store.canvas.value?.strokes?.any { it.id in store.selection && !it.style2?.opacityMask.isNullOrEmpty() } == true
+
+    fun releaseOpacityMask() {
+        val c = store.canvas.value ?: return
+        val out = com.karapp.drawguidance.data.model.V56Vector.releaseOpacityMask(c.strokes, store.selection)
+        if (out != c.strokes) store.commit(out, useArea = false)
+    }
     fun updateGraphSpec(graph: GraphSpec) = shapes.updateGraphSpec(graph)
     fun shapeStrokes(gestureId: String, start: Offset, end: Offset): List<Stroke> = shapes.shapeStrokes(gestureId, start, end)
     fun addShape(gestureId: String, start: Offset, end: Offset) = shapes.addShape(gestureId, start, end)

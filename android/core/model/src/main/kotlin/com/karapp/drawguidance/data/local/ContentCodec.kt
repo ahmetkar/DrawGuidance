@@ -82,6 +82,8 @@ object ContentCodec {
     private const val VERSION_V11: Byte = 11
     private const val EXT3_MASK = 1
     private const val EXT3_WARP = 2
+    /** v56 2E: görünüm, bağlı kopya ve tekrar (JSON, [com.karapp.drawguidance.data.model.StrokeExtras2]). */
+    private const val EXT3_V2 = 4
     private const val LAYER_ALPHA_LOCK = 1
     private const val LAYER_CLIP_BELOW = 2
     /** En yeni içerik sürümü (paylaşımda karşı tarafa bildirilir). */
@@ -343,7 +345,7 @@ object ContentCodec {
     /** v56 seçim maskesi, resim dönüşümü, gren, resimden fırça ya da kement dolgu. */
     internal fun needsV11(s: Stroke): Boolean =
         s.brushType == BrushType.LASSO_FILL || s.mask != null || (s.warp != null && !s.warp.isEmpty) ||
-            s.params?.grain != null || s.params?.stampAssetId != null
+            s.params?.grain != null || s.params?.stampAssetId != null || s.style2 != null || s.cloneOf != null || s.repeat != null
 
     private fun needsV9(s: Stroke): Boolean = s.brushType == BrushType.TEXT && s.text?.path != null
 
@@ -395,9 +397,11 @@ object ContentCodec {
         if (v11) {
             val mask = s.mask
             val warp = s.warp?.takeIf { !it.isEmpty }
-            w.byte((if (mask != null) EXT3_MASK else 0) or (if (warp != null) EXT3_WARP else 0))
+            val ext2 = com.karapp.drawguidance.data.model.StrokeExtras2.of(s)
+            w.byte((if (mask != null) EXT3_MASK else 0) or (if (warp != null) EXT3_WARP else 0) or (if (ext2 != null) EXT3_V2 else 0))
             mask?.let { w.string(paramsJson.encodeToString(com.karapp.drawguidance.data.model.ClipMask.serializer(), it)) }
             warp?.let { w.string(paramsJson.encodeToString(com.karapp.drawguidance.data.model.ImageWarp.serializer(), it)) }
+            ext2?.let { w.string(paramsJson.encodeToString(com.karapp.drawguidance.data.model.StrokeExtras2.serializer(), it)) }
         }
     }
 
@@ -564,6 +568,10 @@ object ContentCodec {
             if (ext3 and EXT3_WARP != 0) {
                 val wp = runCatching { paramsJson.decodeFromString(com.karapp.drawguidance.data.model.ImageWarp.serializer(), r.string()) }.getOrNull()
                 if (wp != null) out = out.copy(warp = wp)
+            }
+            if (ext3 and EXT3_V2 != 0) {
+                val x = runCatching { paramsJson.decodeFromString(com.karapp.drawguidance.data.model.StrokeExtras2.serializer(), r.string()) }.getOrNull()
+                if (x != null) out = out.copy(style2 = x.style2, cloneOf = x.cloneOf, repeat = x.repeat)
             }
         }
         if (paragraph != null && out.text != null) out = out.copy(text = out.text!!.copy(paragraph = paragraph))

@@ -238,7 +238,9 @@ class EditorStore(
         val current = canvas.value ?: return
         val placedInLayer = markAlphaLocked(current.strokes, placeNewInActiveLayer(current.strokes, updated, current.layers), current.layers)
         // v56 seçim alanı varken yeni fırça izleri alanla kırpılır (yapıştırılanlar hariç)
-        val placed = area.value?.takeIf { useArea }?.let { a -> com.karapp.drawguidance.data.model.V56Selection.applyArea(current.strokes.mapTo(HashSet()) { it.id }, placedInLayer, a) } ?: placedInLayer
+        val placed0 = area.value?.takeIf { useArea }?.let { a -> com.karapp.drawguidance.data.model.V56Selection.applyArea(current.strokes.mapTo(HashSet()) { it.id }, placedInLayer, a) } ?: placedInLayer
+        // v56 2E bağlı kopyalar: kaynak değişince kopyalar güncellenir
+        val placed = com.karapp.drawguidance.data.model.V56Vector.sync(current.strokes, placed0)
         val pages = current.pages.toMutableList()
         if (current.currentPage in pages.indices) pages[current.currentPage] = placed else pages.add(placed)
         commit(pages, current.width, current.height, current.backgroundColorHex, coalesce)
@@ -351,10 +353,11 @@ class EditorStore(
         val current = canvas.value ?: return
         val base = previewBase ?: current.also { previewBase = it }
         val pages = base.pages.toMutableList()
-        if (base.currentPage in pages.indices) pages[base.currentPage] = strokes else return
+        val synced = com.karapp.drawguidance.data.model.V56Vector.sync(base.strokes, strokes)
+        if (base.currentPage in pages.indices) pages[base.currentPage] = synced else return
         canvas.value = base.copy(pages = pages)
         visualVersion.value++
-        indexRequests.value = strokes
+        indexRequests.value = synced
     }
 
     fun endPreview(): CanvasUi? {

@@ -96,7 +96,7 @@ object V56Arrange {
         if (dx == 0f && dy == 0f) return s
         fun m(p: StrokePoint) = p.at(p.x + dx, p.y + dy)
         return s.copy(
-            points = s.points.map(::m), clip = s.clip?.map(::m),
+            points = s.points.map(::m), clip = s.clip?.map(::m), style2 = V56Vector.mapStyle(s.style2, ::m),
             mask = s.mask?.let { mk -> mk.copy(points = mk.points.map(::m)) },
             warp = s.warp?.let { w ->
                 w.copy(

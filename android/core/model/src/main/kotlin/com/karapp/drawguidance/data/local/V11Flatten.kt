@@ -29,6 +29,8 @@ object V11Flatten {
         var s = s0
         if (layerAlpha < 1f) s = s.copy(opacity = s.opacity * layerAlpha)
         if (s.mask != null) s = s.copy(mask = null)
+        // 2E görünüm, bağlı kopya ve tekrar kalkar (kopyalar sıradan eleman olarak kalır)
+        if (s.style2 != null || s.cloneOf != null || s.repeat != null) s = s.copy(style2 = null, cloneOf = null, repeat = null)
         s.warp?.let { w ->
             val n = w.mesh?.let { com.karapp.drawguidance.data.model.WarpMesh.sizeOf(it) } ?: 0
             val corners = w.quad?.takeIf { it.size == 4 } ?: w.mesh?.takeIf { n > 1 }?.let { m -> listOf(m[0], m[n - 1], m[n * n - 1], m[n * (n - 1)]) }

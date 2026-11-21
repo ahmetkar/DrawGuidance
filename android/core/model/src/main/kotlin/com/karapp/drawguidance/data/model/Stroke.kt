@@ -563,6 +563,12 @@ data class Stroke(
     val mask: ClipMask? = null,
     /** v56 resim bozma/çarpıtma/yansıma dalgası ([BrushType.IMAGE]); asıl resim değişmez. */
     val warp: ImageWarp? = null,
+    /** v56 2E görünüm: uç/köşe, kontur hizası, tire, ok uçları, desen ve serbest gradyan dolgu, nesne karışım modu, çoklu dolgu/kontur, opaklık maskesi. */
+    val style2: VectorStyle? = null,
+    /** v56 2E bağlı kopya: kaynak değişince bu kopya yeniden üretilir. */
+    val cloneOf: CloneLink? = null,
+    /** v56 2E canlı tekrar (kaynakta): tekrar kopyaları [CloneLink.repeat] taşır. */
+    val repeat: RepeatSpec? = null,
 )
 
 /**

@@ -447,6 +447,7 @@ object TransformOps {
                 else -> st.copy(
                     points = st.points.map { mp(it) },
                     clip = st.clip?.map { mp(it) },
+                    style2 = V56Vector.mapStyle(st.style2) { mp(it) },
                     sizePx = if (st.brushType.isQuad) st.sizePx else (st.sizePx * wf).coerceIn(0.5f, 2000f),
                     shape = st.shape?.let { spec -> spec.copy(style = spec.style.copy(strokeWidth = (spec.style.strokeWidth * wf).coerceIn(0.2f, 400f), cornerRadius = spec.style.cornerRadius * wf)) },
                     mask = st.mask?.let { m -> m.copy(points = m.points.map { mp(it) }) },
@@ -568,7 +569,7 @@ object Reflection {
             fun m(p: StrokePoint) = p.at(p.x, 2f * axis - p.y)
             s.copy(
                 id = newId(s), order = strokes.size + i, groupId = s.groupId?.let { "$it-r" },
-                points = s.points.map { m(it) }, clip = s.clip?.map { m(it) },
+                points = s.points.map { m(it) }, clip = s.clip?.map { m(it) }, style2 = V56Vector.mapStyle(s.style2) { m(it) },
                 mask = s.mask?.let { mk -> mk.copy(points = mk.points.map { m(it) }) },
                 warp = (s.warp ?: ImageWarp()).copy(wave = spec, mesh = s.warp?.mesh?.map { m(it) }, quad = s.warp?.quad?.map { m(it) }),
             )

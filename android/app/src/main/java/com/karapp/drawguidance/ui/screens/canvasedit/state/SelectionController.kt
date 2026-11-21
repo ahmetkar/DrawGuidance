@@ -307,6 +307,8 @@ class SelectionController(private val store: EditorStore, private val host: Edit
                 order = current.strokes.size + i,
                 points = s.points.map(::moved),
                 clip = s.clip?.map(::moved),
+                style2 = com.karapp.drawguidance.data.model.V56Vector.mapStyle(s.style2, ::moved),
+                repeat = null,
             )
         }
         store.commit(current.strokes + copies)

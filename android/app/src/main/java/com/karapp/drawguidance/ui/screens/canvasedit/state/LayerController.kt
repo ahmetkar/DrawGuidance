@@ -113,4 +113,53 @@ class LayerController(private val store: EditorStore) {
         store.commitLayers(layers(), pages)
         store.select(ids)
     }
+
+    /** v56 aşama 7: katmanı çoğalt (hemen üstte "<ad> (kopya)", bütün sayfalardaki elemanlar yeni kimlikle); yeni katman etkin olur. */
+    fun duplicate(id: String): String? {
+        val canvas = store.canvas.value ?: return null
+        val layer = layers().firstOrNull { it.id == id } ?: return null
+        val copyId = UUID.randomUUID().toString()
+        val (outLayers, pages) = com.karapp.drawguidance.data.model.LayerOps.duplicate(
+            layers(), canvas.pages, id, copyId, layer.name + com.karapp.drawguidance.i18n.I18n.tr(" (kopya)"),
+        ) { UUID.randomUUID().toString() }
+        store.commitLayers(outLayers, pages)
+        store.activeLayer.value = copyId
+        store.select(emptySet())
+        return copyId
+    }
+
+    /** v56 aşama 7: katmanları vektör olarak birleştirir (en üstteki seçili katmanın yerinde; tek geri alma adımı). */
+    fun mergeVector(ids: Set<String>): Boolean {
+        val canvas = store.canvas.value ?: return false
+        val current = layers()
+        if (current.count { it.id in ids } < 2) return false
+        val target = current.last { it.id in ids }
+        val (outLayers, pages) = com.karapp.drawguidance.data.model.LayerOps.mergeVector(current, canvas.pages, ids)
+        store.commitLayers(outLayers, pages)
+        store.activeLayer.value = target.id
+        store.select(emptySet())
+        return true
+    }
+
+    /**
+     * v56 aşama 7: birleştirmenin resimli hali. [images] sayfa başına seçili katmanların resme çevrilmiş hali (yoksa
+     * null); seçili katmanların elemanları kalkar, resim hedef katmana girer, hedef katman Normal ve opaklık 1 olur.
+     */
+    fun mergeRaster(ids: Set<String>, images: List<com.karapp.drawguidance.data.model.Stroke?>): Boolean {
+        val canvas = store.canvas.value ?: return false
+        val current = layers()
+        if (current.count { it.id in ids } < 2) return false
+        val target = current.last { it.id in ids }
+        val outLayers = current.filter { it.id !in ids || it.id == target.id }
+            .map { if (it.id == target.id) it.copy(opacity = 1f, blend = com.karapp.drawguidance.data.model.LayerBlend.NORMAL, alphaLock = false, clipToBelow = false) else it }
+        val pages = canvas.pages.mapIndexed { i, page ->
+            val kept = page.filterNot { Layers.of(it, current) in ids }
+            val img = images.getOrNull(i)
+            if (img == null) kept else kept + img.copy(layerId = target.id, order = kept.size)
+        }
+        store.commitLayers(outLayers, pages)
+        store.activeLayer.value = target.id
+        store.select(emptySet())
+        return true
+    }
 }

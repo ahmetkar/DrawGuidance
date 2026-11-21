@@ -1101,12 +1101,13 @@ bir yerdir.
 | **K0** | Aşama 0 bitti: canlı yayın ara-verme hatası, canlı mürekkep, yayın onayı (Android + iOS) | Bildirilen yayın hataları düzeldi |
 | **K1** | Aşama 1–3B bitti: V11 veri modeli, katman motoru, seçim maskesi, **sayfalar arası kes-yapıştır**, yayın fark paketi (Android + iOS); 2E: grup içi seçim, sihirli değnek, kırpma maskesi | 2B temeli |
 | **K2** | Aşama 4–6 bitti: hızlı fırça seçici, gren ve doku, Dönüştür paneli, yansıma, sıvılaştır; 2E: yansıt/çevir, kaydır/eğ, referans noktası, sayısal G/Y/açı, her birini dönüştür, dönüşümü tekrarla, hizala ve dağıt (Nesne menüsü), vektör girdap/büzüştür/şişir | 2B araçlarının çoğu |
-| **K3** | Aşama 7–9B bitti: renk ayarları, simetri, dışa aktarma, e-posta girişi, mağazalar; 2E: dolgu/kontur/görünüm seçenekleri, katman çoğalt, bağlı kopya, opaklık maskesi, tekrarla (doğrusal/ızgara/dairesel/aynalı/adımla) | 2B özelliklerinin çoğu |
+| **K3** | Aşama 7–9 bitti: renk ayarları, simetri, dışa aktarma (9A ve 9B Ahmet'in 2026-11-21 kararıyla K8'e alındı); 2E: dolgu/kontur/görünüm seçenekleri, katman çoğalt, bağlı kopya, opaklık maskesi, tekrarla (doğrusal/ızgara/dairesel/aynalı/adımla) | 2B özelliklerinin çoğu |
 | **K3A** | Aşama 9C bitti (2E): yol işlemleri ve şekil oluşturucu, düğüm türleri ve Bezier tutamakları, yol birleştir/ayır/kapat/ters çevir/uzat, bıçak, konturu yola çevir, efektler (öteleme, zarf, kıvırma, pürüz, zikzak); **2B tamam** | 2B tamam |
 | **K4** | Aşama 10 bitti: 3B temizlik ve tuvalde yeni ekleme akışı | Eski 3B düzenleyiciye giden yollar kapalı |
 | **K5** | Aşama 11 bitti: 3B Çizim temeli ve **Metal çizicinin ilk hali**, iOS CI yeşil | 3B çizim çalışıyor |
 | **K6** | Aşama 12–13 bitti: dolgu, toon, yüzeye boya, video; telefon düzeni | 3B tamam |
-| **K7** | Aşama 14–15 bitti: eğitim, metinler, tam test, imzalı AAB/APK ve IPA | Yayına hazır |
+| **K7** | Aşama 14 bitti: eğitim, metinler, tam test | |
+| **K8** | Aşama 9A, 9B ve 15 bitti (Ahmet, 2026-11-21: en sona): e-posta/şifre girişi, Huawei/Samsung mağaza flavor'ları ve abonelik, sunucu 56.0.0, imzalı AAB/APK ve IPA | Yayına hazır |
 
 **Her durakta yapılanlar:**
 

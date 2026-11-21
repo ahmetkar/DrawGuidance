@@ -141,6 +141,67 @@ class ImageController(
         }
     }
 
+    /**
+     * v56 aşama 7: [assetId] resminin pikselleri [transform] ile işlenir ve yeni resim verisi olarak saklanır (yeni kimlik;
+     * özgün veri geri almada geri gelir). Büyük resimler cihaz sınıfına göre küçültülür. Okunamazsa null.
+     */
+    suspend fun transformAsset(assetId: String, transform: (IntArray) -> IntArray): String? {
+        val prepared = kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.Default) {
+            runCatching {
+                val bmp = com.karapp.drawguidance.data.images.CanvasImageCache.get(assetId)?.asAndroidBitmap()
+                    ?: assetStore.bytes(assetId)?.let { android.graphics.BitmapFactory.decodeByteArray(it, 0, it.size) }
+                    ?: return@runCatching null
+                val source = com.karapp.drawguidance.platform.Compat.readable(bmp)
+                val maxSide = when (com.karapp.drawguidance.platform.DeviceCaps.tier) {
+                    com.karapp.drawguidance.platform.DeviceCaps.Tier.LOW -> 1400f
+                    com.karapp.drawguidance.platform.DeviceCaps.Tier.MID -> 2000f
+                    com.karapp.drawguidance.platform.DeviceCaps.Tier.HIGH -> 3000f
+                }
+                val scale = minOf(1f, maxSide / maxOf(source.width, source.height))
+                val src = if (scale < 1f) android.graphics.Bitmap.createScaledBitmap(source, (source.width * scale).toInt().coerceAtLeast(1), (source.height * scale).toInt().coerceAtLeast(1), true) else source
+                val w = src.width; val h = src.height
+                val px = IntArray(w * h)
+                src.getPixels(px, 0, w, 0, 0, w, h)
+                val out = transform(px)
+                val result = android.graphics.Bitmap.createBitmap(out, w, h, android.graphics.Bitmap.Config.ARGB_8888)
+                val opaque = out.all { it ushr 24 == 0xFF }
+                val bytes = com.karapp.drawguidance.data.library.BitmapCodec.encode(result, opaque = opaque)
+                PreparedImage(bytes, if (opaque) "image/webp" else "image/png", w, h, result, bytes.size, 0f)
+            }.getOrNull()
+        } ?: return null
+        return runCatching { assetStore.save(store.canvasLocalId, prepared) }.getOrNull()
+    }
+
+    /**
+     * v56 aşama 7 katman birleştirme (görünüm korunarak): [strokes] katman görünümleriyle ([layers]) tek resme çizilir;
+     * resim elemanı döner (sayfaya eklenmez). Boşsa null.
+     */
+    suspend fun renderToImage(strokes: List<Stroke>, layers: List<com.karapp.drawguidance.data.model.Layer>, width: Int, height: Int, layerId: String?): Stroke? {
+        val sel = strokes.filter { !it.hidden }
+        if (sel.isEmpty()) return null
+        val bounds = sel.mapNotNull { com.karapp.drawguidance.ui.drawing.StrokeRenderer.paintBounds(it) }.reduceOrNull { a, b -> androidx.compose.ui.geometry.Rect(minOf(a.left, b.left), minOf(a.top, b.top), maxOf(a.right, b.right), maxOf(a.bottom, b.bottom)) } ?: return null
+        val page = androidx.compose.ui.geometry.Rect(0f, 0f, width.toFloat(), height.toFloat())
+        val r = bounds.intersect(page).takeIf { it.width >= 1f && it.height >= 1f } ?: return null
+        val scale = minOf(1f, 2048f / maxOf(r.width, r.height))
+        val w = kotlin.math.ceil(r.width * scale).toInt().coerceAtLeast(1); val h = kotlin.math.ceil(r.height * scale).toInt().coerceAtLeast(1)
+        val bmp = kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.Default) {
+            com.karapp.drawguidance.ui.drawing.StrokeRenderer.renderViewportCache(
+                sel, w, h, scale, androidx.compose.ui.geometry.Offset(-r.left * scale, -r.top * scale),
+                androidx.compose.ui.geometry.Rect(0f, 0f, w.toFloat(), h.toFloat()), layers = layers,
+            ).asAndroidBitmap()
+        }
+        val bytes = java.io.ByteArrayOutputStream().use { out -> bmp.compress(android.graphics.Bitmap.CompressFormat.PNG, 100, out); out.toByteArray() }
+        val assetId = runCatching { assetStore.save(store.canvasLocalId, PreparedImage(bytes, "image/png", w, h, bmp, bytes.size, 0f)) }.getOrNull() ?: return null
+        return Stroke(
+            java.util.UUID.randomUUID().toString(),
+            listOf(
+                com.karapp.drawguidance.data.model.StrokePoint(r.left, r.top), com.karapp.drawguidance.data.model.StrokePoint(r.right, r.top),
+                com.karapp.drawguidance.data.model.StrokePoint(r.right, r.bottom), com.karapp.drawguidance.data.model.StrokePoint(r.left, r.bottom),
+            ),
+            "#000000", BrushType.IMAGE, 1f, 1f, 0, assetId = assetId, layerId = layerId,
+        )
+    }
+
     // --- Resim olarak kaydetme ---
 
     private val _save = MutableStateFlow<ImageSaveState>(ImageSaveState.Idle)

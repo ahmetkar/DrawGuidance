@@ -116,9 +116,9 @@ class V47PortraitMenuTest : V47MenuBase() {
         assertEquals(PanelTab.BRUSH, vm().panel.value)
         assertFalse(exists("properties_empty"))
         shot("v47-portrait-properties-brush")
-        // Seç modunda ayar yok: boş
+        // Seç modunda araç ayarı yok: v56'dan beri (Resim) eleman seçili değilken etkin katmanın renkleri
         compose.runOnIdle { vm().chooseMode(EditMode.SELECT) }
-        waitFor { exists("properties_empty") }
+        waitFor { exists("v56_layer_colors") }
         // Yazı aracında yeni yazının biçimi
         compose.runOnIdle { vm().chooseMode(EditMode.TEXT) }
         waitFor { exists("properties_text") }

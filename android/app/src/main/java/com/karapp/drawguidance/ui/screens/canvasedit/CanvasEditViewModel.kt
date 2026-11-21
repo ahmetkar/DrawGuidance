@@ -2683,6 +2683,114 @@ class CanvasEditViewModel(
     fun moveLayer(id: String, direction: Int) = layerOps.move(id, direction)
     fun moveSelectionToLayer(id: String) = layerOps.moveSelectionTo(id)
 
+    // --- v56 aşama 7: katman çoğalt/birleştir, renk ayarları, hazır ayarlar ---
+
+    fun duplicateLayer(id: String): String? = layerOps.duplicate(id)
+
+    /** Birleştirmede görünüm için resme çevirmek gerekir mi (kullanıcıya bir kez sorulur). */
+    fun layersNeedRaster(ids: Set<String>): Boolean =
+        com.karapp.drawguidance.data.model.LayerOps.needsRaster(layers.value, ids)
+
+    private val _merging = MutableStateFlow(false)
+    val merging: StateFlow<Boolean> = _merging.asStateFlow()
+
+    /**
+     * Seçili katmanları birleştirir: hepsi Normal ve opaklık 1 ise vektör olarak; değilse görünüm korunsun diye her
+     * sayfada seçili katmanlar tek resme çevrilir. Tek geri alma adımı.
+     */
+    fun mergeLayers(ids: Set<String>) {
+        val current = layers.value
+        if (current.count { it.id in ids } < 2 || _merging.value) return
+        if (!layersNeedRaster(ids)) { layerOps.mergeVector(ids); return }
+        val canvas = store.canvas.value ?: return
+        _merging.value = true
+        viewModelScope.launch {
+            try {
+                val target = current.last { it.id in ids }
+                val imgs = canvas.pages.map { page ->
+                    val part = page.filter { com.karapp.drawguidance.data.model.Layers.of(it, current) in ids }
+                    if (part.isEmpty()) null else images.renderToImage(part, current, canvas.width, canvas.height, target.id)
+                }
+                layerOps.mergeRaster(ids, imgs)
+            } finally { _merging.value = false }
+        }
+    }
+
+    /** Aşağıyla birleştir (en alttaki katmanda etkisiz). */
+    fun mergeLayerDown(id: String) {
+        val below = com.karapp.drawguidance.data.model.LayerOps.below(layers.value, id) ?: return
+        mergeLayers(setOf(id, below.id))
+    }
+
+    private var colorBase: List<Stroke>? = null
+
+    /** Renk ayarının hedefi: [layerId] verilirse o katmanın (geçerli sayfadaki) elemanları, yoksa seçim. */
+    private fun colorTargets(base: List<Stroke>, layerId: String?): Set<String> {
+        if (layerId == null) return store.selection
+        val current = layers.value
+        if (current.firstOrNull { it.id == layerId }?.locked == true) return emptySet()
+        return base.filter { com.karapp.drawguidance.data.model.Layers.of(it, current) == layerId }.map { it.id }.toSet()
+    }
+
+    /** Renk ayarı önizlemesi (vektör renkleri canlı; resim pikselleri Uygula'da işlenir). */
+    fun previewColorAdjust(adj: com.karapp.drawguidance.data.model.ColorAdjust, layerId: String?) {
+        val base = colorBase ?: store.canvas.value?.strokes?.also { colorBase = it } ?: return
+        store.previewStrokes(com.karapp.drawguidance.data.model.ColorAdjustOps.mapStrokes(base, colorTargets(base, layerId), adj))
+    }
+
+    fun cancelColorAdjust() { if (colorBase != null) { store.endPreview(); colorBase = null } }
+
+    private val _colorApplying = MutableStateFlow(false)
+    val colorApplying: StateFlow<Boolean> = _colorApplying.asStateFlow()
+
+    /** Renk ayarını uygula: vektör renkleri değişir, resimler piksel olarak işlenir; tek geri alma adımı. */
+    fun applyColorAdjust(adj: com.karapp.drawguidance.data.model.ColorAdjust, layerId: String?) {
+        val base = colorBase ?: store.canvas.value?.strokes ?: return
+        store.endPreview(); colorBase = null
+        if (adj.isIdentity) return
+        val ids = colorTargets(base, layerId)
+        if (ids.isEmpty()) return
+        val mapped = com.karapp.drawguidance.data.model.ColorAdjustOps.mapStrokes(base, ids, adj)
+        val imageIds = base.filter { it.id in ids && it.brushType == BrushType.IMAGE && it.assetId != null }
+        if (imageIds.isEmpty()) { if (mapped != base) store.commit(mapped, useArea = false); return }
+        _colorApplying.value = true
+        viewModelScope.launch {
+            try {
+                val mapper = com.karapp.drawguidance.data.model.ColorAdjustOps.Mapper(adj)
+                val newAssets = HashMap<String, String>()
+                for (img in imageIds) {
+                    val old = img.assetId ?: continue
+                    if (old in newAssets) continue
+                    images.transformAsset(old) { px -> synchronized(mapper) { mapper.mapPixels(px) } }?.let { newAssets[old] = it }
+                }
+                val out = mapped.map { s -> if (s.id in ids && s.brushType == BrushType.IMAGE) s.assetId?.let { a -> newAssets[a] }?.let { s.copy(assetId = it) } ?: s else s }
+                if (out != base) store.commit(out, useArea = false)
+            } finally { _colorApplying.value = false }
+        }
+    }
+
+    /** Ekle › Işık katmanı / Gölge katmanı: yeni katman (mod, opaklık, ad) ve uygun yumuşak fırça. */
+    fun addPresetLayer(kind: com.karapp.drawguidance.data.model.V56Presets.Kind): String {
+        val p = com.karapp.drawguidance.data.model.V56Presets.layer(kind)
+        val id = java.util.UUID.randomUUID().toString()
+        val name = com.karapp.drawguidance.i18n.I18n.tr(if (kind == com.karapp.drawguidance.data.model.V56Presets.Kind.LIGHT) "Işık katmanı" else "Gölge katmanı")
+        store.commitLayers(layers.value + Layer(id, name, blend = p.blend, opacity = p.opacity))
+        store.activeLayer.value = id
+        usePresetBrush(p)
+        return id
+    }
+
+    /** Ekle › Parıltı fırçası. */
+    fun useGlitterBrush() = usePresetBrush(com.karapp.drawguidance.data.model.V56Presets.glitter)
+
+    private fun usePresetBrush(p: com.karapp.drawguidance.data.model.V56Presets.LayerPreset) {
+        brush.select(p.brush)
+        brush.updateColor(p.colorHex)
+        brush.updateSize(p.size)
+        brush.updateOpacity(p.brushOpacity)
+        setMode(EditMode.DRAW)
+    }
+
     // --- Resim düzenleme ---
 
     val selectedImage: StateFlow<Stroke?> get() = imageEdit.selected

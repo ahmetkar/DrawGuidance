@@ -24,6 +24,8 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.MergeType
+import androidx.compose.material.icons.filled.ContentCopy
 import androidx.compose.material.icons.filled.GridOn
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material.icons.filled.Cast
@@ -594,16 +596,32 @@ fun LayersPanelContent(
     look: LayerLookActions? = null,
     /** v56 katmanı dokuyla doldur (katman kimliği); null: menüde yok. */
     onTextureFill: ((String) -> Unit)? = null,
+    /** v56 aşama 7 katmanı çoğalt, aşağıyla birleştir, çoklu seçimle birleştir; null: yok (mod kuralı). */
+    merge: LayerMergeActions? = null,
 ) {
     val colors = NeuTheme.colors
     var renaming by remember { mutableStateOf<Layer?>(null) }
     var deleting by remember { mutableStateOf<Layer?>(null) }
+    var picking by remember { mutableStateOf(false) }
+    var picked by remember { mutableStateOf(emptySet<String>()) }
+    var confirmRaster by remember { mutableStateOf(false) }
     Column(
         Modifier.fillMaxWidth().verticalScroll(rememberScrollState()).padding(4.dp).testTag("layers_panel"),
         verticalArrangement = Arrangement.spacedBy(10.dp),
     ) {
         Text(stringResource(R.string.layers_hint), style = MaterialTheme.typography.bodySmall, color = colors.contentMuted)
         NeuButton(stringResource(R.string.layer_add), onAdd, Modifier.fillMaxWidth(), icon = Icons.Filled.Add)
+        if (merge != null && layers.size > 1) Row(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
+            com.karapp.drawguidance.ui.components.NeuChip(
+                stringResource(R.string.v56_layer_pick), picking, { picking = !picking; picked = emptySet() }, Modifier.testTag("v56_layer_pick"),
+            )
+            if (picking) NeuButton(
+                stringResource(R.string.v56_layer_merge, picked.size), {
+                    if (merge.needsRaster(picked)) confirmRaster = true else { merge.onMerge(picked); picking = false; picked = emptySet() }
+                },
+                Modifier.weight(1f).testTag("v56_layer_merge"), primary = true, enabled = picked.size >= 2,
+            )
+        }
         layers.asReversed().forEachIndexed { reversedIndex, layer ->
             val index = layers.size - 1 - reversedIndex
             val isActive = layer.id == active
@@ -616,6 +634,11 @@ fun LayersPanelContent(
             ) {
                 Column {
                 Row(Modifier.padding(horizontal = 10.dp, vertical = 8.dp), verticalAlignment = Alignment.CenterVertically) {
+                    if (picking) androidx.compose.material3.Checkbox(
+                        checked = layer.id in picked,
+                        onCheckedChange = { on -> picked = if (on) picked + layer.id else picked - layer.id },
+                        modifier = Modifier.testTag("v56_layer_check_$index"),
+                    )
                     Column(Modifier.weight(1f)) {
                         Text(
                             layer.name, style = MaterialTheme.typography.titleSmall, color = if (isActive) colors.accent else colors.content,
@@ -670,6 +693,21 @@ fun LayersPanelContent(
                                 enabled = selectionCount > 0 && !layer.locked && layer.visible,
                                 onClick = { menu = false; onMoveSelection(layer.id) },
                             )
+                            if (merge != null) {
+                                DropdownMenuItem(
+                                    text = { Text(stringResource(R.string.v56_layer_duplicate)) }, leadingIcon = { Icon(Icons.Filled.ContentCopy, null) },
+                                    onClick = { menu = false; merge.onDuplicate(layer.id) }, modifier = Modifier.testTag("v56_layer_duplicate"),
+                                )
+                                DropdownMenuItem(
+                                    text = { Text(stringResource(R.string.v56_layer_merge_down)) }, leadingIcon = { Icon(Icons.Filled.MergeType, null) },
+                                    enabled = index > 0, modifier = Modifier.testTag("v56_layer_merge_down"),
+                                    onClick = {
+                                        menu = false
+                                        val pair = setOf(layer.id, layers[index - 1].id)
+                                        if (merge.needsRaster(pair)) { picked = pair; confirmRaster = true } else merge.onMerge(pair)
+                                    },
+                                )
+                            }
                             if (onTextureFill != null) DropdownMenuItem(
                                 text = { Text(stringResource(R.string.v56_texture_fill_layer)) }, leadingIcon = { Icon(Icons.Filled.Texture, null) },
                                 enabled = !layer.locked && layer.visible, onClick = { menu = false; onTextureFill(layer.id) },
@@ -687,6 +725,20 @@ fun LayersPanelContent(
                 }
             }
         }
+    }
+    if (confirmRaster && merge != null) {
+        AlertDialog(
+            onDismissRequest = { confirmRaster = false },
+            containerColor = colors.background,
+            title = { Text(stringResource(R.string.v56_layer_merge_raster_title)) },
+            text = { Text(stringResource(R.string.v56_layer_merge_raster_text)) },
+            confirmButton = {
+                TextButton(onClick = { merge.onMerge(picked); confirmRaster = false; picking = false; picked = emptySet() }, modifier = Modifier.testTag("v56_layer_merge_confirm")) {
+                    Text(stringResource(R.string.v56_layer_merge_confirm))
+                }
+            },
+            dismissButton = { TextButton(onClick = { confirmRaster = false }) { Text(stringResource(R.string.cancel_button)) } },
+        )
     }
     renaming?.let { layer ->
         com.karapp.drawguidance.ui.components.TextInputSheet(
@@ -709,6 +761,13 @@ fun LayersPanelContent(
 // ---------------------------------------------------------------------------------------------------------------
 // El yazısı önerisi, stil satırı, kaydetme
 // ---------------------------------------------------------------------------------------------------------------
+
+/** v56 aşama 7 katman çoğalt ve birleştir işlemleri. */
+class LayerMergeActions(
+    val onDuplicate: (String) -> Unit,
+    val onMerge: (Set<String>) -> Unit,
+    val needsRaster: (Set<String>) -> Boolean,
+)
 
 /** v23 öneri balonundaki seçenek. */
 internal class SuggestOption(
